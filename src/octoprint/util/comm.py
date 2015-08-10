@@ -225,10 +225,10 @@ class MachineCom(object):
 		self._sendingLock = threading.RLock()
 
 		# monitoring thread
-		self._monitoring_active = True
-		self.monitoring_thread = threading.Thread(target=self._monitor, name="comm._monitor")
-		self.monitoring_thread.daemon = True
-		self.monitoring_thread.start()
+		# self._monitoring_active = True
+		# self.monitoring_thread = threading.Thread(target=self._monitor, name="comm._monitor")
+		# self.monitoring_thread.daemon = True
+		# self.monitoring_thread.start()
 
 		# sending thread
 		self._send_queue_active = True
