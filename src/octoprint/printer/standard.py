@@ -191,6 +191,8 @@ class Printer(PrinterInterface, comm.MachineComPrintCallback):
 		 Connects to the printer. If port and/or baudrate is provided, uses these settings, otherwise autodetection
 		 will be attempted.
 		"""
+		self._connecting = True
+
 		if self._comm is not None:
 			self._comm.close()
 		self._printerProfileManager.select(profile)
