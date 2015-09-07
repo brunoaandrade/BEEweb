@@ -4,11 +4,10 @@ import os
 import threading
 import time
 from octoprint.settings import settings
-from octoprint.server import eventManager
-from octoprint.events import Events
-from octoprint.util.comm import MachineCom
+from octoprint.events import eventManager, Events
+from octoprint.util.comm import MachineCom, get_interval
 from beedriver.connection import Conn as BeeConn
-from octoprint.util import comm, get_exception_string, sanitize_ascii
+from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer
 import Queue as queue
 
 __author__ = "BEEVC - Electronic Systems "
@@ -17,6 +16,7 @@ __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agp
 class BeeCom(MachineCom):
     STATE_CONNECTED_BTF = 12
     STATE_WAITING_FOR_BTF = 13
+    STATE_PREPARING_PRINT =14
 
     _beeConn = None
     _beeCommands = None
@@ -43,12 +43,14 @@ class BeeCom(MachineCom):
         """
         if self._beeConn is None:
             self._beeConn = BeeConn()
+            self._beeConn.connectToFirstPrinter()
 
         if self._beeConn.isConnected():
             self._beeComands = self._beeConn.getCommandIntf()
 
             # change to firmware
-            self._beeComands.startPrinter()
+            if self._beeComands.getPrinterMode() == 'Bootloader':
+                self._beeComands.goToFirmware()
 
             # restart connection
             self._beeConn.reconnect()
@@ -73,8 +75,8 @@ class BeeCom(MachineCom):
                 return
 
         if self.isPrinting() and not self.isSdFileSelected():
-        # self._commandQueue.put((cmd, cmd_type))
-            pass
+            self._commandQueue.put((cmd, cmd_type))
+
         elif self.isOperational():
 
             wait = None
@@ -119,11 +121,13 @@ class BeeCom(MachineCom):
         :return:
         """
         if self._state == self.STATE_CONNECTED_BTF:
-            return "Connected to BEETHEFIRST"
+            return "Connected to " + self._beeConn.getConnectedPrinterName()
         elif self._state == self.STATE_WAITING_FOR_BTF:
-            return "Waiting for connection. Please turn on your printer..."
+            return "No printer detected. Please connect your printer and press connect."
+        elif self._state == self.STATE_PREPARING_PRINT:
+            return "Preparing to print, please wait..."
         else:
-            super(BeeCom, self).getStateString()
+            return super(BeeCom, self).getStateString()
 
     def isOperational(self):
         """
@@ -133,6 +137,84 @@ class BeeCom(MachineCom):
         return self._state == self.STATE_CONNECTED_BTF or\
             self._state == self.STATE_OPERATIONAL or self._state == self.STATE_PRINTING or\
             self._state == self.STATE_PAUSED or self._state == self.STATE_TRANSFERING_FILE
+
+
+    def startPrint(self):
+        """
+        Starts the printing operation
+        """
+        if not self.isOperational() or self.isPrinting():
+            return
+
+        if self._currentFile is None:
+            raise ValueError("No file selected for printing")
+
+        self._heatupWaitStartTime = None
+        self._heatupWaitTimeLost = 0.0
+        self._pauseWaitStartTime = 0
+        self._pauseWaitTimeLost = 0.0
+
+        try:
+            self._currentFile.start()
+
+            payload = {
+                "file": self._currentFile.getFilename(),
+                "filename": os.path.basename(self._currentFile.getFilename()),
+                "origin": self._currentFile.getFileLocation()
+            }
+
+            eventManager().fire(Events.PRINT_STARTED, payload)
+
+            self._changeState(self.STATE_PREPARING_PRINT)
+
+            if self.isSdFileSelected():
+                print_resp = self._beeComands.startSDPrint(self._currentFile.getFilename())
+
+                if print_resp:
+                    self._sd_status_timer = RepeatedTimer(lambda: get_interval("sdStatus", default_value=1.0),
+                                                          self._poll_sd_status, run_first=True)
+                    self._sd_status_timer.start()
+            else:
+                print_resp = self._beeComands.printFile(payload['file'])
+
+            if print_resp is True:
+                self._changeState(self.STATE_PRINTING)
+
+            # now make sure we actually do something, up until now we only filled up the queue
+            #self._sendFromQueue()
+        except:
+            self._logger.exception("Error while trying to start printing")
+            self._errorValue = get_exception_string()
+            self._changeState(self.STATE_ERROR)
+            eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
+
+
+    def cancelPrint(self):
+        """
+        Cancels the print operation
+        """
+        if not self.isOperational() or self.isStreaming():
+            return
+
+        if self._beeComands.cancelPrint():
+
+            self._changeState(self.STATE_OPERATIONAL)
+
+            if self.isSdFileSelected():
+                if self._sd_status_timer is not None:
+                    try:
+                        self._sd_status_timer.cancel()
+                    except:
+                        pass
+
+        payload = {
+            "file": self._currentFile.getFilename(),
+            "filename": os.path.basename(self._currentFile.getFilename()),
+            "origin": self._currentFile.getFileLocation()
+        }
+
+        self.sendGcodeScript("afterPrintCancelled", replacements=dict(event=payload))
+        eventManager().fire(Events.PRINT_CANCELLED, payload)
 
     def _getResponse(self):
         """
@@ -195,6 +277,7 @@ class BeeCom(MachineCom):
                 line = self._getResponse()
                 if line is None:
                     continue
+
                 if line.strip() is not "":
                     self._timeout = comm.get_new_timeout("communication")
 

@@ -36,8 +36,12 @@ $(function() {
         self.isError = ko.observable(undefined);
         self.isReady = ko.observable(undefined);
         self.isLoading = ko.observable(undefined);
+        self.isConnecting = ko.observable(undefined);
 
         self.buttonText = ko.computed(function() {
+            if (self.isConnecting())
+                return gettext("Connecting...");
+
             if (self.isErrorOrClosed())
                 return gettext("Connect");
             else
@@ -110,7 +114,10 @@ $(function() {
         };
 
         self.connect = function() {
+
             if (self.isErrorOrClosed()) {
+                self.isConnecting(true);
+
                 var data = {
                     "command": "connect",
                     "port": self.selectedPort() || "AUTO",
@@ -131,6 +138,8 @@ $(function() {
                     success: function(response) {
                         self.settings.requestData();
                         self.settings.printerProfiles.requestData();
+
+                        self.isConnecting(false);
                     }
                 });
             } else {
@@ -140,9 +149,10 @@ $(function() {
                     type: "POST",
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",
-                    data: JSON.stringify({"command": "disconnect"})
+                    data: JSON.stringify({"command": "disconnect"}),
                 })
             }
+
         };
 
         self.onStartup = function() {

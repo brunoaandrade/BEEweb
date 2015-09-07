@@ -177,14 +177,14 @@ default_settings = {
 	},
 	"appearance": {
 		"name": "",
-		"color": "default",
+		"color": "black",
 		"colorTransparent": False,
 		"defaultLanguage": "_default",
 		"components": {
 			"order": {
 				"navbar": ["settings", "systemmenu", "login"],
 				"sidebar": ["connection", "state", "files"],
-				"tab": ["temperature", "control", "gcodeviewer", "terminal", "timelapse"],
+				"tab": ["gcodeviewer", "control", "temperature", "terminal", "timelapse"],
 				"settings": [
 					"section_printer", "serial", "printerprofiles", "temperatures", "terminalfilters", "gcodescripts",
 					"section_features", "features", "webcam", "accesscontrol", "api",
