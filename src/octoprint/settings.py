@@ -104,6 +104,15 @@ default_settings = {
 			"pathSuffix": "path"
 		},
 		"maxSize": 100 * 1024, # 100 KB
+		"commands": {
+			"systemShutdownCommand": None,
+			"systemRestartCommand": None,
+			"serverRestartCommand": None
+		},
+		"diskspace": {
+			"warning": 500 * 1024 * 1024, # 500 MB
+			"critical": 200 * 1024 * 1024, # 200 MB
+		}
 	},
 	"webcam": {
 		"stream": None,
@@ -143,7 +152,9 @@ default_settings = {
 		"externalHeatupDetection": True,
 		"supportWait": True,
 		"keyboardControl": True,
-		"pollWatched": False
+		"pollWatched": False,
+		"ignoreIdenticalResends": False,
+		"identicalResendsCountdown": 7
 	},
 	"folder": {
 		"uploads": None,
@@ -188,7 +199,7 @@ default_settings = {
 				"settings": [
 					"section_printer", "serial", "printerprofiles", "temperatures", "terminalfilters", "gcodescripts",
 					"section_features", "features", "webcam", "accesscontrol", "api",
-					"section_octoprint", "folders", "appearance", "logs", "plugin_pluginmanager", "plugin_softwareupdate"
+					"section_octoprint", "server", "folders", "appearance", "logs", "plugin_pluginmanager", "plugin_softwareupdate"
 				],
 				"usersettings": ["access", "interface"],
 				"generic": []
@@ -271,6 +282,7 @@ default_settings = {
 			},
 			"hasBed": True,
 			"repetierStyleTargetTemperature": False,
+			"repetierStyleResends": False,
 			"okBeforeCommandOutput": False,
 			"smoothieTemperatureReporting": False,
 			"extendedSdFileList": False,
@@ -280,7 +292,8 @@ default_settings = {
 			"txBuffer": 40,
 			"commandBuffer": 4,
 			"sendWait": True,
-			"waitInterval": 1.0
+			"waitInterval": 1.0,
+			"supportM112": True
 		}
 	}
 }
@@ -321,14 +334,14 @@ class Settings(object):
 
 	                                               "/dev/ttyACM0"
 
-	``["serial", "timeouts"]``                 ::
+	``["serial", "timeout"]``                  ::
 
 	                                               communication: 20.0
 	                                               temperature: 5.0
 	                                               sdStatus: 1.0
 	                                               connection: 10.0
 
-	``["serial", "timeouts", "temperature"]``  ::
+	``["serial", "timeout", "temperature"]``   ::
 
 	                                               5.0
 
@@ -774,11 +787,17 @@ class Settings(object):
 		if not self._dirty and not force:
 			return False
 
-		with open(self._configfile, "wb") as configFile:
-			yaml.safe_dump(self._config, configFile, default_flow_style=False, indent="    ", allow_unicode=True)
-			self._dirty = False
-		self.load()
-		return True
+		from octoprint.util import atomic_write
+		try:
+			with atomic_write(self._configfile, "wb", prefix="octoprint-config-", suffix=".yaml") as configFile:
+				yaml.safe_dump(self._config, configFile, default_flow_style=False, indent="    ", allow_unicode=True)
+				self._dirty = False
+		except:
+			self._logger.exception("Error while saving config.yaml!")
+			raise
+		else:
+			self.load()
+			return True
 
 	@property
 	def last_modified(self):
@@ -970,7 +989,7 @@ class Settings(object):
 		if not force and key in defaults and key in config and defaults[key] == value:
 			del config[key]
 			self._dirty = True
-		elif force or (not key in config and defaults[key] != value) or (key in config and config[key] != value):
+		elif force or (not key in config and key in defaults and defaults[key] != value) or (key in config and config[key] != value):
 			if value is None and key in config:
 				del config[key]
 			else:
