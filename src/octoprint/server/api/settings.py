@@ -69,7 +69,8 @@ def getSettings():
 			"repetierTargetTemp": s.getBoolean(["feature", "repetierTargetTemp"]),
 			"externalHeatupDetection": s.getBoolean(["feature", "externalHeatupDetection"]),
 			"keyboardControl": s.getBoolean(["feature", "keyboardControl"]),
-			"pollWatched": s.getBoolean(["feature", "pollWatched"])
+			"pollWatched": s.getBoolean(["feature", "pollWatched"]),
+			"ignoreIdenticalResends": s.getBoolean(["feature", "ignoreIdenticalResends"])
 		},
 		"serial": {
 			"port": connectionOptions["portPreference"],
@@ -111,6 +112,17 @@ def getSettings():
 				"beforePrintPaused": None,
 				"afterPrintResumed": None,
 				"snippets": dict()
+			}
+		},
+		"server": {
+			"commands": {
+				"systemShutdownCommand": s.get(["server", "commands", "systemShutdownCommand"]),
+				"systemRestartCommand": s.get(["server", "commands", "systemRestartCommand"]),
+				"serverRestartCommand": s.get(["server", "commands", "serverRestartCommand"])
+			},
+			"diskspace": {
+				"warning": s.getInt(["server", "diskspace", "warning"]),
+				"critical": s.getInt(["server", "diskspace", "critical"])
 			}
 		}
 	}
@@ -201,6 +213,7 @@ def setSettings():
 		if "externalHeatupDetection" in data["feature"].keys(): s.setBoolean(["feature", "externalHeatupDetection"], data["feature"]["externalHeatupDetection"])
 		if "keyboardControl" in data["feature"].keys(): s.setBoolean(["feature", "keyboardControl"], data["feature"]["keyboardControl"])
 		if "pollWatched" in data["feature"]: s.setBoolean(["feature", "pollWatched"], data["feature"]["pollWatched"])
+		if "ignoreIdenticalResends" in data["feature"]: s.setBoolean(["feature", "ignoreIdenticalResends"], data["feature"]["ignoreIdenticalResends"])
 
 	if "serial" in data.keys():
 		if "autoconnect" in data["serial"].keys(): s.setBoolean(["serial", "autoconnect"], data["serial"]["autoconnect"])
@@ -249,6 +262,15 @@ def setSettings():
 				if name == "snippets":
 					continue
 				s.saveScript("gcode", name, script.replace("\r\n", "\n").replace("\r", "\n"))
+
+	if "server" in data:
+		if "commands" in data["server"]:
+			if "systemShutdownCommand" in data["server"]["commands"].keys(): s.set(["server", "commands", "systemShutdownCommand"], data["server"]["commands"]["systemShutdownCommand"])
+			if "systemRestartCommand" in data["server"]["commands"].keys(): s.set(["server", "commands", "systemRestartCommand"], data["server"]["commands"]["systemRestartCommand"])
+			if "serverRestartCommand" in data["server"]["commands"].keys(): s.set(["server", "commands", "serverRestartCommand"], data["server"]["commands"]["serverRestartCommand"])
+		if "diskspace" in data["server"]:
+			if "warning" in data["server"]["diskspace"]: s.setInt(["server", "diskspace", "warning"], data["server"]["diskspace"]["warning"])
+			if "critical" in data["server"]["diskspace"]: s.setInt(["server", "diskspace", "critical"], data["server"]["diskspace"]["critical"])
 
 	if "plugins" in data:
 		for plugin in octoprint.plugin.plugin_manager().get_implementations(octoprint.plugin.SettingsPlugin):

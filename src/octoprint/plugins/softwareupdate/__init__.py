@@ -12,6 +12,7 @@ import flask
 import os
 import threading
 import time
+import hashlib
 
 from . import version_checks, updaters, exceptions, util
 
@@ -83,8 +84,12 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 			self._logger.exception("Error while loading version cache from disk")
 		else:
 			try:
-				if "octoprint" in data and len(data["octoprint"]) == 4 and "local" in data["octoprint"][1] and "value" in data["octoprint"][1]["local"]:
-					data_version = data["octoprint"][1]["local"]["value"]
+				if not isinstance(data, dict):
+					self._logger.info("Version cache was created in a different format, not using it")
+					return
+
+				if "__version" in data:
+					data_version = data["__version"]
 				else:
 					self._logger.info("Can't determine version of OctoPrint version cache was created for, not using it")
 					return
@@ -102,24 +107,18 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				self._logger.exception("Error parsing in version cache data")
 
 	def _save_version_cache(self):
-		import tempfile
 		import yaml
-		import shutil
+		from octoprint.util import atomic_write
+		from octoprint._version import get_versions
 
-		file_obj = tempfile.NamedTemporaryFile(delete=False)
-		try:
+		octoprint_version = get_versions()["version"]
+		self._version_cache["__version"] = octoprint_version
+
+		with atomic_write(self._version_cache_path) as file_obj:
 			yaml.safe_dump(self._version_cache, stream=file_obj, default_flow_style=False, indent="  ", allow_unicode=True)
-			file_obj.close()
-			shutil.move(file_obj.name, self._version_cache_path)
 
-			self._version_cache_dirty = False
-			self._logger.info("Saved version cache to disk")
-		finally:
-			try:
-				if os.path.exists(file_obj.name):
-					os.remove(file_obj.name)
-			except Exception as e:
-				self._logger.warn("Could not delete file {}: {}".format(file_obj.name, str(e)))
+		self._version_cache_dirty = False
+		self._logger.info("Saved version cache to disk")
 
 	#~~ SettingsPlugin API
 
@@ -134,9 +133,6 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 					"restart": "octoprint"
 				},
 			},
-
-			"octoprint_restart_command": None,
-			"environment_restart_command": None,
 			"pip_command": None,
 
 			"cache_ttl": 24 * 60,
@@ -146,28 +142,92 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 		data = dict(octoprint.plugin.SettingsPlugin.on_settings_load(self))
 		if "checks" in data:
 			del data["checks"]
+
+		checks = self._get_configured_checks()
+		if "octoprint" in checks:
+			if "checkout_folder" in checks["octoprint"]:
+				data["octoprint_checkout_folder"] = checks["octoprint"]["checkout_folder"]
+			elif "update_folder" in checks["octoprint"]:
+				data["octoprint_checkout_folder"] = checks["octoprint"]["update_folder"]
+			else:
+				data["octoprint_checkout_folder"] = None
+			data["octoprint_type"] = checks["octoprint"].get("type", None)
+		else:
+			data["octoprint_checkout_folder"] = None
+			data["octoprint_type"] = None
+
 		return data
 
 	def on_settings_save(self, data):
 		for key in self.get_settings_defaults():
-			if key == "checks" or key == "cache_ttl":
+			if key == "checks" or key == "cache_ttl" or key == "octoprint_checkout_folder" or key == "octoprint_type":
 				continue
 			if key in data:
 				self._settings.set([key], data[key])
 
 		if "cache_ttl" in data:
 			self._settings.set_int(["cache_ttl"], data["cache_ttl"])
-
 		self._version_cache_ttl = self._settings.get_int(["cache_ttl"]) * 60
 
+		checks = self._get_configured_checks()
+		if "octoprint" in checks:
+			check = checks["octoprint"]
+			update_type = check.get("type", None)
+			checkout_folder = check.get("checkout_folder", None)
+			update_folder = check.get("update_folder", None)
+
+		defaults = dict(
+			plugins=dict(softwareupdate=dict(
+				checks=dict(
+					octoprint=dict(
+						type=update_type,
+						checkout_folder=checkout_folder,
+						update_folder=update_folder
+					)
+				)
+			))
+		)
+
+		if "octoprint_checkout_folder" in data:
+			self._settings.set(["checks", "octoprint", "checkout_folder"], data["octoprint_checkout_folder"], defaults=defaults, force=True)
+			if update_folder and data["octoprint_checkout_folder"]:
+				self._settings.set(["checks", "octoprint", "update_folder"], None, defaults=defaults, force=True)
+			self._refresh_configured_checks = True
+
+		if "octoprint_type" in data and data["octoprint_type"] in ("github_release", "git_commit"):
+			self._settings.set(["checks", "octoprint", "type"], data["octoprint_type"], defaults=defaults, force=True)
+			self._refresh_configured_checks = True
+
 	def get_settings_version(self):
-		return 3
+		return 4
 
 	def on_settings_migrate(self, target, current=None):
+
+		if current is None or current < 4:
+			# config version 4 and higher moves octoprint_restart_command and
+			# environment_restart_command to the core configuration
+
+			# current plugin commands
+			configured_octoprint_restart_command = self._settings.get(["octoprint_restart_command"])
+			configured_environment_restart_command = self._settings.get(["environment_restart_command"])
+
+			# current global commands
+			configured_system_restart_command = self._settings.global_get(["server", "commands", "systemRestartCommand"])
+			configured_server_restart_command = self._settings.global_get(["server", "commands", "serverRestartCommand"])
+
+			# only set global commands if they are not yet set
+			if configured_system_restart_command is None and configured_environment_restart_command is not None:
+				self._settings.global_set(["server", "commands", "systemRestartCommand"], configured_environment_restart_command)
+			if configured_server_restart_command is None and configured_octoprint_restart_command is not None:
+				self._settings.global_set(["server", "commands", "serverRestartCommand"], configured_octoprint_restart_command)
+
+			# delete current plugin commands from config
+			self._settings.set(["environment_restart_command"], None)
+			self._settings.set(["octoprint_restart_command"], None)
+
 		if current is None or current == 2:
-			# there might be some left over data from the time we still persisted everything to settings,
-			# even the stuff that shouldn't be persisted but always provided by the hook - let's
-			# clean up
+			# No config version and config version 2 need the same fix, stripping
+			# accidentally persisted data off the checks
 
 			configured_checks = self._settings.get(["checks"], incl_defaults=False)
 			if configured_checks is None:
@@ -213,6 +273,10 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				self._settings.set(["checks", key], None, defaults=dummy_defaults)
 
 		elif current == 1:
+			# config version 1 had the error that the octoprint check got accidentally
+			# included in checks["octoprint"], leading to recursion and hence to
+			# yaml parser errors
+
 			configured_checks = self._settings.get(["checks"], incl_defaults=False)
 			if configured_checks is None:
 				return
@@ -223,7 +287,6 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				dummy_defaults["plugins"][self._identifier] = dict(checks=dict())
 				dummy_defaults["plugins"][self._identifier]["checks"]["octoprint"] = None
 				self._settings.set(["checks", "octoprint"], None, defaults=dummy_defaults)
-				self._settings.save()
 
 	def _clean_settings_check(self, key, data, defaults, delete=None, save=True):
 		if delete is None:
@@ -337,10 +400,12 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 			if not target in check_targets:
 				continue
 
+			populated_check = self._populated_check(target, check)
+
 			try:
-				target_information, target_update_available, target_update_possible = self._get_current_version(target, check, force=force)
+				target_information, target_update_available, target_update_possible = self._get_current_version(target, populated_check, force=force)
 				if target_information is None:
-					continue
+					target_information = dict()
 			except exceptions.UnknownCheckType:
 				self._logger.warn("Unknown update check type for %s" % target)
 				continue
@@ -349,32 +414,39 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 
 			update_available = update_available or target_update_available
 			update_possible = update_possible or (target_update_possible and target_update_available)
-			information[target] = dict(updateAvailable=target_update_available, updatePossible=target_update_possible, information=target_information)
 
-			if "displayName" in check:
-				information[target]["displayName"] = check["displayName"]
+			from octoprint._version import get_versions
+			octoprint_version = get_versions()["version"]
+			local_name = target_information["local"]["name"]
+			local_value = target_information["local"]["value"]
 
-			if "displayVersion" in check:
-				from octoprint._version import get_versions
-				octoprint_version = get_versions()["version"]
-				local_name = target_information["local"]["name"]
-				local_value = target_information["local"]["value"]
-				information[target]["displayVersion"] = check["displayVersion"].format(octoprint_version=octoprint_version, local_name=local_name, local_value=local_value)
+			information[target] = dict(updateAvailable=target_update_available,
+			                           updatePossible=target_update_possible,
+			                           information=target_information,
+			                           displayName=populated_check["displayName"],
+			                           displayVersion=populated_check["displayVersion"].format(octoprint_version=octoprint_version, local_name=local_name, local_value=local_value),
+			                           check=populated_check)
 
 		if self._version_cache_dirty:
 			self._save_version_cache()
 		return information, update_available, update_possible
+
+	def _get_check_hash(self, check):
+		hash = hashlib.md5()
+		hash.update(repr(check))
+		return hash.hexdigest()
 
 	def _get_current_version(self, target, check, force=False):
 		"""
 		Determines the current version information for one target based on its check configuration.
 		"""
 
+		current_hash = self._get_check_hash(check)
 		if target in self._version_cache and not force:
-			timestamp, information, update_available, update_possible = self._version_cache[target]
-			if timestamp + self._version_cache_ttl >= time.time() > timestamp:
+			data = self._version_cache[target]
+			if data["hash"] == current_hash and data["timestamp"] + self._version_cache_ttl >= time.time() > data["timestamp"]:
 				# we also check that timestamp < now to not get confused too much by clock changes
-				return information, update_available, update_possible
+				return data["information"], data["available"], data["possible"]
 
 		information = dict()
 		update_available = False
@@ -397,7 +469,11 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 			except:
 				update_possible = False
 
-		self._version_cache[target] = (time.time(), information, update_available, update_possible)
+		self._version_cache[target] = dict(timestamp=time.time(),
+		                                   hash=current_hash,
+		                                   information=information,
+		                                   available=update_available,
+		                                   possible=update_possible)
 		self._version_cache_dirty = True
 		return information, update_available, update_possible
 
@@ -481,7 +557,11 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 			if restart_type is not None and restart_type in ("octoprint", "environment"):
 				# one of our updates requires a restart of either type "octoprint" or "environment". Let's see if
 				# we can actually perform that
-				restart_command = self._settings.get(["%s_restart_command" % restart_type])
+
+				if restart_type == "octoprint":
+					restart_command = self._settings.global_get(["server", "commands", "serverRestartCommand"])
+				elif restart_type == "environment":
+					restart_command = self._settings.global_get(["server", "commands", "systemRestartCommand"])
 
 				if restart_command is not None:
 					self._send_client_message("restarting", dict(restart_type=restart_type, results=target_results))
@@ -573,6 +653,30 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 			self._logger.warn("Restart stdout:\n%s" % e.stdout)
 			self._logger.warn("Restart stderr:\n%s" % e.stderr)
 			raise exceptions.RestartFailed()
+
+	def _populated_check(self, target, check):
+		result = dict(check)
+
+		if target == "octoprint":
+			from flask.ext.babel import gettext
+			result["displayName"] = check.get("displayName", gettext("OctoPrint"))
+			result["displayVersion"] = check.get("displayVersion", "{octoprint_version}")
+
+			from octoprint._version import get_versions
+			versions = get_versions()
+			if check["type"] == "github_commit":
+				result["current"] = versions.get("full-revisionid", versions.get("full", "unknown"))
+			else:
+				result["current"] = versions["version"]
+		else:
+			result["displayName"] = check.get("displayName", target)
+			result["displayVersion"] = check.get("displayVersion", check.get("current", "unknown"))
+			if check["type"] in ("github_commit"):
+				result["current"] = check.get("current", None)
+			else:
+				result["current"] = check.get("current", check.get("displayVersion", None))
+
+		return result
 
 	def _get_version_checker(self, target, check):
 		"""
