@@ -3,20 +3,20 @@ from __future__ import absolute_import
 import os
 import threading
 import time
+import Queue as queue
+
 from octoprint.settings import settings
 from octoprint.events import eventManager, Events
 from octoprint.util.comm import MachineCom, get_interval
 from beedriver.connection import Conn as BeeConn
 from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer
-import Queue as queue
 
 __author__ = "BEEVC - Electronic Systems "
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
 
 class BeeCom(MachineCom):
-    STATE_CONNECTED_BTF = 12
-    STATE_WAITING_FOR_BTF = 13
-    STATE_PREPARING_PRINT =14
+    STATE_WAITING_FOR_BTF = 21
+    STATE_PREPARING_PRINT = 22
 
     _beeConn = None
     _beeCommands = None
@@ -46,11 +46,11 @@ class BeeCom(MachineCom):
             self._beeConn.connectToFirstPrinter()
 
         if self._beeConn.isConnected():
-            self._beeComands = self._beeConn.getCommandIntf()
+            self._beeCommands = self._beeConn.getCommandIntf()
 
             # change to firmware
-            if self._beeComands.getPrinterMode() == 'Bootloader':
-                self._beeComands.goToFirmware()
+            if self._beeCommands.getPrinterMode() == 'Bootloader':
+                self._beeCommands.goToFirmware()
 
             # restart connection
             self._beeConn.reconnect()
@@ -111,33 +111,31 @@ class BeeCom(MachineCom):
         :return:
         """
         if self._beeConn.isConnected():
-            self._changeState(self.STATE_CONNECTED_BTF)
+            self._changeState(self.STATE_OPERATIONAL)
         else:
             self._changeState(self.STATE_WAITING_FOR_BTF)
+
+    def getConnectedPrinterName(self):
+        """
+        Returns the current connected printer name
+        :return:
+        """
+        if self._beeConn is not None:
+            return self._beeConn.getConnectedPrinterName()
+        else:
+            return ""
 
     def getStateString(self):
         """
         Returns the current printer state
         :return:
         """
-        if self._state == self.STATE_CONNECTED_BTF:
-            return "Connected to " + self._beeConn.getConnectedPrinterName()
-        elif self._state == self.STATE_WAITING_FOR_BTF:
+        if self._state == self.STATE_WAITING_FOR_BTF:
             return "No printer detected. Please connect your printer and press connect."
         elif self._state == self.STATE_PREPARING_PRINT:
             return "Preparing to print, please wait..."
         else:
             return super(BeeCom, self).getStateString()
-
-    def isOperational(self):
-        """
-        Checks it the printer is ready
-        :return:
-        """
-        return self._state == self.STATE_CONNECTED_BTF or\
-            self._state == self.STATE_OPERATIONAL or self._state == self.STATE_PRINTING or\
-            self._state == self.STATE_PAUSED or self._state == self.STATE_TRANSFERING_FILE
-
 
     def startPrint(self):
         """
@@ -168,14 +166,14 @@ class BeeCom(MachineCom):
             self._changeState(self.STATE_PREPARING_PRINT)
 
             if self.isSdFileSelected():
-                print_resp = self._beeComands.startSDPrint(self._currentFile.getFilename())
+                print_resp = self._beeCommands.startSDPrint(self._currentFile.getFilename())
 
                 if print_resp:
                     self._sd_status_timer = RepeatedTimer(lambda: get_interval("sdStatus", default_value=1.0),
                                                           self._poll_sd_status, run_first=True)
                     self._sd_status_timer.start()
             else:
-                print_resp = self._beeComands.printFile(payload['file'])
+                print_resp = self._beeCommands.printFile(payload['file'])
 
             if print_resp is True:
                 self._changeState(self.STATE_PRINTING)
@@ -196,7 +194,7 @@ class BeeCom(MachineCom):
         if not self.isOperational() or self.isStreaming():
             return
 
-        if self._beeComands.cancelPrint():
+        if self._beeCommands.cancelPrint():
 
             self._changeState(self.STATE_OPERATIONAL)
 
@@ -215,6 +213,47 @@ class BeeCom(MachineCom):
 
         self.sendGcodeScript("afterPrintCancelled", replacements=dict(event=payload))
         eventManager().fire(Events.PRINT_CANCELLED, payload)
+
+
+    def setPause(self, pause):
+        """
+        Toggle Pause method
+        :param pause: True to pause or False to unpause
+        :return:
+        """
+        if self.isStreaming():
+            return
+
+        if not self._currentFile:
+            return
+
+        payload = {
+            "file": self._currentFile.getFilename(),
+            "filename": os.path.basename(self._currentFile.getFilename()),
+            "origin": self._currentFile.getFileLocation()
+        }
+
+        if not pause and self.isPaused():
+            if self._pauseWaitStartTime:
+                self._pauseWaitTimeLost = self._pauseWaitTimeLost + (time.time() - self._pauseWaitStartTime)
+                self._pauseWaitStartTime = None
+
+            self._changeState(self.STATE_PRINTING)
+
+            # resumes printing
+            self._beeCommands.resumePrint()
+
+            eventManager().fire(Events.PRINT_RESUMED, payload)
+        elif pause and self.isPrinting():
+            if not self._pauseWaitStartTime:
+                self._pauseWaitStartTime = time.time()
+
+            self._changeState(self.STATE_PAUSED)
+
+            # pause print
+            self._beeCommands.pausePrint()
+
+            eventManager().fire(Events.PRINT_PAUSED, payload)
 
     def _getResponse(self):
         """
@@ -241,6 +280,55 @@ class BeeCom(MachineCom):
             self._log("Recv: %r" % ret)
 
         return ret
+
+    def initSdCard(self):
+        """
+        Initializes the SD Card in the printer
+        :return:
+        """
+        if not self.isOperational():
+            return
+
+        self._beeCommands.initSD()
+
+        if settings().getBoolean(["feature", "sdAlwaysAvailable"]):
+            self._sdAvailable = True
+            self.refreshSdFiles()
+            self._callback.on_comm_sd_state_change(self._sdAvailable)
+
+    def refreshSdFiles(self):
+        """
+        Refreshes the list of available SD card files
+        :return:
+        """
+        if not self.isOperational() or self.isBusy():
+            return
+        self.sendCommand("M20")
+
+    def startSdFileTransfer(self, filename):
+        """
+        Transfers a file to the SD card
+        :param filename:
+        :return:
+        """
+        if not self.isOperational() or self.isBusy():
+            return
+
+        self._changeState(self.STATE_TRANSFERING_FILE)
+        self.sendCommand("M28 %s" % filename.lower())
+
+    def endSdFileTransfer(self, filename):
+        """
+        Finishes the file transfer to the SD file
+        :param filename:
+        :return:
+        """
+        if not self.isOperational() or self.isBusy():
+            return
+
+        self.sendCommand("M29 %s" % filename.lower())
+        self._changeState(self.STATE_OPERATIONAL)
+        self.refreshSdFiles()
 
     def _monitor(self):
         """
@@ -311,7 +399,7 @@ class BeeCom(MachineCom):
 
                 ##~~ SD file list
                 # if we are currently receiving an sd file list, each line is just a filename, so just read it and abort processing
-                if self._sdFileList and not "End file list" in line:
+                if self._sdFileList and "End file list" in line:
                     preprocessed_line = line.strip().lower()
                     fileinfo = preprocessed_line.rsplit(None, 1)
                     if len(fileinfo) > 1:
@@ -432,7 +520,7 @@ class BeeCom(MachineCom):
                             "origin": self._currentFile.getFileLocation()
                         })
                 elif 'Writing to file' in line:
-                    # anwer to M28, at least on Marlin, Repetier and Sprinter: "Writing to file: %s"
+                    # answer to M28, at least on Marlin, Repetier and Sprinter: "Writing to file: %s"
                     self._changeState(self.STATE_PRINTING)
                     self._clear_to_send.set()
                     line = "ok"

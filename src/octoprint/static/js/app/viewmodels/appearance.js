@@ -5,12 +5,18 @@ $(function() {
         self.name = parameters[0].appearance_name;
         self.color = parameters[0].appearance_color;
         self.colorTransparent = parameters[0].appearance_colorTransparent;
+        self.printerProfiles = parameters[1];
 
         self.brand = ko.computed(function() {
+            var brandText = gettext("BEE.web")
             if (self.name())
-                return gettext("BEE.web") + ": " + self.name();
-            else
-                return gettext("BEE.web");
+                brandText = brandText + ": " + self.name();
+
+            var profileName = self.printerProfiles.currentProfileData().name();
+            if (self.printerProfiles.currentProfile() != '_default')
+                brandText = brandText + " @ " + profileName;
+
+            return brandText;
         });
 
         self.title = ko.computed(function() {
@@ -23,7 +29,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push([
         AppearanceViewModel,
-        ["settingsViewModel"],
+        ["settingsViewModel", "printerProfilesViewModel"],
         "head"
     ]);
 });

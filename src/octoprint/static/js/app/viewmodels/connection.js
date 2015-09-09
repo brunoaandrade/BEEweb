@@ -36,6 +36,7 @@ $(function() {
         self.isError = ko.observable(undefined);
         self.isReady = ko.observable(undefined);
         self.isLoading = ko.observable(undefined);
+
         self.isConnecting = ko.observable(undefined);
 
         self.buttonText = ko.computed(function() {

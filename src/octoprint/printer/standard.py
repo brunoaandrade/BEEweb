@@ -201,6 +201,19 @@ class Printer(PrinterInterface, comm.MachineComPrintCallback):
 		self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
 		self._comm.confirmConnection()
 
+		# selects the printer profile based on the connected printer name
+		printer_name = self.get_printer_name()
+		self._printerProfileManager.select(printer_name)
+
+	def get_printer_name(self):
+		"""
+		 Returns a human readable string corresponding to name of the connected printer.
+		"""
+		if self._comm is None:
+			return ""
+		else:
+			return self._comm.getConnectedPrinterName()
+
 	def disconnect(self):
 		"""
 		 Closes the connection to the printer.
