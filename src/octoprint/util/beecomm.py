@@ -22,6 +22,9 @@ class BeeCom(MachineCom):
     _beeCommands = None
 
     _responseQueue = queue.Queue()
+    _statusQueue = queue.Queue()
+
+    _monitor_print_progress = True
 
     def __init__(self, callbackObject=None, printerProfileManager=None):
         super(BeeCom, self).__init__(None, None, callbackObject, printerProfileManager)
@@ -147,10 +150,7 @@ class BeeCom(MachineCom):
         if self._currentFile is None:
             raise ValueError("No file selected for printing")
 
-        self._heatupWaitStartTime = None
-        self._heatupWaitTimeLost = 0.0
-        self._pauseWaitStartTime = 0
-        self._pauseWaitTimeLost = 0.0
+
 
         try:
             self._currentFile.start()
@@ -173,13 +173,29 @@ class BeeCom(MachineCom):
                                                           self._poll_sd_status, run_first=True)
                     self._sd_status_timer.start()
             else:
-                print_resp = self._beeCommands.printFile(payload['file'])
+                print_resp = self._beeCommands.printFile(payload['file'],
+                                                         statusCallback=self._statusProgressQueueCallback)
 
-            if print_resp is True:
-                self._changeState(self.STATE_PRINTING)
+            if not print_resp is True:
+                self._logger.exception("Error while preparing the printing operation.")
+                self._changeState(self.STATE_ERROR)
+                eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
+            else:
+                self._heatupWaitStartTime = time.time()
+                self._heatupWaitTimeLost = 0.0
+                self._pauseWaitStartTime = 0
+                self._pauseWaitTimeLost = 0.0
 
-            # now make sure we actually do something, up until now we only filled up the queue
-            #self._sendFromQueue()
+            # waits for heating/file transfer
+            while self._beeCommands.isTransferring():
+                time.sleep(1)
+
+            self._changeState(self.STATE_PRINTING)
+
+            if self._heatupWaitStartTime is not None:
+                self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
+                self._heatupWaitStartTime = None
+                self._heating = False
         except:
             self._logger.exception("Error while trying to start printing")
             self._errorValue = get_exception_string()
@@ -332,8 +348,7 @@ class BeeCom(MachineCom):
 
     def _monitor(self):
         """
-        Monitor thread of incoming communication from the printer
-
+        Monitor thread of responses from the commands sent to the printer
         :return:
         """
         feedback_controls, feedback_matcher = comm.convert_feedback_controls(settings().get(["controls"]))
@@ -628,7 +643,7 @@ class BeeCom(MachineCom):
                     elif line.lower().startswith("resend") or line.lower().startswith("rs"):
                         self._handleResendRequest(line)
             except:
-                self._logger.exception("Something crashed inside the USB connection loop, please report this in BeeWeb's bug tracker:")
+                self._logger.exception("Something crashed inside the USB connection.")
 
                 errorMsg = "See octoprint.log for details"
                 self._log(errorMsg)
@@ -636,3 +651,16 @@ class BeeCom(MachineCom):
                 self._changeState(self.STATE_ERROR)
                 eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
         self._log("Connection closed, closing down monitor")
+
+
+
+    def _statusProgressQueueCallback(self, status_obj):
+        """
+        Auxiliar callback method to push the status object that comes from the printer into the queue
+
+        :param status_obj:
+        :return:
+        """
+        # calls the Printer object to update the progress values
+        self._callback.updateProgress(status_obj)
+        self._callback.on_comm_progress()

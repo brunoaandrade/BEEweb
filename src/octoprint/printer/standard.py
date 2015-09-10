@@ -4,7 +4,6 @@ This module holds the standard implementation of the :class:`PrinterInterface` a
 """
 
 from __future__ import absolute_import
-from octoprint.util.beecomm import BeeCom
 
 __author__ = "Gina Häußge <osd@foosel.net>"
 __license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
@@ -191,19 +190,11 @@ class Printer(PrinterInterface, comm.MachineComPrintCallback):
 		 Connects to the printer. If port and/or baudrate is provided, uses these settings, otherwise autodetection
 		 will be attempted.
 		"""
-		self._connecting = True
 
 		if self._comm is not None:
 			self._comm.close()
 		self._printerProfileManager.select(profile)
-		# self._comm = comm.MachineCom(port, baudrate, callbackObject=self, printerProfileManager=self._printerProfileManager)
-
-		self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
-		self._comm.confirmConnection()
-
-		# selects the printer profile based on the connected printer name
-		printer_name = self.get_printer_name()
-		self._printerProfileManager.select(printer_name)
+		self._comm = comm.MachineCom(port, baudrate, callbackObject=self, printerProfileManager=self._printerProfileManager)
 
 	def get_printer_name(self):
 		"""
