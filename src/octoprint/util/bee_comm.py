@@ -128,13 +128,23 @@ class BeeCom(MachineCom):
         else:
             return ""
 
+    def isOperational(self):
+        return self._state == self.STATE_OPERATIONAL \
+               or self._state == self.STATE_PRINTING or self._state == self.STATE_PAUSED \
+               or self._state == self.STATE_TRANSFERING_FILE or self._state == self.STATE_PREPARING_PRINT
+
+    def isClosedOrError(self):
+        return self._state == self.STATE_ERROR or self._state == self.STATE_CLOSED_WITH_ERROR \
+               or self._state == self.STATE_CLOSED or self._state == self.STATE_WAITING_FOR_BTF
+
+
     def getStateString(self):
         """
         Returns the current printer state
         :return:
         """
         if self._state == self.STATE_WAITING_FOR_BTF:
-            return "No printer detected. Please connect your printer and press connect."
+            return "No printer detected. Please turn on your printer and press Connect."
         elif self._state == self.STATE_PREPARING_PRINT:
             return "Preparing to print, please wait..."
         else:
@@ -149,8 +159,6 @@ class BeeCom(MachineCom):
 
         if self._currentFile is None:
             raise ValueError("No file selected for printing")
-
-
 
         try:
             self._currentFile.start()

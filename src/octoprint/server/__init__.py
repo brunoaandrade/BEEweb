@@ -852,13 +852,14 @@ class Server():
 		]
 
 		css_libs = [
+			"css/bee.css",
 			"css/bootstrap.min.css",
 			"css/bootstrap-modal.css",
 			"css/bootstrap-slider.css",
 			"css/bootstrap-tabdrop.css",
 			"css/font-awesome.min.css",
 			"css/jquery.fileupload-ui.css",
-			"css/pnotify.min.css"
+			"css/pnotify.min.css",
 		]
 		css_app = list(dynamic_assets["css"])
 		if len(css_app) == 0:

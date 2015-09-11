@@ -4,7 +4,7 @@ This module holds the standard implementation of the :class:`PrinterInterface` a
 """
 
 from __future__ import absolute_import
-from octoprint.util.beecomm import BeeCom
+from octoprint.util.bee_comm import BeeCom
 from octoprint.printer.standard import Printer
 
 __author__ = "Gina Häußge <osd@foosel.net>"

@@ -12,11 +12,16 @@ $(function() {
             if (self.name())
                 brandText = brandText + ": " + self.name();
 
+            return brandText;
+        });
+
+        self.printerName = ko.computed(function() {
+            var printer = ""
             var profileName = self.printerProfiles.currentProfileData().name();
             if (self.printerProfiles.currentProfile() != '_default')
-                brandText = brandText + " @ " + profileName;
+                printer = "@ " + profileName;
 
-            return brandText;
+            return printer;
         });
 
         self.title = ko.computed(function() {

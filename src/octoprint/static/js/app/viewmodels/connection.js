@@ -155,6 +155,10 @@ $(function() {
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",
                     data: JSON.stringify({"command": "disconnect"}),
+                    success: function(response) {
+                        self.settings.requestData();
+                        self.settings.printerProfiles.requestData();
+                    }
                 })
             }
 
