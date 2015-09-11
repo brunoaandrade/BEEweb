@@ -1,3 +1,8 @@
 #printer-name-label {
     color: #DFB33E !important;
 }
+
+.brand-label-fix {
+    font-size: x-large;
+    margin-right: -10px;
+}
