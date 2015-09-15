@@ -286,10 +286,10 @@ class MachineCom(object):
 		# self.monitoring_thread.start()
 
 		# sending thread
-		self._send_queue_active = True
-		self.sending_thread = threading.Thread(target=self._send_loop, name="comm.sending_thread")
-		self.sending_thread.daemon = True
-		self.sending_thread.start()
+		#self._send_queue_active = True
+		#self.sending_thread = threading.Thread(target=self._send_loop, name="comm.sending_thread")
+		#self.sending_thread.daemon = True
+		# self.sending_thread.start()
 
 	def __del__(self):
 		self.close()

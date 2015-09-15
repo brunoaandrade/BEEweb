@@ -26,6 +26,7 @@ class BeeCom(MachineCom):
     _statusQueue = queue.Queue()
 
     _monitor_print_progress = True
+    _connection_monitor_active = True
 
     def __init__(self, callbackObject=None, printerProfileManager=None):
         super(BeeCom, self).__init__(None, None, callbackObject, printerProfileManager)
@@ -58,6 +59,11 @@ class BeeCom(MachineCom):
 
             # restart connection
             self._beeConn.reconnect()
+
+            # connection status thread
+            #self.conn_status_thread = threading.Thread(target=self._connectionMonitor, name="comm._conn_monitor")
+            #self.conn_status_thread.daemon = True
+            #self.conn_status_thread.start()
 
             return True
         else:
@@ -682,3 +688,18 @@ class BeeCom(MachineCom):
         # calls the Printer object to update the progress values
         self._callback.updateProgress(status_obj)
         self._callback.on_comm_progress()
+
+
+    def _connectionMonitor(self):
+        """
+        Monitor thread to check if the connection to the printer is still active
+        :return:
+        """
+        while self._connection_monitor_active is True:
+            time.sleep(5)
+
+            if self._beeConn.ping() is True:
+                continue
+            else:
+                self.close()
+                break
