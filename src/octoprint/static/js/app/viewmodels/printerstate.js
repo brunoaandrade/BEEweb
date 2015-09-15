@@ -60,7 +60,7 @@ $(function() {
         self.printTimeString = ko.computed(function() {
             if (!self.printTime())
                 return "-";
-            return formatDuration(self.printTime());
+            return formatDurationHoursMinutes(self.printTime());
         });
         self.printTimeLeftString = ko.computed(function() {
             if (self.printTimeLeft() == undefined) {

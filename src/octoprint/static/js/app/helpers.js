@@ -372,6 +372,16 @@ function formatDuration(seconds) {
     return _.sprintf(gettext(/* L10N: duration format */ "%(hour)02d:%(minute)02d:%(second)02d"), {hour: h, minute: m, second: s});
 }
 
+function formatDurationHoursMinutes(seconds) {
+    if (!seconds) return "-";
+    if (seconds < 0) return "00:00";
+
+    var m = (seconds % 3600) / 60;
+    var h = seconds / 3600;
+
+    return _.sprintf(gettext(/* L10N: duration format */ "%(hour)02d:%(minute)02d"), {hour: h, minute: m});
+}
+
 function formatFuzzyEstimation(seconds, base) {
     if (!seconds) return "-";
     if (seconds < 0) return "-";

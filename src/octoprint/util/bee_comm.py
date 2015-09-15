@@ -7,7 +7,8 @@ import Queue as queue
 
 from octoprint.settings import settings
 from octoprint.events import eventManager, Events
-from octoprint.util.comm import MachineCom, get_interval
+from octoprint.util.comm import MachineCom, get_interval, PrintingSdFileInformation, PrintingFileInformation, \
+    PrintingGcodeFileInformation
 from beedriver.connection import Conn as BeeConn
 from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer
 
@@ -353,6 +354,15 @@ class BeeCom(MachineCom):
         self.sendCommand("M29 %s" % filename.lower())
         self._changeState(self.STATE_OPERATIONAL)
         self.refreshSdFiles()
+
+    def getPrintProgress(self):
+        """
+        Gets the current print progress
+        :return:
+        """
+        if self._currentFile is None:
+            return None
+        return self._currentFile.getProgress()
 
     def _monitor(self):
         """
