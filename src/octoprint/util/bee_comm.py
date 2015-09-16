@@ -7,8 +7,7 @@ import Queue as queue
 
 from octoprint.settings import settings
 from octoprint.events import eventManager, Events
-from octoprint.util.comm import MachineCom, get_interval, PrintingSdFileInformation, PrintingFileInformation, \
-    PrintingGcodeFileInformation
+from octoprint.util.comm import MachineCom, get_interval
 from beedriver.connection import Conn as BeeConn
 from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer
 
@@ -61,9 +60,9 @@ class BeeCom(MachineCom):
             self._beeConn.reconnect()
 
             # connection status thread
-            #self.conn_status_thread = threading.Thread(target=self._connectionMonitor, name="comm._conn_monitor")
-            #self.conn_status_thread.daemon = True
-            #self.conn_status_thread.start()
+            self.conn_status_thread = threading.Thread(target=self._connectionMonitor, name="comm._conn_monitor")
+            self.conn_status_thread.daemon = True
+            self.conn_status_thread.start()
 
             return True
         else:
@@ -203,14 +202,18 @@ class BeeCom(MachineCom):
 
             # waits for heating/file transfer
             while self._beeCommands.isTransferring():
-                time.sleep(1)
+                time.sleep(2)
 
             self._changeState(self.STATE_PRINTING)
+
+            # starts the progress status thread
+            self._beeCommands.startStatusMonitor()
 
             if self._heatupWaitStartTime is not None:
                 self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
                 self._heatupWaitStartTime = None
                 self._heating = False
+
         except:
             self._logger.exception("Error while trying to start printing")
             self._errorValue = get_exception_string()
@@ -698,8 +701,9 @@ class BeeCom(MachineCom):
         while self._connection_monitor_active is True:
             time.sleep(5)
 
-            if self._beeConn.ping() is True:
-                continue
-            else:
-                self.close()
-                break
+            if self._state == self.STATE_OPERATIONAL:
+                if self._beeConn.ping() is True:
+                    continue
+                else:
+                    self.close()
+                    break
