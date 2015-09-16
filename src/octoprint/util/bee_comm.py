@@ -64,6 +64,9 @@ class BeeCom(MachineCom):
             self.conn_status_thread.daemon = True
             self.conn_status_thread.start()
 
+            # post connection callback
+            self._onConnected()
+
             return True
         else:
             return False
@@ -83,10 +86,10 @@ class BeeCom(MachineCom):
             if not cmd:
                 return
 
-        if self.isPrinting() and not self.isSdFileSelected():
-            self._commandQueue.put((cmd, cmd_type))
+        #if self.isPrinting() and not self.isSdFileSelected():
+        #    self._commandQueue.put((cmd, cmd_type))
 
-        elif self.isOperational():
+        if self.isOperational():
 
             wait = None
             if "g" in cmd.lower():
@@ -289,32 +292,6 @@ class BeeCom(MachineCom):
 
             eventManager().fire(Events.PRINT_PAUSED, payload)
 
-    def _getResponse(self):
-        """
-        Auxiliar method to read the command response queue
-        :return:
-        """
-        if self._beeConn is None:
-            return None
-        try:
-            ret = self._responseQueue.get()
-        except:
-            self._log("Exception raised while reading from command response queue: %s" % (get_exception_string()))
-            self._errorValue = get_exception_string()
-            return None
-
-        if ret == '':
-            #self._log("Recv: TIMEOUT")
-            return ''
-
-        try:
-            self._log("Recv: %s" % sanitize_ascii(ret))
-        except ValueError as e:
-            self._log("WARN: While reading last line: %s" % e)
-            self._log("Recv: %r" % ret)
-
-        return ret
-
     def initSdCard(self):
         """
         Initializes the SD Card in the printer
@@ -372,6 +349,32 @@ class BeeCom(MachineCom):
         if self._currentFile is None:
             return None
         return self._currentFile.getProgress()
+
+    def _getResponse(self):
+        """
+        Auxiliar method to read the command response queue
+        :return:
+        """
+        if self._beeConn is None:
+            return None
+        try:
+            ret = self._responseQueue.get()
+        except:
+            self._log("Exception raised while reading from command response queue: %s" % (get_exception_string()))
+            self._errorValue = get_exception_string()
+            return None
+
+        if ret == '':
+            #self._log("Recv: TIMEOUT")
+            return ''
+
+        try:
+            self._log("Recv: %s" % sanitize_ascii(ret))
+        except ValueError as e:
+            self._log("WARN: While reading last line: %s" % e)
+            self._log("Recv: %r" % ret)
+
+        return ret
 
     def _monitor(self):
         """
@@ -707,3 +710,29 @@ class BeeCom(MachineCom):
                 else:
                     self.close()
                     break
+
+    def _onConnected(self):
+        """
+        Post connection callback
+        """
+        self._temperature_timer = RepeatedTimer(lambda: get_interval("temperature", default_value=4.0), self._poll_temperature, run_first=True)
+        self._temperature_timer.start()
+
+        if self._sdAvailable:
+            self.refreshSdFiles()
+        else:
+            self.initSdCard()
+
+        payload = dict(port=self._port, baudrate=self._baudrate)
+        eventManager().fire(Events.CONNECTED, payload)
+
+    def _poll_temperature(self):
+        """
+        Polls the temperature after the temperature timeout, re-enqueues itself.
+
+        If the printer is not operational, not printing from sd, busy with a long running command or heating, no poll
+        will be done.
+        """
+
+        if self.isOperational() and not self.isStreaming() and not self._long_running_command and not self._heating:
+            self.sendCommand("M105", cmd_type="temperature_poll")
