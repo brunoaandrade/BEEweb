@@ -70,6 +70,9 @@ def settings(init=False, basedir=None, configfile=None):
 	return _instance
 
 default_settings = {
+	"usb": {
+		"autoconnect": True,
+	},
 	"serial": {
 		"port": None,
 		"baudrate": None,

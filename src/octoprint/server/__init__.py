@@ -396,12 +396,18 @@ class Server():
 		self._server.listen(self._port, address=self._host)
 
 		eventManager.fire(events.Events.STARTUP)
-		if s.getBoolean(["serial", "autoconnect"]):
-			(port, baudrate) = s.get(["serial", "port"]), s.getInt(["serial", "baudrate"])
+		# if s.getBoolean(["serial", "autoconnect"]):
+		# 	(port, baudrate) = s.get(["serial", "port"]), s.getInt(["serial", "baudrate"])
+		# 	printer_profile = printerProfileManager.get_default()
+		# 	connectionOptions = get_connection_options()
+		# 	if port in connectionOptions["ports"]:
+		# 		printer.connect(port=port, baudrate=baudrate, profile=printer_profile["id"] if "id" in printer_profile else "_default")
+
+		if s.getBoolean(["usb", "autoconnect"]):
 			printer_profile = printerProfileManager.get_default()
 			connectionOptions = get_connection_options()
-			if port in connectionOptions["ports"]:
-				printer.connect(port=port, baudrate=baudrate, profile=printer_profile["id"] if "id" in printer_profile else "_default")
+			printer.connect()
+
 
 		# start up watchdogs
 		if s.getBoolean(["feature", "pollWatched"]):

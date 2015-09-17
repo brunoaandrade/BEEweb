@@ -120,6 +120,7 @@ $(function() {
         self.feature_pollWatched = ko.observable(undefined);
         self.feature_ignoreIdenticalResends = ko.observable(undefined);
 
+        self.usb_autoconnect = ko.observable(undefined);
         self.serial_port = ko.observable();
         self.serial_baudrate = ko.observable();
         self.serial_portOptions = ko.observableArray([]);
@@ -423,6 +424,8 @@ $(function() {
             self.feature_keyboardControl(response.feature.keyboardControl);
             self.feature_pollWatched(response.feature.pollWatched);
 
+            self.usb_autoconnect(response.usb.autoconnect);
+
             self.serial_port(response.serial.port);
             self.serial_baudrate(response.serial.baudrate);
             self.serial_portOptions(response.serial.portOptions);
@@ -510,6 +513,9 @@ $(function() {
                         "externalHeatupDetection": !self.feature_disableExternalHeatupDetection(),
                         "keyboardControl": self.feature_keyboardControl(),
                         "pollWatched": self.feature_pollWatched()
+                    },
+                    "usb": {
+                        "autoconnect": self.usb_autoconnect(),
                     },
                     "serial": {
                         "port": self.serial_port(),
