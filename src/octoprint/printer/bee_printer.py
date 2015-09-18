@@ -56,6 +56,15 @@ class BeePrinter(Printer):
             self._executedLines = progressData['Executed Lines'] if 'Executed Lines' in progressData else None
             self._numberLines = progressData['Lines'] if 'Lines' in progressData else None
 
+    def refresh_sd_files(self, blocking=False):
+        """
+        Refreshes the list of file stored on the SD card attached to printer (if available and printer communication
+        available).
+        """
+        if not self._comm or not self._comm.isSdReady():
+            return
+
+        self._comm.refreshSdFiles()
 
     def on_comm_progress(self):
         """

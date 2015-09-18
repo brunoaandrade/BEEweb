@@ -60,9 +60,9 @@ class BeeCom(MachineCom):
             self._beeConn.reconnect()
 
             # connection status thread
-            self.conn_status_thread = threading.Thread(target=self._connectionMonitor, name="comm._conn_monitor")
-            self.conn_status_thread.daemon = True
-            self.conn_status_thread.start()
+            #self.conn_status_thread = threading.Thread(target=self._connectionMonitor, name="comm._conn_monitor")
+            #self.conn_status_thread.daemon = True
+            #self.conn_status_thread.start()
 
             # post connection callback
             self._onConnected()
@@ -95,7 +95,7 @@ class BeeCom(MachineCom):
             if "g" in cmd.lower():
                 wait = "3"
 
-            resp = self._beeConn.sendCmd(cmd, wait)
+            resp = self._beeCommands.sendCmd(cmd, wait)
 
             if resp:
                 # puts the response in the monitor queue
@@ -146,6 +146,11 @@ class BeeCom(MachineCom):
         return self._state == self.STATE_ERROR or self._state == self.STATE_CLOSED_WITH_ERROR \
                or self._state == self.STATE_CLOSED or self._state == self.STATE_WAITING_FOR_BTF
 
+    def isBusy(self):
+        return self.isPrinting() or self.isPaused() or self.isPreparingPrint()
+
+    def isPreparingPrint(self):
+        return self._state == self.STATE_PREPARING_PRINT
 
     def getStateString(self):
         """
@@ -202,6 +207,7 @@ class BeeCom(MachineCom):
                 self._heatupWaitTimeLost = 0.0
                 self._pauseWaitStartTime = 0
                 self._pauseWaitTimeLost = 0.0
+                self._heating = True
 
             # waits for heating/file transfer
             while self._beeCommands.isTransferring():
@@ -248,9 +254,7 @@ class BeeCom(MachineCom):
             "origin": self._currentFile.getFileLocation()
         }
 
-        self.sendGcodeScript("afterPrintCancelled", replacements=dict(event=payload))
         eventManager().fire(Events.PRINT_CANCELLED, payload)
-
 
     def setPause(self, pause):
         """
@@ -314,31 +318,56 @@ class BeeCom(MachineCom):
         """
         if not self.isOperational() or self.isBusy():
             return
-        self.sendCommand("M20")
 
-    def startSdFileTransfer(self, filename):
+        fList = self._beeCommands.getFileList()
+
+        ##~~ SD file list
+        if len(fList) > 0 and 'FileNames' in fList:
+
+            for sdFile in fList['FileNames']:
+
+                if comm.valid_file_type(sdFile, "machinecode"):
+                    if comm.filter_non_ascii(sdFile):
+                        self._logger.warn("Got a file from printer's SD that has a non-ascii filename (%s), that shouldn't happen according to the protocol" % filename)
+                    else:
+                        if not filename.startswith("/"):
+                            # file from the root of the sd -- we'll prepend a /
+                            filename = "/" + filename
+                        self._sdFiles.append((sdFile, 0))
+                    continue
+
+    def startFileTransfer(self, filename, localFilename, remoteFilename):
         """
-        Transfers a file to the SD card
-        :param filename:
-        :return:
+        Transfers a file to the printer's SD Card
         """
         if not self.isOperational() or self.isBusy():
+            self._log("Printer is not operation or busy")
             return
 
-        self._changeState(self.STATE_TRANSFERING_FILE)
-        self.sendCommand("M28 %s" % filename.lower())
+        self._currentFile = comm.StreamingGcodeFileInformation(filename, localFilename, remoteFilename)
+        self._currentFile.start()
 
-    def endSdFileTransfer(self, filename):
-        """
-        Finishes the file transfer to the SD file
-        :param filename:
-        :return:
-        """
-        if not self.isOperational() or self.isBusy():
-            return
+        # starts the transfer
+        self._beeCommands.transferSDFile(filename, localFilename)
 
-        self.sendCommand("M29 %s" % filename.lower())
+        eventManager().fire(Events.TRANSFER_STARTED, {"local": localFilename, "remote": remoteFilename})
+        self._callback.on_comm_file_transfer_started(remoteFilename, self._currentFile.getFilesize())
+
+        # waits for transfer to end
+        while self._beeCommands.getTransferCompletionState() > 0:
+            time.sleep(2)
+
+        remote = self._currentFile.getRemoteFilename()
+        payload = {
+            "local": self._currentFile.getLocalFilename(),
+            "remote": remote,
+            "time": self.getPrintTime()
+        }
+
+        self._currentFile = None
         self._changeState(self.STATE_OPERATIONAL)
+        self._callback.on_comm_file_transfer_done(remote)
+        eventManager().fire(Events.TRANSFER_DONE, payload)
         self.refreshSdFiles()
 
     def getPrintProgress(self):
@@ -441,35 +470,6 @@ class BeeCom(MachineCom):
 
                 ##~~ Error handling
                 line = self._handleErrors(line)
-
-                ##~~ SD file list
-                # if we are currently receiving an sd file list, each line is just a filename, so just read it and abort processing
-                if self._sdFileList and "End file list" in line:
-                    preprocessed_line = line.strip().lower()
-                    fileinfo = preprocessed_line.rsplit(None, 1)
-                    if len(fileinfo) > 1:
-                        # we might have extended file information here, so let's split filename and size and try to make them a bit nicer
-                        filename, size = fileinfo
-                        try:
-                            size = int(size)
-                        except ValueError:
-                            # whatever that was, it was not an integer, so we'll just use the whole line as filename and set size to None
-                            filename = preprocessed_line
-                            size = None
-                    else:
-                        # no extended file information, so only the filename is there and we set size to None
-                        filename = preprocessed_line
-                        size = None
-
-                    if comm.valid_file_type(filename, "machinecode"):
-                        if comm.filter_non_ascii(filename):
-                            self._logger.warn("Got a file from printer's SD that has a non-ascii filename (%s), that shouldn't happen according to the protocol" % filename)
-                        else:
-                            if not filename.startswith("/"):
-                                # file from the root of the sd -- we'll prepend a /
-                                filename = "/" + filename
-                            self._sdFiles.append((filename, size))
-                        continue
 
                 ##~~ process oks
                 if line.strip().startswith("ok") or (self.isPrinting() and supportWait and line.strip().startswith("wait")):
@@ -645,33 +645,6 @@ class BeeCom(MachineCom):
                     elif line.lower().startswith("resend") or line.lower().startswith("rs"):
                         self._handleResendRequest(line)
 
-                ### Printing
-                elif self._state == self.STATE_PRINTING:
-                    if line == "" and time.time() > self._timeout:
-                        if not self._long_running_command:
-                            self._log("Communication timeout during printing, forcing a line")
-                            self._sendCommand("M105")
-                            self._clear_to_send.set()
-                        else:
-                            self._logger.debug("Ran into a communication timeout, but a command known to be a long runner is currently active")
-
-                    if "ok" in line or (supportWait and "wait" in line):
-                        # a wait while printing means our printer's buffer ran out, probably due to some ok getting
-                        # swallowed, so we treat it the same as an ok here teo take up communication again
-                        if self._resendSwallowNextOk:
-                            self._resendSwallowNextOk = False
-
-                        elif self._resendDelta is not None:
-                            self._resendNextCommand()
-
-                        else:
-                            if self._sendFromQueue():
-                                pass
-                            elif not self.isSdPrinting():
-                                self._sendNext()
-
-                    elif line.lower().startswith("resend") or line.lower().startswith("rs"):
-                        self._handleResendRequest(line)
             except:
                 self._logger.exception("Something crashed inside the USB connection.")
 
@@ -696,21 +669,6 @@ class BeeCom(MachineCom):
         self._callback.on_comm_progress()
 
 
-    def _connectionMonitor(self):
-        """
-        Monitor thread to check if the connection to the printer is still active
-        :return:
-        """
-        while self._connection_monitor_active is True:
-            time.sleep(5)
-
-            if self._state == self.STATE_OPERATIONAL:
-                if self._beeConn.ping() is True:
-                    continue
-                else:
-                    self.close()
-                    break
-
     def _onConnected(self):
         """
         Post connection callback
@@ -733,6 +691,25 @@ class BeeCom(MachineCom):
         If the printer is not operational, not printing from sd, busy with a long running command or heating, no poll
         will be done.
         """
+        try:
+            if self.isOperational() and not self.isStreaming() and not self._long_running_command and not self._heating:
+                self.sendCommand("M105", cmd_type="temperature_poll")
+        except Exception, e:
+            self._log("Error polling temperature %s" % str(e))
 
-        if self.isOperational() and not self.isStreaming() and not self._long_running_command and not self._heating:
-            self.sendCommand("M105", cmd_type="temperature_poll")
+
+    def _connectionMonitor(self):
+        """
+        Monitor thread to check if the connection to the printer is still active
+        :return:
+        """
+
+        while self._connection_monitor_active is True:
+            time.sleep(5)
+
+            if self._state != self.STATE_CLOSED:
+                if self._beeConn.ping() is True:
+                    continue
+                else:
+                    self.close()
+                    break
