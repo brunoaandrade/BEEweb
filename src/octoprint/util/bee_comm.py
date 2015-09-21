@@ -713,3 +713,10 @@ class BeeCom(MachineCom):
                 else:
                     self.close()
                     break
+
+    def getCommandsInterface(self):
+        """
+        Returns the commands interface for BVC printers
+        :return:
+        """
+        return self._beeCommands

@@ -200,7 +200,7 @@ default_settings = {
 				"sidebar": ["connection", "state", "files"],
 				"tab": ["gcodeviewer", "control", "temperature", "terminal", "timelapse"],
 				"settings": [
-					"section_printer", "serial", "printerprofiles", "temperatures", "terminalfilters", "gcodescripts",
+					"section_printer", "printerprofiles", "temperatures", "terminalfilters", "gcodescripts",
 					"section_features", "features", "webcam", "accesscontrol", "api",
 					"section_octoprint", "server", "folders", "appearance", "logs", "plugin_pluginmanager", "plugin_softwareupdate"
 				],

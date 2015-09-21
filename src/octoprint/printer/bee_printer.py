@@ -6,6 +6,7 @@ This module holds the standard implementation of the :class:`PrinterInterface` a
 from __future__ import absolute_import
 from octoprint.util.bee_comm import BeeCom
 from octoprint.printer.standard import Printer
+from octoprint.printer import PrinterInterface
 
 __author__ = "Gina Häußge <osd@foosel.net>"
 __license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
@@ -21,6 +22,7 @@ class BeePrinter(Printer):
     _elapsedTime = None
     _numberLines = None
     _executedLines = None
+    _currentFeedRate = None
 
     def __init__(self, fileManager, analysisQueue, printerProfileManager):
         super(BeePrinter, self).__init__(fileManager, analysisQueue, printerProfileManager)
@@ -37,6 +39,10 @@ class BeePrinter(Printer):
 
         self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
         self._comm.confirmConnection()
+
+        # homes all axis
+        if self._comm.getCommandsInterface().isPrinting is not False:
+            self._comm.getCommandsInterface().home()
 
         # selects the printer profile based on the connected printer name
         printer_name = self.get_printer_name()
@@ -94,6 +100,72 @@ class BeePrinter(Printer):
             return self._executedLines
         else:
             return 0
+
+    def jog(self, axis, amount):
+        """
+        Jogs the tool a selected amount in the axis chosen
+
+        :param axis:
+        :param amount:
+        :return:
+        """
+        if not isinstance(axis, (str, unicode)):
+            raise ValueError("axis must be a string: {axis}".format(axis=axis))
+
+        axis = axis.lower()
+        if not axis in PrinterInterface.valid_axes:
+            raise ValueError("axis must be any of {axes}: {axis}".format(axes=", ".join(PrinterInterface.valid_axes), axis=axis))
+        if not isinstance(amount, (int, long, float)):
+            raise ValueError("amount must be a valid number: {amount}".format(amount=amount))
+
+        printer_profile = self._printerProfileManager.get_current_or_default()
+
+        # if the feed rate was manually set uses it
+        if self._currentFeedRate is not None:
+            movement_speed = self._currentFeedRate * 60
+        else:
+            movement_speed = printer_profile["axes"][axis]["speed"] * 60
+
+        bee_commands = self._comm.getCommandsInterface()
+
+        if axis == 'x':
+            bee_commands.move(amount, 0, 0, None, movement_speed)
+        elif axis == 'y':
+            bee_commands.move(0, amount, 0, None, movement_speed)
+        elif axis == 'z':
+            bee_commands.move(0, 0, amount, None, movement_speed)
+
+    def feed_rate(self, factor):
+        """
+        Updates the feed rate factor
+        :param factor:
+        :return:
+        """
+        factor = self._convert_rate_value(factor, min=50, max=200)
+        self._currentFeedRate = factor
+
+    def home(self, axes):
+        """
+        Moves the select axes to their home position
+        :param axes:
+        :return:
+        """
+        if not isinstance(axes, (list, tuple)):
+            if isinstance(axes, (str, unicode)):
+                axes = [axes]
+            else:
+                raise ValueError("axes is neither a list nor a string: {axes}".format(axes=axes))
+
+        validated_axes = filter(lambda x: x in PrinterInterface.valid_axes, map(lambda x: x.lower(), axes))
+        if len(axes) != len(validated_axes):
+            raise ValueError("axes contains invalid axes: {axes}".format(axes=axes))
+
+        bee_commands = self._comm.getCommandsInterface()
+
+        if 'z' in axes:
+            bee_commands.homeZ()
+        elif 'x' in axes and 'y' in axes:
+            bee_commands.homeXY()
 
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
         """
