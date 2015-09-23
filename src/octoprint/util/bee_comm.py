@@ -46,7 +46,7 @@ class BeeCom(MachineCom):
         :return: True if the connection was successful
         """
         if self._beeConn is None:
-            self._beeConn = BeeConn()
+            self._beeConn = BeeConn(self._connShutdownHook)
             self._beeConn.connectToFirstPrinter()
 
         if self._beeConn.isConnected():
@@ -58,11 +58,6 @@ class BeeCom(MachineCom):
 
             # restart connection
             self._beeConn.reconnect()
-
-            # connection status thread
-            #self.conn_status_thread = threading.Thread(target=self._connectionMonitor, name="comm._conn_monitor")
-            #self.conn_status_thread.daemon = True
-            #self.conn_status_thread.start()
 
             # post connection callback
             self._onConnected()
@@ -202,6 +197,7 @@ class BeeCom(MachineCom):
                 self._logger.exception("Error while preparing the printing operation.")
                 self._changeState(self.STATE_ERROR)
                 eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
+                return
             else:
                 self._heatupWaitStartTime = time.time()
                 self._heatupWaitTimeLost = 0.0
@@ -414,34 +410,18 @@ class BeeCom(MachineCom):
         feedback_errors = []
         pause_triggers = comm.convert_pause_triggers(settings().get(["printerParameters", "pauseTriggers"]))
 
-        disable_external_heatup_detection = not settings().getBoolean(["feature", "externalHeatupDetection"])
-
         #exits if no connection is active
         if not self._beeConn.isConnected():
             return
 
-        try_hello = not settings().getBoolean(["feature", "waitForStartOnConnect"])
-
-        #Start monitoring the communication.
-        self._timeout = comm.get_new_timeout("communication")
-
         startSeen = False
-        supportRepetierTargetTemp = settings().getBoolean(["feature", "repetierTargetTemp"])
         supportWait = settings().getBoolean(["feature", "supportWait"])
-
-        # enqueue an M105 first thing
-        if try_hello:
-            self._sendCommand("M110")
-            self._clear_to_send.set()
 
         while self._monitoring_active:
             try:
                 line = self._getResponse()
                 if line is None:
                     continue
-
-                if line.strip() is not "":
-                    self._timeout = comm.get_new_timeout("communication")
 
                 ##~~ debugging output handling
                 if line.startswith("//"):
@@ -477,48 +457,11 @@ class BeeCom(MachineCom):
                     self._long_running_command = False
 
                 ##~~ Temperature processing
-                if ' T:' in line or line.startswith('T:') or ' T0:' in line or line.startswith('T0:') or ' B:' in line or line.startswith('B:'):
-                    if not disable_external_heatup_detection and not line.strip().startswith("ok") and not self._heating:
-                        self._logger.debug("Externally triggered heatup detected")
-                        self._heating = True
-                        self._heatupWaitStartTime = time.time()
+                if ' T:' in line or line.startswith('T:') or ' T0:' in line or line.startswith('T0:') \
+                        or ' B:' in line or line.startswith('B:'):
 
                     self._processTemperatures(line)
                     self._callback.on_comm_temperature_update(self._temp, self._bedTemp)
-
-                elif supportRepetierTargetTemp and ('TargetExtr' in line or 'TargetBed' in line):
-                    matchExtr = self._regex_repetierTempExtr.match(line)
-                    matchBed = self._regex_repetierTempBed.match(line)
-
-                    if matchExtr is not None:
-                        toolNum = int(matchExtr.group(1))
-                        try:
-                            target = float(matchExtr.group(2))
-                            if toolNum in self._temp.keys() and self._temp[toolNum] is not None and isinstance(self._temp[toolNum], tuple):
-                                (actual, oldTarget) = self._temp[toolNum]
-                                self._temp[toolNum] = (actual, target)
-                            else:
-                                self._temp[toolNum] = (None, target)
-                            self._callback.on_comm_temperature_update(self._temp, self._bedTemp)
-                        except ValueError:
-                            pass
-                    elif matchBed is not None:
-                        try:
-                            target = float(matchBed.group(1))
-                            if self._bedTemp is not None and isinstance(self._bedTemp, tuple):
-                                (actual, oldTarget) = self._bedTemp
-                                self._bedTemp = (actual, target)
-                            else:
-                                self._bedTemp = (None, target)
-                            self._callback.on_comm_temperature_update(self._temp, self._bedTemp)
-                        except ValueError:
-                            pass
-
-                #If we are waiting for an M109 or M190 then measure the time we lost during heatup, so we can remove that time from our printing time estimate.
-                if 'ok' in line and self._heatupWaitStartTime:
-                    self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
-                    self._heatupWaitStartTime = None
-                    self._heating = False
 
                 ##~~ SD Card handling
                 elif 'SD init fail' in line or 'volume.init failed' in line or 'openRoot failed' in line:
@@ -656,7 +599,6 @@ class BeeCom(MachineCom):
         self._log("Connection closed, closing down monitor")
 
 
-
     def _statusProgressQueueCallback(self, status_obj):
         """
         Auxiliar callback method to push the status object that comes from the printer into the queue
@@ -698,25 +640,17 @@ class BeeCom(MachineCom):
             self._log("Error polling temperature %s" % str(e))
 
 
-    def _connectionMonitor(self):
-        """
-        Monitor thread to check if the connection to the printer is still active
-        :return:
-        """
-
-        while self._connection_monitor_active is True:
-            time.sleep(5)
-
-            if self._state != self.STATE_CLOSED:
-                if self._beeConn.ping() is True:
-                    continue
-                else:
-                    self.close()
-                    break
-
     def getCommandsInterface(self):
         """
         Returns the commands interface for BVC printers
         :return:
         """
         return self._beeCommands
+
+
+    def _connShutdownHook(self):
+        """
+        Function to be called by the BVC driver to shutdown the connection
+        :return:
+        """
+        self._callback.on_comm_force_disconnect()

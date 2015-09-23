@@ -41,8 +41,9 @@ class BeePrinter(Printer):
         self._comm.confirmConnection()
 
         # homes all axis
-        if self._comm.getCommandsInterface().isPrinting is not False:
-            self._comm.getCommandsInterface().home()
+        bee_commands = self._comm.getCommandsInterface()
+        if bee_commands is not None and bee_commands.isPrinting is not False:
+            bee_commands.home()
 
         # selects the printer profile based on the connected printer name
         printer_name = self.get_printer_name()
@@ -124,7 +125,7 @@ class BeePrinter(Printer):
         if self._currentFeedRate is not None:
             movement_speed = self._currentFeedRate * 60
         else:
-            movement_speed = printer_profile["axes"][axis]["speed"] * 60
+            movement_speed = printer_profile["axes"][axis]["speed"]
 
         bee_commands = self._comm.getCommandsInterface()
 
@@ -166,6 +167,21 @@ class BeePrinter(Printer):
             bee_commands.homeZ()
         elif 'x' in axes and 'y' in axes:
             bee_commands.homeXY()
+
+    def extrude(self, amount):
+        """
+        Extrudes the defined amount
+        :param amount:
+        :return:
+        """
+        if not isinstance(amount, (int, long, float)):
+            raise ValueError("amount must be a valid number: {amount}".format(amount=amount))
+
+        printer_profile = self._printerProfileManager.get_current_or_default()
+        extrusion_speed = printer_profile["axes"]["e"]["speed"]
+
+        bee_commands = self._comm.getCommandsInterface()
+        bee_commands.move(0, 0, 0, amount, extrusion_speed)
 
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
         """
