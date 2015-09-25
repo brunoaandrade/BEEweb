@@ -27,6 +27,7 @@ class BeeCom(MachineCom):
 
     _monitor_print_progress = True
     _connection_monitor_active = True
+    _prepare_print_thread = None
 
     def __init__(self, callbackObject=None, printerProfileManager=None):
         super(BeeCom, self).__init__(None, None, callbackObject, printerProfileManager)
@@ -196,40 +197,25 @@ class BeeCom(MachineCom):
                                                           self._poll_sd_status, run_first=True)
                     self._sd_status_timer.start()
             else:
-                print_resp = self._beeCommands.printFile(payload['file'],
-                                                         statusCallback=self._statusProgressQueueCallback)
+                print_resp = self._beeCommands.printFile(payload['file'])
 
-            if not print_resp is True:
-                self._logger.exception("Error while preparing the printing operation.")
-                self._changeState(self.STATE_ERROR)
-                eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
-                return
-            else:
+            if print_resp is True:
                 self._changeState(self.STATE_PREPARING_PRINT)
                 self._heatupWaitStartTime = time.time()
                 self._heatupWaitTimeLost = 0.0
                 self._pauseWaitStartTime = 0
                 self._pauseWaitTimeLost = 0.0
+
                 self._heating = True
 
-            # waits for heating/file transfer
-            while self._beeCommands.isTransferring():
-                time.sleep(2)
-
-            self._changeState(self.STATE_HEATING)
-
-            while self._beeCommands.isHeating():
-                time.sleep(2)
-
-            self._changeState(self.STATE_PRINTING)
-
-            # starts the progress status thread
-            self._beeCommands.startStatusMonitor()
-
-            if self._heatupWaitStartTime is not None:
-                self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
-                self._heatupWaitStartTime = None
-                self._heating = False
+                self._prepare_print_thread = threading.Thread(target=self._preparePrintThread, name="comm._preparePrint")
+                self._prepare_print_thread.daemon = True
+                self._prepare_print_thread.start()
+            else:
+                self._logger.exception("Error while preparing the printing operation.")
+                self._changeState(self.STATE_ERROR)
+                eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
+                return
 
         except:
             self._logger.exception("Error while trying to start printing")
@@ -670,3 +656,28 @@ class BeeCom(MachineCom):
         :return:
         """
         self._callback.on_comm_force_disconnect()
+
+
+    def _preparePrintThread(self):
+        """
+        Thread code that runs while the print job is being prepared
+        :return:
+        """
+        # waits for heating/file transfer
+        while self._beeCommands.isTransferring():
+            time.sleep(2)
+
+        self._changeState(self.STATE_HEATING)
+
+        while self._beeCommands.isHeating():
+            time.sleep(2)
+
+        self._changeState(self.STATE_PRINTING)
+
+        # starts the progress status thread
+        self._beeCommands.startStatusMonitor(self._statusProgressQueueCallback)
+
+        if self._heatupWaitStartTime is not None:
+            self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
+            self._heatupWaitStartTime = None
+            self._heating = False
