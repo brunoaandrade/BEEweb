@@ -6,3 +6,7 @@
     font-size: x-large;
     margin-right: -10px;
 }
+
+#temperature-graph {
+    background-position: 50% 30% !important;
+}

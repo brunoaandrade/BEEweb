@@ -17,6 +17,7 @@ __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agp
 class BeeCom(MachineCom):
     STATE_WAITING_FOR_BTF = 21
     STATE_PREPARING_PRINT = 22
+    STATE_HEATING = 23
 
     _beeConn = None
     _beeCommands = None
@@ -135,7 +136,8 @@ class BeeCom(MachineCom):
     def isOperational(self):
         return self._state == self.STATE_OPERATIONAL \
                or self._state == self.STATE_PRINTING or self._state == self.STATE_PAUSED \
-               or self._state == self.STATE_TRANSFERING_FILE or self._state == self.STATE_PREPARING_PRINT
+               or self._state == self.STATE_TRANSFERING_FILE or self._state == self.STATE_PREPARING_PRINT \
+               or self._state == self.STATE_HEATING
 
     def isClosedOrError(self):
         return self._state == self.STATE_ERROR or self._state == self.STATE_CLOSED_WITH_ERROR \
@@ -145,7 +147,11 @@ class BeeCom(MachineCom):
         return self.isPrinting() or self.isPaused() or self.isPreparingPrint()
 
     def isPreparingPrint(self):
-        return self._state == self.STATE_PREPARING_PRINT
+        return self._state == self.STATE_PREPARING_PRINT or self._state == self.STATE_HEATING
+
+    def isPrinting(self):
+        return self._state == self.STATE_PRINTING or self._state == self.STATE_PREPARING_PRINT \
+               or self._state == self.STATE_HEATING
 
     def getStateString(self):
         """
@@ -156,6 +162,8 @@ class BeeCom(MachineCom):
             return "No printer detected. Please turn on your printer and press Connect."
         elif self._state == self.STATE_PREPARING_PRINT:
             return "Preparing to print, please wait..."
+        elif self._state == self.STATE_HEATING:
+            return "Heating..."
         else:
             return super(BeeCom, self).getStateString()
 
@@ -180,8 +188,6 @@ class BeeCom(MachineCom):
 
             eventManager().fire(Events.PRINT_STARTED, payload)
 
-            self._changeState(self.STATE_PREPARING_PRINT)
-
             if self.isSdFileSelected():
                 print_resp = self._beeCommands.startSDPrint(self._currentFile.getFilename())
 
@@ -199,6 +205,7 @@ class BeeCom(MachineCom):
                 eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
                 return
             else:
+                self._changeState(self.STATE_PREPARING_PRINT)
                 self._heatupWaitStartTime = time.time()
                 self._heatupWaitTimeLost = 0.0
                 self._pauseWaitStartTime = 0
@@ -207,6 +214,11 @@ class BeeCom(MachineCom):
 
             # waits for heating/file transfer
             while self._beeCommands.isTransferring():
+                time.sleep(2)
+
+            self._changeState(self.STATE_HEATING)
+
+            while self._beeCommands.isHeating():
                 time.sleep(2)
 
             self._changeState(self.STATE_PRINTING)
@@ -615,6 +627,10 @@ class BeeCom(MachineCom):
         """
         Post connection callback
         """
+
+        # starts the connection monitor thread
+        self._beeConn.startConnectionMonitor()
+
         self._temperature_timer = RepeatedTimer(lambda: get_interval("temperature", default_value=4.0), self._poll_temperature, run_first=True)
         self._temperature_timer.start()
 

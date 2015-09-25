@@ -10,7 +10,7 @@ $(function() {
         self.brand = ko.computed(function() {
             var brandText = gettext("BEE.web")
             if (self.name())
-                brandText = brandText + ": " + self.name();
+                brandText = brandText + ":" + self.name();
 
             return brandText;
         });
