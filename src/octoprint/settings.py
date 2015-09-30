@@ -198,7 +198,7 @@ default_settings = {
 			"order": {
 				"navbar": ["settings", "systemmenu", "login"],
 				"sidebar": ["connection", "state", "files"],
-				"tab": ["gcodeviewer", "control", "temperature", "terminal", "timelapse"],
+				"tab": ["workbench", "gcodeviewer", "control", "temperature", "terminal", "timelapse"],
 				"settings": [
 					"section_printer", "printerprofiles", "temperatures", "terminalfilters", "gcodescripts",
 					"section_features", "features", "webcam", "accesscontrol", "api",

@@ -120,6 +120,7 @@ def index():
 	# tabs
 
 	templates["tab"]["entries"] = dict(
+		workbench=(gettext("Workbench"), dict(template="tabs/workbench.jinja2", _div="workbench")),
 		temperature=(gettext("Temperature"), dict(template="tabs/temperature.jinja2", _div="temp")),
 		control=(gettext("Control"), dict(template="tabs/control.jinja2", _div="control")),
 		terminal=(gettext("Terminal"), dict(template="tabs/terminal.jinja2", _div="term")),

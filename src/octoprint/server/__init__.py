@@ -339,7 +339,8 @@ class Server():
 			# camera snapshot
 			(r"/downloads/camera/current", util.tornado.UrlForwardHandler, dict(url=s.get(["webcam", "snapshot"]), as_attachment=True, access_validation=util.tornado.access_validation_factory(app, loginManager, util.flask.user_validator))),
 			# generated webassets
-			(r"/static/webassets/(.*)", util.tornado.LargeResponseHandler, dict(path=os.path.join(s.getBaseFolder("generated"), "webassets")))
+			(r"/static/webassets/(.*)", util.tornado.LargeResponseHandler, dict(path=os.path.join(s.getBaseFolder("generated"), "webassets"))),
+			(r"/stl/(.*)", util.tornado.LargeResponseHandler, dict(path=os.path.join(s.getBaseFolder("uploads")), access_validation=util.tornado.access_validation_factory(app, loginManager, util.flask.user_validator)))
 		]
 		for name, hook in pluginManager.get_hooks("octoprint.server.http.routes").items():
 			try:
@@ -857,6 +858,12 @@ class Server():
 			"js/app/main.js",
 		]
 
+		threejs_libs = [
+			"js/lib/three.min.js",
+			"js/lib/STLLoader.js",
+			"js/lib/TrackballControls.js",
+		]
+
 		css_libs = [
 			"css/bootstrap.min.css",
 			"css/bootstrap-modal.css",
@@ -905,6 +912,8 @@ class Server():
 		register_filter(JsDelimiterBundle)
 
 		js_libs_bundle = Bundle(*js_libs, output="webassets/packed_libs.js", filters="js_delimiter_bundler")
+		threejs_libs_bundle = Bundle(*threejs_libs, output="webassets/three_libs.js", filters="js_delimiter_bundler")
+
 		if settings().getBoolean(["devel", "webassets", "minify"]):
 			js_app_bundle = Bundle(*js_app, output="webassets/packed_app.js", filters="rjsmin, js_delimiter_bundler")
 		else:
@@ -916,6 +925,7 @@ class Server():
 		all_less_bundle = Bundle(*less_app, output="webassets/packed_app.less", filters="cssrewrite, less_importrewrite")
 
 		assets.register("js_libs", js_libs_bundle)
+		assets.register("threejs_libs", threejs_libs_bundle)
 		assets.register("js_app", js_app_bundle)
 		assets.register("css_libs", css_libs_bundle)
 		assets.register("css_app", css_app_bundle)
