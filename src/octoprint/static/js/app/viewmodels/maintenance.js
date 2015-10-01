@@ -5,6 +5,7 @@ $(function() {
         self.loginState = parameters[0];
         self.users = parameters[1];
         self.printerProfiles = parameters[2];
+        self.printerState = parameters[3];
 
         self.receiving = ko.observable(false);
         self.sending = ko.observable(false);
@@ -27,6 +28,28 @@ $(function() {
             self.maintenanceDialog.modal("hide");
         };
 
+        self.startHeating = function() {
+            var data = {
+                target: 210
+            };
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/start_heating",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify(data),
+                success: function() {
+                    $('#start-heating-btn').hide();
+                    $('#cancel-heating-btn').show();
+                },
+                error: function() {  }
+            });
+        }
+
+        self.cancelHeating = function() {
+
+        }
 
         self.requestData = function(callback) {
             if (self.receiving()) {
@@ -73,7 +96,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push([
         MaintenanceViewModel,
-        ["loginStateViewModel", "usersViewModel", "printerProfilesViewModel"],
+        ["loginStateViewModel", "usersViewModel", "printerProfilesViewModel", "printerStateViewModel"],
         ["#maintenance_dialog", "#navbar_maintenance"]
     ]);
 });
