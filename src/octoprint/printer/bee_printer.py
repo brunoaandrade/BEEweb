@@ -8,9 +8,8 @@ from octoprint.util.bee_comm import BeeCom
 from octoprint.printer.standard import Printer
 from octoprint.printer import PrinterInterface
 
-__author__ = "Gina Häußge <osd@foosel.net>"
-__license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
-__copyright__ = "Copyright (C) 2014 The OctoPrint Project - Released under terms of the AGPLv3 License"
+__author__ = "BEEVC - Electronic Systems "
+__license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
 
 
 class BeePrinter(Printer):
@@ -182,6 +181,14 @@ class BeePrinter(Printer):
 
         bee_commands = self._comm.getCommandsInterface()
         bee_commands.move(0, 0, 0, amount, extrusion_speed)
+
+    def get_current_temperature(self):
+        """
+        Returns the current extruder temperature
+        :return:
+        """
+        return self._comm.getCommandsInterface().getNozzleTemperature()
+
 
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
         """
