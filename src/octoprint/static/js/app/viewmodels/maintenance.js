@@ -1,6 +1,9 @@
 $(function() {
     function MaintenanceViewModel(parameters) {
         var self = this;
+        var TARGET_TEMPERATURE = 210;
+        var cancelTemperatureUpdate = false;
+        var fetchTemperatureRetries = 5;
 
         self.loginState = parameters[0];
         self.users = parameters[1];
@@ -10,6 +13,7 @@ $(function() {
         self.receiving = ko.observable(false);
         self.sending = ko.observable(false);
         self.callbacks = [];
+
         self.maintenanceDialog = $('#maintenance_dialog');
 
         self.show = function() {
@@ -28,9 +32,15 @@ $(function() {
             self.maintenanceDialog.modal("hide");
         };
 
+        /***************************************************************************/
+        /*******                   Filament Change functions            ************/
+        /***************************************************************************/
         self.startHeating = function() {
             var data = {
-                target: 210
+                command: "target",
+                targets: {
+                    'tool0': TARGET_TEMPERATURE
+                }
             };
 
             $.ajax({
@@ -40,57 +50,113 @@ $(function() {
                 contentType: "application/json; charset=UTF-8",
                 data: JSON.stringify(data),
                 success: function() {
-                    $('#start-heating-btn').hide();
-                    $('#cancel-heating-btn').show();
+                    $('#start-heating-btn').addClass('hidden');
+                    $('#progress-bar-div').removeClass('hidden');
+
+                    self._updateTempProgress();
                 },
                 error: function() {  }
             });
         }
 
         self.cancelHeating = function() {
+            var data = {
+                command: "target",
+                targets: {
+                    'tool0': 0
+                }
+            };
 
+            $.ajax({
+                url: API_BASEURL + "maintenance/start_heating",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify(data),
+                success: function() {
+                    $('#start-heating-btn').removeClass('hidden');
+                    $('#progress-bar-div').addClass('hidden');
+                },
+                error: function() {  }
+            });
+
+            cancelTemperatureUpdate = true;
         }
 
-        self.requestData = function(callback) {
-            if (self.receiving()) {
-                if (callback) {
-                    self.callbacks.push(callback);
-                }
-                return;
-            }
+        self._updateTempProgress = function() {
 
-            self.receiving(true);
+            fetchTemperatureRetries = 5;
+
             $.ajax({
-                url: API_BASEURL + "settings",
+                url: API_BASEURL + "maintenance/temperature",
                 type: "GET",
                 dataType: "json",
-                success: function(response) {
-                    if (callback) {
-                        self.callbacks.push(callback);
-                    }
+                success: function(data) {
+                    if (!cancelTemperatureUpdate) {
+                        var current_temp = data['temperature'];
+                        var progress = ((current_temp / TARGET_TEMPERATURE) * 100).toFixed(0);
 
-                    try {
-                        self.fromResponse(response);
+                        var tempProgress = $("#temperature_progress");
+                        var tempProgressBar = $(".bar", tempProgress);
 
-                        var cb;
-                        while (self.callbacks.length) {
-                            cb = self.callbacks.shift();
-                            try {
-                                cb();
-                            } catch(exc) {
-                                log.error("Error calling settings callback", cb, ":", (exc.stack || exc));
-                            }
+                        var progressStr = progress + "%";
+                        tempProgressBar.css('width', progressStr);
+                        tempProgressBar.text(progressStr);
+
+                        if (progress >= 100) {
+                            // Heating is finished, let's move on
+                            $('#step2').removeClass('hidden');
+                            $('#step1').addClass('hidden');
+                        } else {
+
+                            setTimeout(function() { self._updateTempProgress() }, 2000);
                         }
-                    } finally {
-                        self.receiving(false);
-                        self.callbacks = [];
                     }
                 },
-                error: function(xhr) {
-                    self.receiving(false);
-                }
+                error: function() {
+                    while (fetchTemperatureRetries > 0)
+                        setTimeout(function() { self._updateTempProgress() }, 2000);
+                        fetchTemperatureRetries -= 1;
+                    }
             });
-        };
+        }
+
+        self.loadFilament = function() {
+            $.ajax({
+                url: API_BASEURL + "maintenance/load",
+                type: "POST",
+                dataType: "json",
+                success: function() { },
+                error: function() {  }
+            });
+        }
+
+        self.unloadFilament = function() {
+            $.ajax({
+                url: API_BASEURL + "maintenance/unload",
+                type: "POST",
+                dataType: "json",
+                success: function() {
+                    $('#step3').removeClass('hidden');
+                    $('#step2').addClass('hidden');
+                },
+                error: function() {  }
+            });
+        }
+
+        self.nextStep3 = function() {
+            $('#step4').removeClass('hidden');
+            $('#step3').addClass('hidden');
+        }
+
+        self.nextStep4 = function() {
+            $('#step5').removeClass('hidden');
+            $('#step4').addClass('hidden');
+        }
+
+        /***************************************************************************/
+        /*******               end Filament Change functions            ************/
+        /***************************************************************************/
 
     }
 
