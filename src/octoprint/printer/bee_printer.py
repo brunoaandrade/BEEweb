@@ -189,6 +189,19 @@ class BeePrinter(Printer):
         """
         return self._comm.getCommandsInterface().getNozzleTemperature()
 
+    def unload(self):
+        """
+        Unloads the filament from the printer
+        :return:
+        """
+        return self._comm.getCommandsInterface().unload()
+
+    def load(self):
+        """
+        Loads the filament to the printer
+        :return:
+        """
+        return self._comm.getCommandsInterface().load()
 
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
         """
