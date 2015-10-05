@@ -1,3 +1,7 @@
+<button id="reset-change-filament" title="Restart Operation" class="btn btn-default pull-right hidden"
+    data-bind="click: changeFilamentStep0">
+    <i class="icon-refresh"></i> {{ _('Restart Operation')}}
+</button>
 <p>{{ _('This operation is needed when you want to print with a differente color or when the filament available is the spool is not enough.')}}</p>
 <br />
 <div id="step1">
@@ -25,7 +29,8 @@
     <div class="row-fluid">
         <div class="span6">
             <button id="start-heating-btn" title="Start Heating" class="btn btn-danger"
-               data-bind="click: startHeating, enable: printerState.isOperational() && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+               data-bind="click: startHeating, enable: printerState.isOperational() && !operationLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                 <i class="icon-exclamation-sign"></i> {{ _('Start Heating')}}</button>
         </div>
     </div>
@@ -48,23 +53,33 @@
     </div>
     <div class="row-fluid">
         <div class="span6">
-            <strong>{{ _('Step 2')}}: {{ _('Filament Unload') }}</strong>
+            <strong>{{ _('Step 2')}}: {{ _('Filament Unload/Load') }}</strong>
         </div>
     </div>
     <div class="row-fluid">
-        <p><strong>{{ _('Make sure the filament is correctly unloaded before proceeding.' ) }}</strong>
-        </p>
-
+        <p><strong>{{ _('Make sure the filament is correctly unloaded before proceeding.' ) }}</strong></p>
+        <br />
         <p>{{ _('Push the Unload button and wait for instructions.' ) }}
         </p>
     </div>
     <div class="row-fluid">
         <button id="unload-btn" title="Unload" class="btn btn-warning"
-            data-bind="click: unloadFilament, enable: printerState.isOperational() && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+            data-bind="click: unloadFilament, enable: printerState.isOperational()
+            && printerState.isReady() && !operationLock()
+            && !printerState.isPrinting() && loginState.isUser()">
             <i class="icon-arrow-down"></i> {{ _('Unload')}}
         </button>
+    </div>
+
+    <div class="row-fluid">
+        <br />
+        <p>{{ _('Push the Load button if the filament is already unloaded and you are ready to load a new one.' ) }}</p>
+    </div>
+    <div class="row-fluid">
         <button id="load-btn" title="Load" class="btn btn-success"
-            data-bind="click: loadFilament, enable: printerState.isOperational() && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+            data-bind="click: loadFilament, enable: printerState.isOperational()
+            && printerState.isReady() && !operationLock()
+            && !printerState.isPrinting() && loginState.isUser()">
             <i class="icon-arrow-up"></i> {{ _('Load')}}
         </button>
     </div>
@@ -153,9 +168,29 @@
         </div>
         <div class="span4"></div>
     </div>
+    <br />
     <div class="row-fluid">
         <div class="span6">
             <strong>{{ _('Final Step')}}: {{ _('Select Filament Code') }}</strong>
         </div>
     </div>
+    <br />
+    <form class="form-horizontal">
+        <div class="control-group">
+            <div class="controls">
+                <select data-bind="options: filamentProfiles, optionsText: 'name', optionsValue: 'key', value: selectedFilament, optionsCaption: '{{ _('Select filament type...') }}'"></select>
+
+                <button id="submit-filament" title="Save Filament" class="btn btn-primary"
+                data-bind="click: saveFilament, enable: printerState.isOperational() && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                    <i class="icon-hdd"></i> {{ _('Save')}}
+                </button>
+            </div>
+        </div>
+        <div class="alert alert-success text-center" data-bind="visible: filamentResponse">
+             <span><i class="icon-ok"></i> {{ _('The filament code was saved. The operation is now finished!')}}</span>
+        </div>
+        <div class="alert alert-danger text-center" data-bind="visible: filamentResponseError">
+             <span><i class="icon-exclamation-sign"></i> {{ _('An error occurred while saving the information. Please try again.')}}</span>
+        </div>
+    </form>
 </div>

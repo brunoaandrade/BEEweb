@@ -14,7 +14,13 @@ $(function() {
         self.sending = ko.observable(false);
         self.callbacks = [];
 
+        self.operationLock = ko.observable(false);
+
         self.maintenanceDialog = $('#maintenance_dialog');
+        self.filamentProfiles = ko.observableArray();
+        self.selectedFilament = ko.observable();
+        self.filamentResponse = ko.observable(false);
+        self.filamentResponseError = ko.observable(false);
 
         self.show = function() {
             // show settings, ensure centered position
@@ -36,6 +42,8 @@ $(function() {
         /*******                   Filament Change functions            ************/
         /***************************************************************************/
         self.startHeating = function() {
+            self.operationLock(true);
+
             var data = {
                 command: "target",
                 targets: {
@@ -54,8 +62,10 @@ $(function() {
                     $('#progress-bar-div').removeClass('hidden');
 
                     self._updateTempProgress();
+
+                    self.operationLock(false);
                 },
-                error: function() {  }
+                error: function() { self.operationLock(false);  }
             });
         }
 
@@ -107,6 +117,7 @@ $(function() {
                             // Heating is finished, let's move on
                             $('#step2').removeClass('hidden');
                             $('#step1').addClass('hidden');
+                            $('#reset-change-filament').removeClass('hidden');
                         } else {
 
                             setTimeout(function() { self._updateTempProgress() }, 2000);
@@ -122,38 +133,121 @@ $(function() {
         }
 
         self.loadFilament = function() {
+            self.operationLock(true);
+
             $.ajax({
                 url: API_BASEURL + "maintenance/load",
                 type: "POST",
                 dataType: "json",
-                success: function() { },
-                error: function() {  }
+                success: function() {
+                    self.nextStep4();
+
+                    self.operationLock(false);
+                },
+                error: function() { self.operationLock(false); }
             });
         }
 
         self.unloadFilament = function() {
+            self.operationLock(true);
+
             $.ajax({
                 url: API_BASEURL + "maintenance/unload",
                 type: "POST",
                 dataType: "json",
                 success: function() {
-                    $('#step3').removeClass('hidden');
-                    $('#step2').addClass('hidden');
+                    self.nextStep3();
+
+                    self.operationLock(false);
                 },
-                error: function() {  }
+                error: function() { self.operationLock(false); }
             });
         }
 
         self.nextStep3 = function() {
             $('#step4').removeClass('hidden');
             $('#step3').addClass('hidden');
+            $('#step2').addClass('hidden');
         }
 
         self.nextStep4 = function() {
             $('#step5').removeClass('hidden');
             $('#step4').addClass('hidden');
+            $('#step3').addClass('hidden');
+            $('#step2').addClass('hidden');
+
+            self.filamentResponse(false);
+            self.filamentResponseError(false);
+
+            self._getFilamentProfiles();
         }
 
+        self.changeFilamentStep0 = function() {
+            $('#step2').addClass('hidden');
+            $('#step3').addClass('hidden');
+            $('#step4').addClass('hidden');
+            $('#step5').addClass('hidden');
+            $('#step1').removeClass('hidden');
+
+            var tempProgress = $("#temperature_progress");
+            var tempProgressBar = $(".bar", tempProgress);
+
+            tempProgressBar.css('width', '0%');
+            tempProgressBar.text('0%');
+
+            $('#start-heating-btn').removeClass('hidden');
+            $('#progress-bar-div').addClass('hidden');
+        }
+
+        self.saveFilament = function() {
+            self.filamentResponse(false);
+            self.filamentResponseError(false);
+
+            var data = {
+                command: "filament",
+                filamentStr: self.selectedFilament()
+            };
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/save_filament",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify(data),
+                success: function(data) {
+                    var response = data['response'];
+
+                    if (response.indexOf('ok') > -1) {
+                        self.filamentResponse(true);
+                    } else {
+                        self.filamentResponseError(true);
+                    }
+
+                },
+                error: function() {  }
+            });
+        }
+        self._getFilamentProfiles = function() {
+
+            $.ajax({
+                url: API_BASEURL + "slicing",
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    var profiles = data['cura']['profiles'];
+                    self.filamentProfiles.removeAll();
+
+                    _.each(profiles, function(profile) {
+
+                        self.filamentProfiles.push({
+                            key: profile.key,
+                            name: profile.displayName
+                        });
+                    });
+                }
+            });
+
+        }
         /***************************************************************************/
         /*******               end Filament Change functions            ************/
         /***************************************************************************/

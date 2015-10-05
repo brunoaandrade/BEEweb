@@ -69,3 +69,26 @@ def loadFilament():
 	printer.load()
 
 	return NO_CONTENT
+
+
+@api.route("/maintenance/save_filament", methods=["POST"])
+@restricted_access
+def saveFilament():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	valid_commands = {
+		"filament": ["filamentStr"]
+	}
+	command, data, response = get_json_command_from_request(request, valid_commands)
+	if response is not None:
+		return response
+
+	filamentStr = data['filamentStr']
+
+	resp = printer.setFilamentString(filamentStr)
+
+	return jsonify({
+		"response": resp
+	})

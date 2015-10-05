@@ -203,6 +203,13 @@ class BeePrinter(Printer):
         """
         return self._comm.getCommandsInterface().load()
 
+    def setFilamentString(self, filamentStr):
+        """
+        Saves the filament reference string in the printer memory
+        :return:
+        """
+        return self._comm.getCommandsInterface().setFilamentString(filamentStr)
+
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
         """
         Auxiliar method to control the print progress status data
