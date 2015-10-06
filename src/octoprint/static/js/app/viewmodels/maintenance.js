@@ -273,9 +273,38 @@ $(function() {
 
         }
         /***************************************************************************/
-        /*******               end Filament Change functions            ************/
+        /**********             end Filament Change functions           ************/
         /***************************************************************************/
 
+        /***************************************************************************/
+        /**********                 Calibration functions               ************/
+        /***************************************************************************/
+
+        self.startCalibration = function() {
+            self.commandLock(true);
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/start_calibration",
+                type: "POST",
+                dataType: "json",
+                success: function() {
+                    self.nextStepCalibration1();
+
+                    self.commandLock(false);
+                },
+                error: function() { self.commandLock(false); }
+            });
+        }
+
+        self.calibrationStep0 = function() {
+
+        }
+
+
+        self.nextStepCalibration1 = function() {
+            $('#calibrationStep2').removeClass('hidden');
+            $('#calibrationStep1').addClass('hidden');
+        }
     }
 
     OCTOPRINT_VIEWMODELS.push([

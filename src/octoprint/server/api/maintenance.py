@@ -92,3 +92,11 @@ def saveFilament():
 	return jsonify({
 		"response": resp
 	})
+
+@api.route("/maintenance/start_calibration", methods=["POST"])
+@restricted_access
+def startCalibration():
+
+	printer.startCalibration()
+
+	return NO_CONTENT
