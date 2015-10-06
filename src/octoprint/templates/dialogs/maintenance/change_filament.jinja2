@@ -1,3 +1,4 @@
+
 <button id="reset-change-filament" title="Restart Operation" class="btn btn-default pull-right hidden"
     data-bind="click: changeFilamentStep0">
     <i class="icon-refresh"></i> {{ _('Restart Operation')}}
@@ -23,7 +24,9 @@
     </div>
     <br />
     <div class="row-fluid">
-        <p>{{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}</p>
+        <span class="span12 alert alert-danger"><i class="icon-exclamation-sign"></i>
+            {{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}
+        </span>
     </div>
     <br />
     <div class="row-fluid">
@@ -31,7 +34,7 @@
             <button id="start-heating-btn" title="Start Heating" class="btn btn-danger"
                data-bind="click: startHeating, enable: printerState.isOperational() && !operationLock()
                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
-                <i class="icon-exclamation-sign"></i> {{ _('Start Heating')}}</button>
+                <i class="icon-fire"></i> {{ _('Start Heating')}}</button>
         </div>
     </div>
     <div id="progress-bar-div" class="row-fluid hidden">
@@ -43,6 +46,7 @@
             data-bind="click: cancelHeating" ><i class="icon-stop"></i> {{ _('Cancel')}}</button>
     </div>
 </div>
+
 <div id="step2" class="hidden">
     <div class="row-fluid">
         <div class="span4"></div>
@@ -65,7 +69,7 @@
     <div class="row-fluid">
         <button id="unload-btn" title="Unload" class="btn btn-warning"
             data-bind="click: unloadFilament, enable: printerState.isOperational()
-            && printerState.isReady() && !operationLock()
+            && printerState.isReady() && !commandLock()
             && !printerState.isPrinting() && loginState.isUser()">
             <i class="icon-arrow-down"></i> {{ _('Unload')}}
         </button>
@@ -78,7 +82,7 @@
     <div class="row-fluid">
         <button id="load-btn" title="Load" class="btn btn-success"
             data-bind="click: loadFilament, enable: printerState.isOperational()
-            && printerState.isReady() && !operationLock()
+            && printerState.isReady() && !commandLock()
             && !printerState.isPrinting() && loginState.isUser()">
             <i class="icon-arrow-up"></i> {{ _('Load')}}
         </button>
@@ -118,11 +122,13 @@
     </div>
     <div class="row-fluid">
         <button id="unload-btn-3" title="Unload" class="btn btn-warning"
-            data-bind="click: unloadFilament, enable: printerState.isOperational() && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+            data-bind="click: unloadFilament, enable: printerState.isOperational() && !commandLock()
+            && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
             <i class="icon-arrow-down"></i> {{ _('Unload')}}
         </button>
         <button id="next-step-3" title="Next Step" class="btn btn-default"
-            data-bind="click: nextStep3, enable: printerState.isOperational() && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+            data-bind="click: nextStep3, enable: printerState.isOperational() && !commandLock()
+            && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
             <i class="icon-arrow-right"></i> {{ _('Next Step')}}
         </button>
     </div>
@@ -150,11 +156,13 @@
     </div>
     <div class="row-fluid">
         <button id="load-btn-4" title="Load" class="btn btn-success"
-            data-bind="click: loadFilament, enable: printerState.isOperational() && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+            data-bind="click: loadFilament, enable: printerState.isOperational() && !commandLock()
+            && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
             <i class="icon-arrow-up"></i> {{ _('Load')}}
         </button>
         <button id="next-step-4" title="Next Step" class="btn btn-default"
-            data-bind="click: nextStep4, enable: printerState.isOperational() && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+            data-bind="click: nextStep4, enable: printerState.isOperational() && !commandLock()
+            && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
             <i class="icon-arrow-right"></i> {{ _('Next Step')}}
         </button>
     </div>
@@ -181,7 +189,8 @@
                 <select data-bind="options: filamentProfiles, optionsText: 'name', optionsValue: 'key', value: selectedFilament, optionsCaption: '{{ _('Select filament type...') }}'"></select>
 
                 <button id="submit-filament" title="Save Filament" class="btn btn-primary"
-                data-bind="click: saveFilament, enable: printerState.isOperational() && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                data-bind="click: saveFilament, enable: printerState.isOperational() && !commandLock()
+                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                     <i class="icon-hdd"></i> {{ _('Save')}}
                 </button>
             </div>

@@ -6,8 +6,8 @@
     <div class="modal-body">
         <div class="full-sized-box">
             <div class="tabbable row-fluid">
-                <div class="span3 scrollable" id="maintenance_dialog_menu">
-                    <ul class="nav nav-list" id="maintenanceTabs">
+                <div class="span3 scrollable" id="maintenance_dialog_menu" >
+                    <ul class="nav nav-list operationsList" id="maintenanceTabs" data-bind="css: { lockedOperation: operationLock() }">
 
                         <li class="nav-header">{{ _('Operations') }}</li>
 
@@ -31,6 +31,9 @@
                 <div class="tab-content span9 scrollable" id="maintenance_dialog_content">
                     <div id="maintenance_changeFilament" class="tab-pane active">
                         {% include 'dialogs/maintenance/change_filament.jinja2' ignore missing %}
+                    </div>
+                    <div id="maintenance_calibration" class="tab-pane">
+                        {% include 'dialogs/maintenance/calibration.jinja2' ignore missing %}
                     </div>
                 </div>
             </div>

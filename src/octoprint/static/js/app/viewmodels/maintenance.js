@@ -14,6 +14,7 @@ $(function() {
         self.sending = ko.observable(false);
         self.callbacks = [];
 
+        self.commandLock = ko.observable(false);
         self.operationLock = ko.observable(false);
 
         self.maintenanceDialog = $('#maintenance_dialog');
@@ -42,6 +43,7 @@ $(function() {
         /*******                   Filament Change functions            ************/
         /***************************************************************************/
         self.startHeating = function() {
+            self.commandLock(true);
             self.operationLock(true);
 
             var data = {
@@ -63,9 +65,9 @@ $(function() {
 
                     self._updateTempProgress();
 
-                    self.operationLock(false);
+                    self.commandLock(false);
                 },
-                error: function() { self.operationLock(false);  }
+                error: function() { self.commandLock(false);  }
             });
         }
 
@@ -86,8 +88,15 @@ $(function() {
                 success: function() {
                     $('#start-heating-btn').removeClass('hidden');
                     $('#progress-bar-div').addClass('hidden');
+
+                    self.commandLock(false);
+                    self.operationLock(false);
+
                 },
-                error: function() {  }
+                error: function() {
+                    self.commandLock(false);
+                    self.operationLock(false);
+                }
             });
 
             cancelTemperatureUpdate = true;
@@ -133,7 +142,7 @@ $(function() {
         }
 
         self.loadFilament = function() {
-            self.operationLock(true);
+            self.commandLock(true);
 
             $.ajax({
                 url: API_BASEURL + "maintenance/load",
@@ -142,14 +151,14 @@ $(function() {
                 success: function() {
                     self.nextStep4();
 
-                    self.operationLock(false);
+                    self.commandLock(false);
                 },
-                error: function() { self.operationLock(false); }
+                error: function() { self.commandLock(false); }
             });
         }
 
         self.unloadFilament = function() {
-            self.operationLock(true);
+            self.commandLock(true);
 
             $.ajax({
                 url: API_BASEURL + "maintenance/unload",
@@ -158,9 +167,9 @@ $(function() {
                 success: function() {
                     self.nextStep3();
 
-                    self.operationLock(false);
+                    self.commandLock(false);
                 },
-                error: function() { self.operationLock(false); }
+                error: function() { self.commandLock(false); }
             });
         }
 
@@ -200,6 +209,8 @@ $(function() {
         }
 
         self.saveFilament = function() {
+            self.commandLock(true);
+
             self.filamentResponse(false);
             self.filamentResponseError(false);
 
@@ -219,12 +230,18 @@ $(function() {
 
                     if (response.indexOf('ok') > -1) {
                         self.filamentResponse(true);
+
+                        self.commandLock(false);
+                        self.operationLock(false);
+
                     } else {
                         self.filamentResponseError(true);
                     }
-
                 },
-                error: function() {  }
+                error: function() {
+                    self.commandLock(false);
+                    self.operationLock(false);
+                }
             });
         }
         self._getFilamentProfiles = function() {
