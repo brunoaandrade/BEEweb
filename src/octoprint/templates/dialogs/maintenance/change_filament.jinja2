@@ -117,19 +117,22 @@
         <div class="span4"></div>
     </div>
     <div class="row-fluid">
-        <p>{{ _('You many now remove the spool. Cut the tip and store the spool in a cold dry place. If the filament is not loose, press the Unload button again.' ) }}
-        </p>
+        <p>{{ _('You many now remove the spool. Cut the tip and store the spool in a cold dry place.' ) }}</p>
     </div>
     <div class="row-fluid">
-        <button id="unload-btn-3" title="Unload" class="btn btn-warning"
-            data-bind="click: unloadFilament, enable: printerState.isOperational() && !commandLock()
-            && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
-            <i class="icon-arrow-down"></i> {{ _('Unload')}}
-        </button>
         <button id="next-step-3" title="Next Step" class="btn btn-default"
             data-bind="click: nextStep3, enable: printerState.isOperational() && !commandLock()
             && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
             <i class="icon-arrow-right"></i> {{ _('Next Step')}}
+        </button>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <p>{{ _('If the filament is not loose, press the Unload button again.')}}</p>
+        <button id="unload-btn-3" title="Unload" class="btn btn-warning"
+            data-bind="click: unloadFilament, enable: printerState.isOperational() && !commandLock()
+            && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+            <i class="icon-arrow-down"></i> {{ _('Unload')}}
         </button>
     </div>
 </div>

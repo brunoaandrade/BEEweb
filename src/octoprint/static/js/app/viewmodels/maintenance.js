@@ -165,12 +165,18 @@ $(function() {
                 type: "POST",
                 dataType: "json",
                 success: function() {
-                    self.nextStep3();
+                    self.nextStep2();
 
                     self.commandLock(false);
                 },
                 error: function() { self.commandLock(false); }
             });
+        }
+
+        self.nextStep2 = function() {
+            $('#step3').removeClass('hidden');
+            $('#step2').addClass('hidden');
+            $('#step1').addClass('hidden');
         }
 
         self.nextStep3 = function() {
@@ -236,6 +242,7 @@ $(function() {
 
                     } else {
                         self.filamentResponseError(true);
+                        self.commandLock(false);
                     }
                 },
                 error: function() {
