@@ -44,13 +44,13 @@
     <div class="jog-panel">
         <h1>Z</h1>
         <div>
-            <button class="btn box" id="control-zinc" data-bind="enable: isOperational() && !isPrinting() && loginState.isUser(), click: function() { $root.sendJogCommand('z',1) }"><i class="icon-arrow-up"></i></button>
+            <button class="btn box" id="control-zinc" data-bind="enable: isOperational() && !isPrinting() && loginState.isUser(), click: function() { $root.sendJogCommand('z',-1) }"><i class="icon-arrow-up"></i></button>
         </div>
         <div>
             <button class="btn box" id="control-zhome" data-bind="enable: isOperational() && !isPrinting() && loginState.isUser(), click: function() { $root.sendHomeCommand(['z']) }"><i class="icon-home"></i></button>
         </div>
         <div>
-            <button class="btn box" id="control-zdec" data-bind="enable: isOperational() && !isPrinting() && loginState.isUser(), click: function() { $root.sendJogCommand('z',-1) }"><i class="icon-arrow-down"></i></button>
+            <button class="btn box" id="control-zdec" data-bind="enable: isOperational() && !isPrinting() && loginState.isUser(), click: function() { $root.sendJogCommand('z',1) }"><i class="icon-arrow-down"></i></button>
         </div>
     </div>
 
