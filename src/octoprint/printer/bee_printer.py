@@ -219,6 +219,13 @@ class BeePrinter(Printer):
         """
         return self._comm.getCommandsInterface().startCalibration(startZ, repeat)
 
+    def nextCalibrationStep(self):
+        """
+        Goes to the next calibration step
+        :return:
+        """
+        return self._comm.getCommandsInterface().goToNextCalibrationPoint()
+
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
         """
         Auxiliar method to control the print progress status data

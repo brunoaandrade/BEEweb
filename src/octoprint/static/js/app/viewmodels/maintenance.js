@@ -282,6 +282,7 @@ $(function() {
 
         self.startCalibration = function() {
             self.commandLock(true);
+            self.operationLock(true);
 
             $.ajax({
                 url: API_BASEURL + "maintenance/start_calibration",
@@ -291,19 +292,139 @@ $(function() {
                     self.nextStepCalibration1();
 
                     self.commandLock(false);
+                    $('#reset-calibration').removeClass('hidden');
                 },
                 error: function() { self.commandLock(false); }
             });
         }
 
+        self.upBigStep = function() {
+            self._sendJogCommand('z', -1, 0.5);
+        }
+
+        self.upSmallStep = function() {
+            self._sendJogCommand('z', -1, 0.05);
+        }
+
+        self.downBigStep = function() {
+            self._sendJogCommand('z', 1, 0.5);
+        }
+
+        self.downSmallStep = function() {
+            self._sendJogCommand('z', 1, 0.05);
+        }
+
         self.calibrationStep0 = function() {
 
+            // Sends the home to command to reset the position
+            self._sendCustomCommand('G28');
+
+            $('#calibrationStep0').removeClass('hidden');
+            $('#calibrationStep1').removeClass('hidden');
+            $('#calibrationStep2').addClass('hidden');
+            $('#calibrationStep3').addClass('hidden');
+            $('#calibrationStep4').addClass('hidden');
+            $('#calibrationStep5').addClass('hidden');
+
+            self.operationLock(false);
+            $('#reset-calibration').addClass('hidden');
         }
 
 
         self.nextStepCalibration1 = function() {
             $('#calibrationStep2').removeClass('hidden');
             $('#calibrationStep1').addClass('hidden');
+        }
+
+        self.nextStepCalibration2 = function() {
+
+            // Sends the command to go to the next calibration point
+            self._nextCalibrationStep();
+
+            $('#calibrationStep3').removeClass('hidden');
+            $('#calibrationStep1').addClass('hidden');
+            $('#calibrationStep2').addClass('hidden');
+            $('#calibrationStep0').addClass('hidden');
+
+        }
+
+        self.nextStepCalibration3 = function() {
+            // Sends the command to go to the next calibration point
+            self._nextCalibrationStep();
+
+            $('#calibrationStep4').removeClass('hidden');
+            $('#calibrationStep3').addClass('hidden');
+            $('#calibrationStep1').addClass('hidden');
+            $('#calibrationStep2').addClass('hidden');
+            $('#calibrationStep0').addClass('hidden');
+
+        }
+
+        self.nextStepCalibration4 = function() {
+
+            // Sends the command to go to the next calibration point
+            self._nextCalibrationStep();
+
+            $('#calibrationStep5').removeClass('hidden');
+            $('#calibrationStep4').addClass('hidden');
+            $('#calibrationStep3').addClass('hidden');
+            $('#calibrationStep1').addClass('hidden');
+            $('#calibrationStep2').addClass('hidden');
+            $('#calibrationStep0').addClass('hidden');
+        }
+
+        self.finishCalibration = function() {
+
+            self.calibrationStep0();
+        }
+
+        self.calibrationTest = function() {
+
+        }
+
+        self._sendJogCommand = function (axis, direction, distance) {
+            self.commandLock(true);
+            var data = {
+                "command": "jog"
+            };
+            data[axis] = distance * direction;
+
+            $.ajax({
+                url: API_BASEURL + "printer/printhead",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify(data),
+                success: function() {
+                    self.commandLock(false);
+                },
+                error: function() { self.commandLock(false); }
+            });
+        };
+
+        self._sendCustomCommand = function (command) {
+            $.ajax({
+                url: API_BASEURL + "printer/command",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify({"command": command})
+            });
+        }
+
+        self._nextCalibrationStep = function() {
+
+            self.commandLock(true);
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/calibration_next",
+                type: "POST",
+                dataType: "json",
+                success: function() {
+                    self.commandLock(false);
+                },
+                error: function() { self.commandLock(false); }
+            });
         }
     }
 

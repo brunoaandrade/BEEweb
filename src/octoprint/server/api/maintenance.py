@@ -100,3 +100,11 @@ def startCalibration():
 	printer.startCalibration()
 
 	return NO_CONTENT
+
+@api.route("/maintenance/calibration_next", methods=["POST"])
+@restricted_access
+def nextCalibrationStep():
+
+	printer.nextCalibrationStep()
+
+	return NO_CONTENT

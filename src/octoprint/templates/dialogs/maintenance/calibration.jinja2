@@ -37,10 +37,152 @@
 </div>
 
 <div id="calibrationStep2" class="hidden">
+    <strong>{{ _('Table Fine Tuning')}}</strong>
+    <br /><br />
+    <div class="row-fluid">
+        <div class="span6">
+            <button id="upsmallstep-btn" title="Up 0.05" class="btn btn-primary"
+               data-bind="click: upSmallStep, enable: printerState.isOperational() && !commandLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                <i class="icon-arrow-up"></i> {{ _('0.05 millimeters')}}</button>
+        </div>
+        <div class="span6">
+            <button id="downsmallstep-btn" title="Down 0.05" class="btn btn-primary"
+               data-bind="click: downSmallStep, enable: printerState.isOperational() && !commandLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                <i class="icon-arrow-down"></i> {{ _('0.05 millimeters')}}</button>
+        </div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span6">
+            <button id="upbigstep-btn" title="Up 0.05" class="btn btn-primary"
+               data-bind="click: upBigStep, enable: printerState.isOperational() && !commandLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                <i class="icon-arrow-up"></i><i class="icon-arrow-up"></i> {{ _('0.5 millimeters')}}</button>
+        </div>
+        <div class="span6">
+            <button id="downbigstep-btn" title="Up 0.05" class="btn btn-primary"
+               data-bind="click: downBigStep, enable: printerState.isOperational() && !commandLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                <i class="icon-arrow-down"></i><i class="icon-arrow-down"></i> {{ _('0.5 millimeters')}}</button>
+        </div>
+    </div>
+    <br />
     <div class="row-fluid">
         <span class="span12 alert alert-info"><i class="icon-exclamation-sign"></i>
             {{ _('WARNING: If you have moved the table up too far against the nozzle, click "Restart Operation".') }}
         </span>
     </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span6">
+            <button id="calib-next-step-3" title="Next Step" class="btn btn-default"
+               data-bind="click: nextStepCalibration2, enable: printerState.isOperational() && !commandLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                <i class="icon-arrow-right"></i> {{ _('Next Step')}}</button>
+        </div>
+    </div>
 </div>
 
+<div id="calibrationStep3" class="hidden">
+    <div class="row-fluid">
+        <div class="span6">
+            <strong>{{ _('Step 2')}}: {{ _('Calibration - Table Level') }}</strong>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span3"></div>
+        <div class="span6">
+            <img src="{{ url_for('static', filename='img/maintenance/cabeca_impressao1.png') }}" />
+        </div>
+        <div class="span3"></div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <span>{{ _('Put a piece of paper on the table beneath the nozzle.' ) }}</span>
+        <span>{{ _('Fine tune the table up or down by rotating the left screw.' ) }}</span>
+        <span>{{ _('You have correctly calibrated the table once the paper is neither stuck nor completely loose.' ) }}</span>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span6">
+            <button id="calib-next-step-4" title="Next Step" class="btn btn-default"
+               data-bind="click: nextStepCalibration3, enable: printerState.isOperational() && !commandLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                <i class="icon-arrow-right"></i> {{ _('Next Step')}}</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="calibrationStep4" class="hidden">
+    <div class="row-fluid">
+        <div class="span6">
+            <strong>{{ _('Step 3')}}: {{ _('Calibration - Table Level') }}</strong>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span3"></div>
+        <div class="span6">
+            <img src="{{ url_for('static', filename='img/maintenance/cabeca_impressao2.png') }}" />
+        </div>
+        <div class="span3"></div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <span>{{ _('Put a piece of paper on the table beneath the nozzle.' ) }}</span>
+        <span>{{ _('Fine tune the table up or down by rotating the right screw.' ) }}</span>
+        <span>{{ _('You have correctly calibrated the table once the paper is neither stuck nor completely loose.' ) }}</span>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span6">
+            <button id="calib-next-step-5" title="Next Step" class="btn btn-default"
+               data-bind="click: nextStepCalibration4, enable: printerState.isOperational() && !commandLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                <i class="icon-arrow-right"></i> {{ _('Next Step')}}
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div id="calibrationStep5" class="hidden">
+    <div class="row-fluid">
+        <div class="span6">
+            <strong>{{ _('Final Step')}}</strong>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span3"></div>
+        <div class="span6">
+            <img src="{{ url_for('static', filename='img/maintenance/etapa_final.png') }}" />
+        </div>
+        <div class="span3"></div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span6">
+            <button id="test-calibration-btn" title="Calibration Test" class="btn btn-primary"
+               data-bind="click: calibrationTest, enable: printerState.isOperational() && !commandLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                <i class="icon-cog"></i> {{ _('Calibration test')}}</button>
+        </div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <span>{{ _('Click "Calibration test" if you want to make sure the table has been correctly calibrated.' ) }}</span>
+        <span>{{ _('The extruder nozzle will move along the table.' ) }}</span>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span6">
+            <button id="calib-finish" title="Finish Calibration" class="btn btn-default"
+               data-bind="click: finishCalibration, enable: printerState.isOperational() && !commandLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                <i class="icon-ok-sign"></i> {{ _('Finish Calibration')}}
+            </button>
+        </div>
+    </div>
+</div>
