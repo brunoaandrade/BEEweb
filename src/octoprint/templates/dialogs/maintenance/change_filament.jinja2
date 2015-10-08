@@ -3,9 +3,15 @@
     data-bind="click: changeFilamentStep0">
     <i class="icon-refresh"></i> {{ _('Restart Operation')}}
 </button>
-<p>{{ _('This operation is needed when you want to print with a differente color or when the filament available is the spool is not enough.')}}</p>
-<br />
+
 <div id="step1">
+    <div class="row-fluid">
+        <span class="span12 alert alert-info">
+            <i class="icon-question-sign"></i>
+            {{ _('This operation is needed when you want to print with a differente color or when the filament available in the spool is not enough.')}}
+        </span>
+    </div>
+    <br />
     <div class="row-fluid">
         <div class="span6">
             <strong>{{ _('Step 1')}}: {{ _('Extruder nozzle temperature') }}</strong>

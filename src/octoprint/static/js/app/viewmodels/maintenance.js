@@ -433,6 +433,131 @@ $(function() {
                 error: function() { self.commandLock(false); }
             });
         }
+
+        /***************************************************************************/
+        /**********             end Calibrations functions              ************/
+        /***************************************************************************/
+
+        /***************************************************************************/
+        /**********            Extruder maintenance functions           ************/
+        /***************************************************************************/
+
+        self.extMaintStep0 = function() {
+            $('#extMaintStep1').removeClass('hidden');
+            $('#extMaintStep2').addClass('hidden');
+            $('#extMaintStep3').addClass('hidden');
+            $('#extMaintStep4').addClass('hidden');
+
+        }
+
+        self.nextStepExtMaintenance1 = function() {
+            $('#extMaintStep2').removeClass('hidden');
+            $('#extMaintStep1').addClass('hidden');
+        }
+
+        self.startHeatingExtMaint = function() {
+            self.commandLock(true);
+            self.operationLock(true);
+
+            var data = {
+                command: "target",
+                targets: {
+                    'tool0': TARGET_TEMPERATURE
+                }
+            };
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/start_heating",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify(data),
+                success: function() {
+                    $('#start-heating-ext-mtn').addClass('hidden');
+                    $('#progress-bar-ext-mtn').removeClass('hidden');
+
+                    self._updateTempProgressExtMaint();
+
+                    self.commandLock(false);
+
+                    self.nextStepExtMaintenance1();
+                },
+                error: function() { self.commandLock(false);  }
+            });
+        }
+
+        self.cancelHeatingExtMaint = function() {
+            var data = {
+                command: "target",
+                targets: {
+                    'tool0': 0
+                }
+            };
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/start_heating",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify(data),
+                success: function() {
+                    $('#start-heating-ext-mtn').removeClass('hidden');
+                    $('#progress-bar-ext-mtn').addClass('hidden');
+
+                    self.commandLock(false);
+                    self.operationLock(false);
+
+                    self.extMaintStep0();
+                },
+                error: function() {
+                    self.commandLock(false);
+                    self.operationLock(false);
+                }
+            });
+
+            cancelTemperatureUpdate = true;
+        }
+
+        self._updateTempProgressExtMaint = function() {
+            fetchTemperatureRetries = 5;
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/temperature",
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    if (!cancelTemperatureUpdate) {
+                        var current_temp = data['temperature'];
+                        var progress = ((current_temp / TARGET_TEMPERATURE) * 100).toFixed(0);
+
+                        var tempProgress = $("#temperature-progress-ext-mtn");
+                        var tempProgressBar = $(".bar", tempProgress);
+
+                        var progressStr = progress + "%";
+                        tempProgressBar.css('width', progressStr);
+                        tempProgressBar.text(progressStr);
+
+                        if (progress >= 100) {
+                            // Heating is finished, let's move on
+
+                        } else {
+
+                            setTimeout(function() { self._updateTempProgressExtMaint() }, 2000);
+                        }
+                    }
+                },
+                error: function() {
+                    while (fetchTemperatureRetries > 0)
+                        setTimeout(function() { self._updateTempProgressExtMaint() }, 2000);
+                        fetchTemperatureRetries -= 1;
+                    }
+            });
+        }
+
+
+        /***************************************************************************/
+        /**********         end Extruder maintenance functions          ************/
+        /***************************************************************************/
     }
 
     OCTOPRINT_VIEWMODELS.push([
