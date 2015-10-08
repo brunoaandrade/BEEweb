@@ -325,6 +325,7 @@ $(function() {
             $('#calibrationStep3').addClass('hidden');
             $('#calibrationStep4').addClass('hidden');
             $('#calibrationStep5').addClass('hidden');
+            $('#calibrationTest').addClass('hidden');
 
             self.operationLock(false);
             $('#reset-calibration').addClass('hidden');
@@ -379,7 +380,13 @@ $(function() {
         }
 
         self.calibrationTest = function() {
-
+            $('#calibrationStep5').addClass('hidden');
+            $('#calibrationStep4').addClass('hidden');
+            $('#calibrationStep3').addClass('hidden');
+            $('#calibrationStep1').addClass('hidden');
+            $('#calibrationStep2').addClass('hidden');
+            $('#calibrationStep0').addClass('hidden');
+            $('#calibrationTest').removeClass('hidden');
         }
 
         self._sendJogCommand = function (axis, direction, distance) {
