@@ -11,6 +11,12 @@
             {{ _('This operation is needed when you want to print with a differente color or when the filament available in the spool is not enough.')}}
         </span>
     </div>
+
+    <div class="row-fluid">
+        <span class="span12 alert alert-danger"><i class="icon-exclamation-sign"></i>
+            {{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}
+        </span>
+    </div>
     <br />
     <div class="row-fluid">
         <div class="span6">
@@ -28,12 +34,7 @@
         <p>{{ _('Extruder nozzle has to be heated whenever you change the filament. When it reaches the ideal temperature you may move to the next stage.' ) }}
         </p>
     </div>
-    <br />
-    <div class="row-fluid">
-        <span class="span12 alert alert-danger"><i class="icon-exclamation-sign"></i>
-            {{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}
-        </span>
-    </div>
+
     <br />
     <div class="row-fluid">
         <div class="span6">
@@ -208,7 +209,7 @@
              <span><i class="icon-ok"></i> {{ _('The filament code was saved. The operation is now finished!')}}</span>
         </div>
         <div class="alert alert-danger text-center" data-bind="visible: filamentResponseError">
-             <span><i class="icon-exclamation-sign"></i> {{ _('An error occurred while saving the information. Please try again.')}}</span>
+             <span><i class="icon-exclamation-sign"></i> {{ _('An error occurred while saving. Please make sure a filament code is selected and try again.')}}</span>
         </div>
     </form>
 </div>

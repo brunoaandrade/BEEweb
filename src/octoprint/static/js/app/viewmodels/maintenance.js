@@ -32,6 +32,9 @@ $(function() {
                 'margin-left': function() { return -($(this).width() /2); }
             });
 
+            // Gets the available filament list
+            self._getFilamentProfiles();
+
             return false;
         };
 
@@ -72,19 +75,13 @@ $(function() {
         }
 
         self.cancelHeating = function() {
-            var data = {
-                command: "target",
-                targets: {
-                    'tool0': 0
-                }
-            };
+
 
             $.ajax({
-                url: API_BASEURL + "maintenance/start_heating",
+                url: API_BASEURL + "maintenance/cancel_heating",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
-                data: JSON.stringify(data),
                 success: function() {
                     $('#start-heating-btn').removeClass('hidden');
                     $('#progress-bar-div').addClass('hidden');
@@ -193,8 +190,6 @@ $(function() {
 
             self.filamentResponse(false);
             self.filamentResponseError(false);
-
-            self._getFilamentProfiles();
         }
 
         self.changeFilamentStep0 = function() {
@@ -248,6 +243,7 @@ $(function() {
                 error: function() {
                     self.commandLock(false);
                     self.operationLock(false);
+                    self.filamentResponseError(true);
                 }
             });
         }
@@ -443,16 +439,34 @@ $(function() {
         /***************************************************************************/
 
         self.extMaintStep0 = function() {
-            $('#extMaintStep1').removeClass('hidden');
             $('#extMaintStep2').addClass('hidden');
             $('#extMaintStep3').addClass('hidden');
             $('#extMaintStep4').addClass('hidden');
+            $('#reset-extruder-maint').addClass('hidden');
 
+            $('#extMaintStep1').removeClass('hidden');
+            $('#start-heating-ext-mtn').removeClass('hidden');
+
+            self.cancelHeatingExtMaint();
         }
 
         self.nextStepExtMaintenance1 = function() {
             $('#extMaintStep2').removeClass('hidden');
             $('#extMaintStep1').addClass('hidden');
+        }
+
+        self.nextStepExtMaint2 = function() {
+            $('#extMaintStep3').removeClass('hidden');
+            $('#extMaintStep2').addClass('hidden');
+            $('#extMaintStep1').addClass('hidden');
+            $('#next-step-ext-mtn-3').addClass('hidden');
+        }
+
+        self.nextStepExtMaint3 = function() {
+            $('#extMaintStep3').addClass('hidden');
+            $('#extMaintStep2').addClass('hidden');
+            $('#extMaintStep1').addClass('hidden');
+            $('#extMaintStep4').removeClass('hidden');
         }
 
         self.startHeatingExtMaint = function() {
@@ -475,6 +489,7 @@ $(function() {
                 success: function() {
                     $('#start-heating-ext-mtn').addClass('hidden');
                     $('#progress-bar-ext-mtn').removeClass('hidden');
+                    $('#reset-extruder-maint').removeClass('hidden');
 
                     self._updateTempProgressExtMaint();
 
@@ -487,19 +502,12 @@ $(function() {
         }
 
         self.cancelHeatingExtMaint = function() {
-            var data = {
-                command: "target",
-                targets: {
-                    'tool0': 0
-                }
-            };
 
             $.ajax({
                 url: API_BASEURL + "maintenance/start_heating",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
-                data: JSON.stringify(data),
                 success: function() {
                     $('#start-heating-ext-mtn').removeClass('hidden');
                     $('#progress-bar-ext-mtn').addClass('hidden');
@@ -539,7 +547,8 @@ $(function() {
 
                         if (progress >= 100) {
                             // Heating is finished, let's move on
-
+                            $('#next-step-ext-mtn-3').removeClass('hidden');
+                            $('#progress-bar-ext-mtn').addClass('hidden');
                         } else {
 
                             setTimeout(function() { self._updateTempProgressExtMaint() }, 2000);
@@ -553,7 +562,6 @@ $(function() {
                     }
             });
         }
-
 
         /***************************************************************************/
         /**********         end Extruder maintenance functions          ************/

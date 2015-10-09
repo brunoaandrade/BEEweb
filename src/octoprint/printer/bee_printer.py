@@ -189,6 +189,22 @@ class BeePrinter(Printer):
         """
         return self._comm.getCommandsInterface().getNozzleTemperature()
 
+
+    def startHeating(self, targetTemperature=210):
+        """
+        Starts the heating procedure
+        :param targetTemperature:
+        :return:
+        """
+        return self._comm.getCommandsInterface().startHeating(targetTemperature)
+
+    def cancelHeating(self):
+        """
+        Cancels the heating procedure
+        :return:
+        """
+        return self._comm.getCommandsInterface().cancelHeating()
+
     def unload(self):
         """
         Unloads the filament from the printer
