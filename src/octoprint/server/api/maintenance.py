@@ -42,10 +42,22 @@ def startHeating():
 
 		# perform the actual temperature commands
 		for tool in validated_values.keys():
-			printer.set_temperature(tool, validated_values[tool])
+			printer.startHeating(validated_values[tool]) # In the future we might pass the extruder identifier here in case of more than 1 extruder
 
 	return NO_CONTENT
 
+
+
+@api.route("/maintenance/cancel_heating", methods=["POST"])
+@restricted_access
+def cancelHeating():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	printer.cancelHeating()
+
+	return NO_CONTENT
 
 @api.route("/maintenance/temperature", methods=["GET"])
 def getTemperature():
@@ -58,6 +70,9 @@ def getTemperature():
 @restricted_access
 def unloadFilament():
 
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
 	printer.unload()
 
 	return NO_CONTENT
@@ -65,6 +80,9 @@ def unloadFilament():
 @api.route("/maintenance/load", methods=["POST"])
 @restricted_access
 def loadFilament():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
 
 	printer.load()
 
@@ -97,6 +115,9 @@ def saveFilament():
 @restricted_access
 def startCalibration():
 
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
 	printer.startCalibration()
 
 	return NO_CONTENT
@@ -104,6 +125,9 @@ def startCalibration():
 @api.route("/maintenance/calibration_next", methods=["POST"])
 @restricted_access
 def nextCalibrationStep():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
 
 	printer.nextCalibrationStep()
 
