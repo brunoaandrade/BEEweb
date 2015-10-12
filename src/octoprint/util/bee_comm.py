@@ -120,7 +120,10 @@ class BeeCom(MachineCom):
         :return:
         """
         if self._beeConn.isConnected():
-            self._changeState(self.STATE_OPERATIONAL)
+            if self._beeCommands.isPrinting():
+                self._changeState(self.STATE_PRINTING)
+            else:
+                self._changeState(self.STATE_OPERATIONAL)
         else:
             self._changeState(self.STATE_WAITING_FOR_BTF)
 

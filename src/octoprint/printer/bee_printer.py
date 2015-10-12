@@ -40,9 +40,10 @@ class BeePrinter(Printer):
         self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
         self._comm.confirmConnection()
 
-        # homes all axis
         bee_commands = self._comm.getCommandsInterface()
-        if bee_commands is not None and bee_commands.isPrinting is not False:
+
+        # homes all axis
+        if bee_commands is not None and bee_commands.isPrinting() is False:
             bee_commands.home()
 
         # selects the printer profile based on the connected printer name
