@@ -46,6 +46,7 @@ $(function() {
         /*******                   Filament Change functions            ************/
         /***************************************************************************/
         self.startHeating = function() {
+            cancelTemperatureUpdate = false;
             self.commandLock(true);
             self.operationLock(true);
 
@@ -76,7 +77,6 @@ $(function() {
 
         self.cancelHeating = function() {
 
-
             $.ajax({
                 url: API_BASEURL + "maintenance/cancel_heating",
                 type: "POST",
@@ -85,6 +85,11 @@ $(function() {
                 success: function() {
                     $('#start-heating-btn').removeClass('hidden');
                     $('#progress-bar-div').addClass('hidden');
+
+                    var tempProgress = $("#temperature_progress");
+                    var tempProgressBar = $(".bar", tempProgress);
+                    tempProgressBar.css('width', '0%');
+                    tempProgressBar.text('0%');
 
                     self.commandLock(false);
                     self.operationLock(false);
@@ -438,6 +443,12 @@ $(function() {
         /**********            Extruder maintenance functions           ************/
         /***************************************************************************/
 
+        self.restartExtMaint = function() {
+            self.cancelHeatingExtMaint();
+
+            self.extMaintStep0();
+        }
+
         self.extMaintStep0 = function() {
             $('#extMaintStep2').addClass('hidden');
             $('#extMaintStep3').addClass('hidden');
@@ -447,7 +458,6 @@ $(function() {
             $('#extMaintStep1').removeClass('hidden');
             $('#start-heating-ext-mtn').removeClass('hidden');
 
-            self.cancelHeatingExtMaint();
         }
 
         self.nextStepExtMaintenance1 = function() {
@@ -470,6 +480,7 @@ $(function() {
         }
 
         self.startHeatingExtMaint = function() {
+            cancelTemperatureUpdate = false;
             self.commandLock(true);
             self.operationLock(true);
 
@@ -504,7 +515,7 @@ $(function() {
         self.cancelHeatingExtMaint = function() {
 
             $.ajax({
-                url: API_BASEURL + "maintenance/start_heating",
+                url: API_BASEURL + "maintenance/cancel_heating",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
@@ -514,6 +525,11 @@ $(function() {
 
                     self.commandLock(false);
                     self.operationLock(false);
+
+                    var tempProgress = $("#temperature-progress-ext-mtn");
+                    var tempProgressBar = $(".bar", tempProgress);
+                    tempProgressBar.css('width', '0%');
+                    tempProgressBar.text('0%');
 
                     self.extMaintStep0();
                 },
@@ -565,6 +581,141 @@ $(function() {
 
         /***************************************************************************/
         /**********         end Extruder maintenance functions          ************/
+        /***************************************************************************/
+
+        /***************************************************************************/
+        /**************            Replace nozzle functions           **************/
+        /***************************************************************************/
+
+        self.restartReplaceNozzle = function() {
+            self.cancelHeatingReplaceNozzle();
+
+            self.replaceNozzleStep0();
+        }
+
+        self.replaceNozzleStep0 = function() {
+            $('#replaceNozzleStep2').addClass('hidden');
+            $('#replaceNozzleStep3').addClass('hidden');
+            $('#reset-replace-nozzle').addClass('hidden');
+
+            $('#replaceNozzleStep1').removeClass('hidden');
+            $('#start-heating-replace-nozzle').removeClass('hidden');
+            $('#next-step-replace-nozzle-2').addClass('hidden');
+        }
+
+        self.nextStepReplaceNozzle1 = function() {
+            $('#replaceNozzleStep2').removeClass('hidden');
+            $('#replaceNozzleStep1').addClass('hidden');
+            $('#next-step-replace-nozzle-2').addClass('hidden');
+        }
+
+        self.nextStepReplaceNozzle2 = function() {
+            $('#replaceNozzleStep3').removeClass('hidden');
+            $('#replaceNozzleStep1').addClass('hidden');
+            $('#replaceNozzleStep2').addClass('hidden');
+        }
+
+        self.startHeatingReplaceNozzle = function() {
+            cancelTemperatureUpdate = false;
+            self.commandLock(true);
+            self.operationLock(true);
+
+            var data = {
+                command: "target",
+                targets: {
+                    'tool0': TARGET_TEMPERATURE
+                }
+            };
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/start_heating",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify(data),
+                success: function() {
+                    $('#start-heating-replace-nozzle').addClass('hidden');
+                    $('#progress-bar-replace-nozzle').removeClass('hidden');
+                    $('#reset-replace-nozzle').removeClass('hidden');
+
+                    self._updateTempProgressReplaceNozzle();
+
+                    self.commandLock(false);
+
+                },
+                error: function() { self.commandLock(false);  }
+            });
+        }
+
+        self.cancelHeatingReplaceNozzle = function() {
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/cancel_heating",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                success: function() {
+                    $('#start-heating-replace-nozzle').removeClass('hidden');
+                    $('#progress-bar-replace-nozzle').addClass('hidden');
+
+                    var tempProgress = $("#temperature-progress-replace-nozzle");
+                    var tempProgressBar = $(".bar", tempProgress);
+                    tempProgressBar.css('width', '0%');
+                    tempProgressBar.text('0%');
+
+                    self.commandLock(false);
+                    self.operationLock(false);
+
+                    self.replaceNozzleStep0();
+                },
+                error: function() {
+                    self.commandLock(false);
+                    self.operationLock(false);
+                }
+            });
+
+            cancelTemperatureUpdate = true;
+        }
+
+        self._updateTempProgressReplaceNozzle = function() {
+            fetchTemperatureRetries = 5;
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/temperature",
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    if (!cancelTemperatureUpdate) {
+                        var current_temp = data['temperature'];
+                        var progress = ((current_temp / TARGET_TEMPERATURE) * 100).toFixed(0);
+
+                        var tempProgress = $("#temperature-progress-replace-nozzle");
+                        var tempProgressBar = $(".bar", tempProgress);
+
+                        var progressStr = progress + "%";
+                        tempProgressBar.css('width', progressStr);
+                        tempProgressBar.text(progressStr);
+
+                        if (progress >= 100) {
+                            // Heating is finished, let's move on
+                            $('#progress-bar-replace-nozzle').addClass('hidden');
+                            $('#next-step-replace-nozzle-2').removeClass('hidden');
+                        } else {
+
+                            setTimeout(function() { self._updateTempProgressReplaceNozzle() }, 2000);
+                        }
+                    }
+                },
+                error: function() {
+                    while (fetchTemperatureRetries > 0)
+                        setTimeout(function() { self._updateTempProgressReplaceNozzle() }, 2000);
+                        fetchTemperatureRetries -= 1;
+                    }
+            });
+        }
+
+        /***************************************************************************/
+        /*************          end Replace nozzle functions           *************/
         /***************************************************************************/
     }
 
