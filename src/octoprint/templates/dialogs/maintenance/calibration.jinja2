@@ -162,12 +162,14 @@
     </div>
     <br />
     <div class="row-fluid">
-        <div class="span6">
+        <div class="span4"></div>
+        <div class="span4">
             <button id="test-calibration-btn" title="Calibration Test" class="btn btn-primary"
-               data-bind="click: calibrationTest, enable: printerState.isOperational() && !commandLock()
+               data-bind="click: calibrationTestStep1, enable: printerState.isOperational() && !commandLock()
                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                 <i class="icon-cog"></i> {{ _('Calibration test')}}</button>
         </div>
+        <div class="span4"></div>
     </div>
     <br />
     <div class="row-fluid">
@@ -186,8 +188,30 @@
     </div>
 </div>
 
+<div id="calibrationTest1" class="hidden">
+    <div class="row-fluid">
+        <div class="span6">
+            <strong>{{ _('Calibration Test')}}</strong>
+        </div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span2"></div>
+        <div class="span8">
+            <img src="{{ url_for('static', filename='img/maintenance/bico_extrusao.png') }}" />
+        </div>
+        <div class="span2"></div>
+    </div>
+    <br /><br />
+    <div class="row-fluid">
+        <div class="span12">
+            <p><span>{{ _('PROCESSING...PLEASE WAIT')}} <i class="icon-spinner icon-spin"></i></span></p>
+            <p>{{ _('The printer is heating up and preparing to run the calibration test. This process may take a few moments.')}}</p>
+        </div>
+    </div>
+</div>
 
-<div id="calibrationTest" class="hidden">
+<div id="calibrationTest2" class="hidden">
     <div class="row-fluid">
         <div class="span6">
             <strong>{{ _('Validate Calibration')}}</strong>

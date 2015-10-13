@@ -46,8 +46,6 @@ def startHeating():
 
 	return NO_CONTENT
 
-
-
 @api.route("/maintenance/cancel_heating", methods=["POST"])
 @restricted_access
 def cancelHeating():
@@ -119,6 +117,30 @@ def startCalibration():
 		return make_response("Printer is not operational", 409)
 
 	printer.startCalibration()
+
+	return NO_CONTENT
+
+@api.route("/maintenance/running_calibration_test", methods=["GET"])
+@restricted_access
+def inCalibrationTest():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	res = printer.isRunningCalibrationTest()
+
+	return jsonify({
+		"response": res
+	})
+
+@api.route("/maintenance/start_calibration_test", methods=["POST"])
+@restricted_access
+def startCalibrationTest():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	printer.startCalibrationTest()
 
 	return NO_CONTENT
 

@@ -326,7 +326,9 @@ $(function() {
             $('#calibrationStep3').addClass('hidden');
             $('#calibrationStep4').addClass('hidden');
             $('#calibrationStep5').addClass('hidden');
-            $('#calibrationTest').addClass('hidden');
+
+            $('#calibrationTest1').addClass('hidden');
+            $('#calibrationTest2').addClass('hidden');
 
             self.operationLock(false);
             $('#reset-calibration').addClass('hidden');
@@ -359,7 +361,6 @@ $(function() {
             $('#calibrationStep1').addClass('hidden');
             $('#calibrationStep2').addClass('hidden');
             $('#calibrationStep0').addClass('hidden');
-
         }
 
         self.nextStepCalibration4 = function() {
@@ -380,15 +381,62 @@ $(function() {
             self.calibrationStep0();
         }
 
-        self.calibrationTest = function() {
+        self.calibrationTestStep1 = function() {
+
+            self.commandLock(true);
             $('#calibrationStep5').addClass('hidden');
             $('#calibrationStep4').addClass('hidden');
             $('#calibrationStep3').addClass('hidden');
             $('#calibrationStep1').addClass('hidden');
             $('#calibrationStep2').addClass('hidden');
             $('#calibrationStep0').addClass('hidden');
-            $('#calibrationTest').removeClass('hidden');
+
+            $('#calibrationTest1').removeClass('hidden');
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/start_calibration_test",
+                type: "POST",
+                dataType: "json",
+                success: function() {
+                    self.commandLock(false);
+                    self._isRunningCalibrationTest();
+                },
+                error: function() {
+                    self.commandLock(false);
+                }
+            });
         }
+
+        self.calibrationTestStep2 = function() {
+
+            $('#calibrationTest1').addClass('hidden');
+            $('#calibrationTest2').removeClass('hidden');
+        }
+
+        self._isRunningCalibrationTest = function () {
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/running_calibration_test",
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+
+                    var printing = data['response'];
+
+                    if (printing == false) {
+                        //If the test is finished goes to step2
+                        self.calibrationTestStep2();
+                        return;
+                    }
+                    setTimeout(function() { self._isRunningCalibrationTest(); }, 10000);
+
+                },
+                error: function() {
+                    setTimeout(function() { self._isRunningCalibrationTest(); }, 10000);
+                }
+            });
+        }
+
 
         self._sendJogCommand = function (axis, direction, distance) {
             self.commandLock(true);
