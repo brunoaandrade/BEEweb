@@ -1,7 +1,6 @@
 $(function() {
     function MaintenanceViewModel(parameters) {
         var self = this;
-        var TARGET_TEMPERATURE = 210;
         var cancelTemperatureUpdate = false;
         var fetchTemperatureRetries = 5;
 
@@ -50,19 +49,11 @@ $(function() {
             self.commandLock(true);
             self.operationLock(true);
 
-            var data = {
-                command: "target",
-                targets: {
-                    'tool0': TARGET_TEMPERATURE
-                }
-            };
-
             $.ajax({
                 url: API_BASEURL + "maintenance/start_heating",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
-                data: JSON.stringify(data),
                 success: function() {
                     $('#start-heating-btn').addClass('hidden');
                     $('#progress-bar-div').removeClass('hidden');
@@ -212,6 +203,9 @@ $(function() {
 
             $('#start-heating-btn').removeClass('hidden');
             $('#progress-bar-div').addClass('hidden');
+            $('#reset-change-filament').addClass('hidden');
+
+            self.operationLock(false);
         }
 
         self.saveFilament = function() {
@@ -317,9 +311,6 @@ $(function() {
 
         self.calibrationStep0 = function() {
 
-            // Sends the home to command to reset the position
-            self._sendCustomCommand('G28');
-
             $('#calibrationStep0').removeClass('hidden');
             $('#calibrationStep1').removeClass('hidden');
             $('#calibrationStep2').addClass('hidden');
@@ -333,7 +324,6 @@ $(function() {
             self.operationLock(false);
             $('#reset-calibration').addClass('hidden');
         }
-
 
         self.nextStepCalibration1 = function() {
             $('#calibrationStep2').removeClass('hidden');
@@ -379,6 +369,9 @@ $(function() {
         self.finishCalibration = function() {
 
             self.calibrationStep0();
+
+            // Sends the home to command to reset the position
+            self._sendCustomCommand('G28');
         }
 
         self.calibrationTestStep1 = function() {
@@ -392,6 +385,7 @@ $(function() {
             $('#calibrationStep0').addClass('hidden');
 
             $('#calibrationTest1').removeClass('hidden');
+            $('#reset-calibration').addClass('hidden');
 
             $.ajax({
                 url: API_BASEURL + "maintenance/start_calibration_test",
@@ -404,6 +398,29 @@ $(function() {
                 error: function() {
                     self.commandLock(false);
                 }
+            });
+        }
+
+        self.repeatCalibration = function() {
+
+            $('#calibrationTest2').addClass('hidden');
+            $('#calibrationTest2').addClass('hidden');
+
+            self.commandLock(true);
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/repeat_calibration",
+                type: "POST",
+                dataType: "json",
+                success: function() {
+                    self.calibrationStep0();
+                    self.nextStepCalibration1();
+
+                    $('#reset-calibration').removeClass('hidden');
+
+                    self.commandLock(false);
+                },
+                error: function() { self.commandLock(false); }
             });
         }
 

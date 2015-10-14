@@ -75,12 +75,21 @@ class BeePrinter(Printer):
 
     def on_comm_progress(self):
         """
-         Callback method for the comm object, called upon any change in progress of the printjob.
+         Callback method for the comm object, called upon any change in progress of the print job.
          Triggers storage of new values for printTime, printTimeLeft and the current progress.
         """
 
         self._setProgressData(self.getPrintProgress(), self.getPrintFilepos(),
                               self._comm.getPrintTime(), self._comm.getCleanedPrintTime())
+
+        # If the status from the printer is no longer printing runs the post-print trigger
+        if self.getPrintProgress() >= 1 \
+                and self._comm.getCommandsInterface().isPreparingOrPrinting() is False:
+
+            self._comm.triggerPrintFinished()
+
+            self._comm.getCommandsInterface().stopStatusMonitor()
+            self._runningCalibrationTest = False
 
     def getPrintProgress(self):
         """
@@ -227,14 +236,13 @@ class BeePrinter(Printer):
         """
         return self._comm.getCommandsInterface().setFilamentString(filamentStr)
 
-    def startCalibration(self, startZ=2.0, repeat=False):
+    def startCalibration(self, repeat=False):
         """
         Starts the calibration procedure
-        :param startZ:
         :param repeat:
         :return:
         """
-        return self._comm.getCommandsInterface().startCalibration(startZ, repeat)
+        return self._comm.getCommandsInterface().startCalibration(repeat=repeat)
 
     def nextCalibrationStep(self):
         """
@@ -249,10 +257,14 @@ class BeePrinter(Printer):
         :return:
         """
         test_gcode = CalibrationGCoder.get_calibration_gcode(self._printerProfileManager.get_current_or_default()['name'])
+        lines = test_gcode.split(',')
 
         file_path = os.path.join(settings().getBaseFolder("uploads"), 'BEETHEFIRST_calib_test.gcode')
         calibtest_file = open(file_path, 'w')
-        calibtest_file.write(test_gcode)
+
+        for line in lines:
+            calibtest_file.write(line + '\n')
+
         calibtest_file.close()
 
         self.select_file(file_path, False)
@@ -267,12 +279,6 @@ class BeePrinter(Printer):
         Updates the running calibration test flag
         :return:
         """
-        if self._runningCalibrationTest:
-            if self._comm.getCommandsInterface().isReady() \
-                    and not self._comm.getCommandsInterface().isHeating() \
-                    and not self._comm.getCommandsInterface().isTransferring():
-                self._runningCalibrationTest = False
-
         return self._runningCalibrationTest
 
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
@@ -385,7 +391,8 @@ class CalibrationGCoder:
                 'M104 S0,'
                 'M113 S0.0,'
                 'M107,'
-                'G1 F6000'
+                'G1 F6000,'
+                'G28'
     }
 
     def __init__(self):
