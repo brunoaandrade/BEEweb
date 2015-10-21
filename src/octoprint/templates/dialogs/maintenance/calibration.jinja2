@@ -219,6 +219,18 @@
             <p>{{ _('The printer is heating up and preparing to run the calibration test. This process may take a few moments.')}}</p>
         </div>
     </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span4"></div>
+        <div class="span4">
+            <button id="cancel-calib-test" title="Cancel Calibration Test" class="btn btn-default"
+               data-bind="click: cancelCalibrationTest, enable: printerState.isOperational() && !commandLock()
+               && printerState.isReady() && loginState.isUser()">
+                <i class="icon-ok-sign"></i> {{ _('Cancel Test')}}
+            </button>
+        </div>
+        <div class="span4"></div>
+    </div>
 </div>
 
 <div id="calibrationTest2" class="hidden">

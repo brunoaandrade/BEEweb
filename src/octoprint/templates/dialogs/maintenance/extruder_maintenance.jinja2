@@ -51,14 +51,6 @@
         </span>
     </div>
     <div class="row-fluid">
-        <div class="span2"></div>
-        <div class="span8">
-            <img src="{{ url_for('static', filename='img/maintenance/remove_cover.png') }}" />
-        </div>
-        <div class="span2"></div>
-    </div>
-    <br />
-    <div class="row-fluid">
         <div class="span6">
             <strong>{{ _('Step 2')}}</strong>
         </div>
@@ -71,16 +63,15 @@
         </p>
     </div>
     <br />
-
-
     <div class="row-fluid">
-        <div class="span2"></div>
-        <div class="span8">
-            <img src="{{ url_for('static', filename='img/maintenance/remove_lid_sized.png') }}" />
+        <div class="span4"></div>
+        <div class="span4">
+            <img src="{{ url_for('static', filename='img/maintenance/remove_cover.png') }}" />
         </div>
-        <div class="span2"></div>
+        <div class="span4"></div>
     </div>
-    <br /><br /><br />
+    <br />
+    <br />
     <div class="row-fluid">
         <div class="span6">
             <strong>{{ _('Step 3')}}</strong>
@@ -96,6 +87,15 @@
         </p>
     </div>
     <br />
+    <div class="row-fluid">
+        <div class="span4"></div>
+        <div class="span4">
+            <img src="{{ url_for('static', filename='img/maintenance/remove_lid_sized.png') }}" />
+        </div>
+        <div class="span4"></div>
+    </div>
+    <br />
+    <br />
 </div>
 
 <br />
@@ -107,7 +107,7 @@
     <button id ="cancel-heating-ext-mtn" title="Cancel" class="btn btn-default pull-right"
         data-bind="click: cancelHeatingExtMaint" ><i class="icon-stop"></i> {{ _('Cancel')}}</button>
 </div>
-
+<br />
 <div id="next-step-ext-mtn-3" class="row-fluid hidden">
     <button id="ext-mtn-3" title="Next Step" class="btn btn-default"
         data-bind="click: nextStepExtMaint2, enable: printerState.isOperational() && !commandLock()
@@ -115,7 +115,7 @@
         <i class="icon-arrow-right"></i> {{ _('Next Step')}}
     </button>
 </div>
-
+<br />
 
 <div id="extMaintStep3" class="hidden">
     <div class="row-fluid">
@@ -181,28 +181,30 @@
     </div>
     <br />
     <div class="row-fluid">
+        <div class="span3"></div>
         <div class="span6">
             <strong>{{ _('Final Step')}}: {{ _('Select Filament Code') }}</strong>
-        </div>
-    </div>
-    <br />
-    <form class="form-horizontal">
-        <div class="control-group">
-            <div class="controls">
-                <select data-bind="options: filamentProfiles, optionsText: 'name', optionsValue: 'key', value: selectedFilament, optionsCaption: '{{ _('Select filament type...') }}'"></select>
+            <br />
+            <form class="form-horizontal">
+                <div class="control-group">
+                    <div class="">
+                        <select data-bind="options: filamentProfiles, optionsText: 'name', optionsValue: 'key', value: selectedFilament, optionsCaption: '{{ _('Select filament type...') }}'"></select>
 
-                <button id="submit-filament" title="Save Filament" class="btn btn-primary"
-                data-bind="click: saveFilament, enable: printerState.isOperational() && !commandLock()
-                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
-                    <i class="icon-hdd"></i> {{ _('Save')}}
-                </button>
-            </div>
+                        <button id="submit-filament" title="Save Filament" class="btn btn-primary"
+                        data-bind="click: saveFilament, enable: printerState.isOperational() && !commandLock()
+                        && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                            <i class="icon-hdd"></i> {{ _('Save')}}
+                        </button>
+                    </div>
+                </div>
+                <div class="alert alert-success text-center" data-bind="visible: filamentResponse">
+                     <span><i class="icon-ok"></i> {{ _('The filament code was saved. The operation is now finished!')}}</span>
+                </div>
+                <div class="alert alert-danger text-center" data-bind="visible: filamentResponseError">
+                     <span><i class="icon-exclamation-sign"></i> {{ _('An error occurred while saving. Please make sure a filament code is selected and try again.')}}</span>
+                </div>
+            </form>
         </div>
-        <div class="alert alert-success text-center" data-bind="visible: filamentResponse">
-             <span><i class="icon-ok"></i> {{ _('The filament code was saved. The operation is now finished!')}}</span>
-        </div>
-        <div class="alert alert-danger text-center" data-bind="visible: filamentResponseError">
-             <span><i class="icon-exclamation-sign"></i> {{ _('An error occurred while saving. Please make sure a filament code is selected and try again.')}}</span>
-        </div>
-    </form>
+        <div class="span3"></div>
+    </div>
 </div>

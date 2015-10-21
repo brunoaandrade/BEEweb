@@ -126,28 +126,30 @@
     </div>
     <br />
     <div class="row-fluid">
+        <div class="span3"></div>
         <div class="span6">
             <strong>{{ _('Final Step')}}: {{ _('Select Filament Code') }}</strong>
-        </div>
-    </div>
-    <br />
-    <form class="form-horizontal">
-        <div class="control-group">
-            <div class="controls">
-                <select data-bind="options: filamentProfiles, optionsText: 'name', optionsValue: 'key', value: selectedFilament, optionsCaption: '{{ _('Select filament type...') }}'"></select>
+            <br />
+            <form class="form-horizontal">
+                <div class="control-group">
+                    <div class="">
+                        <select data-bind="options: filamentProfiles, optionsText: 'name', optionsValue: 'key', value: selectedFilament, optionsCaption: '{{ _('Select filament type...') }}'"></select>
 
-                <button id="submit-filament" title="Save Filament" class="btn btn-primary"
-                data-bind="click: saveFilament, enable: printerState.isOperational() && !commandLock()
-                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
-                    <i class="icon-hdd"></i> {{ _('Save')}}
-                </button>
-            </div>
+                        <button id="submit-filament" title="Save Filament" class="btn btn-primary"
+                        data-bind="click: saveFilament, enable: printerState.isOperational() && !commandLock()
+                        && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                            <i class="icon-hdd"></i> {{ _('Save')}}
+                        </button>
+                    </div>
+                </div>
+                <div class="alert alert-success text-center" data-bind="visible: filamentResponse">
+                     <span><i class="icon-ok"></i> {{ _('The filament code was saved. The operation is now finished!')}}</span>
+                </div>
+                <div class="alert alert-danger text-center" data-bind="visible: filamentResponseError">
+                     <span><i class="icon-exclamation-sign"></i> {{ _('An error occurred while saving. Please make sure a filament code is selected and try again.')}}</span>
+                </div>
+            </form>
         </div>
-        <div class="alert alert-success text-center" data-bind="visible: filamentResponse">
-             <span><i class="icon-ok"></i> {{ _('The filament code was saved. The operation is now finished!')}}</span>
-        </div>
-        <div class="alert alert-danger text-center" data-bind="visible: filamentResponseError">
-             <span><i class="icon-exclamation-sign"></i> {{ _('An error occurred while saving. Please make sure a filament code is selected and try again.')}}</span>
-        </div>
-    </form>
+        <div class="span3"></div>
+    </div>
 </div>

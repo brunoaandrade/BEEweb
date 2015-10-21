@@ -3,6 +3,7 @@ $(function() {
         var self = this;
         var cancelTemperatureUpdate = false;
         var fetchTemperatureRetries = 5;
+        var TARGET_TEMPERATURE = 200;
 
         self.loginState = parameters[0];
         self.users = parameters[1];
@@ -234,6 +235,8 @@ $(function() {
                         self.commandLock(false);
                         self.operationLock(false);
 
+                        // Goes to home position
+                        self._sendCustomCommand('G28');
                     } else {
                         self.filamentResponseError(true);
                         self.commandLock(false);
@@ -401,6 +404,27 @@ $(function() {
             });
         }
 
+        self.cancelCalibrationTest = function() {
+
+            self.commandLock(true);
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/cancel_calibration_test",
+                type: "POST",
+                dataType: "json",
+                success: function() {
+                    self.commandLock(false);
+
+                    $('#calibrationStep5').removeClass('hidden');
+                    $('#calibrationTest1').addClass('hidden');
+                    $('#reset-calibration').removeClass('hidden');
+                },
+                error: function() {
+                    self.commandLock(false);
+                }
+            });
+        }
+
         self.repeatCalibration = function() {
 
             $('#calibrationTest2').addClass('hidden');
@@ -549,19 +573,12 @@ $(function() {
             self.commandLock(true);
             self.operationLock(true);
 
-            var data = {
-                command: "target",
-                targets: {
-                    'tool0': TARGET_TEMPERATURE
-                }
-            };
 
             $.ajax({
                 url: API_BASEURL + "maintenance/start_heating",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
-                data: JSON.stringify(data),
                 success: function() {
                     $('#start-heating-ext-mtn').addClass('hidden');
                     $('#progress-bar-ext-mtn').removeClass('hidden');
@@ -685,19 +702,11 @@ $(function() {
             self.commandLock(true);
             self.operationLock(true);
 
-            var data = {
-                command: "target",
-                targets: {
-                    'tool0': TARGET_TEMPERATURE
-                }
-            };
-
             $.ajax({
                 url: API_BASEURL + "maintenance/start_heating",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
-                data: JSON.stringify(data),
                 success: function() {
                     $('#start-heating-replace-nozzle').addClass('hidden');
                     $('#progress-bar-replace-nozzle').removeClass('hidden');

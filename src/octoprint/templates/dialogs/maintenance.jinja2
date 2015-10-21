@@ -6,29 +6,27 @@
     <div class="modal-body">
         <div class="full-sized-box">
             <div class="tabbable row-fluid">
-                <div class="span3 scrollable" id="maintenance_dialog_menu" >
-                    <ul class="nav nav-list operationsList" id="maintenanceTabs" data-bind="css: { lockedOperation: operationLock() }">
 
-                        <li class="nav-header">{{ _('Operations') }}</li>
+                <ul class="nav nav-tabs operationsList" id="maintenanceTabs" >
 
-                        <li id="maintenance_changeFilament_link" class="active" >
-                            <a href="#maintenance_changeFilament" data-toggle="tab">{{ _('Filament change') }}</a>
-                        </li>
+                    <li id="maintenance_changeFilament_link" class="active" data-bind="css: { lockedOperation: operationLock() }">
+                        <a href="#maintenance_changeFilament" data-toggle="tab">{{ _('Filament change') }}</a>
+                    </li>
 
-                        <li id="maintenance_calibration_link" class="" >
-                            <a href="#maintenance_calibration" data-toggle="tab">{{ _('Calibration') }}</a>
-                        </li>
+                    <li id="maintenance_calibration_link" class="" data-bind="css: { lockedOperation: operationLock() }">
+                        <a href="#maintenance_calibration" data-toggle="tab">{{ _('Calibration') }}</a>
+                    </li>
 
-                        <li id="maintenance_extruderMaintenance_link" class="" >
-                            <a href="#maintenance_extruderMaintenance" data-toggle="tab">{{ _('Extruder maintenance') }}</a>
-                        </li>
+                    <li id="maintenance_extruderMaintenance_link" class="" data-bind="css: { lockedOperation: operationLock() }">
+                        <a href="#maintenance_extruderMaintenance" data-toggle="tab">{{ _('Extruder maintenance') }}</a>
+                    </li>
 
-                        <li id="maintenance_replaceNozzle_link" class="" >
-                            <a href="#maintenance_replaceNozzle" data-toggle="tab">{{ _('Replace nozzle') }}</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="tab-content span9 scrollable" id="maintenance_dialog_content">
+                    <li id="maintenance_replaceNozzle_link" class="" data-bind="css: { lockedOperation: operationLock() }">
+                        <a href="#maintenance_replaceNozzle" data-toggle="tab">{{ _('Replace nozzle') }}</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="maintenance_dialog_content">
                     <div id="maintenance_changeFilament" class="tab-pane active">
                         {% include 'dialogs/maintenance/change_filament.jinja2' ignore missing %}
                     </div>

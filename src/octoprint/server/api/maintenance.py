@@ -131,6 +131,17 @@ def startCalibrationTest():
 
 	return NO_CONTENT
 
+@api.route("/maintenance/cancel_calibration_test", methods=["POST"])
+@restricted_access
+def cancelCalibrationTest():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	printer.cancelCalibrationTest()
+
+	return NO_CONTENT
+
 @api.route("/maintenance/repeat_calibration", methods=["POST"])
 @restricted_access
 def repeatCalibration():

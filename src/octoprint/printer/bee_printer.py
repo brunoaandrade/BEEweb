@@ -200,7 +200,7 @@ class BeePrinter(Printer):
         return self._comm.getCommandsInterface().getNozzleTemperature()
 
 
-    def startHeating(self, targetTemperature=220):
+    def startHeating(self, targetTemperature=200):
         """
         Starts the heating procedure
         :param targetTemperature:
@@ -271,6 +271,15 @@ class BeePrinter(Printer):
         self.start_print()
 
         self._runningCalibrationTest = True
+
+        return None
+
+    def cancelCalibrationTest(self):
+        """
+        Cancels the running calibration test
+        :return:
+        """
+        self.cancel_print()
 
         return None
 
