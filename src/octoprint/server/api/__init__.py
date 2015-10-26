@@ -38,7 +38,7 @@ from . import log as api_logs
 from . import slicing as api_slicing
 from . import printer_profiles as api_printer_profiles
 from . import languages as api_languages
-
+from . import maintenance as api_maintenance
 
 VERSION = "0.1"
 

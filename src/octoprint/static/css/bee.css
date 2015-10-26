@@ -10,3 +10,17 @@
 #temperature-graph {
     background-position: 50% 30% !important;
 }
+
+.lockedOperation a {
+    pointer-events: none;
+    color: white !important;
+}
+
+.active.lockedOperation a {
+    pointer-events: none;
+    color: black !important;
+}
+
+.operationsList li a {
+    font-size: larger !important;
+}
