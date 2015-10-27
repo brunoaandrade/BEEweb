@@ -111,6 +111,16 @@ class BeePrinter(Printer):
         else:
             return 0
 
+    def getPrinterName(self):
+        """
+        Returns the name of the connected printer
+        :return:
+        """
+        if self._comm is not None:
+            return self._comm.getConnectedPrinterName()
+        else:
+            return None
+
     def jog(self, axis, amount):
         """
         Jogs the tool a selected amount in the axis chosen
@@ -214,6 +224,13 @@ class BeePrinter(Printer):
         :return:
         """
         return self._comm.getCommandsInterface().cancelHeating()
+
+    def heatingDone(self):
+        """
+        Runs the necessary commands after the heating operation is finished
+        :return:
+        """
+        return self._comm.getCommandsInterface().goToLoadUnloadPos()
 
     def unload(self):
         """

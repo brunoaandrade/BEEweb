@@ -42,6 +42,21 @@ $(function() {
             self.maintenanceDialog.modal("hide");
         };
 
+        self._heatingDone = function() {
+            $.ajax({
+                url: API_BASEURL + "maintenance/heating_done",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                success: function() {
+
+                },
+                error: function() {
+
+                }
+            });
+        }
+
         /***************************************************************************/
         /*******                   Filament Change functions            ************/
         /***************************************************************************/
@@ -118,6 +133,8 @@ $(function() {
 
                         if (progress >= 100) {
                             // Heating is finished, let's move on
+                            self._heatingDone();
+
                             $('#step2').removeClass('hidden');
                             $('#step1').addClass('hidden');
                             $('#reset-change-filament').removeClass('hidden');
@@ -252,11 +269,11 @@ $(function() {
         self._getFilamentProfiles = function() {
 
             $.ajax({
-                url: API_BASEURL + "slicing",
+                url: API_BASEURL + "maintenance/filament_profiles",
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
-                    var profiles = data['cura']['profiles'];
+                    var profiles = data;
                     self.filamentProfiles.removeAll();
 
                     _.each(profiles, function(profile) {
@@ -645,6 +662,8 @@ $(function() {
 
                         if (progress >= 100) {
                             // Heating is finished, let's move on
+                            self._heatingDone();
+
                             $('#next-step-ext-mtn-3').removeClass('hidden');
                             $('#progress-bar-ext-mtn').addClass('hidden');
                         } else {
@@ -772,6 +791,8 @@ $(function() {
 
                         if (progress >= 100) {
                             // Heating is finished, let's move on
+                            self._heatingDone();
+
                             $('#progress-bar-replace-nozzle').addClass('hidden');
                             $('#next-step-replace-nozzle-2').removeClass('hidden');
                         } else {

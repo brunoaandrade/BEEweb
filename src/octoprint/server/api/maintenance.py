@@ -5,12 +5,14 @@ import re
 __author__ = "BEEVC - Electronic Systems "
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
 
-from flask import request, make_response, jsonify
+from flask import request, make_response, jsonify, url_for
 
 from octoprint.server import printer, NO_CONTENT
 from octoprint.server.util.flask import restricted_access, get_json_command_from_request
 from octoprint.server.api import api
-
+from octoprint.settings import settings as s, valid_boolean_trues
+from octoprint.slicing import UnknownSlicer, SlicerNotConfigured
+from octoprint.server import slicingManager
 
 @api.route("/maintenance/start_heating", methods=["POST"])
 @restricted_access
@@ -39,6 +41,15 @@ def getTemperature():
 	return jsonify({
 		"temperature": current_temp
 	})
+
+@api.route("/maintenance/heating_done", methods=["POST"])
+def heatingDone():
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	printer.heatingDone()
+
+	return NO_CONTENT
 
 @api.route("/maintenance/unload", methods=["POST"])
 @restricted_access
@@ -152,3 +163,47 @@ def repeatCalibration():
 	printer.startCalibration(repeat=True)
 
 	return NO_CONTENT
+
+@api.route("/maintenance/filament_profiles", methods=["GET"])
+def filamentProfiles():
+	"""
+	Gets the slicing profiles (Filament colors) configured for Cura engine
+	:return:
+	"""
+	default_slicer = s().get(["slicing", "defaultSlicer"])
+
+	profiles = _getSlicingProfilesData(default_slicer, printer.getPrinterName())
+
+	return jsonify(profiles)
+
+
+def _getSlicingProfilesData(slicer, printer_name, require_configured=False):
+	profiles = slicingManager.all_profiles(slicer, require_configured=require_configured)
+
+	result = dict()
+	for name, profile in profiles.items():
+		profileData = _getSlicingProfileData(slicer, name, profile)
+
+		if printer_name is not None:
+			key = profileData["key"]
+
+			if printer_name.lower() in key.lower():
+				result[name] = profileData
+		else:
+			result[name]  = profileData
+
+	return result
+
+def _getSlicingProfileData(slicer, name, profile):
+
+	defaultProfiles = s().get(["slicing", "defaultProfiles"])
+	result = dict(
+		key=name,
+		default=defaultProfiles and slicer in defaultProfiles and defaultProfiles[slicer] == name,
+		resource=url_for(".slicingGetSlicerProfile", slicer=slicer, name=name, _external=True)
+	)
+	if profile.display_name is not None:
+		result["displayName"] = profile.display_name
+	if profile.description is not None:
+		result["description"] = profile.description
+	return result
