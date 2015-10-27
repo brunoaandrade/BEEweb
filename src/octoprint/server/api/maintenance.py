@@ -165,6 +165,7 @@ def repeatCalibration():
 	return NO_CONTENT
 
 @api.route("/maintenance/filament_profiles", methods=["GET"])
+@restricted_access
 def filamentProfiles():
 	"""
 	Gets the slicing profiles (Filament colors) configured for Cura engine
@@ -178,23 +179,30 @@ def filamentProfiles():
 
 
 def _getSlicingProfilesData(slicer, printer_name, require_configured=False):
+	if printer_name is None:
+		printer_name = "BEETHEFIRST"
+
 	profiles = slicingManager.all_profiles(slicer, require_configured=require_configured)
 
 	result = dict()
 	for name, profile in profiles.items():
-		profileData = _getSlicingProfileData(slicer, name, profile)
+		profileData = _getSlicingProfileData(slicer, name, profile, printer_name)
+
+		if profileData["displayName"] in result:
+			continue
 
 		if printer_name is not None:
-			key = profileData["key"]
+			profile_key = profileData["key"]
 
-			if printer_name.lower() in key.lower():
-				result[name] = profileData
+			if printer_name.lower() in profile_key.lower():
+				# Uses the filament filtered name as the key for the results array
+				result[profileData["displayName"]] = profileData
 		else:
-			result[name]  = profileData
+			result[profileData["displayName"]] = profileData
 
 	return result
 
-def _getSlicingProfileData(slicer, name, profile):
+def _getSlicingProfileData(slicer, name, profile, printer_name):
 
 	defaultProfiles = s().get(["slicing", "defaultProfiles"])
 	result = dict(
@@ -206,4 +214,14 @@ def _getSlicingProfileData(slicer, name, profile):
 		result["displayName"] = profile.display_name
 	if profile.description is not None:
 		result["description"] = profile.description
+
+	# filters the display name
+	if printer_name is not None:
+		filtered_name = result["displayName"]\
+			.replace('_'+printer_name, '')\
+			.replace('_MED','').replace('_LOW','').replace('_MEDIUM','')\
+			.replace('_HIGHPLUS','').replace('_HIGH','')
+
+		result["displayName"] = filtered_name
+
 	return result

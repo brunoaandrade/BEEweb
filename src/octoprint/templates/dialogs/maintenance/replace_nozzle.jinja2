@@ -133,7 +133,7 @@
             <form class="form-horizontal">
                 <div class="control-group">
                     <div class="">
-                        <select data-bind="options: filamentProfiles, optionsText: 'name', optionsValue: 'key', value: selectedFilament, optionsCaption: '{{ _('Select filament type...') }}'"></select>
+                        <select data-bind="options: filamentProfiles, optionsText: 'name', optionsValue: 'name', value: selectedFilament, optionsCaption: '{{ _('Select filament type...') }}'"></select>
 
                         <button id="submit-filament" title="Save Filament" class="btn btn-primary"
                         data-bind="click: saveFilament, enable: printerState.isOperational() && !commandLock()
