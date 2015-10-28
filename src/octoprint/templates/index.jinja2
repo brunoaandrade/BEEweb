@@ -45,6 +45,60 @@
             </div>
             <div class="container octoprint-container">
                 <div class="row">
+
+                    <!-- Tabs -->
+                    {% if templates.tab.order %}
+                    <div class="tabbable {% if templates.sidebar.order %}span8{% else %}span12{% endif %}">
+
+                        <div class="row-fluid">
+                            <div id="state_wrapper" class="accordion-group">
+                                <div class="accordion-heading">
+                                    <a id="state-header-link" class="accordion-toggle collapsed" data-toggle="collapse" data-target="#state">
+                                        <i class="icon-info-sign"></i> <strong data-bind="text: stateString"></strong>
+                                    </a>
+                                </div>
+                                <div id="state" class="accordion-body collapse">
+                                    <div class="accordion-inner">
+                                        {% include 'sidebar/printer_status.jinja2' ignore missing %}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br />
+
+                        <ul class="nav nav-tabs" id="tabs">
+                            {% for key in templates.tab.order %}
+                                {% set entry, data = templates.tab.entries[key] %}
+                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- ko allowBindings: false -->{% endif %}
+                                <li id="{{ data._div }}_link"
+                                    class="{% if loop.first %}active{% endif %} {% if "classes_link" in data %}{{ data.classes_link|join(' ') }}{% elif "classes" in data %}{{ data.classes|join(' ') }}{% endif %}"
+                                    {% if "data_bind" in data %}data-bind="{{ data.data_bind }}"{% endif %}
+                                    {% if "styles_link" in data %} style="{{ data.styles_link|join(', ') }}" {% elif "styles" in data %} style="{{ data.styles|join(', ') }}" {% endif %}
+                                        >
+                                        <a href="#{{ data._div }}" data-toggle="tab">{{ entry }}</a>
+                                </li>
+                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- /ko -->{% endif %}
+                            {% endfor %}
+                        </ul>
+
+                        <div class="tab-content">
+                            {% for key in templates.tab.order %}
+                                {% set entry, data = templates.tab.entries[key] %}
+                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- ko allowBindings: false -->{% endif %}
+                                <div id="{{ data._div }}"
+                                     class="tab-pane{% if loop.first %} active{% endif %}{% if "additional_classes" in data %} {{ data.additional_classes|join(' ') }}{% endif %}"
+                                     {% if "data_bind" in data %}data-bind="{{ data.data_bind }}"{% endif %}
+                                     {% if "styles_content" in data %} style="{{ data.styles_content|join(', ') }}" {% elif "styles" in data %} style="{{ data.styles|join(', ') }}" {% endif %}
+                                        >
+                                            {% include data.template ignore missing %}
+                                </div>
+                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- /ko -->{% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <!-- Sidebar -->
                     {% if templates.sidebar.order %}
                     <div class="accordion {% if templates.tab.order %}span4{% else %}span12{% endif %}">
@@ -77,51 +131,17 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-
-                    <!-- Tabs -->
-                    {% if templates.tab.order %}
-                    <div class="tabbable {% if templates.sidebar.order %}span8{% else %}span12{% endif %}">
-                        <ul class="nav nav-tabs" id="tabs">
-                            {% for key in templates.tab.order %}
-                                {% set entry, data = templates.tab.entries[key] %}
-                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- ko allowBindings: false -->{% endif %}
-                                <li id="{{ data._div }}_link"
-                                    class="{% if loop.first %}active{% endif %} {% if "classes_link" in data %}{{ data.classes_link|join(' ') }}{% elif "classes" in data %}{{ data.classes|join(' ') }}{% endif %}"
-                                    {% if "data_bind" in data %}data-bind="{{ data.data_bind }}"{% endif %}
-                                    {% if "styles_link" in data %} style="{{ data.styles_link|join(', ') }}" {% elif "styles" in data %} style="{{ data.styles|join(', ') }}" {% endif %}
-                                        >
-                                        <a href="#{{ data._div }}" data-toggle="tab">{{ entry }}</a>
-                                </li>
-                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- /ko -->{% endif %}
-                            {% endfor %}
-                        </ul>
-
-                        <div class="tab-content">
-                            {% for key in templates.tab.order %}
-                                {% set entry, data = templates.tab.entries[key] %}
-                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- ko allowBindings: false -->{% endif %}
-                                <div id="{{ data._div }}"
-                                     class="tab-pane{% if loop.first %} active{% endif %}{% if "additional_classes" in data %} {{ data.additional_classes|join(' ') }}{% endif %}"
-                                     {% if "data_bind" in data %}data-bind="{{ data.data_bind }}"{% endif %}
-                                     {% if "styles_content" in data %} style="{{ data.styles_content|join(', ') }}" {% elif "styles" in data %} style="{{ data.styles|join(', ') }}" {% endif %}
-                                        >
-                                            {% include data.template ignore missing %}
-                                </div>
-                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- /ko -->{% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
                 <div class="footer">
+                    <hr />
                     <ul class="pull-left muted">
-                        <li><small>{{ _('Version') }}: <span class="version">{{ display_version }}</span></small></li>
+                        <li><large>{{ _('BEE.web') }} &copy 2015 BEEVC - Electronic Systems : <span class="version">{{ display_version }}</span></large></li>
                     </ul>
                     <ul class="pull-right">
-                        <li><a href="http://octoprint.org"><i class="icon-home"></i> {{ _('Homepage') }}</a></li>
-                        <li><a href="https://github.com/foosel/OctoPrint/"><i class="icon-github"></i> {{ _('Sourcecode') }}</a></li>
-                        <li><a href="http://docs.octoprint.org"><i class="icon-book"></i> {{ _('Documentation') }}</a></li>
-                        <li><a href="https://github.com/foosel/OctoPrint/issues"><i class="icon-flag"></i> {{ _('Bugs and Requests') }}</a></li>
+                        <li>{{ _('powered by ') }}<a href="http://octoprint.org"><i class="icon-github"></i> Octoprint</a></li>
+                        <!--<li><a href="https://github.com/foosel/OctoPrint/"><i class="icon-github"></i> {{ _('Sourcecode') }}</a></li>-->
+                        <!--<li><a href="http://docs.octoprint.org"><i class="icon-book"></i> {{ _('Documentation') }}</a></li>-->
+                        <!--<li><a href="https://github.com/foosel/OctoPrint/issues"><i class="icon-flag"></i> {{ _('Bugs and Requests') }}</a></li>-->
                     </ul>
                 </div>
             </div>

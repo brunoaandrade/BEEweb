@@ -148,7 +148,7 @@ default_settings = {
 		"alwaysSendChecksum": False,
 		"sendChecksumWithUnknownCommands": False,
 		"unknownCommandsNeedAck": False,
-		"sdSupport": True,
+		"sdSupport": False,
 		"sdAlwaysAvailable": False,
 		"swallowOkAfterResend": True,
 		"repetierTargetTemp": False,

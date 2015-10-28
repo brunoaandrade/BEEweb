@@ -201,6 +201,10 @@ $(function() {
                 contentType: "application/json; charset=UTF-8",
                 data: JSON.stringify({command: "select", print: printAfterLoad})
             });
+
+            // Shows the status panel
+            $("#state").addClass("in");
+            $("#state-header-link").removeClass("collapsed");
         };
 
         self.removeFile = function(file) {
