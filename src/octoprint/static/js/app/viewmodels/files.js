@@ -203,8 +203,7 @@ $(function() {
             });
 
             // Shows the status panel
-            $("#state").addClass("in");
-            $("#state-header-link").removeClass("collapsed");
+            $("#state").collapse("show");
         };
 
         self.removeFile = function(file) {
