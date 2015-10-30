@@ -18,6 +18,7 @@ Cura/preferences.ini
 build
 dist
 pypy
+BEEweb.egg-info
 OctoPrint.egg-info
 *.orig
 

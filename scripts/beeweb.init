@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ### BEGIN INIT INFO
-# Provides:          octoprint
+# Provides:          beeweb
 # Required-Start:    $local_fs networking
 # Required-Stop:
 # Should-Start:
@@ -10,23 +10,23 @@
 # Default-Stop:      0 1 6
 # Short-Description: OctoPrint daemon
 # Description:       Starts the OctoPrint daemon with the user specified in
-#                    /etc/default/octoprint.
+#                    /etc/default/beeweb.
 ### END INIT INFO
 
 # Author: Sami Olmari
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DESC="Octoprint Daemon"
-NAME="Octoprint"
-DAEMON=/usr/local/bin/octoprint
+DESC="BEEweb Daemon"
+NAME="BEEweb"
+DAEMON=/usr/local/bin/beeweb
 PIDFILE=/var/run/$NAME.pid
-PKGNAME=octoprint
+PKGNAME=beeweb
 SCRIPTNAME=/etc/init.d/$PKGNAME
 
 # Read configuration variable file if it is present
 [ -r /etc/default/$PKGNAME ] && . /etc/default/$PKGNAME
 
-# Exit if the octoprint is not installed
+# Exit if the beeweb is not installed
 [ -x "$DAEMON" ] || exit 0
 
 # Load the VERBOSE setting and other rcS variables

@@ -11,7 +11,7 @@ from octoprint.util.comm import MachineCom, get_interval
 from beedriver.connection import Conn as BeeConn
 from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer
 
-__author__ = "BEEVC - Electronic Systems "
+__author__ = "BEEVC - Electronic Systems"
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
 
 class BeeCom(MachineCom):

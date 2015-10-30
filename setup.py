@@ -32,7 +32,8 @@ INSTALL_REQUIRES = [
 	"pkginfo==1.2.1",
 	"requests==2.7.0",
 	"semantic_version==2.4.2",
-	"psutil==3.1.1"
+	"psutil==3.1.1",
+	"beecom>=0.2"
 ]
 
 # Additional requirements for optional install options
@@ -74,26 +75,26 @@ def get_cmdclass():
 	cmdclass = versioneer.get_cmdclass()
 
 	# add clean command
-	cmdclass.update(dict(clean=octoprint_setuptools.CleanCommand.for_options(source_folder="src", eggs=["OctoPrint*.egg-info"])))
+	cmdclass.update(dict(clean=octoprint_setuptools.CleanCommand.for_options(source_folder="src", eggs=["BEEweb*.egg-info"])))
 
 	# add translation commands
 	translation_dir = "translations"
 	pot_file = os.path.join(translation_dir, "messages.pot")
 	bundled_dir = os.path.join("src", "octoprint", "translations")
-	cmdclass.update(octoprint_setuptools.get_babel_commandclasses(pot_file=pot_file, output_dir=translation_dir, pack_name_prefix="OctoPrint-i18n-", pack_path_prefix="", bundled_dir=bundled_dir))
+	cmdclass.update(octoprint_setuptools.get_babel_commandclasses(pot_file=pot_file, output_dir=translation_dir, pack_name_prefix="BEEweb-i18n-", pack_path_prefix="", bundled_dir=bundled_dir))
 
 	return cmdclass
 
 
 def params():
-	name = "OctoPrint"
+	name = "BEEweb"
 	version = versioneer.get_version()
 	cmdclass = get_cmdclass()
 
-	description = "A responsive web interface for 3D printers"
+	description = "A responsive web interface for BEEVERYCREATIVE printers"
 	long_description = open("README.md").read()
 	classifiers = [
-		"Development Status :: 4 - Beta",
+		"Development Status :: 2 - Beta",
 		"Environment :: Web Environment",
 		"Framework :: Flask",
 		"Intended Audience :: Education",
@@ -111,9 +112,9 @@ def params():
 		"Topic :: Printing",
 		"Topic :: System :: Networking :: Monitoring"
 	]
-	author = "Gina Häußge"
-	author_email = "osd@foosel.net"
-	url = "http://octoprint.org"
+	author = "BEEVC - Electronic Systems"
+	author_email = "support@beeverycreative.com"
+	url = "http://beeverycreative.com"
 	license = "AGPLv3"
 
 	packages = find_packages(where="src")
@@ -138,7 +139,7 @@ def params():
 
 	entry_points = {
 		"console_scripts": [
-			"octoprint = octoprint:main"
+			"beeweb = octoprint:main"
 		]
 	}
 
