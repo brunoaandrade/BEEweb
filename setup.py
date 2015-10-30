@@ -94,7 +94,7 @@ def params():
 	description = "A responsive web interface for BEEVERYCREATIVE printers"
 	long_description = open("README.md").read()
 	classifiers = [
-		"Development Status :: 2 - Beta",
+		"Development Status :: Beta",
 		"Environment :: Web Environment",
 		"Framework :: Flask",
 		"Intended Audience :: Education",
