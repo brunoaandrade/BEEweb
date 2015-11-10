@@ -34,7 +34,7 @@ INSTALL_REQUIRES = [
 	"semantic_version==2.4.2",
 	"psutil==3.1.1",
 	"beecom>=0.2",
-	"pyusb>=1.0.0"
+	"pyusb>=1.0.0b2"
 ]
 
 # Additional requirements for optional install options
