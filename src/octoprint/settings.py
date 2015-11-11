@@ -30,7 +30,7 @@ import logging
 import re
 import uuid
 
-_APPNAME = "OctoPrint"
+_APPNAME = "BEEweb"
 
 _instance = None
 

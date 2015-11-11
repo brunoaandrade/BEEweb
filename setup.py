@@ -33,7 +33,7 @@ INSTALL_REQUIRES = [
 	"requests==2.7.0",
 	"semantic_version==2.4.2",
 	"psutil==3.1.1",
-	"beecom>=0.2",
+	"beecom>=0.2.1",
 	"pyusb>=1.0.0b2"
 ]
 

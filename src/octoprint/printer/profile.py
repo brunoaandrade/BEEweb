@@ -141,15 +141,15 @@ class PrinterProfileManager(object):
 
 	default = dict(
 		id = "_default",
-		name = "Default",
-		model = "Generic RepRap Printer",
+		name = "BVC Default",
+		model = "Generic BEEVERYCREATIVE Printer",
 		color = "default",
 		volume=dict(
-			width = 200,
-			depth = 200,
-			height = 200,
+			width = 190,
+			depth = 135,
+			height = 125,
 			formFactor = BedTypes.RECTANGULAR,
-			origin = BedOrigin.LOWERLEFT
+			origin = BedOrigin.CENTER
 		),
 		heatedBed = False,
 		extruder=dict(
@@ -160,12 +160,40 @@ class PrinterProfileManager(object):
 			nozzleDiameter = 0.4
 		),
 		axes=dict(
-			x = dict(speed=6000, inverted=False),
-			y = dict(speed=6000, inverted=False),
-			z = dict(speed=200, inverted=False),
+			x = dict(speed=4800, inverted=False),
+			y = dict(speed=4800, inverted=False),
+			z = dict(speed=4800, inverted=False),
 			e = dict(speed=300, inverted=False)
 		)
 	)
+
+	preset_printers = [dict(
+		id = "beethefirst",
+		name = "BEETHEFIRST",
+		model = "BEETHEFIRST Printer",
+		color = "default",
+		volume=dict(
+			width = 190,
+			depth = 135,
+			height = 125,
+			formFactor = BedTypes.RECTANGULAR,
+			origin = BedOrigin.CENTER
+		),
+		heatedBed = False,
+		extruder=dict(
+			count = 1,
+			offsets = [
+				(0, 0)
+			],
+			nozzleDiameter = 0.4
+		),
+		axes=dict(
+			x = dict(speed=4800, inverted=False),
+			y = dict(speed=4800, inverted=False),
+			z = dict(speed=4800, inverted=False),
+			e = dict(speed=300, inverted=False)
+		)
+	)]
 
 	def __init__(self):
 		self._current = None
@@ -284,6 +312,10 @@ class PrinterProfileManager(object):
 				continue
 
 			results[identifier] = dict_merge(self._load_default(), profile)
+
+		# loads the preset printers
+		results.update(self._load_preset_printers())
+
 		return results
 
 	def _load_all_identifiers(self):
@@ -352,6 +384,19 @@ class PrinterProfileManager(object):
 			self._logger.warn("Invalid default profile after applying overrides")
 			return copy.deepcopy(self.__class__.default)
 		return profile
+
+	def _load_preset_printers(self):
+		set_printers = dict()
+		for prt in self.__class__.preset_printers:
+
+			profile = self._ensure_valid_profile(prt)
+			if not profile:
+				self._logger.warn("Invalid preset profile after applying overrides")
+				return set_printers
+			else:
+				set_printers[prt['id']] = prt
+
+		return set_printers
 
 	def _get_profile_path(self, identifier):
 		return os.path.join(self._folder, "%s.profile" % identifier)
