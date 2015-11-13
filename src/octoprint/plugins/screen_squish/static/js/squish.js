@@ -4,7 +4,7 @@ $(function() {
 
         self.settings = parameters[0];
         self.temperatureViewModel = parameters[1];
-    
+
         self.override_version = ko.observable(false);
         self.show_override = ko.observable(false);
 
@@ -55,11 +55,11 @@ $(function() {
             // hide the units in temperature settings at the tablet breakpoint for space
             $('#temp span.add-on').addClass('squish-temp-units');
 
-            max_version = self.settings.settings.plugins.ScreenSquish.octoprint_max_version();
-            if (max_version && max_version != '') {
+            //max_version = self.settings.settings.plugins.ScreenSquish.octoprint_max_version();
+            //if (max_version && max_version != '') {
                 self.override_version(true);
                 self.show_override(true);
-            }
+            //}
         };
 
         self.onSettingsBeforeSave = function() {
@@ -67,13 +67,13 @@ $(function() {
             if (self.override_version()) {
                 version = $('span.version').text();
             }
-            self.settings.settings.plugins.ScreenSquish.octoprint_max_version(version);
-            if (version == '' && self.show_override()) {
-                new PNotify({
-                    title: gettext("ScreenSquish auto off"),
-                    text: gettext("This won't take effect until OctoPrint has been restarted.")
-                });
-            }
+            //self.settings.settings.plugins.ScreenSquish.octoprint_max_version(version);
+            //if (version == '' && self.show_override()) {
+            //    new PNotify({
+            //        title: gettext("ScreenSquish auto off"),
+            //        text: gettext("This won't take effect until OctoPrint has been restarted.")
+            //    });
+            //}
         }
 
         self.updateScreenWidth = function() {
