@@ -1,0 +1,49 @@
+<div id="maintenance_dialog" class="modal hide fade large" tabindex="-1" role="dialog" aria-labelledby="maintenance_dialog_label" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 id="maintenance_dialog_label">{{ _('Printer Maintenance') }} <i class="icon-spinner icon-spin" data-bind="visible: receiving"></i></h3>
+    </div>
+    <div class="modal-body">
+        <div class="full-sized-box">
+            <div class="tabbable row-fluid">
+
+                <ul class="nav nav-tabs operationsList" id="maintenanceTabs" >
+
+                    <li id="maintenance_changeFilament_link" class="active" data-bind="css: { lockedOperation: operationLock() }">
+                        <a href="#maintenance_changeFilament" data-toggle="tab">{{ _('Filament change') }}</a>
+                    </li>
+
+                    <li id="maintenance_calibration_link" class="" data-bind="css: { lockedOperation: operationLock() }">
+                        <a href="#maintenance_calibration" data-toggle="tab">{{ _('Calibration') }}</a>
+                    </li>
+
+                    <li id="maintenance_extruderMaintenance_link" class="" data-bind="css: { lockedOperation: operationLock() }">
+                        <a href="#maintenance_extruderMaintenance" data-toggle="tab">{{ _('Extruder maintenance') }}</a>
+                    </li>
+
+                    <li id="maintenance_replaceNozzle_link" class="" data-bind="css: { lockedOperation: operationLock() }">
+                        <a href="#maintenance_replaceNozzle" data-toggle="tab">{{ _('Replace nozzle') }}</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="maintenance_dialog_content">
+                    <div id="maintenance_changeFilament" class="tab-pane active">
+                        {% include 'dialogs/maintenance/change_filament.jinja2' ignore missing %}
+                    </div>
+                    <div id="maintenance_calibration" class="tab-pane">
+                        {% include 'dialogs/maintenance/calibration.jinja2' ignore missing %}
+                    </div>
+                    <div id="maintenance_extruderMaintenance" class="tab-pane">
+                        {% include 'dialogs/maintenance/extruder_maintenance.jinja2' ignore missing %}
+                    </div>
+                    <div id="maintenance_replaceNozzle" class="tab-pane">
+                        {% include 'dialogs/maintenance/replace_nozzle.jinja2' ignore missing %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Close') }}</button>
+    </div>
+</div>

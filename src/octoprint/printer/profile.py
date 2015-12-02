@@ -141,15 +141,15 @@ class PrinterProfileManager(object):
 
 	default = dict(
 		id = "_default",
-		name = "Default",
-		model = "Generic RepRap Printer",
+		name = "BVC Default",
+		model = "Generic BEEVERYCREATIVE Printer",
 		color = "default",
 		volume=dict(
-			width = 200,
-			depth = 200,
-			height = 200,
+			width = 190,
+			depth = 135,
+			height = 125,
 			formFactor = BedTypes.RECTANGULAR,
-			origin = BedOrigin.LOWERLEFT
+			origin = BedOrigin.CENTER
 		),
 		heatedBed = False,
 		extruder=dict(
@@ -160,9 +160,9 @@ class PrinterProfileManager(object):
 			nozzleDiameter = 0.4
 		),
 		axes=dict(
-			x = dict(speed=6000, inverted=False),
-			y = dict(speed=6000, inverted=False),
-			z = dict(speed=200, inverted=False),
+			x = dict(speed=4800, inverted=False),
+			y = dict(speed=4800, inverted=False),
+			z = dict(speed=4800, inverted=False),
 			e = dict(speed=300, inverted=False)
 		)
 	)
@@ -284,6 +284,7 @@ class PrinterProfileManager(object):
 				continue
 
 			results[identifier] = dict_merge(self._load_default(), profile)
+
 		return results
 
 	def _load_all_identifiers(self):

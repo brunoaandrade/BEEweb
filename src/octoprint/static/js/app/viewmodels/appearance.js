@@ -26,7 +26,7 @@ $(function() {
 
         self.title = ko.computed(function() {
             if (self.name())
-                return self.name() + " [" + gettext("BEE.web") + "]";
+                return "[" + gettext("BEE.web") + "]:" + self.name();
             else
                 return gettext("BEE.web");
         });

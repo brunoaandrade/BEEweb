@@ -30,7 +30,7 @@ import logging
 import re
 import uuid
 
-_APPNAME = "OctoPrint"
+_APPNAME = "BEEweb"
 
 _instance = None
 
@@ -148,7 +148,7 @@ default_settings = {
 		"alwaysSendChecksum": False,
 		"sendChecksumWithUnknownCommands": False,
 		"unknownCommandsNeedAck": False,
-		"sdSupport": True,
+		"sdSupport": False,
 		"sdAlwaysAvailable": False,
 		"swallowOkAfterResend": True,
 		"repetierTargetTemp": False,
@@ -196,13 +196,13 @@ default_settings = {
 		"defaultLanguage": "_default",
 		"components": {
 			"order": {
-				"navbar": ["settings", "systemmenu", "login"],
-				"sidebar": ["connection", "state", "files"],
+				"navbar": ["maintenance", "settings", "systemmenu", "login"],
+				"sidebar": ["state", "files", "connection"],
 				"tab": ["workbench", "gcodeviewer", "control", "temperature", "terminal", "timelapse"],
 				"settings": [
 					"section_printer", "printerprofiles", "temperatures", "terminalfilters", "gcodescripts",
 					"section_features", "features", "webcam", "accesscontrol", "api",
-					"section_octoprint", "server", "folders", "appearance", "logs", "plugin_pluginmanager", "plugin_softwareupdate"
+					"section_beeweb", "server", "folders", "appearance", "logs", "plugin_pluginmanager", "plugin_softwareupdate"
 				],
 				"usersettings": ["access", "interface"],
 				"generic": []

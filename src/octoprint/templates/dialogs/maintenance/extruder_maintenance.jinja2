@@ -1,0 +1,210 @@
+<div class="row-fluid">
+    <button id="reset-extruder-maint" title="Restart Operation" class="btn btn-default pull-right hidden"
+        data-bind="click: restartExtMaint">
+        <i class="icon-refresh"></i> {{ _('Restart Operation')}}
+    </button>
+</div>
+<br />
+<div id="extMaintStep1">
+    <div class="row-fluid">
+        <span class="span12 alert alert-info">
+            <i class="icon-question-sign"></i> {{ _('This operation allows you to clean the extruder.')}}
+        </span>
+    </div>
+    <div class="row-fluid">
+        <span class="span12 alert alert-danger"><i class="icon-exclamation-sign"></i>
+            {{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}
+        </span>
+    </div>
+    <div class="row-fluid">
+        <div class="span6">
+            <strong>{{ _('Step 1')}}: {{ _('Extruder heating for filament removal') }}</strong>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span4"></div>
+        <div class="span4">
+            <img src="{{ url_for('static', filename='img/maintenance/bico_extrusao.png') }}" />
+        </div>
+        <div class="span4"></div>
+    </div>
+    <div class="row-fluid">
+        <p><strong>{{ _('Please use the tools available in your maintenance kit and make sure you have read the instructional material before continuing.' ) }}
+            </strong>
+        </p>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span6">
+            <button id="start-heating-ext-mtn" title="Start Heating" class="btn btn-danger"
+               data-bind="click: startHeatingExtMaint, enable: printerState.isOperational() && !operationLock()
+               && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                <i class="icon-fire"></i> {{ _('Start Heating')}}</button>
+        </div>
+    </div>
+</div>
+
+<div id="extMaintStep2" class="hidden">
+    <div class="row-fluid">
+        <span class="span12 alert alert-danger"><i class="icon-exclamation-sign"></i>
+            {{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}
+        </span>
+    </div>
+    <div class="row-fluid">
+        <div class="span6">
+            <strong>{{ _('Step 2')}}</strong>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <p>
+            <strong>{{ _('Use a hex key to remove the screws on the top cover of your 3D printer.' ) }}</strong>
+            <strong>{{ _('Remove the cover by gently pulling upwards.' ) }}</strong>
+            <strong>{{ _('Make sure to place the screws in a secure location.' ) }}</strong>
+        </p>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span4"></div>
+        <div class="span4">
+            <img src="{{ url_for('static', filename='img/maintenance/remove_cover.png') }}" />
+        </div>
+        <div class="span4"></div>
+    </div>
+    <br />
+    <br />
+    <div class="row-fluid">
+        <div class="span6">
+            <strong>{{ _('Step 3')}}</strong>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <p>
+            <strong>{{ _('Using the same tool as before, remove the screw that attaches the cover plate to your 3D printer.' ) }}</strong>
+            <strong>{{ _('Afterwards slide the cover plate in the direction indicated OPEN.' ) }}</strong>
+        </p>
+        <p>
+            <strong>{{ _('Remember to put the screws in a safe location.' ) }}</strong>
+        </p>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span4"></div>
+        <div class="span4">
+            <img src="{{ url_for('static', filename='img/maintenance/remove_lid_sized.png') }}" />
+        </div>
+        <div class="span4"></div>
+    </div>
+    <br />
+    <br />
+</div>
+
+<br />
+<div id="progress-bar-ext-mtn" class="row-fluid hidden">
+    <span>{{ _('Your 3D printer must finish heating before continuing this operation. Please wait...') }}</span>
+    <div id="temperature-progress-ext-mtn" class="progress" style="width: 100%;">
+        <div class="bar" style="width: 0%"></div>
+    </div>
+    <button id ="cancel-heating-ext-mtn" title="Cancel" class="btn btn-default pull-right"
+        data-bind="click: cancelHeatingExtMaint" ><i class="icon-stop"></i> {{ _('Cancel')}}</button>
+</div>
+<br />
+<div id="next-step-ext-mtn-3" class="row-fluid hidden">
+    <button id="ext-mtn-3" title="Next Step" class="btn btn-default"
+        data-bind="click: nextStepExtMaint2, enable: printerState.isOperational() && !commandLock()
+        && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+        <i class="icon-arrow-right"></i> {{ _('Next Step')}}
+    </button>
+</div>
+<br />
+
+<div id="extMaintStep3" class="hidden">
+    <div class="row-fluid">
+        <div class="span3"></div>
+        <div class="span7">
+            <img src="{{ url_for('static', filename='img/maintenance/clean_nozzle_sized.png') }}" />
+        </div>
+        <div class="span2">
+            <div class="row-fluid">
+                <button id="load-ext-mtn" title="Load" class="btn btn-success span12"
+                    data-bind="click: loadFilament, enable: printerState.isOperational()
+                    && printerState.isReady() && !commandLock()
+                    && !printerState.isPrinting() && loginState.isUser()">
+                    <i class="icon-arrow-up"></i> {{ _('Load')}}
+                </button>
+            </div>
+            <br />
+            <div class="row-fluid">
+                <button id="unload-ext-mtn" title="Unload" class="btn btn-warning span12"
+                    data-bind="click: unloadFilament, enable: printerState.isOperational()
+                    && printerState.isReady() && !commandLock()
+                    && !printerState.isPrinting() && loginState.isUser()">
+                    <i class="icon-arrow-down"></i> {{ _('Unload')}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span6">
+            <strong>{{ _('Step 4')}}</strong>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <p>
+            <span>{{ _('Make sure to unload any filament still loaded in your 3D printer.' ) }}</span>
+            <span>{{ _('Apply the cleaning tool to remove any leftover material that might have lodged inside the extruder.' ) }}</span>
+        </p>
+        <p>
+            <span>{{ _('After cleaning the extruder, press load and make sure the filament is extruding normally.' ) }}</span>
+        </p>
+    </div>
+
+    <br />
+    <div class="row-fluid">
+        <button id="ext-mtn-4" title="Next Step" class="btn btn-default"
+            data-bind="click: nextStepExtMaint3, enable: printerState.isOperational() && !commandLock()
+            && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+            <i class="icon-arrow-right"></i> {{ _('Next Step')}}
+        </button>
+    </div>
+</div>
+
+
+
+<div id="extMaintStep4" class="hidden">
+    <div class="row-fluid">
+        <div class="span2"></div>
+        <div class="span8">
+            <img src="{{ url_for('static', filename='img/maintenance/troca_filamento.png') }}" />
+        </div>
+        <div class="span2"></div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span3"></div>
+        <div class="span6">
+            <strong>{{ _('Final Step')}}: {{ _('Select Filament Code') }}</strong>
+            <br />
+            <form class="form-horizontal">
+                <div class="control-group">
+                    <div class="">
+                        <select data-bind="options: filamentProfiles, optionsText: 'name', optionsValue: 'name', value: selectedFilament, optionsCaption: '{{ _('Select filament type...') }}'"></select>
+
+                        <button id="submit-filament" title="Save Filament" class="btn btn-primary"
+                        data-bind="click: saveFilament, enable: printerState.isOperational() && !commandLock()
+                        && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                            <i class="icon-hdd"></i> {{ _('Save')}}
+                        </button>
+                    </div>
+                </div>
+                <div class="alert alert-success text-center" data-bind="visible: filamentResponse">
+                     <span><i class="icon-ok"></i> {{ _('The filament code was saved. The operation is now finished!')}}</span>
+                </div>
+                <div class="alert alert-danger text-center" data-bind="visible: filamentResponseError">
+                     <span><i class="icon-exclamation-sign"></i> {{ _('An error occurred while saving. Please make sure a filament code is selected and try again.')}}</span>
+                </div>
+            </form>
+        </div>
+        <div class="span3"></div>
+    </div>
+</div>

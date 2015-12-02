@@ -171,7 +171,7 @@ class Server():
 		def exception_logger(exc_type, exc_value, exc_tb):
 			self._logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_tb))
 		sys.excepthook = exception_logger
-		self._logger.info("Starting OctoPrint %s" % DISPLAY_VERSION)
+		self._logger.info("Starting BEEweb %s" % DISPLAY_VERSION)
 
 		# then initialize the plugin manager
 		pluginManager = octoprint.plugin.plugin_manager(init=True)

@@ -91,13 +91,13 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				if "__version" in data:
 					data_version = data["__version"]
 				else:
-					self._logger.info("Can't determine version of OctoPrint version cache was created for, not using it")
+					self._logger.info("Can't determine version of BEEweb version cache was created for, not using it")
 					return
 
 				from octoprint._version import get_versions
 				octoprint_version = get_versions()["version"]
 				if data_version != octoprint_version:
-					self._logger.info("Version cache was created for another version of OctoPrint, not using it")
+					self._logger.info("Version cache was created for another version of BEEweb, not using it")
 					return
 
 				self._version_cache = data
@@ -127,8 +127,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 			"checks": {
 				"octoprint": {
 					"type": "github_release",
-					"user": "foosel",
-					"repo": "OctoPrint",
+					"user": "beeverycreative",
+					"repo": "BEEweb",
 					"update_script": "{{python}} \"{update_script}\" --python=\"{{python}}\" \"{{folder}}\" {{target}}".format(update_script=os.path.join(self._basefolder, "scripts", "update-octoprint.py")),
 					"restart": "octoprint"
 				},
@@ -659,7 +659,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 
 		if target == "octoprint":
 			from flask.ext.babel import gettext
-			result["displayName"] = check.get("displayName", gettext("OctoPrint"))
+			result["displayName"] = check.get("displayName", gettext("BEEweb"))
 			result["displayVersion"] = check.get("displayVersion", "{octoprint_version}")
 
 			from octoprint._version import get_versions
@@ -690,7 +690,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 		if target == "octoprint":
 			from octoprint._version import get_versions
 			from flask.ext.babel import gettext
-			check["displayName"] = gettext("OctoPrint")
+			check["displayName"] = gettext("BEEweb")
 			check["displayVersion"] = "{octoprint_version}"
 			check["current"] = get_versions()["version"]
 

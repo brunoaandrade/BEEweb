@@ -201,6 +201,9 @@ $(function() {
                 contentType: "application/json; charset=UTF-8",
                 data: JSON.stringify({command: "select", print: printAfterLoad})
             });
+
+            // Shows the status panel
+            $("#state").collapse("show");
         };
 
         self.removeFile = function(file) {

@@ -11,7 +11,7 @@ from octoprint.util.comm import MachineCom, get_interval
 from beedriver.connection import Conn as BeeConn
 from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer
 
-__author__ = "BEEVC - Electronic Systems "
+__author__ = "BEEVC - Electronic Systems"
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
 
 class BeeCom(MachineCom):
@@ -120,7 +120,10 @@ class BeeCom(MachineCom):
         :return:
         """
         if self._beeConn.isConnected():
-            self._changeState(self.STATE_OPERATIONAL)
+            if self._beeCommands.isPrinting():
+                self._changeState(self.STATE_PRINTING)
+            else:
+                self._changeState(self.STATE_OPERATIONAL)
         else:
             self._changeState(self.STATE_WAITING_FOR_BTF)
 
@@ -242,13 +245,13 @@ class BeeCom(MachineCom):
                     except:
                         pass
 
-        payload = {
-            "file": self._currentFile.getFilename(),
-            "filename": os.path.basename(self._currentFile.getFilename()),
-            "origin": self._currentFile.getFileLocation()
-        }
+            payload = {
+                "file": self._currentFile.getFilename(),
+                "filename": os.path.basename(self._currentFile.getFilename()),
+                "origin": self._currentFile.getFileLocation()
+            }
 
-        eventManager().fire(Events.PRINT_CANCELLED, payload)
+            eventManager().fire(Events.PRINT_CANCELLED, payload)
 
     def setPause(self, pause):
         """
@@ -399,6 +402,26 @@ class BeeCom(MachineCom):
 
         return ret
 
+    def triggerPrintFinished(self):
+        """
+        This method runs the post-print job code
+        :return:
+        """
+        self._sdFilePos = 0
+        self._callback.on_comm_print_job_done()
+        self._changeState(self.STATE_OPERATIONAL)
+        eventManager().fire(Events.PRINT_DONE, {
+            "file": self._currentFile.getFilename(),
+            "filename": os.path.basename(self._currentFile.getFilename()),
+            "origin": self._currentFile.getFileLocation(),
+            "time": self.getPrintTime()
+        })
+        if self._sd_status_timer is not None:
+            try:
+                self._sd_status_timer.cancel()
+            except:
+                pass
+
     def _monitor(self):
         """
         Monitor thread of responses from the commands sent to the printer
@@ -510,22 +533,7 @@ class BeeCom(MachineCom):
                     self._changeState(self.STATE_PRINTING)
                     self._clear_to_send.set()
                     line = "ok"
-                elif 'Done printing file' in line and self.isSdPrinting():
-                    # printer is reporting file finished printing
-                    self._sdFilePos = 0
-                    self._callback.on_comm_print_job_done()
-                    self._changeState(self.STATE_OPERATIONAL)
-                    eventManager().fire(Events.PRINT_DONE, {
-                        "file": self._currentFile.getFilename(),
-                        "filename": os.path.basename(self._currentFile.getFilename()),
-                        "origin": self._currentFile.getFileLocation(),
-                        "time": self.getPrintTime()
-                    })
-                    if self._sd_status_timer is not None:
-                        try:
-                            self._sd_status_timer.cancel()
-                        except:
-                            pass
+
                 elif 'Done saving file' in line:
                     self.refreshSdFiles()
                 elif 'File deleted' in line and line.strip().endswith("ok"):
