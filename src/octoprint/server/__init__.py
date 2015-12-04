@@ -862,6 +862,7 @@ class Server():
 			"js/lib/three.min.js",
 			"js/lib/STLLoader.js",
 			"js/lib/TrackballControls.js",
+			"js/lib/TransformControls.js",
 		]
 
 		css_libs = [
