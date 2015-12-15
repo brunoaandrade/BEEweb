@@ -666,10 +666,12 @@ class Server():
 	def _setup_blueprints(self):
 		from octoprint.server.api import api
 		from octoprint.server.apps import apps, clear_registered_app
+		from octoprint.server.api.bee_custom import api as beeapi
 		import octoprint.server.views
 
 		app.register_blueprint(api, url_prefix="/api")
 		app.register_blueprint(apps, url_prefix="/apps")
+		app.register_blueprint(beeapi, url_prefix="/bee/api")
 
 		# also register any blueprints defined in BlueprintPlugins
 		self._register_blueprint_plugins()
