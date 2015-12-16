@@ -48,31 +48,42 @@
                             <div id="wifi-config" class="tab-pane active">
                                 Please select the wi-fi network you wish to join. <br /><br />
 
-                                <div class="row-fluid form-horizontal">
+                                <div class="row-fluid">
 
                                     <div class="control-group">
                                         <div class="controls">
                                             <label>{{ _('Available networks') }}: </label>
-                                            <select id="networks-list" class="form-control" onchange="$('#network-password').show();" >
+                                            <select id="networks-list" class="form-control" style="margin-bottom: 0px;"
+                                                    onchange="$('#network-password').show();" >
                                                 <option value=""></option>
 
                                             </select>
+
                                             <a id="get-networks-button" class="btn btn-default" onclick="getNetworkList()"
                                             data-loading-text="<i class='icon-refresh icon-spin'></i>">
                                                 <i class="icon-refresh"></i>
                                             </a>
-
-                                            <button class="btn btn-primary" onclick="getNetworkList()">
-                                                {{ _('Connect') }} <i class="icon-rss"></i>
-                                            </button>
                                         </div>
                                     </div>
 
                                     <div id="network-password" class="control-group" style="display: none;">
                                         <div class="controls">
                                             <label>{{ _('Network password') }}: </label>
-                                            <input type="text"/>
+                                            <input id="password-input" type="text"/>
                                         </div>
+
+                                        <div class="controls">
+                                            <button id="connect-button" class="btn btn-primary" onclick="connectToNetwork()">
+                                                {{ _('Connect') }} <i class="icon-rss"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="alert-connect" class="row-fluid" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <i class="icon-info"></i>
+                                        {{ _('The server will now try to connect to the Wi-fi network. You will loose connectivity with this page.') }}
                                     </div>
                                 </div>
 
@@ -128,6 +139,26 @@
                         });
 
                         $('#get-networks-button').button('reset');
+                    }
+                });
+            }
+
+            function connectToNetwork() {
+
+                var pass = $('#password-input').val();
+                var network = $('#networks-list').val();
+
+                var content = { 'network': network, 'password': pass };
+
+                $.ajax({
+                    url: "bee/api/wifi/connect",
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json; charset=UTF-8",
+                    data: JSON.stringify(content),
+                    success: function(data) {
+                        $('#connect-button').prop('disabled', true);
+                        $('#alert-connect').show();
                     }
                 });
 
