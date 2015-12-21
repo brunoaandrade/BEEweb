@@ -1,13 +1,12 @@
 # coding=utf-8
 from __future__ import absolute_import
 
-import os
-from octoprint.server.util.iwlistparse import get_ssid_list
-
 __author__ = "BEEVC - Electronic Systems "
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
 __copyright__ = "Copyright (C) 2014 The OctoPrint Project - Released under terms of the AGPLv3 License"
 
+import os
+from octoprint.server.util.iwlistparse import get_ssid_list
 from octoprint.server.api import api
 from octoprint.server import printer, NO_CONTENT
 from flask import Blueprint, jsonify, request, make_response
@@ -32,7 +31,7 @@ def getConnectedPrinter():
 @api.route("/wifi/list", methods=["GET"])
 def getAvailableHotspots():
 
-	networks = get_ssid_list('wlan0', '/Users/dpacheco/Desktop/iwlist_scan.txt')
+	networks = get_ssid_list('wlan0')
 
 	return jsonify({
 		"wifi_networks": networks
