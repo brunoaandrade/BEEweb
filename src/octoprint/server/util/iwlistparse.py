@@ -33,7 +33,7 @@ def get_ssid_list(net_iface, out_file_path = None):
 	if out_file_path is None:
 		import os
 		f = os.popen('sudo iwlist ' + net_iface + ' scan')
-		iwlist_output = f.read()
+		iwlist_output = f.readlines()
 	else:
 		iwlist_output = open(out_file_path, mode='r')
 

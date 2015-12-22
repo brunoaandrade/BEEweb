@@ -150,6 +150,9 @@
 
                 var content = { 'network': network, 'password': pass };
 
+                $('#connect-button').prop('disabled', true);
+                $('#alert-connect').show();
+
                 $.ajax({
                     url: "bee/api/wifi/connect",
                     type: "POST",
@@ -157,8 +160,7 @@
                     contentType: "application/json; charset=UTF-8",
                     data: JSON.stringify(content),
                     success: function(data) {
-                        $('#connect-button').prop('disabled', true);
-                        $('#alert-connect').show();
+
                     }
                 });
 

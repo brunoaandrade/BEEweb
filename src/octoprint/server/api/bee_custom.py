@@ -52,7 +52,7 @@ def connectNetwork():
 	regex_pass = re.compile(r'psk=".+"', re.IGNORECASE)
 
 	lines = []
-	with open('/etc/wpa_supplicant/wpa_supplicant.conf') as infile:
+	with open('/etc/wpa_supplicant/wpa_supplicant.conf.dist') as infile:
 		for line in infile:
 			if 'ssid' in line:
 				line = regex_net.sub('ssid="%s"' % data['network'], line)
