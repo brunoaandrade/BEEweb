@@ -2,6 +2,8 @@
 import os
 import re
 
+HOSTNAME_UPDATE_SCRIPT = 'hostname_upd.sh'
+
 def update_hostname(new_hostname):
 	"""
 	Updates the machine's hostname to a new value
@@ -11,10 +13,32 @@ def update_hostname(new_hostname):
 	"""
 
 	if new_hostname is not None:
-		command = "sudo hostname " + new_hostname
-		os.system(command)
+		lines_buffer = []
+		with open('/etc/hosts') as hosts_file:
+			for line in hosts_file:
+				if '127.0.0.1' in line:
+					line = '127.0.0.1        ' + new_hostname
+				lines_buffer.append(line)
 
-		print "Hostname updated: " + new_hostname
+		from os.path import expanduser
+		home = expanduser("~")
+		with open(home + '/hosts_update', 'w') as hosts_outfile:
+			for line in lines_buffer:
+				hosts_outfile.write(line)
+
+		# writes the file that will replace /etc/hostname
+		with open(home + '/hostname_update', 'w') as hostname_outfile:
+			hostname_outfile.write(new_hostname)
+
+		# Executes the shell script to update the hostname
+		import os.path
+		script_path = home + '/' + HOSTNAME_UPDATE_SCRIPT
+		if os.path.isfile(script_path):
+			try:
+				import subprocess
+				subprocess.call([script_path])
+			except:
+				print ('Error executing hostname update script.')
 
 		return True
 	else:

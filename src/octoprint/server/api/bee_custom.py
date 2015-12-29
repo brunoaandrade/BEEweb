@@ -57,9 +57,6 @@ def saveNetworkConfig():
 	if not new_hostname or not is_valid_hostname(new_hostname):
 		return make_response("Invalid hostname parameter.", 406)
 
-	# Updates the hostname
-	update_hostname(new_hostname)
-
 	# writes the wpa_supplicant configuration file
 	import re
 	regex_net = re.compile(r'ssid=".+"', re.IGNORECASE)
@@ -90,6 +87,10 @@ def saveNetworkConfig():
 			subprocess.call([script_path])
 		except:
 			print ('Error executing wi-fi client mode script.')
+
+	# Updates the hostname
+	# NOTE: This operation is done last because it will force the server to reboot
+	update_hostname(new_hostname)
 
 	return NO_CONTENT
 
