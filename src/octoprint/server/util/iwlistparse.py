@@ -45,7 +45,7 @@ def get_ssid_list(net_iface, out_file_path = None):
 
 			if cell_line is not None:
 				cell_line = cell_line.strip("\"\n")
-				if cell_line not in networks_found:
+				if cell_line not in networks_found and cell_line is not '':
 					networks_found.append(cell_line)
 
 	return networks_found
