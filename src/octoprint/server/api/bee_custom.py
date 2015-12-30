@@ -30,7 +30,7 @@ def getConnectedPrinter():
 @api.route("/wifi/list", methods=["GET"])
 def getAvailableHotspots():
 
-	networks = get_ssid_list('wlan0', '/Users/dpacheco/Desktop/wlist_scan.txt')
+	networks = get_ssid_list('wlan0')
 
 	return jsonify({
 		"wifi_networks": networks
