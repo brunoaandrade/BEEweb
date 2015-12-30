@@ -1,4 +1,6 @@
 # coding=utf-8
+WIFI_CMODE_SCRIPT = 'wifi_client_mode.sh'
+
 def match(line, keyword):
 	"""
 	If the first part of line (modulo blanks) matches keyword,
@@ -49,3 +51,43 @@ def get_ssid_list(net_iface, out_file_path = None):
 					networks_found.append(cell_line)
 
 	return networks_found
+
+
+def switch_wifi_client_mode(network_name, password):
+	"""
+	Switches the Wifi interfaces to client mode and tries to connect to the specified
+	network using the system configured scripts
+
+	:param network:
+	:param password:
+	:return:
+	"""
+	import re
+	regex_net = re.compile(r'ssid=".+"', re.IGNORECASE)
+	regex_pass = re.compile(r'psk=".+"', re.IGNORECASE)
+
+	lines = []
+	with open('/etc/wpa_supplicant/wpa_supplicant.conf.dist') as infile:
+		for line in infile:
+			if 'ssid' in line:
+				line = regex_net.sub('ssid="%s"' % network_name, line)
+			if 'psk' in line:
+				line = regex_pass.sub('psk="%s"' % password, line)
+
+			lines.append(line)
+
+	from os.path import expanduser
+	home = expanduser("~")
+	with open(home + '/wpa_supplicant_update.conf', 'w') as outfile:
+		for line in lines:
+			outfile.write(line)
+
+	# Executes the shell script to change the wi-fi mode
+	import os.path
+	script_path = home + '/' + WIFI_CMODE_SCRIPT
+	if os.path.isfile(script_path):
+		try:
+			import subprocess
+			subprocess.call([script_path])
+		except:
+			print ('Error executing wi-fi client mode script.')
