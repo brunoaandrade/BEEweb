@@ -45,21 +45,31 @@ def saveNetworkConfig():
 
 	data = request.json
 	network_name = data['network']
-	new_hostname = data['hostname']
 	password = data['password']
 
 	# validates input data
 	if network_name is None:
 		return make_response("Invalid network name parameter.", 406)
 
-	if not new_hostname or not is_valid_hostname(new_hostname):
-		return make_response("Invalid hostname parameter.", 406)
-
 	# Tries to switch the Wifi configuration to client mode
 	switch_wifi_client_mode(network_name, password)
 
+	return NO_CONTENT
+
+@api.route("/hostname/save", methods=["POST"])
+def hostnameSave():
+
+	if not "application/json" in request.headers["Content-Type"]:
+		return make_response("Expected content-type JSON", 400)
+
+	data = request.json
+	new_hostname = data['hostname']
+
+	if not new_hostname or not is_valid_hostname(new_hostname):
+		return make_response("Invalid hostname parameter.", 406)
+
 	# Updates the hostname
-	# NOTE: This operation is done last because it will force the server to reboot
+	# NOTE: This operation will force the server to reboot
 	update_hostname(new_hostname)
 
 	return NO_CONTENT

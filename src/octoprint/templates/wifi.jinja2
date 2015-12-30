@@ -72,11 +72,34 @@
                                             <input id="password-input" type="text"/>
                                         </div>
                                     </div>
+                                    <br />
+                                    <div id="buttons-network" class="control-group" >
+
+                                        <div class="controls">
+                                            <button id="connect-button" class="btn btn-primary" onclick="connectNetwork()">
+                                                {{ _('Connect') }} <i class="icon-rss   "></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="alert-connect" class="row-fluid" style="display: none;">
+                                        <div class="alert alert-success">
+                                            <i class="icon-info"></i>
+                                            {{ _('The device will now try to connect to the selected Wifi network.
+                                            You will loose connectivity with this web page.') }}
+                                        </div>
+                                    </div>
+
+
+
                                     <hr />
                                     <div class="alert alert-info">
                                         <i class="icon-info"></i>
                                         <small>{{ _('The hostname will be used to identify your device in the network.
                                         Please choose a unique name.') }}</small>
+                                    </div>
+                                    <div class="alert alert-danger">
+                                        <i class="icon-info"></i>
+                                        <small>{{ _('Please notice that changing the hostname will require rebooting your device!') }}</small>
                                     </div>
                                     <div id="hostname" class="control-group" >
                                         <div class="controls">
@@ -89,22 +112,18 @@
                                     <div id="buttons" class="control-group" >
 
                                         <div class="controls">
-                                            <button id="connect-button" class="btn btn-primary" onclick="saveConfig()">
+                                            <button id="change-hostname-button" class="btn btn-primary" onclick="saveHostname()">
                                                 {{ _('Save') }} <i class="icon-save"></i>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div id="alert-connect" class="row-fluid" style="display: none;">
-                                    <div class="alert alert-info">
-                                        <i class="icon-info"></i>
-                                        {{ _('The device will now try to connect to the configured Wifi network.
-                                        You will loose connectivity with this web page.') }}
-                                    </div>
+                                <div id="alert-hostname" class="row-fluid" style="display: none;">
+
                                     <div class="alert alert-warning">
                                         <i class="icon-info"></i>
-                                        {{ _('To access this application again use the hostname you configured. Ex: http://beewepbi.local being beewebpi the hostname.') }}
+                                        {{ _('The device will now reboot. In order to access this application again use the hostname you configured. Ex: http://beewepbi.local being beewebpi the hostname.') }}
                                     </div>
                                 </div>
 
@@ -164,19 +183,39 @@
                 });
             }
 
-            function saveConfig() {
+            function connectNetwork() {
 
                 var pass = $('#password-input').val();
                 var network = $('#networks-list').val();
-                var hostname = $('#hostname-input').val();
 
-                var content = { 'network': network, 'password': pass, 'hostname': hostname };
+                var content = { 'network': network, 'password': pass };
 
                 $('#connect-button').prop('disabled', true);
                 $('#alert-connect').show();
 
                 $.ajax({
                     url: "bee/api/netconfig/save",
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json; charset=UTF-8",
+                    data: JSON.stringify(content),
+                    success: function(data) {
+
+                    }
+                });
+            }
+
+            function saveHostname() {
+
+                var hostname = $('#hostname-input').val();
+
+                var content = { 'hostname': hostname };
+
+                $('#change-hostname-button').prop('disabled', true);
+                $('#alert-hostname').show();
+
+                $.ajax({
+                    url: "bee/api/hostname/save",
                     type: "POST",
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",
