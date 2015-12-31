@@ -46,7 +46,7 @@
                         <div class="tab-content">
 
                             <div id="wifi-config" class="tab-pane active">
-                                Please select the wi-fi network you wish to join. <br /><br />
+                                {{ _('Please select the wi-fi network you wish to join.') }} <br /><br />
 
                                 <div class="row-fluid">
 
@@ -82,10 +82,11 @@
                                         </div>
                                     </div>
                                     <div id="alert-connect" class="row-fluid" style="display: none;">
-                                        <div class="alert alert-success">
+                                        <div class="alert alert-warning">
                                             <i class="icon-info"></i>
-                                            {{ _('The device will now try to connect to the selected Wifi network.
-                                            You will loose connectivity with this web page.') }}
+                                            {{ _('The device will now try to connect to the selected network for one minute.
+                                            You will loose connectivity with this web page. If the connection is not successful after
+                                            one minute you can access this page again using the device own wi-fi network.') }}
                                         </div>
                                     </div>
 
@@ -104,7 +105,7 @@
                                     <div id="hostname" class="control-group" >
                                         <div class="controls">
                                             <label>{{ _('Hostname') }}: </label>
-                                            <input id="hostname-input" type="text" placeholder="beewebpi"/>
+                                            <input id="hostname-input" type="text" />
                                         </div>
 
                                     </div>
@@ -158,7 +159,21 @@
         <script>
             $( document ).ready(function() {
                 getNetworkList();
+
+                getCurrentHostname();
             });
+
+            function getCurrentHostname() {
+                $.ajax({
+                    url: "bee/api/hostname",
+                    type: "GET",
+                    dataType: "json",
+                    contentType: "application/json; charset=UTF-8",
+                    success: function(data) {
+                        $("#hostname-input").val(data.hostname);
+                    }
+                });
+            }
 
             function getNetworkList() {
 

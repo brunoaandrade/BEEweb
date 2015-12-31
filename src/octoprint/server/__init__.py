@@ -1,6 +1,8 @@
 # coding=utf-8
 from __future__ import absolute_import
 
+from threading import Thread
+
 __author__ = "Gina Häußge <osd@foosel.net>"
 __license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
 __copyright__ = "Copyright (C) 2014 The OctoPrint Project - Released under terms of the AGPLv3 License"
@@ -968,5 +970,11 @@ class LifecycleManager(object):
 					self._plugin_lifecycle_callbacks[event].remove(callback)
 
 if __name__ == "__main__":
+	# starts the connectivity thread
+	from octoprint.server.util.netconnection import check_connection_thread
+	conn_thread = Thread(target = check_connection_thread, args = ())
+	conn_thread.start()
+
+	# starts the main server
 	server = Server()
 	server.run()

@@ -1,5 +1,9 @@
 # coding=utf-8
+from threading import Thread
+
 WIFI_CMODE_SCRIPT = 'wifi_client_mode.sh'
+WIFI_AP_SCRIPT = 'wifi_ap_mode.sh'
+RM_WPA_SUPPLICANT_CONF = 'remove_wpa_supplicant_conf.sh'
 
 def match(line, keyword):
 	"""
@@ -58,11 +62,14 @@ def switch_wifi_client_mode(network_name, password):
 	Switches the Wifi interfaces to client mode and tries to connect to the specified
 	network using the system configured scripts
 
-	:param network:
+	:param network_name:
 	:param password:
 	:return:
 	"""
 	import re
+	import os.path
+	import subprocess
+
 	regex_net = re.compile(r'ssid=".+"', re.IGNORECASE)
 	regex_pass = re.compile(r'psk=".+"', re.IGNORECASE)
 
@@ -83,11 +90,42 @@ def switch_wifi_client_mode(network_name, password):
 			outfile.write(line)
 
 	# Executes the shell script to change the wi-fi mode
-	import os.path
+
 	script_path = home + '/' + WIFI_CMODE_SCRIPT
 	if os.path.isfile(script_path):
 		try:
-			import subprocess
 			subprocess.call([script_path])
 		except:
 			print ('Error executing wi-fi client mode script.')
+
+	# starts the connectivity thread
+	from octoprint.server.util.netconnection import check_connection_thread
+	conn_thread = Thread(target = check_connection_thread, args = ())
+	conn_thread.start()
+
+
+def switch_wifi_ap_mode():
+	"""
+	Switches the Wifi interface to AP mode
+	:return:
+	"""
+	import os.path
+	import subprocess
+	from os.path import expanduser
+	home = expanduser("~")
+
+	# removes wpa_supplicant configuration
+	script_path = home + '/' + RM_WPA_SUPPLICANT_CONF
+	if os.path.isfile(script_path):
+		try:
+			subprocess.call([script_path])
+		except:
+			print ('Error removing wpa_supplicant configuration.')
+
+		# Executes the shell script to change the wi-fi mode
+		script_path = home + '/' + WIFI_AP_SCRIPT
+		if os.path.isfile(script_path):
+			try:
+				subprocess.call([script_path])
+			except:
+				print ('Error executing wi-fi AP mode script.')

@@ -6,7 +6,7 @@ __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agp
 __copyright__ = "Copyright (C) 2014 The OctoPrint Project - Released under terms of the AGPLv3 License"
 
 from octoprint.server.util.wifi_util import get_ssid_list, switch_wifi_client_mode
-from octoprint.server.util.hostname_util import is_valid_hostname, update_hostname
+from octoprint.server.util.hostname_util import is_valid_hostname, update_hostname, get_hostname
 from octoprint.server.api import api
 from octoprint.server import printer, NO_CONTENT
 from flask import Blueprint, jsonify, request, make_response
@@ -34,6 +34,15 @@ def getAvailableHotspots():
 
 	return jsonify({
 		"wifi_networks": networks
+	})
+
+@api.route("/hostname", methods=["GET"])
+def getCurrentHostname():
+
+	hostname = get_hostname()
+
+	return jsonify({
+		"hostname": hostname
 	})
 
 

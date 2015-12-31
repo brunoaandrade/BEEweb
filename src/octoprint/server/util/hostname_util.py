@@ -4,6 +4,21 @@ import re
 
 HOSTNAME_UPDATE_SCRIPT = 'hostname_upd.sh'
 
+def get_hostname():
+	"""
+	Returns the current configured hostname in /etc/hostname
+	:return:
+	"""
+	import os.path
+	if os.path.isfile('/etc/hostname'):
+		with open('/etc/hostname', 'r') as hostname_file:
+			for line in hostname_file:
+				if line:
+					return line.strip()
+	else:
+		return 'beewebpi'
+
+
 def update_hostname(new_hostname):
 	"""
 	Updates the machine's hostname to a new value
