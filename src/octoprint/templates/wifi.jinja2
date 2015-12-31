@@ -136,7 +136,7 @@
                 <div class="footer">
                     <hr />
                     <ul class="pull-left muted">
-                        <li><large>{{ _('BEE.web') }} &copy 2015 BEEVC - Electronic Systems : <span class="version">{{ display_version }}</span></large></li>
+                        <li><large>{{ _('BEE.web') }} &copy 2016 BEEVC - Electronic Systems : <span class="version">{{ display_version }}</span></large></li>
                     </ul>
                     <ul class="pull-right">
                         <li>{{ _('powered by ') }}<a href="http://octoprint.org"><i class="icon-github"></i> Octoprint</a></li>
@@ -236,6 +236,9 @@
                     contentType: "application/json; charset=UTF-8",
                     data: JSON.stringify(content),
                     success: function(data) {
+
+                    },
+                    error: function(resp) {
 
                     }
                 });
