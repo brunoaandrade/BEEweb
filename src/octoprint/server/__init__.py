@@ -1,6 +1,8 @@
 # coding=utf-8
 from __future__ import absolute_import
 
+from threading import Thread
+
 __author__ = "Gina Häußge <osd@foosel.net>"
 __license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
 __copyright__ = "Copyright (C) 2014 The OctoPrint Project - Released under terms of the AGPLv3 License"
@@ -667,10 +669,12 @@ class Server():
 	def _setup_blueprints(self):
 		from octoprint.server.api import api
 		from octoprint.server.apps import apps, clear_registered_app
+		from octoprint.server.api.bee_custom import api as beeapi
 		import octoprint.server.views
 
 		app.register_blueprint(api, url_prefix="/api")
 		app.register_blueprint(apps, url_prefix="/apps")
+		app.register_blueprint(beeapi, url_prefix="/bee/api")
 
 		# also register any blueprints defined in BlueprintPlugins
 		self._register_blueprint_plugins()
@@ -977,5 +981,11 @@ class LifecycleManager(object):
 					self._plugin_lifecycle_callbacks[event].remove(callback)
 
 if __name__ == "__main__":
+	# starts the connectivity thread
+	from octoprint.server.util.netconnection import check_connection_thread
+	conn_thread = Thread(target = check_connection_thread, args = ())
+	conn_thread.start()
+
+	# starts the main server
 	server = Server()
 	server.run()
