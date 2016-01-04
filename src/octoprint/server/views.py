@@ -475,3 +475,23 @@ def plugin_assets(name, filename):
 	return redirect(url_for("plugin." + name + ".static", filename=filename))
 
 
+@app.route("/wifi")
+def wifi_config():
+
+	import datetime
+	locales = dict((l.language, dict(language=l.language, display=l.display_name, english=l.english_name)) for l in LOCALES)
+
+	render_kwargs = dict(
+		version=VERSION,
+		display_version=DISPLAY_VERSION,
+		branch=BRANCH,
+		locales=locales
+	)
+
+	response = make_response(render_template(
+		"wifi.jinja2",
+		**render_kwargs
+	))
+	response.headers["Last-Modified"] = datetime.datetime.now()
+
+	return response

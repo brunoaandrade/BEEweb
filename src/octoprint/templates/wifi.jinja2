@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title data-bind="text: title">BEE.web</title>
+
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/bee.png') }}">
+        <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='img/bee.png') }}">
+        <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='img/bee.png') }}">
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+        {% include 'stylesheets.jinja2' %}
+    </head>
+    <body>
+        <div class="page-container">
+            <div id="navbar" class="navbar navbar-static-top">
+                <div class="navbar-inner" data-bind="css: appearanceClasses">
+                    <div class="container">
+                        <a class="brand" href="#">
+                            <span class="brand-label-fix" data-bind="text: appearance.brand">BEE.web</span>
+                        </a>
+                        <span id="printer-name-label" class="brand" data-bind="text: appearance.printerName"></span>
+                        <div class="nav-collapse">
+                            <!-- Navbar -->
+                            <ul class="nav pull-right">
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container octoprint-container">
+                <div class="row-fluid">
+
+                    <!-- Tabs -->
+                    <div class="tabbable span12">
+
+                        <ul class="nav nav-tabs" id="tabs">
+                            <li id="wifi-config_link" class="active">
+                                <a href="#wifi-config" data-toggle="tab">{{ _('Network Configurations') }}</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+
+                            <div id="wifi-config" class="tab-pane active">
+                                {{ _('Please select the wi-fi network you wish to join.') }} <br /><br />
+
+                                <div class="row-fluid">
+
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <label>{{ _('Available networks') }}: </label>
+                                            <select id="networks-list" class="form-control" style="margin-bottom: 0px;"
+                                                    onchange="$('#network-password').show();" >
+                                                <option value=""></option>
+
+                                            </select>
+
+                                            <a id="get-networks-button" class="btn btn-default" onclick="getNetworkList()"
+                                            data-loading-text="<i class='icon-refresh icon-spin'></i>">
+                                                <i class="icon-refresh"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div id="network-password" class="control-group" style="display: none;">
+                                        <div class="controls">
+                                            <label>{{ _('Network password') }}: </label>
+                                            <input id="password-input" type="text"/>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div id="buttons-network" class="control-group" >
+
+                                        <div class="controls">
+                                            <button id="connect-button" class="btn btn-primary" onclick="connectNetwork()">
+                                                {{ _('Connect') }} <i class="icon-rss   "></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="alert-connect" class="row-fluid" style="display: none;">
+                                        <div class="alert alert-warning">
+                                            <i class="icon-info"></i>
+                                            {{ _('The device will now try to connect to the selected network for one minute.
+                                            You will loose connectivity with this web page. If the connection is not successful after
+                                            one minute you can access this page again using the device own wi-fi network.') }}
+                                        </div>
+                                    </div>
+
+
+
+                                    <hr />
+                                    <div class="alert alert-info">
+                                        <i class="icon-info"></i>
+                                        <small>{{ _('The hostname will be used to identify your device in the network.
+                                        Please choose a unique name.') }}</small>
+                                    </div>
+                                    <div class="alert alert-danger">
+                                        <i class="icon-info"></i>
+                                        <small>{{ _('Please notice that changing the hostname will require rebooting your device!') }}</small>
+                                    </div>
+                                    <div id="hostname" class="control-group" >
+                                        <div class="controls">
+                                            <label>{{ _('Hostname') }}: </label>
+                                            <input id="hostname-input" type="text" />
+                                        </div>
+
+                                    </div>
+                                    <br />
+                                    <div id="buttons" class="control-group" >
+
+                                        <div class="controls">
+                                            <button id="change-hostname-button" class="btn btn-primary" onclick="saveHostname()">
+                                                {{ _('Save') }} <i class="icon-save"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="alert-hostname" class="row-fluid" style="display: none;">
+
+                                    <div class="alert alert-warning">
+                                        <i class="icon-info"></i>
+                                        {{ _('The device will now reboot. In order to access this application again use the hostname you configured. Ex: http://beewepbi.local being beewebpi the hostname.') }}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="footer">
+                    <hr />
+                    <ul class="pull-left muted">
+                        <li><large>{{ _('BEE.web') }} &copy 2016 BEEVC - Electronic Systems : <span class="version">{{ display_version }}</span></large></li>
+                    </ul>
+                    <ul class="pull-right">
+                        <li>{{ _('powered by ') }}<a href="http://octoprint.org"><i class="icon-github"></i> Octoprint</a></li>
+                        <!--<li><a href="https://github.com/foosel/OctoPrint/"><i class="icon-github"></i> {{ _('Sourcecode') }}</a></li>-->
+                        <!--<li><a href="http://docs.octoprint.org"><i class="icon-book"></i> {{ _('Documentation') }}</a></li>-->
+                        <!--<li><a href="https://github.com/foosel/OctoPrint/issues"><i class="icon-flag"></i> {{ _('Bugs and Requests') }}</a></li>-->
+                    </ul>
+                </div>
+            </div>
+
+            {% assets "js_libs" %}
+                <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+            {% endassets %}
+
+            {% if g.locale %}
+                <script type="text/javascript" src="{{ url_for('localeJs', locale=g.locale, domain='messages') }}"></script>
+            {% endif %}
+
+        </div>
+        <script>
+            $( document ).ready(function() {
+                getNetworkList();
+
+                getCurrentHostname();
+            });
+
+            function getCurrentHostname() {
+                $.ajax({
+                    url: "bee/api/hostname",
+                    type: "GET",
+                    dataType: "json",
+                    contentType: "application/json; charset=UTF-8",
+                    success: function(data) {
+                        $("#hostname-input").val(data.hostname);
+                    }
+                });
+            }
+
+            function getNetworkList() {
+
+                $('#get-networks-button').button('loading');
+
+                $.ajax({
+                    url: "bee/api/wifi/list",
+                    type: "GET",
+                    dataType: "json",
+                    contentType: "application/json; charset=UTF-8",
+                    success: function(data) {
+                        $("#networks-list option").remove();
+
+                        // Appens a first empty option
+                        $("#networks-list").append($("<option></option>"));
+                        $.each(data.wifi_networks, function(index, item) {
+                            $("#networks-list").append($("<option></option>").text(item).val(item));
+                        });
+
+                        $('#get-networks-button').button('reset');
+                    }
+                });
+            }
+
+            function connectNetwork() {
+
+                var pass = $('#password-input').val();
+                var network = $('#networks-list').val();
+
+                var content = { 'network': network, 'password': pass };
+
+                $('#connect-button').prop('disabled', true);
+                $('#alert-connect').show();
+
+                $.ajax({
+                    url: "bee/api/netconfig/save",
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json; charset=UTF-8",
+                    data: JSON.stringify(content),
+                    success: function(data) {
+
+                    }
+                });
+            }
+
+            function saveHostname() {
+
+                var hostname = $('#hostname-input').val();
+
+                var content = { 'hostname': hostname };
+
+                $('#change-hostname-button').prop('disabled', true);
+                $('#alert-hostname').show();
+
+                $.ajax({
+                    url: "bee/api/hostname/save",
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json; charset=UTF-8",
+                    data: JSON.stringify(content),
+                    success: function(data) {
+
+                    },
+                    error: function(resp) {
+
+                    }
+                });
+
+            }
+
+        </script>
+    </body>
+</html>
