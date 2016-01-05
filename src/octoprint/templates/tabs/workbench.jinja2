@@ -2,147 +2,18 @@
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
 
+
+<div class="row-fluid">
+    <select id="workbench_file_list" data-bind="options: FileList, optionsText: 'name',optionsValue: 'hash',optionsCaption: 'Choose...',event: { change: loadModel }"></select>
+
+</div>
 <div id="stl_container" >
 </div>
 
 <script>
 
-    var control, container, camera, cameraTarget, scene, renderer;
-    var objects = [], plane;
-
     init();
     render();
     animate();
 
-    function init() {
-
-        container = document.getElementById( 'stl_container' );
-        //document.body.appendChild( container );
-
-        // renderer
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight / 1.5);
-        container.appendChild( renderer.domElement );
-
-        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 3000 );
-		camera.position.set( 0, 200, 100 );
-		camera.up.set( 0, 0, 1 ); // Without this the model is seen upside down
-		camera.lookAt( new THREE.Vector3( 0, 100, 0 ) );
-
-        scene = new THREE.Scene();
-        //scene.add( new THREE.GridHelper( 90, 30 ) );
-
-        var light1 = new THREE.PointLight( 0xffffff, 0.5 );
-        light1.position.set( 200, 200, 200 );
-        var light2 = new THREE.PointLight( 0xffffff, 0.5 );
-        light2.position.set( -200, 200, 200 );
-        var light3 = new THREE.PointLight( 0xffffff, 0.5 );
-        light3.position.set( 200, -200, 200 );
-        var light4 = new THREE.PointLight( 0xffffff, 0.5 );
-        light4.position.set( -200, -200, 200 );
-        scene.add( light1 );
-        scene.add( light2 );
-        scene.add( light3 );
-        scene.add( light4 );
-
-        addBed(-95, -67.5, 0, 0, 0, 0, 1);
-
-        // Loads the model
-        loadModel('3DBenchy.stl');
-
-        controls = new THREE.TrackballControls( camera, container );
-        controls.rotateSpeed = 1.0;
-        controls.zoomSpeed = 0.7;
-        controls.panSpeed = 0.8;
-
-        controls.noZoom = false;
-        controls.noPan = false;
-
-        controls.staticMoving = true;
-        controls.dynamicDampingFactor = 0.3;
-
-        window.addEventListener( 'resize', onWindowResize, false );
-	}
-
-
-    function loadModel(modelName) {
-
-        var loader = new THREE.STLLoader();
-
-        control = new THREE.TransformControls( camera, renderer.domElement );
-		control.addEventListener( 'change', render );
-
-        // Colored binary STL
-        loader.load('./stl/' + modelName, function ( geometry ) {
-            var material = new THREE.MeshPhongMaterial( { color: 0xECC459, specular: 0x111111, shininess: 200 } );
-
-            var mesh = new THREE.Mesh( geometry, material );
-            mesh.position.set( 0, 0, 0 );
-            //mesh.rotation.set( - Math.PI , Math.PI , 0 );
-            //mesh.scale.set( 1.5, 1.5, 1.5 );
-            //mesh.castShadow = true;
-            scene.add( mesh );
-
-            objects.push( mesh );
-            control.attach( mesh );
-
-            scene.add( control );
-        });
-    }
-
-    function render() {
-        control.update();
-        renderer.render( scene, camera );
-    }
-
-    function animate() {
-        requestAnimationFrame( animate );
-        controls.update();
-        renderer.render( scene, camera );
-    }
-
-    function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-
-        renderer.setSize( window.innerWidth, window.innerHeight / 1.5 );
-
-        render();
-    }
-
-    function addBed(x, y, z, rx, ry, rz, s ) {
-
-        var color = 0x3BADE6;
-        var extrudeSettings = { amount: 1, bevelEnabled: false};
-
-        // Rectangle
-        var rectLength = 190, rectWidth = 135;
-
-        var rectShape = new THREE.Shape();
-        rectShape.moveTo( 0,0 );
-        rectShape.lineTo( 0, rectWidth );
-        rectShape.lineTo( rectLength, rectWidth );
-        rectShape.lineTo( rectLength, 0 );
-        rectShape.lineTo( 0, 0 );
-
-        // 3D shape
-        var geometry = new THREE.ExtrudeGeometry( rectShape, extrudeSettings );
-
-        var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
-        mesh.position.set( x, y, z-1 );
-        mesh.rotation.set( rx, ry, rz );
-        mesh.scale.set( s, s, s );
-
-        // flat shape
-        /*
-        var geometry = new THREE.ShapeGeometry( rectShape );
-
-        var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color, side: THREE.DoubleSide } ) );
-        mesh.position.set( x, y, z );
-        mesh.rotation.set( rx, ry, rz );
-        mesh.scale.set( s, s, s );
-        */
-
-        scene.add( mesh );
-    }
 </script>

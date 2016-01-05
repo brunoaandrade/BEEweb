@@ -867,6 +867,7 @@ class Server():
 			"js/lib/STLLoader.js",
 			"js/lib/TrackballControls.js",
 			"js/lib/TransformControls.js",
+			"js/app/3Doperations.js",
 		]
 
 		css_libs = [
