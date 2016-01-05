@@ -7,15 +7,8 @@
 
 <script>
 
-    var container, stats;
-
-    var camera, cameraTarget, scene, renderer;
-    var objects = [], plane;;
-
-    var raycaster = new THREE.Raycaster();
-    var mouse = new THREE.Vector2(),
-    offset = new THREE.Vector3(),
-    INTERSECTED, SELECTED;
+    var control, container, camera, cameraTarget, scene, renderer;
+    var objects = [], plane;
 
     init();
     render();
@@ -27,47 +20,37 @@
         //document.body.appendChild( container );
 
         // renderer
-        renderer=new THREE.WebGLRenderer({ antialias: true });
+        renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight / 1.5);
         container.appendChild( renderer.domElement );
 
         camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 3000 );
-		camera.position.set( 0, 400, 10 );
+		camera.position.set( 0, 200, 100 );
+		camera.up.set( 0, 0, 1 ); // Without this the model is seen upside down
 		camera.lookAt( new THREE.Vector3( 0, 100, 0 ) );
 
         scene = new THREE.Scene();
-        scene.add( new THREE.GridHelper( 90, 30 ) );
+        //scene.add( new THREE.GridHelper( 90, 30 ) );
 
-        var light = new THREE.DirectionalLight( 0xffffff, 2 );
-        light.position.set( 1, 1, 1 );
-        scene.add( light );
+        var light1 = new THREE.PointLight( 0xffffff, 0.5 );
+        light1.position.set( 200, 200, 200 );
+        var light2 = new THREE.PointLight( 0xffffff, 0.5 );
+        light2.position.set( -200, 200, 200 );
+        var light3 = new THREE.PointLight( 0xffffff, 0.5 );
+        light3.position.set( 200, -200, 200 );
+        var light4 = new THREE.PointLight( 0xffffff, 0.5 );
+        light4.position.set( -200, -200, 200 );
+        scene.add( light1 );
+        scene.add( light2 );
+        scene.add( light3 );
+        scene.add( light4 );
 
         addBed(-95, -67.5, 0, 0, 0, 0, 1);
 
-        var loader = new THREE.STLLoader();
+        // Loads the model
+        loadModel('3DBenchy.stl');
 
-        control = new THREE.TransformControls( camera, renderer.domElement );
-		control.addEventListener( 'change', render );
-
-        // Colored binary STL
-        loader.load('./stl/3DBenchy.stl', function ( geometry ) {
-            var material = new THREE.MeshPhongMaterial( { color: 0xECC459, specular: 0x111111, shininess: 200 } );
-
-            var mesh = new THREE.Mesh( geometry, material );
-            //mesh.position.set( 0, -20, 0 );
-            //mesh.rotation.set( - Math.PI / 6, Math.PI / 6, 0 );
-            //mesh.scale.set( 1.5, 1.5, 1.5 );
-            //mesh.castShadow = true;
-            scene.add( mesh );
-
-            objects.push( mesh );
-            control.attach( mesh );
-
-            scene.add( control );
-        });
-
-
-        controls = new THREE.TrackballControls( camera );
+        controls = new THREE.TrackballControls( camera, container );
         controls.rotateSpeed = 1.0;
         controls.zoomSpeed = 0.7;
         controls.panSpeed = 0.8;
@@ -78,21 +61,33 @@
         controls.staticMoving = true;
         controls.dynamicDampingFactor = 0.3;
 
-        //renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
-        //renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
-        //renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
-        //
         window.addEventListener( 'resize', onWindowResize, false );
 	}
 
 
-    function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+    function loadModel(modelName) {
 
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        var loader = new THREE.STLLoader();
 
-        render();
+        control = new THREE.TransformControls( camera, renderer.domElement );
+		control.addEventListener( 'change', render );
+
+        // Colored binary STL
+        loader.load('./stl/' + modelName, function ( geometry ) {
+            var material = new THREE.MeshPhongMaterial( { color: 0xECC459, specular: 0x111111, shininess: 200 } );
+
+            var mesh = new THREE.Mesh( geometry, material );
+            mesh.position.set( 0, 0, 0 );
+            //mesh.rotation.set( - Math.PI , Math.PI , 0 );
+            //mesh.scale.set( 1.5, 1.5, 1.5 );
+            //mesh.castShadow = true;
+            scene.add( mesh );
+
+            objects.push( mesh );
+            control.attach( mesh );
+
+            scene.add( control );
+        });
     }
 
     function render() {
@@ -101,71 +96,24 @@
     }
 
     function animate() {
-            requestAnimationFrame( animate );
-            controls.update();
-            renderer.render( scene, camera );
+        requestAnimationFrame( animate );
+        controls.update();
+        renderer.render( scene, camera );
     }
 
-    /*function onDocumentMouseMove( event ) {
-        event.preventDefault();
-        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-        //
-        raycaster.setFromCamera( mouse, camera );
-        if ( SELECTED ) {
-            var intersects = raycaster.intersectObject( plane );
-            if ( intersects.length > 0 ) {
-                SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
-            }
-            return;
-        }
-        var intersects = raycaster.intersectObjects( objects );
-        if ( intersects.length > 0 ) {
-            if ( INTERSECTED != intersects[ 0 ].object ) {
-                if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-                INTERSECTED = intersects[ 0 ].object;
-                INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-                plane.position.copy( INTERSECTED.position );
-                plane.lookAt( camera.position );
-            }
-            container.style.cursor = 'pointer';
-        } else {
-            if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-            INTERSECTED = null;
-            container.style.cursor = 'auto';
-        }
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight / 1.5 );
+
+        render();
     }
-
-    function onDocumentMouseDown( event ) {
-        event.preventDefault();
-        raycaster.setFromCamera( mouse, camera );
-        var intersects = raycaster.intersectObjects( objects );
-        if ( intersects.length > 0 ) {
-            controls.enabled = false;
-            SELECTED = intersects[ 0 ].object;
-            var intersects = raycaster.intersectObject( plane );
-            if ( intersects.length > 0 ) {
-                offset.copy( intersects[ 0 ].point ).sub( plane.position );
-            }
-            container.style.cursor = 'move';
-        }
-    }
-
-    function onDocumentMouseUp( event ) {
-        event.preventDefault();
-        controls.enabled = true;
-        if ( INTERSECTED ) {
-            plane.position.copy( INTERSECTED.position );
-            SELECTED = null;
-        }
-        container.style.cursor = 'auto';
-    }*/
-
 
     function addBed(x, y, z, rx, ry, rz, s ) {
 
-        var color = 0x47C2FF;
-        var extrudeSettings = { amount: 1, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 0.5 };
+        var color = 0x3BADE6;
+        var extrudeSettings = { amount: 1, bevelEnabled: false};
 
         // Rectangle
         var rectLength = 190, rectWidth = 135;
@@ -181,7 +129,7 @@
         var geometry = new THREE.ExtrudeGeometry( rectShape, extrudeSettings );
 
         var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
-        mesh.position.set( x, y, z );
+        mesh.position.set( x, y, z-1 );
         mesh.rotation.set( rx, ry, rz );
         mesh.scale.set( s, s, s );
 
@@ -196,6 +144,5 @@
         */
 
         scene.add( mesh );
-
     }
 </script>
