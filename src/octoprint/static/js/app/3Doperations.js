@@ -3,7 +3,7 @@
  */
 var control, container, camera, cameraTarget,
     scene, renderer, controls, objects, raycaster,
-    mouseVector;
+    mouseVector, containerWidthOffset, containerHeightOffset;
 
 /**
  * Main initialization function
@@ -11,14 +11,17 @@ var control, container, camera, cameraTarget,
 function init() {
 
     container = document.getElementById( 'stl_container' );
-    //document.body.appendChild( container );
+    var bondingOffset = container.getBoundingClientRect();
+
+    containerWidthOffset = bondingOffset.left;
+    containerHeightOffset = bondingOffset.top;
 
     // renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight / 1.5);
     container.appendChild( renderer.domElement );
 
-    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 3000 );
+    camera = new THREE.PerspectiveCamera( 45, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 1, 3000 );
     camera.position.set( 0, 200, 100 );
     camera.up.set( 0, 0, 1 ); // Without this the model is seen upside down
     camera.lookAt( new THREE.Vector3( 0, 100, 0 ) );
@@ -63,7 +66,20 @@ function init() {
 	mouseVector = new THREE.Vector3();
 
     window.addEventListener( 'resize', onWindowResize, false );
-    container.addEventListener( 'click', onMouseClick, false );
+    //container.addEventListener( 'click', onMouseClick, false );
+    container.addEventListener( 'mouseup', onMouseUp, false );
+    container.addEventListener( 'mousedown', onMouseDown, false );
+}
+
+function render() {
+    control.update();
+    renderer.render( scene, camera );
+}
+
+function animate() {
+    requestAnimationFrame( animate );
+    controls.update();
+    renderer.render( scene, camera );
 }
 
 /**
@@ -98,17 +114,6 @@ function loadModel(modelName) {
     });
 }
 
-function render() {
-    control.update();
-    renderer.render( scene, camera );
-}
-
-function animate() {
-    requestAnimationFrame( animate );
-    controls.update();
-    renderer.render( scene, camera );
-}
-
 /**
  * OnWindowResize event function
  */
@@ -122,33 +127,34 @@ function onWindowResize() {
 }
 
 /**
- * OnMouseClick event function
+ * OnMouseDown event function
  */
-function onMouseClick( e ) {
+function onMouseDown( e ) {
 
-    mouseVector.x = 2 * (e.clientX / container.clientWidth) - 1;
-    mouseVector.y = 1 - 2 * ( e.clientY / container.clientHeight );
+    // Records the first click position
+    mouseVector.x = 2 * ( (e.clientX - containerWidthOffset) / renderer.domElement.clientWidth) - 1;
+    mouseVector.y = 1 - 2 * ( (e.clientY - containerHeightOffset) / renderer.domElement.clientHeight );
     mouseVector.z = 0.5;
-    debugger;
+}
+
+/**
+ * OnMouseUp event function
+ */
+function onMouseUp( e ) {
+
+    var prevMouseVector = mouseVector.clone();
+
+    mouseVector.x = 2 * ( (e.clientX - containerWidthOffset) / renderer.domElement.clientWidth) - 1;
+    mouseVector.y = 1 - 2 * ( (e.clientY - containerHeightOffset) / renderer.domElement.clientHeight );
+    mouseVector.z = 0.5;
+
     raycaster.setFromCamera( mouseVector, camera );
-    //mouseVector.unproject( camera );
-    //raycaster.set( camera.position, mouseVector.sub(camera.position).normalize() );
 
     var intersects = raycaster.intersectObjects( objects.children );
 
-    objects.children.forEach(function( obj ) {
-        //obj.material.color.setRGB( 140, 140, 140 ); // Sets color to gray
-
-        // create color gray
-        var colorObject = new THREE.Color('#8c8c8c') ;
-        //set the color in the object
-        obj.material.color = colorObject;
-    });
-
-
     // Selects the first found intersection
     if (intersects.length > 0) {
-    debugger;
+
         var intersection = intersects[ 0 ],
             model = intersection.object;
 
@@ -157,6 +163,22 @@ function onMouseClick( e ) {
         var colorObject = new THREE.Color('#ECC459') ;
         //set the color in the object
         model.material.color = colorObject;
+
+    } else {
+
+        if (prevMouseVector.x == mouseVector.x
+        && prevMouseVector.y == mouseVector.y
+        && prevMouseVector.z == mouseVector.z) { // It means the scene wasn't dragged and so we should remove all selections
+
+            objects.children.forEach(function( obj ) {
+            //obj.material.color.setRGB( 140, 140, 140 ); // Sets color to gray
+
+            // create color gray
+            var colorObject = new THREE.Color('#8c8c8c') ;
+            //set the color in the object
+            obj.material.color = colorObject;
+            });
+        }
     }
 }
 
