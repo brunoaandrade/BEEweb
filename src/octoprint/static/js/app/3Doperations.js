@@ -1,9 +1,12 @@
 /**
  * Global Variables declaration
  */
-var control, container, camera, cameraTarget,
-    scene, renderer, controls, objects, raycaster,
-    mouseVector, containerWidthOffset, containerHeightOffset;
+var transformControls, container, camera, cameraTarget,
+    scene, renderer, trackballControls, objects, raycaster,
+    mouseVector, containerWidthOffset, containerHeightOffset, selectedObject;
+
+var SELECT_COLOR = '#ECC459';
+var DEFAULT_COLOR = '#8C8C8C';
 
 /**
  * Main initialization function
@@ -50,16 +53,16 @@ function init() {
     // Loads the model
     loadModel('3DBenchy.stl');
 
-    controls = new THREE.TrackballControls( camera, container );
-    controls.rotateSpeed = 1.0;
-    controls.zoomSpeed = 0.7;
-    controls.panSpeed = 0.8;
+    trackballControls = new THREE.TrackballControls( camera, container );
+    trackballControls.rotateSpeed = 1.0;
+    trackballControls.zoomSpeed = 0.7;
+    trackballControls.panSpeed = 0.8;
 
-    controls.noZoom = false;
-    controls.noPan = false;
+    trackballControls.noZoom = false;
+    trackballControls.noPan = false;
 
-    controls.staticMoving = true;
-    controls.dynamicDampingFactor = 0.3;
+    trackballControls.staticMoving = true;
+    trackballControls.dynamicDampingFactor = 0.3;
 
     // Auxiliar objects for model selection
 	raycaster = new THREE.Raycaster();
@@ -72,13 +75,13 @@ function init() {
 }
 
 function render() {
-    control.update();
+    transformControls.update();
     renderer.render( scene, camera );
 }
 
 function animate() {
     requestAnimationFrame( animate );
-    controls.update();
+    trackballControls.update();
     renderer.render( scene, camera );
 }
 
@@ -89,12 +92,12 @@ function animate() {
 function loadModel(modelName) {
 
     // Removes previous object
-    scene.remove(control);
+    scene.remove(transformControls);
 
     var loader = new THREE.STLLoader();
 
-    control = new THREE.TransformControls( camera, renderer.domElement );
-    control.addEventListener( 'change', render );
+    transformControls = new THREE.TransformControls( camera, renderer.domElement );
+    transformControls.addEventListener( 'change', render );
 
     // Colored binary STL
     loader.load('./stl/' + modelName, function ( geometry ) {
@@ -105,12 +108,17 @@ function loadModel(modelName) {
         //mesh.rotation.set( - Math.PI , Math.PI , 0 );
         //mesh.scale.set( 1.5, 1.5, 1.5 );
         //mesh.castShadow = true;
-        scene.add( mesh );
-        control.attach( mesh );
 
-        scene.add( control );
+        // Attach tranform controls to object
+        transformControls.attach( mesh );
+
+        scene.add( mesh );
+        scene.add( transformControls );
 
         objects.add(mesh);
+
+        selectedObject = mesh;
+
     });
 }
 
@@ -155,30 +163,42 @@ function onMouseUp( e ) {
     // Selects the first found intersection
     if (intersects.length > 0) {
 
-        var intersection = intersects[ 0 ],
-            model = intersection.object;
+        var intersection = intersects[ 0 ];
+        var model = intersection.object;
+
+        // De-selects other objects
+        objects.children.forEach(function( obj ) {
+
+            // create color gray
+            var colorObject = new THREE.Color(DEFAULT_COLOR) ;
+            //set the color in the object
+            obj.material.color = colorObject;
+        });
+
+        if (selectedObject !== model) {
+            // Attaches the transform controls to the newly selected object
+            transformControls.attach( model );
+        }
 
         //obj.material.color.setRGB( 236, 196, 89 ); // Sets color to yellow 0xECC459
         // create color gray
-        var colorObject = new THREE.Color('#ECC459') ;
+        var colorObject = new THREE.Color(SELECT_COLOR) ;
         //set the color in the object
         model.material.color = colorObject;
 
-    } else {
+        selectedObject = model;
 
-        if (prevMouseVector.x == mouseVector.x
+    } else if (prevMouseVector.x == mouseVector.x
         && prevMouseVector.y == mouseVector.y
         && prevMouseVector.z == mouseVector.z) { // It means the scene wasn't dragged and so we should remove all selections
 
-            objects.children.forEach(function( obj ) {
-            //obj.material.color.setRGB( 140, 140, 140 ); // Sets color to gray
+        objects.children.forEach(function( obj ) {
 
             // create color gray
-            var colorObject = new THREE.Color('#8c8c8c') ;
+            var colorObject = new THREE.Color(DEFAULT_COLOR) ;
             //set the color in the object
             obj.material.color = colorObject;
-            });
-        }
+        });
     }
 }
 
