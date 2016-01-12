@@ -90,7 +90,6 @@ def switch_wifi_client_mode(network_name, password):
 			outfile.write(line)
 
 	# Executes the shell script to change the wi-fi mode
-
 	script_path = home + '/' + WIFI_CMODE_SCRIPT
 	if os.path.isfile(script_path):
 		try:
@@ -99,9 +98,9 @@ def switch_wifi_client_mode(network_name, password):
 			print ('Error executing wi-fi client mode script.')
 
 	# starts the connectivity thread
-	from octoprint.server.util.netconnection import check_connection_thread
-	conn_thread = Thread(target = check_connection_thread, args = ())
-	conn_thread.start()
+	#from octoprint.server.util.netconnection import check_connection_thread_usb
+	#conn_thread = Thread(target = check_connection_thread_usb, args = ())
+	#conn_thread.start()
 
 
 def switch_wifi_ap_mode():
@@ -114,18 +113,10 @@ def switch_wifi_ap_mode():
 	from os.path import expanduser
 	home = expanduser("~")
 
-	# removes wpa_supplicant configuration
-	script_path = home + '/' + RM_WPA_SUPPLICANT_CONF
+	# Executes the shell script to change the wi-fi mode
+	script_path = home + '/' + WIFI_AP_SCRIPT
 	if os.path.isfile(script_path):
 		try:
 			subprocess.call([script_path])
 		except:
-			print ('Error removing wpa_supplicant configuration.')
-
-		# Executes the shell script to change the wi-fi mode
-		script_path = home + '/' + WIFI_AP_SCRIPT
-		if os.path.isfile(script_path):
-			try:
-				subprocess.call([script_path])
-			except:
-				print ('Error executing wi-fi AP mode script.')
+			print ('Error executing wi-fi AP mode script.')

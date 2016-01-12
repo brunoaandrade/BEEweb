@@ -971,8 +971,8 @@ class LifecycleManager(object):
 
 if __name__ == "__main__":
 	# starts the connectivity thread
-	from octoprint.server.util.netconnection import check_connection_thread
-	conn_thread = Thread(target = check_connection_thread, args = ())
+	from octoprint.server.util.netconnection import check_connection_thread_usb
+	conn_thread = Thread(target = check_connection_thread_usb, args = ())
 	conn_thread.start()
 
 	# starts the main server
