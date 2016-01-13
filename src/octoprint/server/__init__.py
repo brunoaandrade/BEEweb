@@ -127,6 +127,9 @@ class Server():
 
 		self._template_searchpaths = []
 
+	def get_main_logger(self):
+		return self._logger
+
 	def run(self):
 		if not self._allowRoot:
 			self._check_for_root()
@@ -970,11 +973,11 @@ class LifecycleManager(object):
 					self._plugin_lifecycle_callbacks[event].remove(callback)
 
 if __name__ == "__main__":
-	# starts the connectivity thread
-	from octoprint.server.util.netconnection import check_usb_dongle_thread
-	conn_thread = Thread(target = check_usb_dongle_thread, args = ())
-	conn_thread.start()
-
 	# starts the main server
 	server = Server()
 	server.run()
+
+	# starts the connectivity thread
+	from octoprint.server.util.netconnection import check_usb_dongle_thread
+	conn_thread = Thread(target = check_usb_dongle_thread, args = (server.get_main_logger()))
+	conn_thread.start()
