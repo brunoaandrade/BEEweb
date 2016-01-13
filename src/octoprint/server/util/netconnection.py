@@ -19,14 +19,13 @@ def internet_on():
 
 	return False
 
-def check_internet_conn_thread(logger):
+def check_internet_conn_thread():
 	"""
 	Thread function to check if connection to the internet is detected.
 	If not Internet connection is detected after 1 minute switches to the Wifi AP mode
-	:param logger: External logger from server
 	:return:
 	"""
-	_logger = logger
+	_logger = logging.getLogger()
 	counter = 0
 	INTERNET_POLL_INTERVAL = 10 #seconds
 	RETRIES_LIMIT = 6
@@ -51,13 +50,12 @@ def check_internet_conn_thread(logger):
 
 		sleep(INTERNET_POLL_INTERVAL)
 
-def check_usb_dongle_thread(logger):
+def check_usb_dongle_thread():
 	"""
 	Thread function to check if usb connection with a specific Wifi dongle is detected.
-	:param logger: External logger from server
 	:return:
 	"""
-	_logger = logger
+	_logger = logging.getLogger()
 
 	USB_POLL_INTERVAL = 10 # seconds
 	USB_VENDOR_ID = 0x0bda

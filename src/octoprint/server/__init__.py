@@ -177,7 +177,7 @@ class Server():
 
 		# starts the wifi connectivity thread
 		from octoprint.server.util.netconnection import check_usb_dongle_thread
-		conn_thread = Thread(target = check_usb_dongle_thread, args = (self._logger))
+		conn_thread = Thread(target = check_usb_dongle_thread, args = ())
 		conn_thread.start()
 
 		# then initialize the plugin manager
