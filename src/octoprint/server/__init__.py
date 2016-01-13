@@ -157,6 +157,11 @@ class Server():
 
 		debug = self._debug
 
+		# starts the wifi connectivity thread
+		from octoprint.server.util.netconnection import check_usb_dongle_thread
+		conn_thread = Thread(target = check_usb_dongle_thread, args = (server.get_main_logger()))
+		conn_thread.start()
+
 		# first initialize the settings singleton and make sure it uses given configfile and basedir if available
 		s = settings(init=True, basedir=self._basedir, configfile=self._configfile)
 
@@ -976,8 +981,3 @@ if __name__ == "__main__":
 	# starts the main server
 	server = Server()
 	server.run()
-
-	# starts the connectivity thread
-	from octoprint.server.util.netconnection import check_usb_dongle_thread
-	conn_thread = Thread(target = check_usb_dongle_thread, args = (server.get_main_logger()))
-	conn_thread.start()
