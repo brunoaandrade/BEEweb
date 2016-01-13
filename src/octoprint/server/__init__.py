@@ -45,6 +45,7 @@ loginManager = None
 pluginManager = None
 appSessionManager = None
 pluginLifecycleManager = None
+wifi_conn_thread = None
 
 principals = Principal(app)
 admin_permission = Permission(RoleNeed("admin"))
@@ -146,6 +147,7 @@ class Server():
 		global appSessionManager
 		global pluginLifecycleManager
 		global debug
+		global wifi_conn_thread
 
 		from tornado.ioloop import IOLoop
 		from tornado.web import Application, RequestHandler
@@ -174,11 +176,6 @@ class Server():
 			self._logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_tb))
 		sys.excepthook = exception_logger
 		self._logger.info("Starting BEEweb %s" % DISPLAY_VERSION)
-
-		# starts the wifi connectivity thread
-		from octoprint.server.util.netconnection import check_usb_dongle_thread
-		conn_thread = Thread(target = check_usb_dongle_thread, args = ())
-		conn_thread.start()
 
 		# then initialize the plugin manager
 		pluginManager = octoprint.plugin.plugin_manager(init=True)
