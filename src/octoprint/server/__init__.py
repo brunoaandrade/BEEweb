@@ -462,7 +462,17 @@ class Server():
 
 			import threading
 			threading.Thread(target=work).start()
+
 		ioloop.add_callback(on_after_startup)
+
+		# adds another post startup callback
+		def wifi_mode_monitor():
+
+			from octoprint.server.util.netconnection import check_usb_dongle_thread
+			import threading
+			threading.Thread(target=check_usb_dongle_thread).start()
+
+		ioloop.add_callback(wifi_mode_monitor)
 
 		# prepare our shutdown function
 		def on_shutdown():
