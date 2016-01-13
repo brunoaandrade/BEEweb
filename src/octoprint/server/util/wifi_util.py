@@ -1,6 +1,7 @@
 # coding=utf-8
-from threading import Thread
-from octoprint.server import wifi_conn_thread as global_conn_thread
+from __future__ import absolute_import
+
+from octoprint.server import wifi_conn_thread
 
 WIFI_CMODE_SCRIPT = 'wifi_client_mode.sh'
 WIFI_AP_SCRIPT = 'wifi_ap_mode.sh'
@@ -99,8 +100,8 @@ def switch_wifi_client_mode(network_name, password):
 			print ('Error executing wi-fi client mode script.')
 
 	# starts the wifi connectivity thread
-	if global_conn_thread is None:
-		global_conn_thread.start()
+	if wifi_conn_thread is None:
+		wifi_conn_thread.start()
 
 
 def switch_wifi_ap_mode():
