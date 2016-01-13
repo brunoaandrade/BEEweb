@@ -191,11 +191,6 @@ class Server():
 		appSessionManager = util.flask.AppSessionManager()
 		pluginLifecycleManager = LifecycleManager(pluginManager)
 
-		# Instatiates the thread responsible to monitor Wifi USB dongle connection
-		from octoprint.server.util.netconnection import check_usb_dongle_thread
-		wifi_conn_thread = Thread(target = check_usb_dongle_thread, args = ())
-		wifi_conn_thread.start()
-
 		def octoprint_plugin_inject_factory(name, implementation):
 			if not isinstance(implementation, octoprint.plugin.OctoPrintPlugin):
 				return None
@@ -459,6 +454,11 @@ class Server():
 						return
 					implementation.on_after_startup()
 				pluginLifecycleManager.add_callback("enabled", call_on_after_startup)
+
+				# Instatiates the thread responsible to monitor Wifi USB dongle connection
+				from octoprint.server.util.netconnection import check_usb_dongle_thread
+				wifi_conn_thread = Thread(target = check_usb_dongle_thread, args = ())
+				wifi_conn_thread.start()
 
 			import threading
 			threading.Thread(target=work).start()
