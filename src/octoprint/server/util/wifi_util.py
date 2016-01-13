@@ -95,10 +95,6 @@ def switch_wifi_client_mode(network_name, password):
 		except:
 			print ('Error executing wi-fi client mode script.')
 
-	# starts the wifi connectivity thread
-	#if wifi_conn_thread is None:
-	#	wifi_conn_thread.start()
-
 
 def switch_wifi_ap_mode():
 	"""
