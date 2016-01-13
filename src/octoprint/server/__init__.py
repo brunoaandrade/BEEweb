@@ -45,7 +45,6 @@ loginManager = None
 pluginManager = None
 appSessionManager = None
 pluginLifecycleManager = None
-wifi_conn_thread = None
 
 principals = Principal(app)
 admin_permission = Permission(RoleNeed("admin"))
@@ -147,7 +146,6 @@ class Server():
 		global appSessionManager
 		global pluginLifecycleManager
 		global debug
-		global wifi_conn_thread
 
 		from tornado.ioloop import IOLoop
 		from tornado.web import Application, RequestHandler
@@ -455,24 +453,10 @@ class Server():
 					implementation.on_after_startup()
 				pluginLifecycleManager.add_callback("enabled", call_on_after_startup)
 
-				# Instatiates the thread responsible to monitor Wifi USB dongle connection
-				from octoprint.server.util.netconnection import check_usb_dongle_thread
-				wifi_conn_thread = Thread(target = check_usb_dongle_thread, args = ())
-				wifi_conn_thread.start()
-
 			import threading
 			threading.Thread(target=work).start()
 
 		ioloop.add_callback(on_after_startup)
-
-		# adds another post startup callback
-		def wifi_mode_monitor():
-
-			from octoprint.server.util.netconnection import check_usb_dongle_thread
-			import threading
-			threading.Thread(target=check_usb_dongle_thread).start()
-
-		ioloop.add_callback(wifi_mode_monitor)
 
 		# prepare our shutdown function
 		def on_shutdown():
