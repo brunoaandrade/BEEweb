@@ -57,7 +57,7 @@ def check_usb_dongle_thread():
 	"""
 	_logger = logging.getLogger()
 
-	USB_POLL_INTERVAL = 10 # seconds
+	USB_POLL_INTERVAL = 5 # seconds
 	USB_VENDOR_ID = 0x0bda
 	USB_PRODUCT_ID = 0x8176
 
@@ -65,16 +65,17 @@ def check_usb_dongle_thread():
 
 	_logger.info("Starting USB dongle connectivity monitor thread...")
 	while True:
+		dev_list = []
+		for dev in usb.core.find(idVendor=USB_VENDOR_ID, idProduct=USB_PRODUCT_ID, find_all=True):
+			dev_list.append(dev)
 
 		# If the dongle is not found but the removed flag is False switches it to True
-		if usb.core.find(idVendor=USB_VENDOR_ID, idProduct=USB_PRODUCT_ID, find_all=True) is None\
-				and wifi_dongle_removed is False:
+		if len(dev_list) == 0 and wifi_dongle_removed is False:
 			_logger.info("USB dongle removed")
 			wifi_dongle_removed = True
 
 		# Detects if the dongle was reconnected and switches to the AP mode
-		if usb.core.find(idVendor=USB_VENDOR_ID, idProduct=USB_PRODUCT_ID, find_all=True) is not None\
-				and wifi_dongle_removed is True:
+		if len(dev_list) > 0 and wifi_dongle_removed is True:
 			_logger.info("USB dongle detected. Switching to AP mode.")
 			switch_wifi_ap_mode()
 			wifi_dongle_removed = False
