@@ -19,6 +19,7 @@ from watchdog.observers import Observer
 from watchdog.observers.polling import PollingObserver
 from collections import defaultdict
 from octoprint.printer.bee_printer import BeePrinter
+from octoprint.server.util.netconnection import check_usb_dongle_thread
 
 import os
 import logging
@@ -190,6 +191,9 @@ class Server():
 		printer = BeePrinter(fileManager, analysisQueue, printerProfileManager)
 		appSessionManager = util.flask.AppSessionManager()
 		pluginLifecycleManager = LifecycleManager(pluginManager)
+
+		# Instatiates the thread responsible to monitor Wifi USB dongle connection
+		wifi_conn_thread = Thread(target = check_usb_dongle_thread, args = ())
 
 		def octoprint_plugin_inject_factory(name, implementation):
 			if not isinstance(implementation, octoprint.plugin.OctoPrintPlugin):

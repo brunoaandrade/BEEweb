@@ -100,8 +100,6 @@ def switch_wifi_client_mode(network_name, password):
 
 	# starts the wifi connectivity thread
 	if global_conn_thread is None:
-		from octoprint.server.util.netconnection import check_usb_dongle_thread
-		global_conn_thread = Thread(target = check_usb_dongle_thread, args = ())
 		global_conn_thread.start()
 
 
