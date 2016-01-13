@@ -33,7 +33,7 @@ $(function () {
 		//resize canvas after STL Viewer tab is made active.
 		self.onTabChange = function (current, previous) {
 			if (current == "#workbench") {
-				self.resiveCanvas();
+				self.resizeCanvas();
 				self.updateFileList();
 			}
 		};
@@ -51,6 +51,10 @@ $(function () {
 
 		self.updateFileList = function () {
 			self.FileList(_.filter(self.files.allItems, self.files.supportedFilters["model"]));
+		};
+
+		self.resizeCanvas = function () {
+
 		};
 
 	}

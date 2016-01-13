@@ -68,6 +68,8 @@ function init() {
 	raycaster = new THREE.Raycaster();
 	mouseVector = new THREE.Vector3();
 
+	selectedObject = null;
+
     window.addEventListener( 'resize', onWindowResize, false );
     //container.addEventListener( 'click', onMouseClick, false );
     container.addEventListener( 'mouseup', onMouseUp, false );
@@ -117,16 +119,65 @@ function loadModel(modelName) {
 
         objects.add(mesh);
 
-        selectedObject = mesh;
-
     });
 }
 
 /**
+ * Removes a model from the scene
+ *
+ */
+function removeModel(modelObj) {
+    scene.remove(modelObj);
+    objects.remove(modelObj);
+    scene.remove(transformControls);
+}
+
+/**
+ * Removes the selected model from the scene
+ *
+ */
+function removeSelected() {
+    if (selectedObject !== null) {
+        removeModel(selectedObject);
+    }
+}
+
+/**
+ * Activates the rotate mode for the selected object
+ *
+ */
+function activateRotate() {
+    if (transformControls !== null && selectedObject !== null) {
+        transformControls.setMode("rotate");
+    }
+}
+
+
+/**
+ * Activates the scale mode for the selected object
+ *
+ */
+function activateScale() {
+    if (transformControls !== null && selectedObject !== null) {
+        transformControls.setMode("scale");
+    }
+}
+
+
+/**
+ * Activates the translate (move) mode for the selected object
+ *
+ */
+function activateMove() {
+    if (transformControls !== null && selectedObject !== null) {
+        transformControls.setMode("translate");
+    }
+}
+/**
  * OnWindowResize event function
  */
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
 
     renderer.setSize( window.innerWidth, window.innerHeight / 1.5 );
@@ -199,6 +250,8 @@ function onMouseUp( e ) {
             //set the color in the object
             obj.material.color = colorObject;
         });
+
+        selectedObject = null;
     }
 }
 

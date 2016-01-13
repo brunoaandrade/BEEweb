@@ -6,7 +6,24 @@
     <!-- <select id="workbench_file_list" data-bind="options: FileList, optionsText: 'name',
     optionsValue: 'hash',optionsCaption: 'Choose...',event: { change: loadModel }"></select>
     -->
+    <button class="btn btn-primary span3" onclick="activateScale();">
+        <i class="icon-crop" ></i>
+        <span>{{ _('Scale') }}</span>
+    </button>
+    <button class="btn btn-primary span3" onclick="activateRotate();">
+        <i class="icon-mail-reply" ></i>
+        <span>{{ _('Rotate') }}</span>
+    </button>
+    <button class="btn btn-primary span3" onclick="activateMove();">
+        <i class="icon-exchange" ></i>
+        <span>{{ _('Move') }}</span>
+    </button>
+    <button class="btn btn-default span3" onclick="removeSelected();">
+        <i class="icon-trash" ></i>
+        <span>{{ _('Remove') }}</span>
+    </button>
 </div>
+<br />
 <div id="stl_container" >
 </div>
 
