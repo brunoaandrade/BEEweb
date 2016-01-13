@@ -127,9 +127,6 @@ class Server():
 
 		self._template_searchpaths = []
 
-	def get_main_logger(self):
-		return self._logger
-
 	def run(self):
 		if not self._allowRoot:
 			self._check_for_root()
@@ -157,11 +154,6 @@ class Server():
 
 		debug = self._debug
 
-		# starts the wifi connectivity thread
-		from octoprint.server.util.netconnection import check_usb_dongle_thread
-		conn_thread = Thread(target = check_usb_dongle_thread, args = (server.get_main_logger()))
-		conn_thread.start()
-
 		# first initialize the settings singleton and make sure it uses given configfile and basedir if available
 		s = settings(init=True, basedir=self._basedir, configfile=self._configfile)
 
@@ -182,6 +174,11 @@ class Server():
 			self._logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_tb))
 		sys.excepthook = exception_logger
 		self._logger.info("Starting BEEweb %s" % DISPLAY_VERSION)
+
+		# starts the wifi connectivity thread
+		from octoprint.server.util.netconnection import check_usb_dongle_thread
+		conn_thread = Thread(target = check_usb_dongle_thread, args = (self._logger))
+		conn_thread.start()
 
 		# then initialize the plugin manager
 		pluginManager = octoprint.plugin.plugin_manager(init=True)
