@@ -39,7 +39,7 @@ from . import slicing as api_slicing
 from . import printer_profiles as api_printer_profiles
 from . import languages as api_languages
 from . import maintenance as api_maintenance
-from . import bee_custom as api_bee_custom
+from . import bee_utils as api_bee_custom
 
 VERSION = "0.1"
 

@@ -3,7 +3,7 @@
  */
 var transformControls, container, camera, cameraTarget,
     scene, renderer, trackballControls, objects, raycaster,
-    mouseVector, containerWidthOffset, containerHeightOffset, selectedObject;
+    mouseVector, containerWidthOffset, containerHeightOffset, bed, selectedObject;
 
 var SELECT_COLOR = '#ECC459';
 var DEFAULT_COLOR = '#8C8C8C';
@@ -122,6 +122,20 @@ function loadModel(modelName) {
     });
 }
 
+
+/**
+ * Saves the current scene
+ *
+ */
+function saveScene() {
+    var exporter = new THREE.STLExporter();
+    var stlString = exporter.parse( scene );
+
+    var blob = new Blob([stlString], {type: 'text/plain'});
+
+}
+
+
 /**
  * Removes a model from the scene
  *
@@ -152,7 +166,6 @@ function activateRotate() {
     }
 }
 
-
 /**
  * Activates the scale mode for the selected object
  *
@@ -163,7 +176,6 @@ function activateScale() {
     }
 }
 
-
 /**
  * Activates the translate (move) mode for the selected object
  *
@@ -173,6 +185,9 @@ function activateMove() {
         transformControls.setMode("translate");
     }
 }
+
+
+
 /**
  * OnWindowResize event function
  */
@@ -292,5 +307,8 @@ function addBed(x, y, z, rx, ry, rz, s ) {
     mesh.scale.set( s, s, s );
     */
 
-    scene.add( mesh );
+    // Sets the global bed var
+    bed = mesh
+
+    scene.add( bed );
 }

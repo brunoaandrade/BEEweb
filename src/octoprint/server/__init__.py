@@ -670,7 +670,7 @@ class Server():
 	def _setup_blueprints(self):
 		from octoprint.server.api import api
 		from octoprint.server.apps import apps, clear_registered_app
-		from octoprint.server.api.bee_custom import api as beeapi
+		from octoprint.server.api.bee_utils import api as beeapi
 		import octoprint.server.views
 
 		app.register_blueprint(api, url_prefix="/api")
@@ -866,6 +866,7 @@ class Server():
 		threejs_libs = [
 			"js/lib/three.min.js",
 			"js/lib/STLLoader.js",
+			"js/lib/STLExporter.js",
 			"js/lib/TrackballControls.js",
 			"js/lib/TransformControls.js",
 			"js/app/3Doperations.js",
