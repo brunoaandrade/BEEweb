@@ -129,10 +129,16 @@ function loadModel(modelName) {
  */
 function saveScene() {
     var exporter = new THREE.STLExporter();
+
+    // Removes bed from scene before parsing
+    scene.remove( bed );
+    debugger;
     var stlString = exporter.parse( scene );
 
     var blob = new Blob([stlString], {type: 'text/plain'});
 
+    // Re-inserts the bed into the scene
+    scene.add( bed );
 }
 
 
@@ -153,6 +159,9 @@ function removeModel(modelObj) {
 function removeSelected() {
     if (selectedObject !== null) {
         removeModel(selectedObject);
+
+        selectedObject = null;
+        $('.model-selection').prop('disabled', true);
     }
 }
 
@@ -253,6 +262,7 @@ function onMouseUp( e ) {
         model.material.color = colorObject;
 
         selectedObject = model;
+        $('.model-selection').prop('disabled', false);
 
     } else if (prevMouseVector.x == mouseVector.x
         && prevMouseVector.y == mouseVector.y
@@ -267,6 +277,7 @@ function onMouseUp( e ) {
         });
 
         selectedObject = null;
+        $('.model-selection').prop('disabled', true);
     }
 }
 

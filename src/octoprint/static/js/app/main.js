@@ -378,6 +378,29 @@ $(function() {
             var current = e.target.hash;
             var previous = e.relatedTarget.hash;
 
+            var tabContainer = $('#tab-container');
+            var sidebarContainer = $('#sidebar-container');
+            var workbControls = $('#workbench_ctrls_wrapper');
+            if (current == '#workbench') {
+
+                tabContainer.removeClass('span8');
+                tabContainer.addClass('span9');
+
+                sidebarContainer.removeClass('span4');
+                sidebarContainer.addClass('span3');
+
+                workbControls.css('display', 'block');
+            } else {
+                tabContainer.removeClass('span9');
+                tabContainer.addClass('span8');
+
+                sidebarContainer.removeClass('span3');
+                sidebarContainer.addClass('span4');
+
+                workbControls.css('display', 'none');
+            }
+
+
             _.each(allViewModels, function(viewModel) {
                 if (viewModel.hasOwnProperty("onAfterTabChange")) {
                     viewModel.onAfterTabChange(current, previous);

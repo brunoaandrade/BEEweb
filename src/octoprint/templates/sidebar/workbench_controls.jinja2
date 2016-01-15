@@ -1,0 +1,45 @@
+<div id="workbench-controls-container" >
+    <button class="btn btn-block btn-primary" id="print_scene"
+            data-bind="enable: loginState.isUser() && !connection.isConnecting()">
+        <i class="icon-print" ></i>
+        {{ _('Print...') }}
+    </button>
+    <br />
+    <button class="btn btn-block" id="save_scene"
+            data-bind="" onclick="saveScene();">
+        <i class="icon-save" ></i>
+        {{ _('Save Scene') }}
+    </button>
+    <br />
+    <button class="btn btn-block model-selection" id="reset_selection"
+            data-bind="" disabled="true">
+        <i class="icon-reply-all" ></i>
+        {{ _('Reset model') }}
+    </button>
+    <br />
+    <button class="btn btn-block model-selection" id="delete_selection"
+            data-bind="" disabled="true" onclick="removeSelected();">
+        <i class="icon-trash" ></i>
+        {{ _('Delete') }}
+    </button>
+    <hr />
+
+
+    <label class="checkbox">
+        {{ _('3D Operations') }}
+    </label>
+    <button class="btn btn-primary btn-block model-selection" onclick="activateScale();" disabled="true">
+        <i class="icon-crop" ></i>
+        <span>{{ _('Scale') }}</span>
+    </button>
+    <br />
+    <button class="btn btn-primary btn-block model-selection" onclick="activateRotate();" disabled="true">
+        <i class="icon-refresh" ></i>
+        <span>{{ _('Rotate') }}</span>
+    </button>
+    <br />
+    <button class="btn btn-primary btn-block model-selection" onclick="activateMove();" disabled="true">
+        <i class="icon-exchange" ></i>
+        <span>{{ _('Move') }}</span>
+    </button>
+</div>

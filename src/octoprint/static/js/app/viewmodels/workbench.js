@@ -3,6 +3,9 @@ $(function () {
 		var self = this;
 
 		self.files = parameters[0].listHelper;
+		self.loginState = parameters[1];
+		self.connection = parameters[2];
+
 		self.FileList = ko.observableArray();
 
 		self.models = document.getElementById('workbench_file_list');
@@ -30,10 +33,9 @@ $(function () {
 			self.FileList(_.filter(self.files.allItems, self.files.supportedFilters["model"]));
 		};
 
-		//resize canvas after STL Viewer tab is made active.
-		self.onTabChange = function (current, previous) {
+		//resize canvas after Workbench tab is made active.
+		self.onAfterTabChange = function (current, previous) {
 			if (current == "#workbench") {
-				self.resizeCanvas();
 				self.updateFileList();
 			}
 		};
@@ -53,10 +55,6 @@ $(function () {
 			self.FileList(_.filter(self.files.allItems, self.files.supportedFilters["model"]));
 		};
 
-		self.resizeCanvas = function () {
-
-		};
-
 	}
 
 	// This is how our plugin registers itself with the application, by adding some configuration information to
@@ -68,9 +66,9 @@ $(function () {
 			// This is a list of dependencies to inject into the plugin, the order which you request here is the order
 			// in which the dependencies will be injected into your view model upon instantiation via the parameters
 			// argument
-			["gcodeFilesViewModel"],
+			["gcodeFilesViewModel", "loginStateViewModel", "connectionViewModel"],
 
 			// Finally, this is the list of all elements we want this view model to be bound to.
-			[("#workbench")]
+			[("#workbench", "#workbench-controls-container")]
 		]);
 });
