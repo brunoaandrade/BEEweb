@@ -139,6 +139,8 @@ function saveScene() {
 
     // Re-inserts the bed into the scene
     scene.add( bed );
+
+    saveAs(blob, 'scene.stl');
 }
 
 
