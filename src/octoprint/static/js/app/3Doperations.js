@@ -130,15 +130,11 @@ function loadModel(modelName) {
 function saveScene() {
     var exporter = new THREE.STLExporter();
 
-    // Removes bed from scene before parsing
-    scene.remove( bed );
-    debugger;
-    var stlString = exporter.parse( scene );
+    var stlString = exporter.parse( objects );
+
+    //var stlString = generateSTL( selectedObject );
 
     var blob = new Blob([stlString], {type: 'text/plain'});
-
-    // Re-inserts the bed into the scene
-    scene.add( bed );
 
     saveAs(blob, 'scene.stl');
 }
