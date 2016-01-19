@@ -69,6 +69,7 @@ function init() {
 	mouseVector = new THREE.Vector3();
 
 	selectedObject = null;
+	transformControls = null;
 
     window.addEventListener( 'resize', onWindowResize, false );
     //container.addEventListener( 'click', onMouseClick, false );
@@ -77,7 +78,9 @@ function init() {
 }
 
 function render() {
-    transformControls.update();
+    if (null !== transformControls) {
+        transformControls.update();
+    }
     renderer.render( scene, camera );
 }
 
@@ -98,9 +101,6 @@ function loadModel(modelName) {
 
     var loader = new THREE.STLLoader();
 
-    transformControls = new THREE.TransformControls( camera, renderer.domElement );
-    transformControls.addEventListener( 'change', render );
-
     // Colored binary STL
     loader.load('./stl/' + modelName, function ( geometry ) {
         var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 200 } );
@@ -111,11 +111,7 @@ function loadModel(modelName) {
         //mesh.scale.set( 1.5, 1.5, 1.5 );
         //mesh.castShadow = true;
 
-        // Attach tranform controls to object
-        transformControls.attach( mesh );
-
         scene.add( mesh );
-        scene.add( transformControls );
 
         objects.add(mesh);
 
@@ -150,7 +146,9 @@ function resetSelectedModel() {
 		selectedObject.rotation.set( 0, 0, 0 );
 		selectedObject.scale.set( 1, 1, 1 );
 
+        transformControls.dispose();
 		scene.remove( transformControls );
+
 		transformControls = new THREE.TransformControls( camera, renderer.domElement );
         transformControls.addEventListener( 'change', render );
 		transformControls.attach( selectedObject );
@@ -269,16 +267,22 @@ function onMouseUp( e ) {
             obj.material.color = colorObject;
         });
 
-        if (selectedObject !== model) {
-            // Attaches the transform controls to the newly selected object
-            transformControls.attach( model );
-        }
-
         //obj.material.color.setRGB( 236, 196, 89 ); // Sets color to yellow 0xECC459
         // create color gray
         var colorObject = new THREE.Color(SELECT_COLOR) ;
         //set the color in the object
         model.material.color = colorObject;
+
+        // Attach tranform controls to object
+        transformControls = new THREE.TransformControls( camera, renderer.domElement );
+        transformControls.addEventListener( 'change', render );
+
+        // Attaches the transform controls to the newly selected object
+        if (selectedObject === null || selectedObject !== model) {
+            transformControls.attach( model );
+        }
+
+        scene.add( transformControls );
 
         selectedObject = model;
         $('.model-selection').prop('disabled', false);
@@ -295,7 +299,11 @@ function onMouseUp( e ) {
             obj.material.color = colorObject;
         });
 
+        transformControls.dispose();
+        scene.remove(transformControls);
+        transformControls = null;
         selectedObject = null;
+
         $('.model-selection').prop('disabled', true);
     }
 }
