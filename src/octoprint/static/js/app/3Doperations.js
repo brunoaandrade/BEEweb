@@ -139,15 +139,36 @@ function saveScene() {
     saveAs(blob, 'scene.stl');
 }
 
+/**
+ * Resets the transformations of the selected object
+ *
+ */
+function resetSelectedModel() {
+
+    if (selectedObject !== null) {
+        selectedObject.position.set( 0, 0, 0 );
+		selectedObject.rotation.set( 0, 0, 0 );
+		selectedObject.scale.set( 1, 1, 1 );
+
+		scene.remove( transformControls );
+		transformControls = new THREE.TransformControls( camera, renderer.domElement );
+        transformControls.addEventListener( 'change', render );
+		transformControls.attach( selectedObject );
+        scene.add( transformControls );
+    }
+}
 
 /**
  * Removes a model from the scene
  *
  */
 function removeModel(modelObj) {
-    scene.remove(modelObj);
-    objects.remove(modelObj);
-    scene.remove(transformControls);
+
+    if (null !== modelObj) {
+        scene.remove(modelObj);
+        objects.remove(modelObj);
+        scene.remove(transformControls);
+    }
 }
 
 /**
