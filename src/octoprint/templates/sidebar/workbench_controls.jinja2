@@ -28,17 +28,17 @@
     <label class="checkbox">
         {{ _('3D Operations') }}
     </label>
-    <button class="btn btn-primary btn-block model-selection" onclick="activateMove();" disabled="true">
+    <button id="btn-move" class="btn btn-default btn-block model-selection" onclick="activateMove();" disabled="true">
         <i class="icon-exchange" ></i>
         <span>{{ _('Move') }}</span>
     </button>
     <br />
-    <button class="btn btn-primary btn-block model-selection" onclick="activateScale();" disabled="true">
+    <button id="btn-scale" class="btn btn-default btn-block model-selection" onclick="activateScale();" disabled="true">
         <i class="icon-crop" ></i>
         <span>{{ _('Scale') }}</span>
     </button>
     <br />
-    <button class="btn btn-primary btn-block model-selection" onclick="activateRotate();" disabled="true">
+    <button id="btn-rotate" class="btn btn-default btn-block model-selection" onclick="activateRotate();" disabled="true">
         <i class="icon-refresh" ></i>
         <span>{{ _('Rotate') }}</span>
     </button>

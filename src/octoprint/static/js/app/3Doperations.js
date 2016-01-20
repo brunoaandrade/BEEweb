@@ -45,8 +45,6 @@ function init() {
     scene.add( light3 );
     scene.add( light4 );
 
-    addBed(-95, -67.5, 0, 0, 0, 0, 1);
-
     objects = new THREE.Object3D();
     scene.add(objects);
 
@@ -71,6 +69,9 @@ function init() {
 	selectedObject = null;
 	transformControls = null;
 
+	// Adds the printer bed auxiliar object
+	_addBed(-95, -67.5, 0, 0, 0, 0, 1);
+
     window.addEventListener( 'resize', onWindowResize, false );
     //container.addEventListener( 'click', onMouseClick, false );
     container.addEventListener( 'mouseup', onMouseUp, false );
@@ -78,7 +79,8 @@ function init() {
 }
 
 function render() {
-    if (null !== transformControls) {
+
+    if (transformControls !== null) {
         transformControls.update();
     }
     renderer.render( scene, camera );
@@ -146,13 +148,7 @@ function resetSelectedModel() {
 		selectedObject.rotation.set( 0, 0, 0 );
 		selectedObject.scale.set( 1, 1, 1 );
 
-        transformControls.dispose();
-		scene.remove( transformControls );
-
-		transformControls = new THREE.TransformControls( camera, renderer.domElement );
-        transformControls.addEventListener( 'change', render );
-		transformControls.attach( selectedObject );
-        scene.add( transformControls );
+        _removeAllSelections();
     }
 }
 
@@ -174,7 +170,7 @@ function removeModel(modelObj) {
  *
  */
 function removeSelected() {
-    if (selectedObject !== null) {
+    if (selectedObject != null) {
         removeModel(selectedObject);
 
         selectedObject = null;
@@ -187,8 +183,12 @@ function removeSelected() {
  *
  */
 function activateRotate() {
-    if (transformControls !== null && selectedObject !== null) {
+    if (transformControls != null && selectedObject != null) {
         transformControls.setMode("rotate");
+        $('#btn-move').removeClass('btn-primary');
+        $('#btn-scale').removeClass('btn-primary');
+        $('#btn-rotate').removeClass('btn-default');
+        $('#btn-rotate').addClass('btn-primary');
     }
 }
 
@@ -197,8 +197,12 @@ function activateRotate() {
  *
  */
 function activateScale() {
-    if (transformControls !== null && selectedObject !== null) {
+    if (transformControls != null && selectedObject != null) {
         transformControls.setMode("scale");
+        $('#btn-move').removeClass('btn-primary');
+        $('#btn-rotate').removeClass('btn-primary');
+        $('#btn-scale').removeClass('btn-default');
+        $('#btn-scale').addClass('btn-primary');
     }
 }
 
@@ -207,8 +211,12 @@ function activateScale() {
  *
  */
 function activateMove() {
-    if (transformControls !== null && selectedObject !== null) {
+    if (transformControls != null && selectedObject != null) {
         transformControls.setMode("translate");
+        $('#btn-scale').removeClass('btn-primary');
+        $('#btn-rotate').removeClass('btn-primary');
+        $('#btn-move').removeClass('btn-default');
+        $('#btn-move').addClass('btn-primary');
     }
 }
 
@@ -258,61 +266,87 @@ function onMouseUp( e ) {
         var intersection = intersects[ 0 ];
         var model = intersection.object;
 
-        // De-selects other objects
-        objects.children.forEach(function( obj ) {
-
-            // create color gray
-            var colorObject = new THREE.Color(DEFAULT_COLOR) ;
-            //set the color in the object
-            obj.material.color = colorObject;
-        });
-
-        //obj.material.color.setRGB( 236, 196, 89 ); // Sets color to yellow 0xECC459
-        // create color gray
-        var colorObject = new THREE.Color(SELECT_COLOR) ;
-        //set the color in the object
-        model.material.color = colorObject;
-
-        // Attach tranform controls to object
-        transformControls = new THREE.TransformControls( camera, renderer.domElement );
-        transformControls.addEventListener( 'change', render );
-
-        // Attaches the transform controls to the newly selected object
-        if (selectedObject === null || selectedObject !== model) {
-            transformControls.attach( model );
-        }
-
-        scene.add( transformControls );
-
-        selectedObject = model;
-        $('.model-selection').prop('disabled', false);
+        _selectModel(model);
 
     } else if (prevMouseVector.x == mouseVector.x
         && prevMouseVector.y == mouseVector.y
         && prevMouseVector.z == mouseVector.z) { // It means the scene wasn't dragged and so we should remove all selections
 
-        objects.children.forEach(function( obj ) {
+        _removeAllSelections();
 
-            // create color gray
-            var colorObject = new THREE.Color(DEFAULT_COLOR) ;
-            //set the color in the object
-            obj.material.color = colorObject;
-        });
-
-        transformControls.dispose();
-        scene.remove(transformControls);
-        transformControls = null;
-        selectedObject = null;
-
-        $('.model-selection').prop('disabled', true);
     }
+}
+
+/*********************************************************************/
+/**************         AUXILIAR FUNCTIONS           *****************/
+/*********************************************************************/
+
+/**
+ * Selects a model in the canvas
+ */
+function _selectModel( model ) {
+
+    // De-selects other objects
+    objects.children.forEach(function( obj ) {
+
+        //sets the default color in the object
+        obj.material.color = new THREE.Color(DEFAULT_COLOR) ;
+    });
+
+    //sets the selected color in the object
+    model.material.color = new THREE.Color(SELECT_COLOR);
+
+    // Attaches the transform controls to the newly selected object
+    if (selectedObject == null || selectedObject !== model) {
+        scene.remove(transformControls);
+        transformControls = new THREE.TransformControls( camera, renderer.domElement );
+        transformControls.addEventListener( 'change', render );
+        transformControls.attach( model );
+
+        scene.add( transformControls );
+    }
+
+    // Sets the selected object to the first selected model
+    selectedObject = model;
+
+    // Activates the side buttons
+    $('.model-selection').prop('disabled', false);
+
+    // Activates the default transform operation
+    activateMove();
+}
+
+/**
+ * Removes all selections from the objects in the canvas
+ */
+function _removeAllSelections() {
+
+    objects.children.forEach(function( obj ) {
+
+        //sets the default color in the object
+        obj.material.color = new THREE.Color(DEFAULT_COLOR) ;
+    });
+
+    if (transformControls != null) {
+
+        transformControls.detach();
+        //transformControls.dispose();
+    }
+
+    selectedObject = null;
+
+    $('.model-selection').prop('disabled', true);
+
+    $('#btn-scale').removeClass('btn-primary');
+    $('#btn-rotate').removeClass('btn-primary');
+    $('#btn-move').removeClass('btn-primary');
 }
 
 /**
  * Adds the printer bed to the canvas
  *
  */
-function addBed(x, y, z, rx, ry, rz, s ) {
+function _addBed(x, y, z, rx, ry, rz, s ) {
 
     var color = 0x3BADE6;
     var extrudeSettings = { amount: 1, bevelEnabled: false};
