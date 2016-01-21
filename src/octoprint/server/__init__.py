@@ -867,6 +867,7 @@ class Server():
 			"js/lib/three.min.js",
 			"js/lib/STLLoader.js",
 			"js/lib/STLExporter.js",
+			"js/lib/STLBinaryExporter.js",
 			"js/lib/FileSaver.js",
 			"js/lib/TrackballControls.js",
 			"js/lib/TransformControls.js",

@@ -126,15 +126,36 @@ function loadModel(modelName) {
  *
  */
 function saveScene() {
-    var exporter = new THREE.STLExporter();
 
-    var stlString = exporter.parse( objects );
+    var stlData = _generateSTLFromScene();
 
-    //var stlString = generateSTL( selectedObject );
+    var data = new FormData();
+    data.append('file', stlData['stl'], stlData['sceneName']);
 
-    var blob = new Blob([stlString], {type: 'text/plain'});
+    $.ajax({
+        url: API_BASEURL + "files/local",
+        type: 'POST',
+        data: data,
+        contentType: false,
+        processData: false,
+        success: function(data) {
 
-    saveAs(blob, 'scene.stl');
+        },
+        error: function() {
+
+        }
+    });
+}
+
+/**
+ * Downloads the current scene in STL format
+ *
+ */
+function downloadScene() {
+
+    var stlData = _generateSTLFromScene();
+
+    saveAs(stlData['stl'], stlData['sceneName']);
 }
 
 /**
@@ -383,4 +404,28 @@ function _addBed(x, y, z, rx, ry, rz, s ) {
     bed = mesh
 
     scene.add( bed );
+}
+
+
+/**
+ * Auxiliar function to generate the STL file and Scene name from the current canvas scene.
+ *
+ * Return dictionary with 'stl' -> File and 'sceneName' -> File name
+ */
+function _generateSTLFromScene() {
+
+    var exporter = new THREE.STLBinaryExporter();
+
+    var stlData = exporter.parse( objects );
+
+    // plain text ascii
+    //var blob = new Blob([stlData], {type: 'text/plain'});
+    // binary
+    var blob = new Blob([stlData], {type: 'application/octet-binary'});
+
+    var now = new Date();
+    var sceneName = 'bee_' + now.getFullYear() + '_' + (now.getMonth()+1) + '_' + now.getDate()
+    + '_' + now.getHours() + '_' + now.getMinutes() + '_' + now.getSeconds() + '.stl';
+
+    return {'stl': blob, 'sceneName': sceneName};
 }

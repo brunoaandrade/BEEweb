@@ -1,0 +1,98 @@
+/**
+ * @author kovacsv / http://kovacsv.hu/
+ * @author mrdoob / http://mrdoob.com/
+ * @author mudcube / http://mudcu.be/
+ *
+ * Modified by dpacheco to support Scenes with BufferGeometry objects
+ */
+
+THREE.STLBinaryExporter = function () {};
+
+THREE.STLBinaryExporter.prototype = {
+
+	constructor: THREE.STLBinaryExporter,
+
+	parse: ( function () {
+
+		var vector = new THREE.Vector3();
+		var normalMatrixWorld = new THREE.Matrix3();
+
+		return function parse( scene ) {
+
+			var triangles = 0;
+			debugger;
+			scene.traverse( function ( object ) {
+                debugger;
+				if ( ! ( object instanceof THREE.Mesh ) ) return;
+
+				var bgeometry = object.geometry;
+				if ( bgeometry instanceof THREE.BufferGeometry ) {
+				    // Converts to a normal Geometry object
+					bgeometry = new THREE.Geometry().fromBufferGeometry( object.geometry );
+				}
+
+                triangles += bgeometry.faces.length;
+
+			} );
+
+			var offset = 80; // skip header
+			var bufferLength = triangles * 2 + triangles * 3 * 4 * 4 + 80 + 4;
+			var arrayBuffer = new ArrayBuffer( bufferLength );
+			var output = new DataView( arrayBuffer );
+			output.setUint32( offset, triangles, true ); offset += 4;
+
+			scene.traverse( function ( object ) {
+
+				if ( ! ( object instanceof THREE.Mesh ) ) return;
+
+				var bgeometry = object.geometry;
+				if ( bgeometry instanceof THREE.BufferGeometry ) {
+				    // Converts to a normal Geometry object
+					bgeometry = new THREE.Geometry().fromBufferGeometry( object.geometry );
+				}
+
+				if ( ! ( bgeometry instanceof THREE.Geometry ) ) return;
+
+				var geometry = bgeometry;
+				var matrixWorld = object.matrixWorld;
+
+				var vertices = bgeometry.vertices;
+				var faces = bgeometry.faces;
+
+				normalMatrixWorld.getNormalMatrix( matrixWorld );
+
+				for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+					var face = faces[ i ];
+
+					vector.copy( face.normal ).applyMatrix3( normalMatrixWorld ).normalize();
+
+					output.setFloat32( offset, vector.x, true ); offset += 4; // normal
+					output.setFloat32( offset, vector.y, true ); offset += 4;
+					output.setFloat32( offset, vector.z, true ); offset += 4;
+
+					var indices = [ face.a, face.b, face.c ];
+
+					for ( var j = 0; j < 3; j ++ ) {
+
+						vector.copy( vertices[ indices[ j ] ] ).applyMatrix4( matrixWorld );
+
+						output.setFloat32( offset, vector.x, true ); offset += 4; // vertices
+						output.setFloat32( offset, vector.y, true ); offset += 4;
+						output.setFloat32( offset, vector.z, true ); offset += 4;
+
+					}
+
+					output.setUint16( offset, 0, true ); offset += 2; // attribute byte count
+
+				}
+
+			} );
+
+			return output;
+
+		};
+
+	}() )
+
+};

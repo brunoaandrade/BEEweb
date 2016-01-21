@@ -11,17 +11,12 @@
         {{ _('Save Scene') }}
     </button>
     <br />
-    <button class="btn btn-block model-selection" id="reset_selection"
-            data-bind="" disabled="true" onclick="resetSelectedModel();">
-        <i class="icon-reply-all" ></i>
-        {{ _('Reset model') }}
+    <button class="btn btn-block" id="download_scene"
+            data-bind="" onclick="downloadScene();">
+        <i class="icon-download" ></i>
+        {{ _('Download Scene') }}
     </button>
-    <br />
-    <button class="btn btn-block model-selection" id="delete_selection"
-            data-bind="" disabled="true" onclick="removeSelected();">
-        <i class="icon-trash" ></i>
-        {{ _('Delete') }}
-    </button>
+
     <hr />
 
 
@@ -41,5 +36,17 @@
     <button id="btn-rotate" class="btn btn-default btn-block model-selection" onclick="activateRotate();" disabled="true">
         <i class="icon-refresh" ></i>
         <span>{{ _('Rotate') }}</span>
+    </button>
+    <hr />
+    <button class="btn btn-block model-selection" id="reset_selection"
+            data-bind="" disabled="true" onclick="resetSelectedModel();">
+        <i class="icon-reply-all" ></i>
+        {{ _('Reset model') }}
+    </button>
+    <br />
+    <button class="btn btn-block btn-danger model-selection" id="delete_selection"
+            data-bind="" disabled="true" onclick="removeSelected();">
+        <i class="icon-trash" ></i>
+        {{ _('Delete') }}
     </button>
 </div>
