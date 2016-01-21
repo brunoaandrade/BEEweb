@@ -20,9 +20,9 @@ THREE.STLBinaryExporter.prototype = {
 		return function parse( scene ) {
 
 			var triangles = 0;
-			debugger;
+
 			scene.traverse( function ( object ) {
-                debugger;
+
 				if ( ! ( object instanceof THREE.Mesh ) ) return;
 
 				var bgeometry = object.geometry;
