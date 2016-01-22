@@ -4,6 +4,13 @@ canvas { width: 100% !important; }
     color: #ECC459 !important;
 }
 
+#navbar .navbar-inner .brand span {
+    background-image: url(../img/bee3d-48x48.png) !important;
+}
+#navbar .navbar-inner .brand span {
+    background-size: 40px 30px !important;
+    padding-left: 45px !important;
+}
 .brand-label-fix {
     font-size: x-large;
     margin-right: -10px;

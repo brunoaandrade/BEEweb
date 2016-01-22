@@ -25,9 +25,9 @@ function init() {
     container.appendChild( renderer.domElement );
 
     camera = new THREE.PerspectiveCamera( 45, renderer.domElement.clientWidth / renderer.domElement.clientHeight, 1, 3000 );
-    camera.position.set( 0, 200, 100 );
+    camera.position.set( 0, -200, 100 );
     camera.up.set( 0, 0, 1 ); // Without this the model is seen upside down
-    camera.lookAt( new THREE.Vector3( 0, 100, 0 ) );
+    camera.lookAt( new THREE.Vector3( 0, -100, 0 ) );
 
     scene = new THREE.Scene();
     //scene.add( new THREE.GridHelper( 90, 30 ) );
@@ -49,7 +49,7 @@ function init() {
     scene.add(objects);
 
     // Loads the model
-    loadModel('3DBenchy.stl');
+    loadModel('BEE.stl');
 
     trackballControls = new THREE.TrackballControls( camera, container );
     trackballControls.rotateSpeed = 1.0;
@@ -111,7 +111,7 @@ function loadModel(modelName) {
         mesh.position.set( 0, 0, 0 );
         //mesh.rotation.set( - Math.PI , Math.PI , 0 );
         //mesh.scale.set( 1.5, 1.5, 1.5 );
-        //mesh.castShadow = true;
+        mesh.castShadow = true;
 
         scene.add( mesh );
 
@@ -156,6 +156,17 @@ function downloadScene() {
     var stlData = _generateSTLFromScene();
 
     saveAs(stlData['stl'], stlData['sceneName']);
+}
+
+/**
+ * Centers the selected model on the platform
+ *
+ */
+function centerModel() {
+
+    if (selectedObject !== null) {
+        selectedObject.position.set( 0, 0, 0 );
+    }
 }
 
 /**

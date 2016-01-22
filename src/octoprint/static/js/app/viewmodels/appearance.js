@@ -8,9 +8,9 @@ $(function() {
         self.printerProfiles = parameters[1];
 
         self.brand = ko.computed(function() {
-            var brandText = gettext("BEE.web")
+            var brandText = gettext("BEEsoft")
             if (self.name())
-                brandText = brandText + ":" + self.name();
+                brandText = brandText + self.name();
 
             return brandText;
         });
@@ -26,9 +26,9 @@ $(function() {
 
         self.title = ko.computed(function() {
             if (self.name())
-                return "[" + gettext("BEE.web") + "]:" + self.name();
+                return "[" + gettext("BEEsoft") + "]" + self.name();
             else
-                return gettext("BEE.web");
+                return gettext("BEEsoft");
         });
     }
 
