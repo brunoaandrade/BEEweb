@@ -77,11 +77,11 @@ body {
 
 .navbar-inner-color (@base, @gradientalpha: 100%, @image: false) {
   @top: lighten(@base, 25%);
-  @bottom: darken(@base, 15%);
+  @bottom: lighten(@base, 15%);
 
   @text-color-light: #f2f2f2;
   @text-color-dark: #333333;
-  @text-color: contrast(@bottom, @text-color-dark, @text-color-light);
+  @text-color: contrast(@bottom, @text-color-dark, @text-color-light, 10%);
 
   .navbar-background-color(fade(@top, @gradientalpha), fade(@bottom, @gradientalpha), @image);
 
@@ -126,7 +126,7 @@ body {
     }
   }
   &.yellow {
-    @base: #F2DE28;
+    @base: #FFCF23;
     .navbar-inner-color(@base);
 
     &.transparent {

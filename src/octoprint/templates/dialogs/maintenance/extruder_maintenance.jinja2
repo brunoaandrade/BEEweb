@@ -11,11 +11,7 @@
             <i class="icon-question-sign"></i> {{ _('This operation allows you to clean the extruder.')}}
         </span>
     </div>
-    <div class="row-fluid">
-        <span class="span12 alert alert-danger"><i class="icon-exclamation-sign"></i>
-            {{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}
-        </span>
-    </div>
+
     <div class="row-fluid">
         <div class="span6">
             <strong>{{ _('Step 1')}}: {{ _('Extruder heating for filament removal') }}</strong>
@@ -41,6 +37,12 @@
                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                 <i class="icon-fire"></i> {{ _('Start Heating')}}</button>
         </div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <span class="span12 alert alert-danger"><i class="icon-exclamation-sign"></i>
+            {{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}
+        </span>
     </div>
 </div>
 

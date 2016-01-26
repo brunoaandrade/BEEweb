@@ -120,6 +120,13 @@ function loadModel(modelName) {
     });
 }
 
+/**
+ * Starts the printing operation
+ *
+ */
+function startPrint() {
+
+}
 
 /**
  * Saves the current scene
@@ -300,12 +307,12 @@ function onMouseUp( e ) {
 
         _selectModel(model);
 
+
     } else if (prevMouseVector.x == mouseVector.x
         && prevMouseVector.y == mouseVector.y
         && prevMouseVector.z == mouseVector.z) { // It means the scene wasn't dragged and so we should remove all selections
 
         _removeAllSelections();
-
     }
 }
 
@@ -344,6 +351,15 @@ function _selectModel( model ) {
     // Activates the side buttons
     $('.model-selection').prop('disabled', false);
 
+    // Shows the controls panel
+    if ($('#workbench_ctrls_wrapper').css('display') == 'none') {
+        $('#workbench_ctrls_wrapper').show();
+    } else {
+        if (!$('#workbench_ctrls').hasClass('in')) {
+            $("#workbench_ctrls").collapse("show");
+        }
+    }
+
     // Activates the default transform operation
     activateMove();
 }
@@ -372,6 +388,12 @@ function _removeAllSelections() {
     $('#btn-scale').removeClass('btn-primary');
     $('#btn-rotate').removeClass('btn-primary');
     $('#btn-move').removeClass('btn-primary');
+
+    if ($('#workbench_ctrls_wrapper').css('display') != 'none') {
+        if ($('#workbench_ctrls').hasClass('in')) {
+            $("#workbench_ctrls").collapse('hide');
+        }
+    }
 }
 
 /**

@@ -69,3 +69,8 @@ at `~/Library/Application Support/BEEweb` on MacOS.
 Please note that the most commonly used configuration settings can also easily
 be edited from BEEweb's settings dialog.
 
+If you want to customize the look of the application change the octoprint.less file under the static/less directory.
+Install the tool lessc using npm, and compile the main less file using the following command line:
+
+$ lessc -x octoprint.less ../css/octoprint.css
+

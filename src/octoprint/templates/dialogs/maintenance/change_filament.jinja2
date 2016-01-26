@@ -13,12 +13,6 @@
     </div>
 
     <div class="row-fluid">
-        <span class="span12 alert alert-danger"><i class="icon-exclamation-sign"></i>
-            {{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}
-        </span>
-    </div>
-    <br />
-    <div class="row-fluid">
         <div class="span6">
             <strong>{{ _('Step 1')}}: {{ _('Extruder nozzle temperature') }}</strong>
         </div>
@@ -44,6 +38,13 @@
                 <i class="icon-fire"></i> {{ _('Start Heating')}}</button>
         </div>
     </div>
+    <br />
+    <div class="row-fluid">
+        <span class="span12 alert alert-danger"><i class="icon-exclamation-sign"></i>
+            {{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}
+        </span>
+    </div>
+
     <div id="progress-bar-div" class="row-fluid hidden">
         <span>{{ _('Heating, please wait...') }}</span>
         <div id="temperature_progress" class="progress" style="width: 100%;">
