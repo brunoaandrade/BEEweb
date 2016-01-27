@@ -871,7 +871,10 @@ class Server():
 			"js/lib/FileSaver.js",
 			"js/lib/TrackballControls.js",
 			"js/lib/TransformControls.js",
-			"js/app/3Doperations.js",
+			"js/app/workbench/helpers.bee.js",
+			"js/app/workbench/events.three.js",
+			"js/app/workbench/main.three.js",
+			"js/app/workbench/transform_operations.bee.js",
 		]
 
 		css_libs = [

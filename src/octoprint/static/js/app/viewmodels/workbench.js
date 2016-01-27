@@ -44,7 +44,7 @@ $(function () {
 		self.onEventUpload = function (file) {
 			if (file.file.substr(file.file.length - 3).toLowerCase() == "stl") {
 
-				loadModel(file.file);
+				BEEwb.main.loadModel(file.file);
 			}
 		};
 
