@@ -2,16 +2,8 @@
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
 
-<div id="stl_container" ></div>
+<div class="row-fluid worbench-top-buttons">
 
-<div class="row-fluid">
-
-    <button class="btn btn-primary span2" id="print_scene" onclick="startPrint();"
-            data-bind="enable: loginState.isUser() && !connection.isConnecting()">
-        <i class="icon-print" ></i>
-        {{ _('Start Print...') }}
-    </button>
-    <span class="span6"></span>
     <button class="btn span2" id="save_scene"
             data-bind="" onclick="saveScene();">
         <i class="icon-save" ></i>
@@ -23,7 +15,16 @@
         <i class="icon-download" ></i>
         {{ _('Download') }}
     </button>
+    <span class="span6"></span>
+    <button class="btn btn-primary span2" id="print_scene" onclick="startPrint();"
+            data-bind="enable: loginState.isUser() && !connection.isConnecting()">
+        <i class="icon-print" ></i>
+        {{ _('Start Print...') }}
+    </button>
 </div>
+
+<div id="stl_container" ></div>
+
 <script>
 
     BEEwb.main.init();

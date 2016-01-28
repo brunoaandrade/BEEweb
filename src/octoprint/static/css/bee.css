@@ -4,6 +4,10 @@ canvas { width: 100% !important; }
     color: #807B71 !important;
 }
 
+.axis-input-box {
+    text-align:right;
+}
+
 .brand-label-fix {
     font-size: x-large;
     margin-right: -10px;
@@ -25,4 +29,8 @@ canvas { width: 100% !important; }
 
 .operationsList li a {
     font-size: larger !important;
+}
+
+.worbench-top-buttons {
+    margin-bottom: 5px;
 }

@@ -864,13 +864,13 @@ class Server():
 		]
 
 		threejs_libs = [
-			"js/lib/three.min.js",
-			"js/lib/STLLoader.js",
-			"js/lib/STLExporter.js",
-			"js/lib/STLBinaryExporter.js",
-			"js/lib/FileSaver.js",
-			"js/lib/TrackballControls.js",
-			"js/lib/TransformControls.js",
+			"js/lib/threejs/three.min.js",
+			"js/lib/threejs/STLLoader.js",
+			"js/lib/threejs/STLExporter.js",
+			"js/lib/threejs/STLBinaryExporter.js",
+			"js/lib/threejs/FileSaver.js",
+			"js/lib/threejs/TrackballControls.js",
+			"js/lib/threejs/TransformControls.js",
 			"js/app/workbench/helpers.bee.js",
 			"js/app/workbench/events.three.js",
 			"js/app/workbench/main.three.js",

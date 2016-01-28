@@ -37,7 +37,7 @@ BEEwb.main = {
         this.containerHeightOffset = bondingOffset.top;
 
         // renderer
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer = new THREE.WebGLRenderer({ alpha: true , antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight / 1.5);
         this.container.appendChild( this.renderer.domElement );
 
@@ -94,6 +94,8 @@ BEEwb.main = {
         //container.addEventListener( 'click', onMouseClick, false );
         this.container.addEventListener( 'mouseup', BEEwb.events.onMouseUp, false );
         this.container.addEventListener( 'mousedown', BEEwb.events.onMouseDown, false );
+
+        this.container.addEventListener( 'mousemove', BEEwb.events.onMouseMove, false );
     },
 
     render: function () {

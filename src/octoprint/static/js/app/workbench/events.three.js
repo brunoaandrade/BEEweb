@@ -64,3 +64,13 @@ BEEwb.events.onMouseUp = function( e ) {
         BEEwb.main.removeAllSelections();
     }
 }
+
+/**
+ * OnMouseMove event function
+ */
+BEEwb.events.onMouseMove = function( e ) {
+
+    if (BEEwb.transform_ops.selectedMode == 'translate') {
+        BEEwb.transform_ops.updatePositionInputs();
+    }
+}

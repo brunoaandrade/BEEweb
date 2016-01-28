@@ -6,14 +6,20 @@
     </button>
     <br />
     <div id="axis-values">
-        <form class="form-inline">
+        <div id="move-axis-form" class="form-inline">
 
-            <label for="x-axis">X </label> <input type="text" id="x-axis" name="x-axis" value="0"/><br /><br />
-            <label for="y-axis">Y </label> <input type="text" id="y-axis" name="y-axis" value="0"/><br /><br />
-            <label for="z-axis">Z </label> <input type="text" id="z-axis" name="z-axis" value="0"/>
-        </form>
+            <label for="x-axis">X </label>
+            <input type="text" class="axis-input-box" id="x-axis" name="x-axis" value="0" onchange="BEEwb.transform_ops.move();"/><br /><br />
+
+            <label for="y-axis">Y </label>
+            <input type="text" class="axis-input-box" id="y-axis" name="y-axis" value="0" onchange="BEEwb.transform_ops.move();"/><br /><br />
+
+            <label for="z-axis">Z </label>
+            <input type="text" class="axis-input-box" id="z-axis" name="z-axis" value="0" onchange="BEEwb.transform_ops.move();"/><br /><br />
+            <hr />
+        </div>
     </div>
-    <br />
+
     <button id="btn-scale" class="btn btn-default btn-block model-selection" onclick="BEEwb.transform_ops.activateScale();" disabled="true">
         <i class="icon-crop" ></i>
         <span>{{ _('Scale') }}</span>
