@@ -20,6 +20,20 @@ BEEwb.transform_ops.move = function() {
 }
 
 /**
+ * Scales the selected model to the input text boxes axis values
+ *
+ */
+BEEwb.transform_ops.scale = function() {
+
+    if (BEEwb.main.selectedObject !== null) {
+        var x = $('#x-axis').val();
+        var y = $('#y-axis').val();
+        var z = $('#z-axis').val();
+        BEEwb.main.selectedObject.scale.set( x, y, z );
+    }
+}
+
+/**
  * Centers the selected model on the platform
  *
  */
