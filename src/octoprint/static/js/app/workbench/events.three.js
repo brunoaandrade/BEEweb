@@ -63,14 +63,13 @@ BEEwb.events.onMouseUp = function( e ) {
 
         BEEwb.main.removeAllSelections();
     }
-}
 
-/**
- * OnMouseMove event function
- */
-BEEwb.events.onMouseMove = function( e ) {
-
+    // Updates the size/scale/rotation input boxes
     if (BEEwb.transform_ops.selectedMode == 'translate') {
         BEEwb.transform_ops.updatePositionInputs();
+    }
+
+    if (BEEwb.transform_ops.selectedMode == 'scale') {
+        BEEwb.transform_ops.updateScaleSizeInputs();
     }
 }

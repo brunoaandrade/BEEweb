@@ -27,3 +27,63 @@ BEEwb.helpers.generateSTLFromScene = function( objects ) {
 
     return {'stl': blob, 'sceneName': sceneName};
 }
+
+/**
+ * Calculates Geometry object size
+ *
+ * param geometry: THREEJS.Geometry object
+ *
+ * Returns dictionary with size { 'x': ..., 'y': ..., 'z': ...}
+ */
+BEEwb.helpers.objectSize = function( geometry ) {
+
+    if ( geometry == null) {
+        return { 'x': 0, 'y': 0, 'z': 0};
+    }
+
+    var bbox = geometry.boundingBox;
+    var xSize = 0;
+    var ySize = 0;
+    var zSize = 0;
+
+    // X size
+    if (bbox.max.x < 0) {
+        xSize -= bbox.max.x;
+    } else {
+        xSize += bbox.max.x;
+    }
+
+    if (bbox.min.x < 0) {
+        xSize -= bbox.min.x
+    } else {
+        xSize += bbox.min.x;
+    }
+
+    // Y size
+    if (bbox.max.y < 0) {
+        ySize -= bbox.max.y;
+    } else {
+        ySize += bbox.max.y;
+    }
+
+    if (bbox.min.y < 0) {
+        ySize -= bbox.min.y
+    } else {
+        ySize += bbox.min.y;
+    }
+
+    // Z size
+    if (bbox.max.z < 0) {
+        zSize -= bbox.max.z;
+    } else {
+        zSize += bbox.max.z;
+    }
+
+    if (bbox.min.z < 0) {
+        zSize -= bbox.min.z
+    } else {
+        zSize += bbox.min.z;
+    }
+
+    return { 'x': xSize, 'y': ySize, 'z': zSize};
+}

@@ -2,7 +2,12 @@
 var BEEwb = BEEwb || {};
 
 BEEwb.transform_ops = {
-    selectedMode: 'translate'
+    selectedMode: 'translate',
+    initialSize: null
+}
+
+BEEwb.transform_ops.resetObjectData = function() {
+    this.initialSize = null;
 }
 
 /**
@@ -26,9 +31,9 @@ BEEwb.transform_ops.move = function() {
 BEEwb.transform_ops.scale = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        var x = $('#x-axis').val();
-        var y = $('#y-axis').val();
-        var z = $('#z-axis').val();
+        var x = $('#scalex-axis').val();
+        var y = $('#scaley-axis').val();
+        var z = $('#scalez-axis').val();
         BEEwb.main.selectedObject.scale.set( x, y, z );
     }
 }
@@ -55,7 +60,10 @@ BEEwb.transform_ops.resetSelectedModel = function() {
 		BEEwb.main.selectedObject.rotation.set( 0, 0, 0 );
 		BEEwb.main.selectedObject.scale.set( 1, 1, 1 );
 
+        // Updates the size/scale/rotation input boxes
         this.updatePositionInputs();
+
+        this.updateScaleSizeInputs();
     }
 }
 
@@ -104,6 +112,7 @@ BEEwb.transform_ops.activateRotate = function() {
         $('#btn-rotate').addClass('btn-primary');
 
         $('#move-axis-form').hide();
+        $('#scale-values-form').hide();
     }
 }
 
@@ -124,6 +133,9 @@ BEEwb.transform_ops.activateScale = function() {
         $('#btn-scale').addClass('btn-primary');
 
         $('#move-axis-form').hide();
+        $('#scale-values-form').show();
+
+        this.updateScaleSizeInputs();
     }
 }
 
@@ -144,6 +156,7 @@ BEEwb.transform_ops.activateMove = function() {
         $('#btn-move').addClass('btn-primary');
 
         $('#move-axis-form').show();
+        $('#scale-values-form').hide();
     }
 }
 
@@ -157,5 +170,26 @@ BEEwb.transform_ops.updatePositionInputs = function() {
         $('#x-axis').val(BEEwb.main.selectedObject.position.x.toFixed(1));
         $('#y-axis').val(BEEwb.main.selectedObject.position.y.toFixed(1));
         $('#z-axis').val(BEEwb.main.selectedObject.position.z.toFixed(1));
+    }
+}
+
+/**
+ * Updates the selected object scale/size input boxes
+ *
+ */
+BEEwb.transform_ops.updateScaleSizeInputs = function() {
+
+    if (BEEwb.main.selectedObject != null) {
+        if (BEEwb.transform_ops.initialSize == null) {
+            BEEwb.transform_ops.initialSize = BEEwb.helpers.objectSize(BEEwb.main.selectedObject.geometry);
+        }
+
+        var newX = BEEwb.transform_ops.initialSize['x'] * BEEwb.main.selectedObject.scale.x;
+        var newY = BEEwb.transform_ops.initialSize['y'] * BEEwb.main.selectedObject.scale.y;
+        var newZ = BEEwb.transform_ops.initialSize['z'] * BEEwb.main.selectedObject.scale.z;
+
+        $('#scalex-axis').val(newX.toFixed(2));
+        $('#scaley-axis').val(newY.toFixed(2));
+        $('#scalez-axis').val(newZ.toFixed(2));
     }
 }

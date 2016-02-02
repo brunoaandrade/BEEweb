@@ -7,7 +7,7 @@
     <br />
     <div id="axis-values">
         <div id="move-axis-form" class="form-inline">
-
+            <span>{{ _('Position') }}</span><br />
             <label for="x-axis">X </label>
             <input type="text" class="axis-input-box" id="x-axis" name="x-axis" onchange="BEEwb.transform_ops.move();"/><br /><br />
 
@@ -25,16 +25,16 @@
         <span>{{ _('Scale') }}</span>
     </button>
     <br />
-    <div id="scale-values" style="display: none;">
+    <div id="scale-values-form" style="display: none;">
         <span>{{ _('Object Dimensions') }}</span><br />
         <div id="scale-axis-form" class="form-inline">
-            <label for="x-axis">X </label>
+            <label for="scalex-axis">X </label>
             <input type="text" class="axis-input-box" id="scalex-axis" name="x-axis" onchange="BEEwb.transform_ops.scale();"/><br /><br />
 
-            <label for="y-axis">Y </label>
+            <label for="scaley-axis">Y </label>
             <input type="text" class="axis-input-box" id="scaley-axis" name="y-axis" onchange="BEEwb.transform_ops.scale();"/><br /><br />
 
-            <label for="z-axis">Z </label>
+            <label for="scalez-axis">Z </label>
             <input type="text" class="axis-input-box" id="scalez-axis" name="z-axis" onchange="BEEwb.transform_ops.scale();"/><br /><br />
             <hr />
         </div>

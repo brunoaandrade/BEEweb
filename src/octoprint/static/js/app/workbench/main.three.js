@@ -94,8 +94,6 @@ BEEwb.main = {
         //container.addEventListener( 'click', onMouseClick, false );
         this.container.addEventListener( 'mouseup', BEEwb.events.onMouseUp, false );
         this.container.addEventListener( 'mousedown', BEEwb.events.onMouseDown, false );
-
-        this.container.addEventListener( 'mousemove', BEEwb.events.onMouseMove, false );
     },
 
     render: function () {
@@ -268,7 +266,7 @@ BEEwb.main = {
      */
      _addBed: function(x, y, z, rx, ry, rz, s ) {
 
-        var color = 0x3BADE6;
+        var color = 0x468AC7;
         var extrudeSettings = { amount: 1, bevelEnabled: false};
 
         // Rectangle
