@@ -1,12 +1,12 @@
 // global namespace
 var BEEwb = BEEwb || {};
 
-BEEwb.transform_ops = {
+BEEwb.transformOps = {
     selectedMode: 'translate',
     initialSize: null
 }
 
-BEEwb.transform_ops.resetObjectData = function() {
+BEEwb.transformOps.resetObjectData = function() {
     this.initialSize = null;
 }
 
@@ -14,7 +14,7 @@ BEEwb.transform_ops.resetObjectData = function() {
  * Moves the selected model to the input text boxes axis values
  *
  */
-BEEwb.transform_ops.move = function() {
+BEEwb.transformOps.move = function() {
 
     if (BEEwb.main.selectedObject !== null) {
         var x = $('#x-axis').val();
@@ -28,7 +28,7 @@ BEEwb.transform_ops.move = function() {
  * Scales the selected model to the input text boxes axis values
  *
  */
-BEEwb.transform_ops.scale = function() {
+BEEwb.transformOps.scale = function() {
 
     if (BEEwb.main.selectedObject !== null) {
         var x = $('#scalex-axis').val();
@@ -43,7 +43,18 @@ BEEwb.transform_ops.scale = function() {
  * Centers the selected model on the platform
  *
  */
-BEEwb.transform_ops.centerModel = function() {
+BEEwb.transformOps.scaleToMax = function() {
+
+    if (BEEwb.main.selectedObject !== null) {
+        BEEwb.main.selectedObject.position.set( 0, 0, 0 );
+    }
+}
+
+/**
+ * Centers the selected model on the platform
+ *
+ */
+BEEwb.transformOps.centerModel = function() {
 
     if (BEEwb.main.selectedObject !== null) {
         BEEwb.main.selectedObject.position.set( 0, 0, 0 );
@@ -54,7 +65,7 @@ BEEwb.transform_ops.centerModel = function() {
  * Resets the transformations of the selected object
  *
  */
-BEEwb.transform_ops.resetSelectedModel = function() {
+BEEwb.transformOps.resetSelectedModel = function() {
 
     if (BEEwb.main.selectedObject !== null) {
         BEEwb.main.selectedObject.position.set( 0, 0, 0 );
@@ -72,7 +83,7 @@ BEEwb.transform_ops.resetSelectedModel = function() {
  * Removes a model from the scene
  *
  */
-BEEwb.transform_ops.removeModel = function(modelObj) {
+BEEwb.transformOps.removeModel = function(modelObj) {
 
     if (null !== modelObj) {
         BEEwb.main.scene.remove(modelObj);
@@ -85,7 +96,7 @@ BEEwb.transform_ops.removeModel = function(modelObj) {
  * Removes the selected model from the scene
  *
  */
-BEEwb.transform_ops.removeSelected = function() {
+BEEwb.transformOps.removeSelected = function() {
 
     if (BEEwb.main.selectedObject != null) {
         this.removeModel(BEEwb.main.selectedObject);
@@ -100,11 +111,11 @@ BEEwb.transform_ops.removeSelected = function() {
  * Activates the rotate mode for the selected object
  *
  */
-BEEwb.transform_ops.activateRotate = function() {
+BEEwb.transformOps.activateRotate = function() {
 
     if (BEEwb.main.transformControls != null && BEEwb.main.selectedObject != null) {
 
-        BEEwb.transform_ops.selectedMode = 'rotate';
+        this.selectedMode = 'rotate';
         BEEwb.main.transformControls.setMode("rotate");
 
         $('#btn-move').removeClass('btn-primary');
@@ -121,11 +132,11 @@ BEEwb.transform_ops.activateRotate = function() {
  * Activates the scale mode for the selected object
  *
  */
-BEEwb.transform_ops.activateScale = function() {
+BEEwb.transformOps.activateScale = function() {
 
     if (BEEwb.main.transformControls != null && BEEwb.main.selectedObject != null) {
 
-        BEEwb.transform_ops.selectedMode = 'scale';
+        this.selectedMode = 'scale';
         BEEwb.main.transformControls.setMode("scale");
 
         $('#btn-move').removeClass('btn-primary');
@@ -144,12 +155,12 @@ BEEwb.transform_ops.activateScale = function() {
  * Activates the translate (move) mode for the selected object
  *
  */
-BEEwb.transform_ops.activateMove = function() {
+BEEwb.transformOps.activateMove = function() {
 
     if (BEEwb.main.transformControls != null && BEEwb.main.selectedObject != null) {
 
         BEEwb.main.transformControls.setMode("translate");
-        BEEwb.transform_ops.selectedMode = 'translate';
+        this.selectedMode = 'translate';
 
         $('#btn-scale').removeClass('btn-primary');
         $('#btn-rotate').removeClass('btn-primary');
@@ -165,7 +176,7 @@ BEEwb.transform_ops.activateMove = function() {
  * Updates the selected object position input boxes
  *
  */
-BEEwb.transform_ops.updatePositionInputs = function() {
+BEEwb.transformOps.updatePositionInputs = function() {
 
     if (BEEwb.main.selectedObject != null) {
         $('#x-axis').val(BEEwb.main.selectedObject.position.x.toFixed(1));
@@ -178,16 +189,16 @@ BEEwb.transform_ops.updatePositionInputs = function() {
  * Updates the selected object scale/size input boxes
  *
  */
-BEEwb.transform_ops.updateScaleSizeInputs = function() {
+BEEwb.transformOps.updateScaleSizeInputs = function() {
 
     if (BEEwb.main.selectedObject != null) {
-        if (BEEwb.transform_ops.initialSize == null) {
-            BEEwb.transform_ops.initialSize = BEEwb.helpers.objectSize(BEEwb.main.selectedObject.geometry);
+        if (this.initialSize == null) {
+            this.initialSize = BEEwb.helpers.objectSize(BEEwb.main.selectedObject.geometry);
         }
 
-        var newX = BEEwb.transform_ops.initialSize['x'] * BEEwb.main.selectedObject.scale.x;
-        var newY = BEEwb.transform_ops.initialSize['y'] * BEEwb.main.selectedObject.scale.y;
-        var newZ = BEEwb.transform_ops.initialSize['z'] * BEEwb.main.selectedObject.scale.z;
+        var newX = this.initialSize['x'] * BEEwb.main.selectedObject.scale.x;
+        var newY = this.initialSize['y'] * BEEwb.main.selectedObject.scale.y;
+        var newZ = this.initialSize['z'] * BEEwb.main.selectedObject.scale.z;
 
         $('#scalex-axis').val(newX.toFixed(2));
         $('#scaley-axis').val(newY.toFixed(2));
@@ -199,12 +210,12 @@ BEEwb.transform_ops.updateScaleSizeInputs = function() {
  * Scales the selected object converting size passed in the parameters to the appropriate scale
  *
  */
-BEEwb.transform_ops.scaleBySize = function(x, y, z) {
+BEEwb.transformOps.scaleBySize = function(x, y, z) {
 
     if (BEEwb.main.selectedObject != null) {
-        var xScale = x / BEEwb.transform_ops.initialSize['x'];
-        var yScale = y / BEEwb.transform_ops.initialSize['y'];
-        var zScale = z / BEEwb.transform_ops.initialSize['z'];
+        var xScale = x / this.initialSize['x'];
+        var yScale = y / this.initialSize['y'];
+        var zScale = z / this.initialSize['z'];
 
         BEEwb.main.selectedObject.scale.set( xScale, yScale, zScale );
     }

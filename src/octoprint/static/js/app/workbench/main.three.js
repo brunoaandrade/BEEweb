@@ -21,8 +21,8 @@ BEEwb.main = {
     containerHeightOffset: 0,
     bed: 0,
     selectedObject: null,
-    bedWidth: 190,
-    bedHeight: 135,
+    bedHeight: 145,
+    bedWidth: 200,
 
 
     /**
@@ -225,7 +225,7 @@ BEEwb.main = {
         }
 
         // Activates the default transform operation
-        BEEwb.transform_ops.activateMove();
+        BEEwb.transformOps.activateMove();
     },
 
     /**
@@ -267,7 +267,8 @@ BEEwb.main = {
      _addBed: function( ) {
 
         // Rectangle
-        var rectLength = 200, rectWidth = 145;
+        var rectHeight = this.bedHeight;
+        var rectWidth = this.bedWidth;
 
         // Loads bed support stl
         var that = this;
@@ -288,16 +289,16 @@ BEEwb.main = {
 
         var rectShape = new THREE.Shape();
         rectShape.moveTo( 0,0 );
-        rectShape.lineTo( 0, rectWidth );
-        rectShape.lineTo( rectLength, rectWidth );
-        rectShape.lineTo( rectLength, 0 );
+        rectShape.lineTo( 0, rectHeight );
+        rectShape.lineTo( rectWidth, rectHeight );
+        rectShape.lineTo( rectWidth, 0 );
         rectShape.lineTo( 0, 0 );
 
         // 3D shape
         var geometry = new THREE.ExtrudeGeometry( rectShape, extrudeSettings );
 
         var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
-        mesh.position.set( -(rectLength / 2), -(rectWidth / 2), -0.5 );
+        mesh.position.set( -(rectWidth / 2), -(rectHeight / 2), -0.5 );
         mesh.rotation.set( 0, 0, 0 );
         mesh.scale.set( 1, 1, 1 );
 

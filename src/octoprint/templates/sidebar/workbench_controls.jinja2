@@ -1,6 +1,6 @@
 <div id="workbench-controls-container" >
 
-    <button id="btn-move" class="btn btn-default btn-block model-selection" onclick="BEEwb.transform_ops.activateMove();" disabled="true">
+    <button id="btn-move" class="btn btn-default btn-block model-selection" onclick="BEEwb.transformOps.activateMove();" disabled="true">
         <i class="icon-exchange" ></i>
         <span>{{ _('Move') }}</span>
     </button>
@@ -9,18 +9,18 @@
         <div id="move-axis-form" class="form-inline">
             <span>{{ _('Position') }}</span><br />
             <label for="x-axis">X </label>
-            <input type="text" class="axis-input-box" id="x-axis" name="x-axis" onchange="BEEwb.transform_ops.move();"/><br /><br />
+            <input type="text" class="axis-input-box" id="x-axis" name="x-axis" onchange="BEEwb.transformOps.move();"/><br /><br />
 
             <label for="y-axis">Y </label>
-            <input type="text" class="axis-input-box" id="y-axis" name="y-axis" onchange="BEEwb.transform_ops.move();"/><br /><br />
+            <input type="text" class="axis-input-box" id="y-axis" name="y-axis" onchange="BEEwb.transformOps.move();"/><br /><br />
 
             <label for="z-axis">Z </label>
-            <input type="text" class="axis-input-box" id="z-axis" name="z-axis" onchange="BEEwb.transform_ops.move();"/><br /><br />
+            <input type="text" class="axis-input-box" id="z-axis" name="z-axis" onchange="BEEwb.transformOps.move();"/><br /><br />
             <hr />
         </div>
     </div>
 
-    <button id="btn-scale" class="btn btn-default btn-block model-selection" onclick="BEEwb.transform_ops.activateScale();" disabled="true">
+    <button id="btn-scale" class="btn btn-default btn-block model-selection" onclick="BEEwb.transformOps.activateScale();" disabled="true">
         <i class="icon-crop" ></i>
         <span>{{ _('Scale') }}</span>
     </button>
@@ -29,35 +29,35 @@
         <span>{{ _('Object Dimensions') }}</span><br />
         <div id="scale-axis-form" class="form-inline">
             <label for="scalex-axis">X </label>
-            <input type="text" class="axis-input-box" id="scalex-axis" name="x-axis" onchange="BEEwb.transform_ops.scale();"/><br /><br />
+            <input type="text" class="axis-input-box" id="scalex-axis" name="x-axis" onchange="BEEwb.transformOps.scale();"/><br /><br />
 
             <label for="scaley-axis">Y </label>
-            <input type="text" class="axis-input-box" id="scaley-axis" name="y-axis" onchange="BEEwb.transform_ops.scale();"/><br /><br />
+            <input type="text" class="axis-input-box" id="scaley-axis" name="y-axis" onchange="BEEwb.transformOps.scale();"/><br /><br />
 
             <label for="scalez-axis">Z </label>
-            <input type="text" class="axis-input-box" id="scalez-axis" name="z-axis" onchange="BEEwb.transform_ops.scale();"/><br /><br />
+            <input type="text" class="axis-input-box" id="scalez-axis" name="z-axis" onchange="BEEwb.transformOps.scale();"/><br /><br />
             <hr />
         </div>
     </div>
-    <button id="btn-rotate" class="btn btn-default btn-block model-selection" onclick="BEEwb.transform_ops.activateRotate();" disabled="true">
+    <button id="btn-rotate" class="btn btn-default btn-block model-selection" onclick="BEEwb.transformOps.activateRotate();" disabled="true">
         <i class="icon-refresh" ></i>
         <span>{{ _('Rotate') }}</span>
     </button>
     <hr />
     <button class="btn btn-block model-selection" id="center_selection"
-            data-bind="" disabled="true" onclick="BEEwb.transform_ops.centerModel();">
+            data-bind="" disabled="true" onclick="BEEwb.transformOps.centerModel();">
         <i class="icon-bullseye" ></i>
         {{ _('Center model') }}
     </button>
     <br />
     <button class="btn btn-block model-selection" id="reset_selection"
-            data-bind="" disabled="true" onclick="BEEwb.transform_ops.resetSelectedModel();">
+            data-bind="" disabled="true" onclick="BEEwb.transformOps.resetSelectedModel();">
         <i class="icon-reply-all" ></i>
         {{ _('Reset model') }}
     </button>
     <br />
     <button class="btn btn-block btn-danger model-selection" id="delete_selection"
-            data-bind="" disabled="true" onclick="BEEwb.transform_ops.removeSelected();">
+            data-bind="" disabled="true" onclick="BEEwb.transformOps.removeSelected();">
         <i class="icon-trash" ></i>
         {{ _('Delete') }}
     </button>

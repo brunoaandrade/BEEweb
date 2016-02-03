@@ -65,11 +65,11 @@ BEEwb.events.onMouseUp = function( e ) {
     }
 
     // Updates the size/scale/rotation input boxes
-    if (BEEwb.transform_ops.selectedMode == 'translate') {
-        BEEwb.transform_ops.updatePositionInputs();
+    if (BEEwb.transformOps.selectedMode == 'translate') {
+        BEEwb.transformOps.updatePositionInputs();
     }
 
-    if (BEEwb.transform_ops.selectedMode == 'scale') {
-        BEEwb.transform_ops.updateScaleSizeInputs();
+    if (BEEwb.transformOps.selectedMode == 'scale') {
+        BEEwb.transformOps.updateScaleSizeInputs();
     }
 }
