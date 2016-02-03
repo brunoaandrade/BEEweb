@@ -88,7 +88,7 @@ BEEwb.main = {
         this.transformControls = null;
 
         // Adds the printer bed auxiliar object
-        this._addBed(-95, -67.5, 0, 0, 0, 0, 1);
+        this._addBed();
 
         window.addEventListener( 'resize', BEEwb.events.onWindowResize, false );
         //container.addEventListener( 'click', onMouseClick, false );
@@ -264,13 +264,27 @@ BEEwb.main = {
      * Adds the printer bed to the canvas
      *
      */
-     _addBed: function(x, y, z, rx, ry, rz, s ) {
-
-        var color = 0x468AC7;
-        var extrudeSettings = { amount: 1, bevelEnabled: false};
+     _addBed: function( ) {
 
         // Rectangle
-        var rectLength = 190, rectWidth = 135;
+        var rectLength = 200, rectWidth = 145;
+
+        // Loads bed support stl
+        var that = this;
+        var loader = new THREE.STLLoader();
+        loader.load('./stl/btf_bed.stl', function ( geometry ) {
+            var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 200 } );
+
+            var mesh = new THREE.Mesh( geometry, material );
+            mesh.position.set( 0, 0, -0.5 );
+            mesh.castShadow = false;
+
+            that.scene.add( mesh );
+
+        });
+
+        var color = 0x468AC7;
+        var extrudeSettings = { amount: 0.5, bevelEnabled: false};
 
         var rectShape = new THREE.Shape();
         rectShape.moveTo( 0,0 );
@@ -283,9 +297,9 @@ BEEwb.main = {
         var geometry = new THREE.ExtrudeGeometry( rectShape, extrudeSettings );
 
         var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
-        mesh.position.set( x, y, z-1 );
-        mesh.rotation.set( rx, ry, rz );
-        mesh.scale.set( s, s, s );
+        mesh.position.set( -(rectLength / 2), -(rectWidth / 2), -0.5 );
+        mesh.rotation.set( 0, 0, 0 );
+        mesh.scale.set( 1, 1, 1 );
 
         // flat shape
         /*

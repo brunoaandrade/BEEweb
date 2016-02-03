@@ -342,7 +342,7 @@ class Server():
 			(r"/downloads/camera/current", util.tornado.UrlForwardHandler, dict(url=s.get(["webcam", "snapshot"]), as_attachment=True, access_validation=util.tornado.access_validation_factory(app, loginManager, util.flask.user_validator))),
 			# generated webassets
 			(r"/static/webassets/(.*)", util.tornado.LargeResponseHandler, dict(path=os.path.join(s.getBaseFolder("generated"), "webassets"))),
-			(r"/stl/(.*)", util.tornado.LargeResponseHandler, dict(path=os.path.join(s.getBaseFolder("uploads")), access_validation=util.tornado.access_validation_factory(app, loginManager, util.flask.user_validator)))
+			(r"/stl/([^/]*\.stl)", util.tornado.LargeResponseHandler, dict(path=os.path.join(s.getBaseFolder("stls")), access_validation=util.tornado.access_validation_factory(app, loginManager, util.flask.user_validator)))
 		]
 		for name, hook in pluginManager.get_hooks("octoprint.server.http.routes").items():
 			try:

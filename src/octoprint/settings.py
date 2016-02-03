@@ -161,6 +161,7 @@ default_settings = {
 	},
 	"folder": {
 		"uploads": None,
+		"stls": None,
 		"timelapse": None,
 		"timelapse_tmp": None,
 		"logs": None,
