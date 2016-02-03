@@ -34,7 +34,8 @@ BEEwb.transform_ops.scale = function() {
         var x = $('#scalex-axis').val();
         var y = $('#scaley-axis').val();
         var z = $('#scalez-axis').val();
-        BEEwb.main.selectedObject.scale.set( x, y, z );
+
+        this.scaleBySize(x, y ,z);
     }
 }
 
@@ -191,5 +192,20 @@ BEEwb.transform_ops.updateScaleSizeInputs = function() {
         $('#scalex-axis').val(newX.toFixed(2));
         $('#scaley-axis').val(newY.toFixed(2));
         $('#scalez-axis').val(newZ.toFixed(2));
+    }
+}
+
+/**
+ * Scales the selected object converting size passed in the parameters to the appropriate scale
+ *
+ */
+BEEwb.transform_ops.scaleBySize = function(x, y, z) {
+
+    if (BEEwb.main.selectedObject != null) {
+        var xScale = x / BEEwb.transform_ops.initialSize['x'];
+        var yScale = y / BEEwb.transform_ops.initialSize['y'];
+        var zScale = z / BEEwb.transform_ops.initialSize['z'];
+
+        BEEwb.main.selectedObject.scale.set( xScale, yScale, zScale );
     }
 }
