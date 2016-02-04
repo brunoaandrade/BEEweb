@@ -23,23 +23,12 @@ def getConnectedPrinter():
 	else:
 		printer_name = ''
 
+	profile = printer.getCurrentProfile()
+
 	return jsonify({
-		"printer": printer_name
+		"printer": printer_name,
+		"profile": profile
 	})
-
-
-@api.route("/scene/save", methods=["POST"])
-def save3DScene():
-
-	if not "application/json" in request.headers["Content-Type"]:
-		return make_response("Expected content-type JSON", 400)
-
-	data = request.json
-	stl = data['content']
-
-	print stl
-
-	return NO_CONTENT
 
 
 @api.route("/wifi/list", methods=["GET"])

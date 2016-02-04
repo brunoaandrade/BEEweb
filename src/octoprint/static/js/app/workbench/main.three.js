@@ -21,14 +21,43 @@ BEEwb.main = {
     containerHeightOffset: 0,
     bed: 0,
     selectedObject: null,
-    bedHeight: 135,
-    bedWidth: 190,
-
+    bedHeight: 0,
+    bedWidth: 0,
+    bedDepth: 0,
 
     /**
      * Main initialization function
      */
     init: function() {
+
+        var that = this;
+        // Loads the printer profile
+        $.ajax({
+            url: "bee/api/printer",
+            type: 'GET',
+            success: function(data) {
+
+                that.bedDepth = data.profile.volume.depth;
+                that.bedWidth = data.profile.volume.width;
+                that.bedHeight = data.profile.volume.height;
+
+            },
+            error: function() {
+
+
+            },
+            complete: function() {
+                that._initializeGraphics();
+                that.render();
+                that.animate();
+            }
+        });
+    },
+
+    /**
+     * Initialization function callback
+     */
+    _initializeGraphics: function() {
 
         this.container = document.getElementById( 'stl_container' );
         var bondingOffset = this.container.getBoundingClientRect();
@@ -41,7 +70,9 @@ BEEwb.main = {
         this.renderer.setSize(window.innerWidth, window.innerHeight / 1.5);
         this.container.appendChild( this.renderer.domElement );
 
-        this.camera = new THREE.PerspectiveCamera( 45, this.renderer.domElement.clientWidth / this.renderer.domElement.clientHeight, 1, 3000 );
+        this.camera = new THREE.PerspectiveCamera(
+         45, this.renderer.domElement.clientWidth / this.renderer.domElement.clientHeight, 1, 3000
+        );
         this.camera.position.set( 0, -200, 100 );
         this.camera.up.set( 0, 0, 1 ); // Without this the model is seen upside down
         this.camera.lookAt( new THREE.Vector3( 0, -100, 0 ) );
@@ -67,7 +98,7 @@ BEEwb.main = {
         this.scene.add(this.objects);
 
         // Loads the model
-        this.loadModel('BEE.stl');
+        this.loadModel('BEE.stl', true);
 
         this.trackballControls = new THREE.TrackballControls( this.camera, this.container );
         this.trackballControls.rotateSpeed = 1.0;
@@ -114,7 +145,12 @@ BEEwb.main = {
      * Loads an STL model into the canvas
      *
      */
-    loadModel: function (modelName) {
+    loadModel: function (modelName, systemFile) {
+
+        var folder = './downloads/files/local/';
+        if (systemFile === true) {
+            folder = './stl/';
+        }
 
         // Removes previous object
         this.scene.remove(this.transformControls);
@@ -123,7 +159,7 @@ BEEwb.main = {
 
         var that = this;
         // Colored binary STL
-        loader.load('./downloads/files/local/' + modelName, function ( geometry ) {
+        loader.load(folder + modelName, function ( geometry ) {
             var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 200 } );
 
             var mesh = new THREE.Mesh( geometry, material );
@@ -145,6 +181,7 @@ BEEwb.main = {
      */
     startPrint: function () {
 
+
     },
 
     /**
@@ -153,7 +190,7 @@ BEEwb.main = {
      */
     saveScene: function () {
 
-        var stlData = _generateSTLFromScene();
+        var stlData = BEEwb.helpers.generateSTLFromScene( this.objects );
 
         var data = new FormData();
         data.append('file', stlData['stl'], stlData['sceneName']);
@@ -179,7 +216,7 @@ BEEwb.main = {
      */
     downloadScene: function () {
 
-        var stlData = BEEwb.helpers.generateSTLFromScene();
+        var stlData = BEEwb.helpers.generateSTLFromScene( this.objects );
 
         saveAs(stlData['stl'], stlData['sceneName']);
     },
@@ -217,7 +254,7 @@ BEEwb.main = {
 
         // Shows the controls panel
         if ($('#workbench_ctrls_wrapper').css('display') == 'none') {
-            $('#workbench_ctrls_wrapper').show();
+            $('#workbench_ctrls_wrapper').slideDown();
         } else {
             if (!$('#workbench_ctrls').hasClass('in')) {
                 $("#workbench_ctrls").collapse("show");
@@ -267,7 +304,7 @@ BEEwb.main = {
      _addBed: function( ) {
 
         // Rectangle
-        var rectHeight = this.bedHeight;
+        var rectHeight = this.bedDepth;
         var rectWidth = this.bedWidth;
 
         // Loads bed support stl

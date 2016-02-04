@@ -111,6 +111,16 @@ class BeePrinter(Printer):
         else:
             return 0
 
+    def getCurrentProfile(self):
+        """
+        Returns current printer profile
+        :return:
+        """
+        if self._printerProfileManager is not None:
+            return self._printerProfileManager.get_current_or_default()
+        else:
+            return None
+
     def getPrinterName(self):
         """
         Returns the name of the connected printer

@@ -47,6 +47,18 @@ BEEwb.transformOps.scaleToMax = function() {
 
     if (BEEwb.main.selectedObject !== null) {
         BEEwb.main.selectedObject.position.set( 0, 0, 0 );
+
+        var hLimit = BEEwb.main.bedHeight;// z
+        var wLimit = BEEwb.main.bedWidth; // x
+        var dLimit = BEEwb.main.bedDepth; // y
+
+        var xScale = wLimit / this.initialSize['x'];
+        var yScale = dLimit / this.initialSize['y'];
+        var zScale = hLimit / this.initialSize['z'];
+
+        var scale = Math.min(xScale, Math.min (yScale, zScale));
+
+        BEEwb.main.selectedObject.scale.set(scale, scale ,scale);
     }
 }
 
@@ -123,8 +135,8 @@ BEEwb.transformOps.activateRotate = function() {
         $('#btn-rotate').removeClass('btn-default');
         $('#btn-rotate').addClass('btn-primary');
 
-        $('#move-axis-form').hide();
-        $('#scale-values-form').hide();
+        $('#move-axis-form').slideUp();
+        $('#scale-values-form').slideUp();
     }
 }
 
@@ -144,8 +156,8 @@ BEEwb.transformOps.activateScale = function() {
         $('#btn-scale').removeClass('btn-default');
         $('#btn-scale').addClass('btn-primary');
 
-        $('#move-axis-form').hide();
-        $('#scale-values-form').show();
+        $('#move-axis-form').slideUp();
+        $('#scale-values-form').slideDown();
 
         this.updateScaleSizeInputs();
     }
@@ -167,8 +179,8 @@ BEEwb.transformOps.activateMove = function() {
         $('#btn-move').removeClass('btn-default');
         $('#btn-move').addClass('btn-primary');
 
-        $('#move-axis-form').show();
-        $('#scale-values-form').hide();
+        $('#move-axis-form').slideDown();
+        $('#scale-values-form').slideUp();
     }
 }
 

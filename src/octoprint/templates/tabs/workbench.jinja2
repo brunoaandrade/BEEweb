@@ -5,18 +5,18 @@
 <div class="row-fluid worbench-top-buttons">
 
     <button class="btn btn-info span2" id="save_scene"
-            data-bind="" onclick="saveScene();">
+            data-bind="" onclick="BEEwb.main.saveScene();">
         <i class="icon-save" ></i>
         {{ _('Save Scene') }}
     </button>
 
     <button class="btn span2" id="download_scene"
-            data-bind="" onclick="downloadScene();">
+            data-bind="" onclick="BEEwb.main.downloadScene();">
         <i class="icon-download" ></i>
         {{ _('Download') }}
     </button>
     <span class="span6"></span>
-    <button class="btn btn-primary span2" id="print_scene" onclick="startPrint();"
+    <button class="btn btn-primary span2" id="print_scene" onclick="BEEwb.main.startPrint();"
             data-bind="enable: loginState.isUser() && !connection.isConnecting()">
         <i class="icon-print" ></i>
         {{ _('Start Print...') }}
@@ -28,7 +28,7 @@
 <script>
 
     BEEwb.main.init();
-    BEEwb.main.render();
-    BEEwb.main.animate();
+    //BEEwb.main.render();
+    //BEEwb.main.animate();
 
 </script>

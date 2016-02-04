@@ -874,6 +874,7 @@ class Server():
 		]
 
 		threejs_libs = [
+			"js/lib/jquery/jquery.min.js",
 			"js/lib/threejs/three.min.js",
 			"js/lib/threejs/STLLoader.js",
 			"js/lib/threejs/STLExporter.js",
