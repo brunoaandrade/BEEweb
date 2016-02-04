@@ -192,7 +192,7 @@ default_settings = {
 	},
 	"appearance": {
 		"name": "",
-		"color": "black",
+		"color": "yellow",
 		"colorTransparent": False,
 		"defaultLanguage": "_default",
 		"components": {

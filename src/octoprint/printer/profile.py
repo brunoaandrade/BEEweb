@@ -141,7 +141,7 @@ class PrinterProfileManager(object):
 
 	default = dict(
 		id = "_default",
-		name = "BVC Default",
+		name = "BEETHEFIRST",
 		model = "Generic BEEVERYCREATIVE Printer",
 		color = "default",
 		volume=dict(

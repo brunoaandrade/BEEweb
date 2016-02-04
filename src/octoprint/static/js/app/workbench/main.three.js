@@ -21,8 +21,8 @@ BEEwb.main = {
     containerHeightOffset: 0,
     bed: 0,
     selectedObject: null,
-    bedHeight: 145,
-    bedWidth: 200,
+    bedHeight: 135,
+    bedWidth: 190,
 
 
     /**
@@ -123,7 +123,7 @@ BEEwb.main = {
 
         var that = this;
         // Colored binary STL
-        loader.load('./stl/' + modelName, function ( geometry ) {
+        loader.load('./downloads/files/local/' + modelName, function ( geometry ) {
             var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 200 } );
 
             var mesh = new THREE.Mesh( geometry, material );
@@ -277,7 +277,7 @@ BEEwb.main = {
             var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 200 } );
 
             var mesh = new THREE.Mesh( geometry, material );
-            mesh.position.set( 0, 0, -0.5 );
+            mesh.position.set( 0, 0, -0.1 );
             mesh.castShadow = false;
 
             that.scene.add( mesh );
@@ -285,7 +285,7 @@ BEEwb.main = {
         });
 
         var color = 0x468AC7;
-        var extrudeSettings = { amount: 0.5, bevelEnabled: false};
+        var extrudeSettings = { amount: 0.0, bevelEnabled: false}; //amount = thickness
 
         var rectShape = new THREE.Shape();
         rectShape.moveTo( 0,0 );
@@ -298,7 +298,7 @@ BEEwb.main = {
         var geometry = new THREE.ExtrudeGeometry( rectShape, extrudeSettings );
 
         var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
-        mesh.position.set( -(rectWidth / 2), -(rectHeight / 2), -0.5 );
+        mesh.position.set( -(rectWidth / 2), -(rectHeight / 2), 0 );
         mesh.rotation.set( 0, 0, 0 );
         mesh.scale.set( 1, 1, 1 );
 

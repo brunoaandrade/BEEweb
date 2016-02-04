@@ -175,6 +175,16 @@ class Server():
 		sys.excepthook = exception_logger
 		self._logger.info("Starting BEEweb %s" % DISPLAY_VERSION)
 
+		# Starts the wifi dongle monitor thread
+		import octoprint.server.util.wifi_util as wifi_module
+		from octoprint.server.util.wifi_util import check_usb_dongle_thread
+
+		if wifi_module.wifi_cthread_flag is False:
+			import threading
+			threading.Thread(target=check_usb_dongle_thread).start()
+			wifi_module.wifi_cthread_flag = True
+
+
 		# then initialize the plugin manager
 		pluginManager = octoprint.plugin.plugin_manager(init=True)
 
@@ -874,7 +884,7 @@ class Server():
 			"js/app/workbench/helpers.bee.js",
 			"js/app/workbench/events.three.js",
 			"js/app/workbench/main.three.js",
-			"js/app/workbench/transform_operations.bee.js",
+			"js/app/workbench/transform-operations.bee.js",
 		]
 
 		css_libs = [
@@ -989,6 +999,7 @@ class LifecycleManager(object):
 					self._plugin_lifecycle_callbacks[event].remove(callback)
 
 if __name__ == "__main__":
+
 	# starts the main server
 	server = Server()
 	server.run()

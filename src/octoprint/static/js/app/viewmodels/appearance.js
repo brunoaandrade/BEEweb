@@ -18,8 +18,8 @@ $(function() {
         self.printerName = ko.computed(function() {
             var printer = ""
             var profileName = self.printerProfiles.currentProfileData().name();
-            if (self.printerProfiles.currentProfile() != '_default')
-                printer = "@ " + profileName;
+
+            printer = "@ " + profileName;
 
             return printer;
         });
