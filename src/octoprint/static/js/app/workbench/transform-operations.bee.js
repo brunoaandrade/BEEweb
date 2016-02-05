@@ -232,3 +232,14 @@ BEEwb.transformOps.scaleBySize = function(x, y, z) {
         BEEwb.main.selectedObject.scale.set( xScale, yScale, zScale );
     }
 }
+
+/**
+ * Sets the initial size for the transform operations
+ *
+ */
+BEEwb.transformOps.setInitialSize = function() {
+
+    if (BEEwb.main.selectedObject != null) {
+        this.initialSize = BEEwb.helpers.objectSize(BEEwb.main.selectedObject.geometry);
+    }
+}

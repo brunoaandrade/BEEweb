@@ -263,6 +263,9 @@ BEEwb.main = {
 
         // Activates the default transform operation
         BEEwb.transformOps.activateMove();
+
+        // Sets the initial size for the transform operations
+        BEEwb.transformOps.setInitialSize();
     },
 
     /**

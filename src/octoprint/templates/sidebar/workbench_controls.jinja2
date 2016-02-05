@@ -43,10 +43,12 @@
             <input type="text" class="span9 axis-input-box" id="scalez-axis" name="z-axis" onchange="BEEwb.transformOps.scale();"/>
             <label class="span3" for="scalez-axis">Z (mm)</label>
             <br /><br />
-            <button id="btn-scale-max" class="btn btn-warning btn-block model-selection" onclick="BEEwb.transformOps.scaleToMax();" disabled="true">
+            <span class="span2"></span>
+            <button id="btn-scale-max" class="span8 btn btn-sm btn-default model-selection" onclick="BEEwb.transformOps.scaleToMax();" disabled="true">
                 <i class="icon-crop" ></i>
                 <span>{{ _('Scale to Max') }}</span>
             </button>
+            <span class="span2"></span>
             <hr />
         </div>
     </div>
