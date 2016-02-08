@@ -137,6 +137,7 @@ BEEwb.transformOps.activateRotate = function() {
 
         $('#move-axis-form').slideUp();
         $('#scale-values-form').slideUp();
+        $('#rotate-values-form').slideDown();
     }
 }
 

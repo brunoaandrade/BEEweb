@@ -56,7 +56,52 @@
         <i class="icon-refresh" ></i>
         <span>{{ _('Rotate') }}</span>
     </button>
-    <hr />
+    <br />
+    <div id="rotate-values-form" style="display: none;">
+        <span><strong>{{ _('Object Rotation') }}</strong></span><br /><br />
+
+        <div id="rotate-axis-form" class="row-fluid form-inline">
+            <input type="text" class="span9 axis-input-box" id="rotx-axis" name="x-axis" onchange="BEEwb.transformOps.rotate();"/>
+            <label class="span3" for="scalex-axis">X (deg°)</label>
+            <br /><br />
+
+            <input type="text" class="span9 axis-input-box" id="roty-axis" name="y-axis" onchange="BEEwb.transformOps.rotate();"/>
+            <label class="span3" for="scaley-axis">Y (deg°)</label>
+            <br /><br />
+
+            <input type="text" class="span9 axis-input-box" id="rotz-axis" name="z-axis" onchange="BEEwb.transformOps.rotate();"/>
+            <label class="span3" for="scalez-axis">Z (deg°)</label>
+            <br /><br />
+            <div class="row-fluid">
+                 <span class="span2"></span>
+
+                <label class="radio inline span3">
+                    <input type="radio" id="rot-axis-selx" name="rot-axis-sel" value="x" > X</input>
+                </label>
+                <label class="radio inline span3">
+                    <input type="radio" id="rot-axis-sely" name="rot-axis-sel" value="y" > Y</input>
+                </label>
+                <label class="radio inline span3">
+                    <input type="radio" id="rot-axis-selz" name="rot-axis-sel" value="z" > Z</input>
+                </label>
+
+            </div>
+
+            <div class="row-fluid">
+                <button id="btn-rotate-ccw" class="span5 btn btn-sm btn-default model-selection" onclick="BEEwb.transformOps.rotateCCW();" disabled="true">
+                    <i class="icon-rotate-left" ></i>
+                    <span>{{ _('Rotate 90° Left') }}</span>
+                </button>
+                <span class="span2"></span>
+                <button id="btn-rotate-cw" class="span5 btn btn-sm btn-default model-selection" onclick="BEEwb.transformOps.rotateCW();" disabled="true">
+                    <i class="icon-rotate-right" ></i>
+                    <span>{{ _('Rotate 90° Right') }}</span>
+                </button>
+            </div>
+        </div>
+        <hr />
+
+    </div>
     <button class="btn btn-block model-selection" id="center_selection"
             data-bind="" disabled="true" onclick="BEEwb.transformOps.centerModel();">
         <i class="icon-bullseye" ></i>
