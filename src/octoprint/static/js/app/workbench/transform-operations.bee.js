@@ -93,11 +93,23 @@ BEEwb.transformOps._rotateStep = function( degrees ) {
     var selAxis = $('input[name=rot-axis-sel]:checked').val();
 
     if (selAxis == 'x')
-        BEEwb.main.selectedObject.rotation.set(BEEwb.main.selectedObject.rotation.x + radStep, 0, 0);
+        BEEwb.main.selectedObject.rotation.set(
+            BEEwb.main.selectedObject.rotation.x + radStep,
+            BEEwb.main.selectedObject.rotation.y,
+            BEEwb.main.selectedObject.rotation.z
+        );
     else if (selAxis == 'y')
-        BEEwb.main.selectedObject.rotation.set(0, BEEwb.main.selectedObject.rotation.y + radStep, 0);
+        BEEwb.main.selectedObject.rotation.set(
+            BEEwb.main.selectedObject.rotation.x,
+            BEEwb.main.selectedObject.rotation.y + radStep,
+            BEEwb.main.selectedObject.rotation.z
+        );
     else if (selAxis == 'z')
-        BEEwb.main.selectedObject.rotation.set(0, 0, BEEwb.main.selectedObject.rotation.z + radStep);
+        BEEwb.main.selectedObject.rotation.set(
+            BEEwb.main.selectedObject.rotation.x,
+            BEEwb.main.selectedObject.rotation.y,
+            BEEwb.main.selectedObject.rotation.z + radStep
+        );
 }
 
 /**
