@@ -40,6 +40,67 @@ BEEwb.transformOps.scale = function() {
 }
 
 /**
+ * Rotates the selected model to the input text boxes axis values
+ *
+ */
+BEEwb.transformOps.rotate = function() {
+
+    if (BEEwb.main.selectedObject !== null) {
+        var x = $('#rotx-axis').val();
+        var y = $('#roty-axis').val();
+        var z = $('#rotz-axis').val();
+
+        this.rotateByDegrees(x, y ,z);
+    }
+}
+
+/**
+ * Rotates the selected model 90 degrees to the left (counter clockwise)
+ * in the selected axis in the radio input control
+ *
+ */
+BEEwb.transformOps.rotateCCW = function() {
+
+    if (BEEwb.main.selectedObject !== null) {
+        this._rotateStep(90);
+
+        this.updateRotationInputs();
+    }
+}
+
+/**
+ * Rotates the selected model 90 degrees to the right (clockwise)
+ * in the selected axis in the radio input control
+ *
+ */
+BEEwb.transformOps.rotateCW = function() {
+
+    if (BEEwb.main.selectedObject !== null) {
+        this._rotateStep(-90);
+
+        this.updateRotationInputs();
+    }
+}
+
+/**
+ * Rotates the selected model 'n' degrees
+ * in the selected axis in the radio input control
+ *
+ */
+BEEwb.transformOps._rotateStep = function( degrees ) {
+
+    var radStep = BEEwb.helpers.convertToRadians(degrees);
+    var selAxis = $('input[name=rot-axis-sel]:checked').val();
+
+    if (selAxis == 'x')
+        BEEwb.main.selectedObject.rotation.set(BEEwb.main.selectedObject.rotation.x + radStep, 0, 0);
+    else if (selAxis == 'y')
+        BEEwb.main.selectedObject.rotation.set(0, BEEwb.main.selectedObject.rotation.y + radStep, 0);
+    else if (selAxis == 'z')
+        BEEwb.main.selectedObject.rotation.set(0, 0, BEEwb.main.selectedObject.rotation.z + radStep);
+}
+
+/**
  * Centers the selected model on the platform
  *
  */
@@ -88,6 +149,8 @@ BEEwb.transformOps.resetSelectedModel = function() {
         this.updatePositionInputs();
 
         this.updateScaleSizeInputs();
+
+        this.updateRotationInputs();
     }
 }
 
@@ -159,6 +222,7 @@ BEEwb.transformOps.activateScale = function() {
 
         $('#move-axis-form').slideUp();
         $('#scale-values-form').slideDown();
+        $('#rotate-values-form').slideUp();
 
         this.updateScaleSizeInputs();
     }
@@ -182,6 +246,7 @@ BEEwb.transformOps.activateMove = function() {
 
         $('#move-axis-form').slideDown();
         $('#scale-values-form').slideUp();
+        $('#rotate-values-form').slideUp();
     }
 }
 
@@ -220,6 +285,24 @@ BEEwb.transformOps.updateScaleSizeInputs = function() {
 }
 
 /**
+ * Updates the selected object rotation angles input boxes
+ *
+ */
+BEEwb.transformOps.updateRotationInputs = function() {
+
+    if (BEEwb.main.selectedObject != null) {
+
+        var newX = BEEwb.helpers.convertToDegrees(BEEwb.main.selectedObject.rotation.x);
+        var newY = BEEwb.helpers.convertToDegrees(BEEwb.main.selectedObject.rotation.y);
+        var newZ = BEEwb.helpers.convertToDegrees(BEEwb.main.selectedObject.rotation.z);
+
+        $('#rotx-axis').val(newX.toFixed(2));
+        $('#roty-axis').val(newY.toFixed(2));
+        $('#rotz-axis').val(newZ.toFixed(2));
+    }
+}
+
+/**
  * Scales the selected object converting size passed in the parameters to the appropriate scale
  *
  */
@@ -233,6 +316,22 @@ BEEwb.transformOps.scaleBySize = function(x, y, z) {
         BEEwb.main.selectedObject.scale.set( xScale, yScale, zScale );
     }
 }
+
+/**
+ * Rotates the selected object converting size passed in the parameters to the appropriate scale
+ *
+ */
+BEEwb.transformOps.rotateByDegrees = function(x, y, z) {
+
+    if (BEEwb.main.selectedObject != null) {
+        var xRotation = BEEwb.helpers.convertToRadians(x);
+        var yRotation = BEEwb.helpers.convertToRadians(y);
+        var zRotation = BEEwb.helpers.convertToRadians(z);
+
+        BEEwb.main.selectedObject.rotation.set( xRotation, yRotation, zRotation );
+    }
+}
+
 
 /**
  * Sets the initial size for the transform operations

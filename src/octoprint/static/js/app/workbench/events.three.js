@@ -72,4 +72,8 @@ BEEwb.events.onMouseUp = function( e ) {
     if (BEEwb.transformOps.selectedMode == 'scale') {
         BEEwb.transformOps.updateScaleSizeInputs();
     }
+
+     if (BEEwb.transformOps.selectedMode == 'rotate') {
+         BEEwb.transformOps.updateRotationInputs();
+     }
 }

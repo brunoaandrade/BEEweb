@@ -87,3 +87,33 @@ BEEwb.helpers.objectSize = function( geometry ) {
 
     return { 'x': xSize, 'y': ySize, 'z': zSize};
 }
+
+/**
+ * Converts radians to degrees
+ *
+ * param radians: Angle in radians value
+ *
+ * Returns value in degrees
+ */
+BEEwb.helpers.convertToDegrees = function( radians ) {
+    if (radians != null) {
+        return radians * (180/3.1416);
+    } else {
+        return 0;
+    }
+}
+
+/**
+ * Converts degress to radians
+ *
+ * param degrees: Angle in degrees value
+ *
+ * Returns value in degrees
+ */
+BEEwb.helpers.convertToRadians = function( degrees ) {
+    if (degrees != null) {
+        return degrees * (3.1416/180);
+    } else {
+        return 0;
+    }
+}
