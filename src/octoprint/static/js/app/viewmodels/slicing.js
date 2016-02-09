@@ -45,7 +45,7 @@ $(function() {
             self.title(_.sprintf(gettext("Slicing %(filename)s"), {filename: self.file}));
             self.gcodeFilename(self.file.substr(0, self.file.lastIndexOf(".")));
             self.printerProfile(self.printerProfiles.currentProfile());
-            self.afterSlicing("none");
+            self.afterSlicing("select");
             $("#slicing_configuration_dialog").modal("show");
         };
 

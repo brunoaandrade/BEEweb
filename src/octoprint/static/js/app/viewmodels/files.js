@@ -402,9 +402,9 @@ $(function() {
                 }
                 self.requestData(filename, location);
 
-                if (_.endsWith(filename.toLowerCase(), ".stl")) {
-                    self.slicing.show(location, filename);
-                }
+                //if (_.endsWith(filename.toLowerCase(), ".stl")) {
+                //    self.slicing.show(location, filename);
+                //}
 
                 if (data.result.done) {
                     $("#gcode_upload_progress .bar").css("width", "0%");

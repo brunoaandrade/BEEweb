@@ -180,13 +180,13 @@ BEEwb.main = {
      *
      */
     startPrint: function () {
-
-
+        $("#slicing_configuration_dialog").modal("show");
     },
 
     /**
      * Saves the current scene
      *
+     * Returns the name of the generated scene STL file
      */
     saveScene: function () {
 
@@ -208,6 +208,8 @@ BEEwb.main = {
 
             }
         });
+
+        return stlData['sceneName'];
     },
 
     /**
