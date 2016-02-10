@@ -55,7 +55,8 @@ BEEwb.events.onMouseUp = function( e ) {
         var intersection = intersects[ 0 ];
         var model = intersection.object;
 
-        BEEwb.main.selectModel(model);
+        if (BEEwb.main.selectedObject !== model)
+            BEEwb.main.selectModel(model);
 
     } else if (prevMouseVector.x == BEEwb.main.mouseVector.x
         && prevMouseVector.y == BEEwb.main.mouseVector.y
