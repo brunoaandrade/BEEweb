@@ -28,7 +28,6 @@ $(function () {
 
         self.startPrint = function () {
 			var location = "local";
-            debugger;
             var filename = BEEwb.main.saveScene();
 
             self.slicing.show(location, filename);
