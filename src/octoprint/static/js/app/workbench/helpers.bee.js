@@ -41,6 +41,7 @@ BEEwb.helpers.objectSize = function( geometry ) {
         return { 'x': 0, 'y': 0, 'z': 0};
     }
 
+    geometry.computeBoundingBox();
     var bbox = geometry.boundingBox;
     var xSize = 0;
     var ySize = 0;
@@ -86,6 +87,28 @@ BEEwb.helpers.objectSize = function( geometry ) {
     }
 
     return { 'x': xSize, 'y': ySize, 'z': zSize};
+}
+
+/**
+ * Checks if the object is out of bounds
+ *
+ * param geometry: THREEJS.Geometry object
+ * param bboxSize: array { x, y, z } with bounding box size
+ *
+ * Returns true if the object is out of bounds
+ */
+BEEwb.helpers.objectOutOfBounds = function( geometry, bboxSize ) {
+    if ( geometry == null) {
+        return false;
+    }
+
+    geometry.computeBoundingBox();
+    var bbox = geometry.boundingBox;
+    if ( bbox.max.x > bboxSize[0] || bbox.max.y > bboxSize[1] || bbox.max.z > bboxSize[2]) {
+        return true;
+    }
+
+    return false;
 }
 
 /**

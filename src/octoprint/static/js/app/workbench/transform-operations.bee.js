@@ -132,6 +132,8 @@ BEEwb.transformOps.scaleToMax = function() {
         var scale = Math.min(xScale, Math.min (yScale, zScale));
 
         BEEwb.main.selectedObject.scale.set(scale, scale ,scale);
+
+        this.updateScaleSizeInputs();
     }
 }
 

@@ -162,6 +162,34 @@ BEEwb.main = {
         loader.load(folder + modelName, function ( geometry ) {
             var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 200 } );
 
+            // Updates the bounding box for the next calculations
+            geometry.computeBoundingBox();
+            var bbox = geometry.boundingBox;
+
+            var xShift = 0;
+            var yShift = 0;
+            var zShift = 0;
+
+            // Checks if the object is out of center in any axis
+            if ( bbox.min.x > 0 ) {
+                var centerX = 0.5 * ( bbox.max.x - bbox.min.x );
+                xShift = bbox.min.x + centerX;
+            }
+
+            if ( bbox.min.y > 0 ) {
+                var centerY = 0.5 * ( bbox.max.y - bbox.min.y );
+                yShift = bbox.min.y + centerY;
+            }
+
+            if ( bbox.min.z > 0 ) {
+                var centerZ = 0.5 * ( bbox.max.z - bbox.min.z );
+                zShift = bbox.min.z + centerZ;
+            }
+
+            // Applies the transformation matrix for any necessary shift in position
+            geometry.applyMatrix( new THREE.Matrix4().makeTranslation( -xShift, -yShift, -zShift ) );
+
+
             var mesh = new THREE.Mesh( geometry, material );
             mesh.position.set( 0, 0, 0 );
             //mesh.rotation.set( - Math.PI , Math.PI , 0 );
@@ -173,14 +201,6 @@ BEEwb.main = {
             that.objects.add(mesh);
 
         });
-    },
-
-    /**
-     * Starts the printing operation
-     *
-     */
-    startPrint: function () {
-        $("#slicing_configuration_dialog").modal("show");
     },
 
     /**

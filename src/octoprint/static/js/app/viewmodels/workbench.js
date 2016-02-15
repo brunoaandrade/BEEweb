@@ -16,6 +16,7 @@ $(function () {
 
 		//append file list with newly updated stl file.
 		self.onEventUpload = function (file) {
+
 			if (file.file.substr(file.file.length - 3).toLowerCase() == "stl") {
 
 				BEEwb.main.loadModel(file.file);
