@@ -151,6 +151,9 @@ BEEwb.main = {
         var folder = './downloads/files/local/';
         if (systemFile === true) {
             folder = './stl/';
+        } else {
+            // Only shows the loading modal if it's model loaded by the user
+            $('#loadingDialog').modal('show');
         }
 
         // Removes previous object
@@ -201,6 +204,7 @@ BEEwb.main = {
 
             that.objects.add(mesh);
 
+            $('#loadingDialog').modal('hide');
         });
     },
 
