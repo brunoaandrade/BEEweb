@@ -34,3 +34,6 @@ canvas { width: 100% !important; }
 .worbench-top-buttons {
     margin-bottom: 5px;
 }
+.workbench-alert {
+    padding: 4px 35px 4px 14px;
+}

@@ -1,5 +1,6 @@
 var SELECT_COLOR = '#ECC459';
 var DEFAULT_COLOR = '#8C8C8C';
+var OUT_BOUNDS_COLOR = '#BD362F';
 
 // global namespace
 var BEEwb = BEEwb || {};
@@ -288,6 +289,34 @@ BEEwb.main = {
 
         // Sets the initial size for the transform operations
         BEEwb.transformOps.setInitialSize();
+    },
+
+    /**
+     * Checks if the selected object is out of the printing area
+     */
+    isSelectedObjectOutOfBounds: function () {
+
+        if (BEEwb.helpers.objectOutOfBounds(BEEwb.main.selectedObject, [BEEwb.main.bedWidth, BEEwb.main.bedDepth, BEEwb.main.bedHeight])) {
+            BEEwb.main._toggleObjectOutOfBounds(BEEwb.main.selectedObject, true);
+        } else {
+            BEEwb.main._toggleObjectOutOfBounds(BEEwb.main.selectedObject, false);
+        }
+    },
+
+    /**
+     * Toogles the out of bounds state for a model in the scene
+     */
+    _toggleObjectOutOfBounds: function ( model, toogle ) {
+        //sets the out of bounds color in the object
+        if (model != null) {
+            if (toogle) {
+                model.material.color = new THREE.Color(OUT_BOUNDS_COLOR);
+                $('#out-bound-msg').show();
+            } else {
+                model.material.color = new THREE.Color(SELECT_COLOR);
+                $('#out-bound-msg').hide();
+            }
+        }
     },
 
     /**

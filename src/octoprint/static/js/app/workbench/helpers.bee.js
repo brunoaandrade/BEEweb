@@ -92,19 +92,23 @@ BEEwb.helpers.objectSize = function( geometry ) {
 /**
  * Checks if the object is out of bounds
  *
- * param geometry: THREEJS.Geometry object
+ * param obj: THREEJS.Object3D object
  * param bboxSize: array { x, y, z } with bounding box size
  *
  * Returns true if the object is out of bounds
  */
-BEEwb.helpers.objectOutOfBounds = function( geometry, bboxSize ) {
-    if ( geometry == null) {
+BEEwb.helpers.objectOutOfBounds = function( obj, bboxSize ) {
+    if ( obj == null) {
         return false;
     }
 
-    geometry.computeBoundingBox();
-    var bbox = geometry.boundingBox;
-    if ( bbox.max.x > bboxSize[0] || bbox.max.y > bboxSize[1] || bbox.max.z > bboxSize[2]) {
+    // Computes the box after any transformations
+    var bbox = new THREE.Box3().setFromObject( obj );
+    if ( bbox.max.x > (bboxSize[0] / 2) || bbox.max.y > (bboxSize[1] / 2) || bbox.max.z > bboxSize[2]) {
+        return true;
+    }
+
+    if ( bbox.min.x < -(bboxSize[0] / 2) || bbox.min.y < -(bboxSize[1] / 2) || bbox.min.z < 0) {
         return true;
     }
 

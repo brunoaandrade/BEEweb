@@ -21,6 +21,7 @@ BEEwb.transformOps.move = function() {
         var y = $('#y-axis').val();
         var z = $('#z-axis').val();
         BEEwb.main.selectedObject.position.set( x, y, z );
+        BEEwb.main.transformControls.update();
     }
 }
 
@@ -36,6 +37,7 @@ BEEwb.transformOps.scale = function() {
         var z = $('#scalez-axis').val();
 
         this.scaleBySize(x, y ,z);
+        BEEwb.main.transformControls.update();
     }
 }
 
@@ -50,7 +52,8 @@ BEEwb.transformOps.rotate = function() {
         var y = $('#roty-axis').val();
         var z = $('#rotz-axis').val();
 
-        this.rotateByDegrees(x, y ,z);
+        this._rotateByDegrees(x, y ,z);
+        BEEwb.main.transformControls.update();
     }
 }
 
@@ -130,10 +133,16 @@ BEEwb.transformOps.scaleToMax = function() {
         var zScale = hLimit / this.initialSize['z'];
 
         var scale = Math.min(xScale, Math.min (yScale, zScale));
+        // Small adjustment to avoid false positive out of bounds message due to precision errors
+        scale -= 0.01;
 
         BEEwb.main.selectedObject.scale.set(scale, scale ,scale);
+        BEEwb.main.transformControls.update();
 
         this.updateScaleSizeInputs();
+
+        // Checks if the selected object is out of bounds
+        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -145,6 +154,10 @@ BEEwb.transformOps.centerModel = function() {
 
     if (BEEwb.main.selectedObject !== null) {
         BEEwb.main.selectedObject.position.set( 0, 0, 0 );
+        BEEwb.main.transformControls.update();
+
+        // Checks if the selected object is out of bounds
+        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -159,12 +172,17 @@ BEEwb.transformOps.resetSelectedModel = function() {
 		BEEwb.main.selectedObject.rotation.set( 0, 0, 0 );
 		BEEwb.main.selectedObject.scale.set( 1, 1, 1 );
 
+        BEEwb.main.transformControls.update();
+
         // Updates the size/scale/rotation input boxes
         this.updatePositionInputs();
 
         this.updateScaleSizeInputs();
 
         this.updateRotationInputs();
+
+        // Checks if the selected object is out of bounds
+        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -274,6 +292,9 @@ BEEwb.transformOps.updatePositionInputs = function() {
         $('#x-axis').val(BEEwb.main.selectedObject.position.x.toFixed(1));
         $('#y-axis').val(BEEwb.main.selectedObject.position.y.toFixed(1));
         $('#z-axis').val(BEEwb.main.selectedObject.position.z.toFixed(1));
+
+        // Checks if the selected object is out of bounds
+        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -295,6 +316,9 @@ BEEwb.transformOps.updateScaleSizeInputs = function() {
         $('#scalex-axis').val(newX.toFixed(2));
         $('#scaley-axis').val(newY.toFixed(2));
         $('#scalez-axis').val(newZ.toFixed(2));
+
+        // Checks if the selected object is out of bounds
+        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -313,6 +337,9 @@ BEEwb.transformOps.updateRotationInputs = function() {
         $('#rotx-axis').val(newX.toFixed(2));
         $('#roty-axis').val(newY.toFixed(2));
         $('#rotz-axis').val(newZ.toFixed(2));
+
+        // Checks if the selected object is out of bounds
+        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -328,6 +355,7 @@ BEEwb.transformOps.scaleBySize = function(x, y, z) {
         var zScale = z / this.initialSize['z'];
 
         BEEwb.main.selectedObject.scale.set( xScale, yScale, zScale );
+        BEEwb.main.transformControls.update();
     }
 }
 
@@ -335,7 +363,7 @@ BEEwb.transformOps.scaleBySize = function(x, y, z) {
  * Rotates the selected object converting size passed in the parameters to the appropriate scale
  *
  */
-BEEwb.transformOps.rotateByDegrees = function(x, y, z) {
+BEEwb.transformOps._rotateByDegrees = function(x, y, z) {
 
     if (BEEwb.main.selectedObject != null) {
         var xRotation = BEEwb.helpers.convertToRadians(x);

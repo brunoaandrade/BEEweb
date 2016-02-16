@@ -13,7 +13,12 @@
         <i class="icon-download" ></i>
         {{ _('Download') }}
     </button>
-    <span class="span6"></span>
+    <div class="span6">
+        <div id="out-bound-msg" class="alert alter-warning workbench-alert" style="display: none;">
+            <i class="icon-warning-sign"></i>
+            {{ _('The model is out of the priting area.') }}
+        </div>
+    </div>
     <button class="btn btn-primary span2" id="print_scene"
             data-bind="click: startPrint, enable: loginState.isUser() && !connection.isConnecting()">
         <i class="icon-print" ></i>
