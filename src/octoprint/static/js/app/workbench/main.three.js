@@ -25,6 +25,7 @@ BEEwb.main = {
     bedHeight: 0,
     bedWidth: 0,
     bedDepth: 0,
+    savedScenesFiles: [],
 
     /**
      * Main initialization function
@@ -148,6 +149,11 @@ BEEwb.main = {
      */
     loadModel: function (modelName, systemFile) {
 
+        // Workaround to prevent the "double" loading of a saved scene
+        if (this.savedScenesFiles.indexOf(modelName) > -1) {
+            return null;
+        }
+
         var folder = './downloads/files/local/';
         if (systemFile === true) {
             folder = './stl/';
@@ -214,7 +220,7 @@ BEEwb.main = {
      * Returns the name of the generated scene STL file
      */
     saveScene: function () {
-
+        var scope = this;
         var stlData = BEEwb.helpers.generateSTLFromScene( this.objects );
 
         var data = new FormData();
@@ -228,6 +234,7 @@ BEEwb.main = {
             processData: false,
             success: function(data) {
 
+                scope.savedScenesFiles.push(data.files.local.name);
             },
             error: function() {
 
