@@ -161,6 +161,28 @@ BEEwb.transformOps.centerModel = function() {
     }
 }
 
+
+/**
+ * Places the selected model on top of the platform
+ *
+ */
+BEEwb.transformOps.placeOnBed = function() {
+
+    if (BEEwb.main.selectedObject !== null) {
+
+        // Computes the box after any transformations
+        var bbox = new THREE.Box3().setFromObject( BEEwb.main.selectedObject );
+
+        if (bbox.min.z != 0)
+            BEEwb.main.selectedObject.position.setZ( BEEwb.main.selectedObject.position.z - bbox.min.z );
+
+        BEEwb.main.transformControls.update();
+
+        // Checks if the selected object is out of bounds
+        BEEwb.main.isSelectedObjectOutOfBounds();
+    }
+}
+
 /**
  * Resets the transformations of the selected object
  *
