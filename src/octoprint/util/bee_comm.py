@@ -171,9 +171,10 @@ class BeeCom(MachineCom):
         else:
             return super(BeeCom, self).getStateString()
 
-    def startPrint(self):
+    def startPrint(self, pos=None):
         """
         Starts the printing operation
+        :param pos: unused parameter, just to keep the interface compatible with octoprint
         """
         if not self.isOperational() or self.isPrinting():
             return
