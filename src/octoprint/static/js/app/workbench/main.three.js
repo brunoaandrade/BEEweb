@@ -308,16 +308,16 @@ BEEwb.main = {
     isSelectedObjectOutOfBounds: function () {
 
         if (BEEwb.helpers.objectOutOfBounds(BEEwb.main.selectedObject, [BEEwb.main.bedWidth, BEEwb.main.bedDepth, BEEwb.main.bedHeight])) {
-            BEEwb.main._toggleObjectOutOfBounds(BEEwb.main.selectedObject, true);
+            BEEwb.main.toggleObjectOutOfBounds(BEEwb.main.selectedObject, true);
         } else {
-            BEEwb.main._toggleObjectOutOfBounds(BEEwb.main.selectedObject, false);
+            BEEwb.main.toggleObjectOutOfBounds(BEEwb.main.selectedObject, false);
         }
     },
 
     /**
      * Toogles the out of bounds state for a model in the scene
      */
-    _toggleObjectOutOfBounds: function ( model, toogle ) {
+    toggleObjectOutOfBounds: function ( model, toogle ) {
         //sets the out of bounds color in the object
         if (model != null) {
             if (toogle) {

@@ -218,6 +218,8 @@ BEEwb.transformOps.removeModel = function(modelObj) {
         BEEwb.main.scene.remove(modelObj);
         BEEwb.main.objects.remove(modelObj);
         BEEwb.main.scene.remove(BEEwb.main.transformControls);
+
+         BEEwb.main.toggleObjectOutOfBounds(BEEwb.main.selectedObject, false);
     }
 }
 
