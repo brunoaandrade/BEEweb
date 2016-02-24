@@ -1173,3 +1173,7 @@
 #settings_dialog #squishSettingsTabButton {
   display: none;
 }
+
+#maintenance_dialog {
+  position: absolute;
+}
