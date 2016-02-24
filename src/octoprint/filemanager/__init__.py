@@ -18,6 +18,11 @@ from .analysis import QueueEntry, AnalysisQueue
 from .storage import LocalFileStorage
 from .util import AbstractFileWrapper, StreamWrapper, DiskFileWrapper
 
+from collections import namedtuple
+
+ContentTypeMapping = namedtuple("ContentTypeMapping", "extensions, content_type")
+ContentTypeDetector = namedtuple("ContentTypeDetector", "extensions, detector")
+
 extensions = dict(
 )
 
@@ -25,11 +30,11 @@ def full_extension_tree():
 	result = dict(
 		# extensions for 3d model files
 		model=dict(
-			stl=["stl"]
+			stl=ContentTypeMapping(["stl"], "application/sla")
 		),
 		# extensions for printable machine code
 		machinecode=dict(
-			gcode=["gcode", "gco", "g"]
+			gcode=ContentTypeMapping(["gcode", "gco", "g"], "text/plain")
 		)
 	)
 
@@ -68,8 +73,12 @@ def get_all_extensions(subtree=None):
 		for key, value in subtree.items():
 			if isinstance(value, dict):
 				result += get_all_extensions(value)
+			elif isinstance(value, (ContentTypeMapping, ContentTypeDetector)):
+				result += value.extensions
 			elif isinstance(value, (list, tuple)):
 				result += value
+	elif isinstance(subtree, (ContentTypeMapping, ContentTypeDetector)):
+		result = subtree.extensions
 	elif isinstance(subtree, (list, tuple)):
 		result = subtree
 	return result
@@ -79,12 +88,31 @@ def get_path_for_extension(extension, subtree=None):
 		subtree = full_extension_tree()
 
 	for key, value in subtree.items():
-		if isinstance(value, (list, tuple)) and extension in value:
+		if isinstance(value, (ContentTypeMapping, ContentTypeDetector)) and extension in value.extensions:
+			return [key]
+		elif isinstance(value, (list, tuple)) and extension in value:
 			return [key]
 		elif isinstance(value, dict):
 			path = get_path_for_extension(extension, subtree=value)
 			if path:
 				return [key] + path
+
+	return None
+
+def get_content_type_mapping_for_extension(extension, subtree=None):
+	if not subtree:
+		subtree = full_extension_tree()
+
+	for key, value in subtree.items():
+		content_extension_matches = isinstance(value, (ContentTypeMapping, ContentTypeDetector)) and extension in value. extensions
+		list_extension_matches = isinstance(value, (list, tuple)) and extension in value
+
+		if content_extension_matches or list_extension_matches:
+			return value
+		elif isinstance(value, dict):
+			result = get_content_type_mapping_for_extension(extension, subtree=value)
+			if result is not None:
+				return result
 
 	return None
 
@@ -105,6 +133,19 @@ def get_file_type(filename):
 	_, extension = os.path.splitext(filename)
 	extension = extension[1:].lower()
 	return get_path_for_extension(extension)
+
+def get_mime_type(filename):
+	_, extension = os.path.splitext(filename)
+	extension = extension[1:].lower()
+	mapping = get_content_type_mapping_for_extension(extension)
+	if mapping:
+		if isinstance(mapping, ContentTypeMapping) and mapping.content_type is not None:
+			return mapping.content_type
+		elif isinstance(mapping, ContentTypeDetector) and callable(mapping.detector):
+			result = mapping.detector(filename)
+			if result is not None:
+				return result
+	return "application/octet-stream"
 
 
 class NoSuchStorage(Exception):
@@ -133,6 +174,9 @@ class FileManager(object):
 
 		self._progress_plugins = []
 		self._preprocessor_hooks = dict()
+
+		import octoprint.settings
+		self._recovery_file = os.path.join(octoprint.settings.settings().getBaseFolder("data"), "print_recovery_data.yaml")
 
 	def initialize(self):
 		self.reload_plugins()
@@ -372,6 +416,43 @@ class FileManager(object):
 		except NoSuchStorage:
 			# if there's no storage configured where to log the print, we'll just not log it
 			pass
+
+	def save_recovery_data(self, origin, path, pos):
+		import time
+		import yaml
+		from octoprint.util import atomic_write
+
+		data = dict(origin=origin,
+		            path=self.path_in_storage(origin, path),
+		            pos=pos,
+		            date=time.time())
+		try:
+			with atomic_write(self._recovery_file) as f:
+				yaml.safe_dump(data, stream=f, default_flow_style=False, indent="  ", allow_unicode=True)
+		except:
+			self._logger.exception("Could not write recovery data to file {}".format(self._recovery_file))
+
+	def delete_recovery_data(self):
+		if not os.path.isfile(self._recovery_file):
+			return
+
+		try:
+			os.remove(self._recovery_file)
+		except:
+			self._logger.exception("Error deleting recovery data file {}".format(self._recovery_file))
+
+	def get_recovery_data(self):
+		if not os.path.isfile(self._recovery_file):
+			return None
+
+		import yaml
+		try:
+			with open(self._recovery_file) as f:
+				data = yaml.safe_load(f)
+			return data
+		except:
+			self._logger.exception("Could not read recovery data from file {}".format(self._recovery_file))
+			self.delete_recovery_data()
 
 	def set_additional_metadata(self, destination, path, key, data, overwrite=False, merge=False):
 		self._storage(destination).set_additional_metadata(path, key, data, overwrite=overwrite, merge=merge)

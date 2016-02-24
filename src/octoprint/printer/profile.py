@@ -12,7 +12,7 @@ import re
 import logging
 
 from octoprint.settings import settings
-from octoprint.util import dict_merge, dict_clean, dict_contains_keys
+from octoprint.util import dict_merge, dict_sanitize, dict_contains_keys, is_hidden_path
 
 class SaveError(Exception):
 	pass
@@ -151,7 +151,7 @@ class PrinterProfileManager(object):
 			formFactor = BedTypes.RECTANGULAR,
 			origin = BedOrigin.LOWERLEFT
 		),
-		heatedBed = False,
+		heatedBed = True,
 		extruder=dict(
 			count = 1,
 			offsets = [
@@ -214,7 +214,7 @@ class PrinterProfileManager(object):
 
 		identifier = self._sanitize(identifier)
 		profile["id"] = identifier
-		profile = dict_clean(profile, self.__class__.default)
+		profile = dict_sanitize(profile, self.__class__.default)
 
 		if identifier == "_default":
 			default_profile = dict_merge(self._load_default(), profile)
@@ -289,7 +289,7 @@ class PrinterProfileManager(object):
 	def _load_all_identifiers(self):
 		results = dict(_default=None)
 		for entry in os.listdir(self._folder):
-			if entry.startswith(".") or not entry.endswith(".profile") or entry == "_default.profile":
+			if is_hidden_path(entry) or not entry.endswith(".profile") or entry == "_default.profile":
 				continue
 
 			path = os.path.join(self._folder, entry)
@@ -408,7 +408,7 @@ class PrinterProfileManager(object):
 		for path in (("volume", "width"), ("volume", "depth"), ("volume", "height"), ("extruder", "nozzleDiameter")):
 			try:
 				convert_value(profile, path, float)
-			except:
+			except Exception as e:
 				self._logger.warn("Profile has invalid value for path {path!r}: {msg}".format(path=".".join(path), msg=str(e)))
 				return False
 
@@ -416,7 +416,7 @@ class PrinterProfileManager(object):
 		for path in (("axes", "x", "inverted"), ("axes", "y", "inverted"), ("axes", "z", "inverted")):
 			try:
 				convert_value(profile, path, bool)
-			except:
+			except Exception as e:
 				self._logger.warn("Profile has invalid value for path {path!r}: {msg}".format(path=".".join(path), msg=str(e)))
 				return False
 

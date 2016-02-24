@@ -26,13 +26,14 @@ INSTALL_REQUIRES = [
 	"netaddr==0.7.17",
 	"watchdog==0.8.3",
 	"sarge==0.1.4",
-	"netifaces==0.8",
+	"netifaces==0.10",
 	"pylru==1.0.9",
 	"rsa==3.2",
 	"pkginfo==1.2.1",
 	"requests==2.7.0",
 	"semantic_version==2.4.2",
-	"psutil==3.1.1"
+	"psutil==3.2.1",
+	"awesome-slugify>=1.6.5,<1.7"
 ]
 
 # Additional requirements for optional install options
@@ -47,7 +48,10 @@ EXTRA_REQUIRES = dict(
 		# Documentation dependencies
 		"sphinx>=1.3",
 		"sphinxcontrib-httpdomain",
-		"sphinx_rtd_theme"
+		"sphinx_rtd_theme",
+
+		# PyPi upload related
+		"pypandoc"
 	],
 
 	# Dependencies for developing OctoPrint plugins
@@ -56,16 +60,11 @@ EXTRA_REQUIRES = dict(
 	]
 )
 
+# Additional requirements for setup
+SETUP_REQUIRES = []
+
 # Dependency links for any of the aforementioned dependencies
 DEPENDENCY_LINKS = []
-
-# Versioneer configuration
-versioneer.VCS = 'git'
-versioneer.versionfile_source = 'src/octoprint/_version.py'
-versioneer.versionfile_build = 'octoprint/_version.py'
-versioneer.tag_prefix = ''
-versioneer.parentdir_prefix = ''
-versioneer.lookupfile = '.versioneer-lookup'
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Anything below here is just command setup and general setup configuration
@@ -90,8 +89,22 @@ def params():
 	version = versioneer.get_version()
 	cmdclass = get_cmdclass()
 
-	description = "A responsive web interface for 3D printers"
+	description = "A snappy web interface for 3D printers"
 	long_description = open("README.md").read()
+
+	install_requires = INSTALL_REQUIRES
+	extras_require = EXTRA_REQUIRES
+	dependency_links = DEPENDENCY_LINKS
+	setup_requires = SETUP_REQUIRES
+
+	try:
+		import pypandoc
+		setup_requires += ["setuptools-markdown"]
+		long_description_markdown_filename = "README.md"
+		del pypandoc
+	except:
+		pass
+
 	classifiers = [
 		"Development Status :: 4 - Beta",
 		"Environment :: Web Environment",
@@ -126,9 +139,6 @@ def params():
 
 	include_package_data = True
 	zip_safe = False
-	install_requires = INSTALL_REQUIRES
-	extras_require = EXTRA_REQUIRES
-	dependency_links = DEPENDENCY_LINKS
 
 	if os.environ.get('READTHEDOCS', None) == 'True':
 		# we can't tell read the docs to please perform a pip install -e .[develop], so we help
