@@ -39,7 +39,7 @@ $(function() {
 
         self.isConnecting = ko.observable(undefined);
 
-        self.buttonText = ko.computed(function() {
+        self.buttonText = ko.pureComputed(function() {
             if (self.isConnecting())
                 return gettext("Connecting...");
 
@@ -161,7 +161,6 @@ $(function() {
                     }
                 })
             }
-
         };
 
         self.onStartup = function() {

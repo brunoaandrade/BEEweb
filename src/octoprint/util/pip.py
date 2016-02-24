@@ -9,9 +9,35 @@ __copyright__ = "Copyright (C) 2014 The OctoPrint Project - Released under terms
 import sarge
 import sys
 import logging
+import re
 
 
 from octoprint.util import to_unicode
+
+
+# These regexes are based on the colorama package
+# Author: Jonathan Hartley
+# License: BSD-3 (https://github.com/tartley/colorama/blob/master/LICENSE.txt)
+# Website: https://github.com/tartley/colorama/
+_ANSI_CSI_PATTERN = "\001?\033\[(\??(?:\d|;)*)([a-zA-Z])\002?"  # Control Sequence Introducer
+_ANSI_OSC_PATTERN = "\001?\033\]((?:.|;)*?)(\x07)\002?"         # Operating System Command
+_ANSI_REGEX = re.compile("|".join([_ANSI_CSI_PATTERN,
+                                   _ANSI_OSC_PATTERN]))
+
+
+def _clean_ansi(text):
+	"""
+	>>> text = "Successfully \x1b[?25linstalled a package"
+	>>> _clean_ansi(text)
+	'Successfully installed a package'
+	>>> text = "Successfully installed\x1b[?25h a package"
+	>>> _clean_ansi(text)
+	'Successfully installed a package'
+	>>> text = "Successfully installed a \x1b[31mpackage\x1b[39m"
+	>>> _clean_ansi(text)
+	'Successfully installed a package'
+	"""
+	return _ANSI_REGEX.sub("", text)
 
 
 class UnknownPip(Exception):
@@ -21,14 +47,16 @@ class PipCaller(object):
 	def __init__(self, configured=None):
 		self._logger = logging.getLogger(__name__)
 
-		self._configured = configured
+		self.configured = configured
+		self.refresh = False
 
 		self._command = None
 		self._version = None
+		self._version_string = None
+		self._use_sudo = False
 
-		self._command, self._version = self._find_pip()
+		self.trigger_refresh()
 
-		self.refresh = False
 		self.on_log_call = lambda *args, **kwargs: None
 		self.on_log_stdout = lambda *args, **kwargs: None
 		self.on_log_stderr = lambda *args, **kwargs: None
@@ -54,18 +82,36 @@ class PipCaller(object):
 		return self._version
 
 	@property
+	def version_string(self):
+		return self._version_string
+
+	@property
+	def use_sudo(self):
+		return self._use_sudo
+
+	@property
 	def available(self):
 		return self._command is not None
 
+	def trigger_refresh(self):
+		try:
+			self._command, self._version, self._version_string, self._use_sudo = self._find_pip()
+		except:
+			self._logger.exception("Error while discovering pip command")
+			self._command = None
+			self._version = None
+		self.refresh = False
+
 	def execute(self, *args):
 		if self.refresh:
-			self._command, self._version = self._find_pip()
-			self.refresh = False
+			self.trigger_refresh()
 
 		if self._command is None:
 			raise UnknownPip()
 
 		command = [self._command] + list(args)
+		if self._use_sudo:
+			command = ["sudo"] + command
 
 		joined_command = " ".join(command)
 		self._logger.debug(u"Calling: {}".format(joined_command))
@@ -80,13 +126,13 @@ class PipCaller(object):
 			while p.returncode is None:
 				line = p.stderr.readline(timeout=0.5)
 				if line:
-					line = to_unicode(line, errors="replace")
+					line = self._convert_line(line)
 					self._log_stderr(line)
 					all_stderr.append(line)
 
 				line = p.stdout.readline(timeout=0.5)
 				if line:
-					line = to_unicode(line, errors="replace")
+					line = self._convert_line(line)
 					self._log_stdout(line)
 					all_stdout.append(line)
 
@@ -97,13 +143,13 @@ class PipCaller(object):
 
 		stderr = p.stderr.text
 		if stderr:
-			split_lines = stderr.split("\n")
+			split_lines = map(self._convert_line, stderr.split("\n"))
 			self._log_stderr(*split_lines)
 			all_stderr += split_lines
 
 		stdout = p.stdout.text
 		if stdout:
-			split_lines = stdout.split("\n")
+			split_lines = map(self._convert_line, stdout.split("\n"))
 			self._log_stdout(*split_lines)
 			all_stdout += split_lines
 
@@ -111,8 +157,16 @@ class PipCaller(object):
 
 
 	def _find_pip(self):
-		pip_command = self._configured
+		pip_command = self.configured
+
+		if pip_command is not None and pip_command.startswith("sudo "):
+			pip_command = pip_command[len("sudo "):]
+			pip_sudo = True
+		else:
+			pip_sudo = False
+
 		pip_version = None
+		version_segment = None
 
 		if pip_command is None:
 			import os
@@ -144,7 +198,11 @@ class PipCaller(object):
 
 		if pip_command is not None:
 			self._logger.debug("Found pip at {}, going to figure out its version".format(pip_command))
-			p = sarge.run([pip_command, "--version"], stdout=sarge.Capture(), stderr=sarge.Capture())
+
+			sarge_command = [pip_command, "--version"]
+			if pip_sudo:
+				sarge_command = ["sudo"] + sarge_command
+			p = sarge.run(sarge_command, stdout=sarge.Capture(), stderr=sarge.Capture())
 
 			if p.returncode != 0:
 				self._logger.warn("Error while trying to run pip --version: {}".format(p.stderr.text))
@@ -174,10 +232,14 @@ class PipCaller(object):
 			else:
 				self._logger.info("Found pip at {}, version is {}".format(pip_command, version_segment))
 
-		return pip_command, pip_version
+		return pip_command, pip_version, version_segment, pip_sudo
 
 	def _log_stdout(self, *lines):
 		self.on_log_stdout(*lines)
 
 	def _log_stderr(self, *lines):
 		self.on_log_stderr(*lines)
+
+	@staticmethod
+	def _convert_line(line):
+		return to_unicode(_clean_ansi(line), errors="replace")

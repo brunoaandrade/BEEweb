@@ -7,8 +7,8 @@ $(function() {
         self.colorTransparent = parameters[0].appearance_colorTransparent;
         self.printerProfiles = parameters[1];
 
-        self.brand = ko.computed(function() {
-            var brandText = gettext("BEEsoft")
+        self.brand = ko.pureComputed(function() {
+            var brandText = gettext("BEEsoft");
             if (self.name())
                 brandText = brandText + self.name();
 
@@ -24,7 +24,7 @@ $(function() {
             return printer;
         });
 
-        self.title = ko.computed(function() {
+        self.title = ko.pureComputed(function() {
             if (self.name())
                 return "[" + gettext("BEEsoft") + "]" + self.name();
             else

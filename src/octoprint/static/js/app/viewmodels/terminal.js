@@ -5,8 +5,18 @@ $(function() {
         self.loginState = parameters[0];
         self.settings = parameters[1];
 
+        // TODO remove with release of 1.3.0 and switch to OctoPrint.coreui usage
+        self.tabTracking = parameters[2];
+
+        self.tabActive = false;
+
         self.log = ko.observableArray([]);
+        self.log.extend({ throttle: 500 });
+        self.plainLogLines = ko.observableArray([]);
+        self.plainLogLines.extend({ throttle: 500 });
+
         self.buffer = ko.observable(300);
+        self.upperLimit = ko.observable(1499);
 
         self.command = ko.observable(undefined);
 
@@ -26,7 +36,26 @@ $(function() {
         self.cmdHistory = [];
         self.cmdHistoryIdx = -1;
 
-        self.displayedLines = ko.computed(function() {
+        self.enableFancyFunctionality = ko.observable(true);
+        self.disableTerminalLogDuringPrinting = ko.observable(false);
+        self.acceptableTime = 500;
+        self.acceptableUnfancyTime = 300;
+
+        self.forceFancyFunctionality = ko.observable(false);
+        self.forceTerminalLogDuringPrinting = ko.observable(false);
+
+        self.fancyFunctionality = ko.pureComputed(function() {
+            return self.enableFancyFunctionality() || self.forceFancyFunctionality();
+        });
+        self.terminalLogDuringPrinting = ko.pureComputed(function() {
+            return !self.disableTerminalLogDuringPrinting() || self.forceTerminalLogDuringPrinting();
+        });
+
+        self.displayedLines = ko.pureComputed(function() {
+            if (!self.enableFancyFunctionality()) {
+                return self.log();
+            }
+
             var regex = self.filterRegex();
             var lineVisible = function(entry) {
                 return regex == undefined || !entry.line.match(regex);
@@ -34,7 +63,8 @@ $(function() {
 
             var filtered = false;
             var result = [];
-            _.each(self.log(), function(entry) {
+            var lines = self.log();
+            _.each(lines, function(entry) {
                 if (lineVisible(entry)) {
                     result.push(entry);
                     filtered = false;
@@ -46,19 +76,41 @@ $(function() {
 
             return result;
         });
-        self.displayedLines.subscribe(function() {
-            self.updateOutput();
+
+        self.plainLogOutput = ko.pureComputed(function() {
+            if (self.fancyFunctionality()) {
+                return;
+            }
+            return self.plainLogLines().join("\n");
         });
 
-        self.lineCount = ko.computed(function() {
-            var total = self.log().length;
-            var displayed = _.filter(self.displayedLines(), function(entry) { return entry.type == "line" }).length;
+        self.lineCount = ko.pureComputed(function() {
+            if (!self.fancyFunctionality()) {
+                return;
+            }
+
+            var regex = self.filterRegex();
+            var lineVisible = function(entry) {
+                return regex == undefined || !entry.line.match(regex);
+            };
+
+            var lines = self.log();
+            var total = lines.length;
+            var displayed = _.filter(lines, lineVisible).length;
             var filtered = total - displayed;
 
-            if (total == displayed) {
-                return _.sprintf(gettext("showing %(displayed)d lines"), {displayed: displayed});
+            if (filtered > 0) {
+                if (total > self.upperLimit()) {
+                    return _.sprintf(gettext("showing %(displayed)d lines (%(filtered)d of %(total)d total lines filtered, buffer full)"), {displayed: displayed, total: total, filtered: filtered});
+                } else {
+                    return _.sprintf(gettext("showing %(displayed)d lines (%(filtered)d of %(total)d total lines filtered)"), {displayed: displayed, total: total, filtered: filtered});
+                }
             } else {
-                return _.sprintf(gettext("showing %(displayed)d lines (%(filtered)d of %(total)d total lines filtered)"), {displayed: displayed, total: total, filtered: filtered});
+                if (total > self.upperLimit()) {
+                    return _.sprintf(gettext("showing %(displayed)d lines (buffer full)"), {displayed: displayed});
+                } else {
+                    return _.sprintf(gettext("showing %(displayed)d lines"), {displayed: displayed});
+                }
             }
         });
 
@@ -75,7 +127,23 @@ $(function() {
 
         self.fromCurrentData = function(data) {
             self._processStateData(data.state);
+
+            var start = new Date().getTime();
             self._processCurrentLogData(data.logs);
+            var end = new Date().getTime();
+
+            var difference = end - start;
+            if (self.enableFancyFunctionality()) {
+                if (difference > self.acceptableTime) {
+                    self.enableFancyFunctionality(false);
+                    log.warn("Terminal: Detected slow client (needed " + difference + "ms for processing new log data), disabling fancy terminal functionality");
+                }
+            } else {
+                if (!self.disableTerminalLogDuringPrinting() && difference > self.acceptableUnfancyTime) {
+                    self.disableTerminalLogDuringPrinting(true);
+                    log.warn("Terminal: Detected very slow client (needed " + difference + "ms for processing new log data), completely disabling terminal output during printing");
+                }
+            }
         };
 
         self.fromHistoryData = function(data) {
@@ -84,14 +152,52 @@ $(function() {
         };
 
         self._processCurrentLogData = function(data) {
-            self.log(self.log().concat(_.map(data, function(line) { return self._toInternalFormat(line) })));
-            if (self.autoscrollEnabled()) {
-                self.log(self.log.slice(-self.buffer()));
+            var length = self.log().length;
+            if (length >= self.upperLimit()) {
+                return;
             }
+
+            if (!self.terminalLogDuringPrinting() && self.isPrinting()) {
+                var last = self.plainLogLines()[self.plainLogLines().length - 1];
+                var disabled = "--- client too slow, log output disabled while printing ---";
+                if (last != disabled) {
+                    self.plainLogLines.push(disabled);
+                }
+                return;
+            }
+
+            var newData = (data.length + length > self.upperLimit())
+                ? data.slice(0, self.upperLimit() - length)
+                : data;
+            if (!newData) {
+                return;
+            }
+
+            if (!self.fancyFunctionality()) {
+                // lite version of the terminal - text output only
+                self.plainLogLines(self.plainLogLines().concat(newData).slice(-self.buffer()));
+                self.updateOutput();
+                return;
+            }
+
+            var newLog = self.log().concat(_.map(newData, function(line) { return self._toInternalFormat(line) }));
+            if (newData.length != data.length) {
+                var cutoff = "--- too many lines to buffer, cut off ---";
+                newLog.push(self._toInternalFormat(cutoff, "cut"));
+            }
+
+            if (self.autoscrollEnabled()) {
+                // we only keep the last <buffer> entries
+                newLog = newLog.slice(-self.buffer());
+            }
+            self.log(newLog);
+            self.updateOutput();
         };
 
         self._processHistoryLogData = function(data) {
+            self.plainLogLines(data);
             self.log(_.map(data, function(line) { return self._toInternalFormat(line) }));
+            self.updateOutput();
         };
 
         self._toInternalFormat = function(line, type) {
@@ -122,7 +228,7 @@ $(function() {
         };
 
         self.updateOutput = function() {
-            if (self.autoscrollEnabled()) {
+            if (self.tabActive && self.tabTracking.browserTabVisible && self.autoscrollEnabled()) {
                 self.scrollToEnd();
             }
         };
@@ -132,16 +238,16 @@ $(function() {
         };
 
         self.selectAll = function() {
-            var container = $("#terminal-output");
+            var container = self.fancyFunctionality() ? $("#terminal-output") : $("#terminal-output-lowfi");
             if (container.length) {
                 container.selectText();
             }
         };
 
         self.scrollToEnd = function() {
-            var container = $("#terminal-output");
+            var container = self.fancyFunctionality() ? $("#terminal-output") : $("#terminal-output-lowfi");
             if (container.length) {
-                container.scrollTop(container[0].scrollHeight - container.height())
+                container.scrollTop(container[0].scrollHeight);
             }
         };
 
@@ -217,19 +323,15 @@ $(function() {
         };
 
         self.onAfterTabChange = function(current, previous) {
-            if (current != "#term") {
-                return;
-            }
-            if (self.autoscrollEnabled()) {
-                self.scrollToEnd();
-            }
+            self.tabActive = current == "#term";
+            self.updateOutput();
         };
 
     }
 
     OCTOPRINT_VIEWMODELS.push([
         TerminalViewModel,
-        ["loginStateViewModel", "settingsViewModel"],
+        ["loginStateViewModel", "settingsViewModel", "tabTracking"],
         "#term"
     ]);
 });
