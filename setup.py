@@ -33,7 +33,7 @@ INSTALL_REQUIRES = [
 	"requests==2.7.0",
 	"semantic_version==2.4.2",
 	"psutil==3.2.1",
-	"awesome-slugify>=1.6.5,<1.7"
+	"awesome-slugify>=1.6.5,<1.7",
 	"beecom>=0.2.1",
 	"pyusb>=1.0.0b2"
 ]
@@ -67,14 +67,6 @@ SETUP_REQUIRES = []
 
 # Dependency links for any of the aforementioned dependencies
 DEPENDENCY_LINKS = []
-
-# Versioneer configuration
-versioneer.VCS = 'git'
-versioneer.versionfile_source = 'src/octoprint/_version.py'
-versioneer.versionfile_build = 'octoprint/_version.py'
-versioneer.tag_prefix = ''
-versioneer.parentdir_prefix = ''
-versioneer.lookupfile = '.versioneer-lookup'
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Anything below here is just command setup and general setup configuration

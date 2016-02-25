@@ -6,6 +6,7 @@ $(function() {
         self.color = parameters[0].appearance_color;
         self.colorTransparent = parameters[0].appearance_colorTransparent;
         self.printerProfiles = parameters[1];
+        self.connection = parameters[2];
 
         self.brand = ko.pureComputed(function() {
             var brandText = gettext("BEEsoft");
@@ -16,10 +17,13 @@ $(function() {
         });
 
         self.printerName = ko.computed(function() {
-            var printer = ""
-            var profileName = self.printerProfiles.currentProfileData().name();
+            var printer = "";
 
-            printer = "@ " + profileName;
+            if (!self.connection.isErrorOrClosed()) {
+                var profileName = self.printerProfiles.currentProfileData().name();
+
+                printer = "@ " + profileName;
+            }
 
             return printer;
         });
@@ -34,7 +38,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push([
         AppearanceViewModel,
-        ["settingsViewModel", "printerProfilesViewModel"],
+        ["settingsViewModel", "printerProfilesViewModel", "connectionViewModel"],
         "head"
     ]);
 });
