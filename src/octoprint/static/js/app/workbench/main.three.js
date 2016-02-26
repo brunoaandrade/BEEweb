@@ -199,9 +199,31 @@ BEEwb.main = {
             // Applies the transformation matrix for any necessary shift in position
             geometry.applyMatrix( new THREE.Matrix4().makeTranslation( -xShift, -yShift, -zShift ) );
 
+            // Calculates any possible translation in the X axis due to previously loaded models
+            debugger;
+            xShift = 0;
+            if (that.objects.children.length > 0) {
+                var counter = 0;
+                that.objects.children.forEach(function( obj ) {
+                    if (obj.geometry != null) {
+                        var objBox = new THREE.Box3().setFromObject( obj );
+
+                        if (counter == 0)
+                            xShift += (objBox.size().x / 2);
+                        else
+                            xShift += objBox.size().x;
+
+                        counter++;
+                    }
+                });
+
+                // Final shift calculation with the "left" side of the new object
+                xShift = xShift - bbox.min.x + 1; // +1 for a small padding between the objects
+            }
 
             var mesh = new THREE.Mesh( geometry, material );
-            mesh.position.set( 0, 0, 0 );
+            mesh.position.set( xShift, 0, 0 );
+
             //mesh.rotation.set( - Math.PI , Math.PI , 0 );
             //mesh.scale.set( 1.5, 1.5, 1.5 );
             mesh.castShadow = true;
