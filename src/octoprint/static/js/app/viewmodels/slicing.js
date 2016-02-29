@@ -21,6 +21,11 @@ $(function() {
         self.profiles = ko.observableArray();
         self.printerProfile = ko.observable();
 
+        self.colors = ko.observableArray();
+        self.selColor = ko.observable();
+        self.selDensity = ko.observable(5);
+        self.selResolution = ko.observable("med");
+
         self.configured_slicers = ko.pureComputed(function() {
             return _.filter(self.slicers(), function(slicer) {
                 return slicer.configured;
@@ -60,8 +65,8 @@ $(function() {
         self.enableSliceButton = ko.pureComputed(function() {
             return self.gcodeFilename() != undefined
                 && self.gcodeFilename().trim() != ""
-                && self.slicer() != undefined
-                && self.profile() != undefined;
+                && self.slicer() != undefined;
+                //&& self.profile() != undefined;
         });
 
         self.requestData = function(callback) {
@@ -118,6 +123,8 @@ $(function() {
 
             var selectedProfile = undefined;
             self.profiles.removeAll();
+            self.colors.removeAll();
+
             _.each(_.values(slicer.profiles), function(profile) {
                 var name = profile.displayName;
                 if (name == undefined) {
@@ -132,6 +139,22 @@ $(function() {
                     key: profile.key,
                     name: name
                 })
+
+                // Parses the list and filters for BVC colors
+                // Assumes the '_' nomenclature separation for the profile names
+
+                var profile_parts = name.split('_');
+                if (profile_parts[0] != null) {
+                    var color = profile_parts[0];
+                    if (!_.findWhere(self.colors(), color)) {
+                        self.colors.push(color);
+                    }
+                }
+
+                // Selects the first color from the list by default
+                if (self.colors().length > 0) {
+                    self.selColor(self.colors()[0]);
+                }
             });
 
             if (selectedProfile != undefined) {
@@ -147,6 +170,31 @@ $(function() {
                 && !_.endsWith(gcodeFilename.toLowerCase(), ".gcode")
                 && !_.endsWith(gcodeFilename.toLowerCase(), ".g")) {
                 gcodeFilename = gcodeFilename + ".gco";
+            }
+
+            // Selects the slicing profile based on the color and resolution
+            if (self.selColor() != null && self.selResolution() != null) {
+                _.each(self.profiles(), function(profile) {
+                    // checks if the profile contains the selected color
+                    if (_.contains(profile.name, self.selColor())) {
+                        if (self.selResolution() == 'med'
+                            && (_.contains(profile.name, 'MED') || _.contains(profile.name, 'MEDIUM'))) {
+                                self.profile(profile);
+                        }
+
+                        if (self.selResolution() == 'low' && _.contains(profile.name, 'LOW')) {
+                            self.profile(profile);
+                        }
+
+                        if (self.selResolution() == 'high' && _.contains(profile.name, 'HIGH')) {
+                            self.profile(profile);
+                        }
+
+                        if (self.selResolution() == 'high_plus' && _.contains(profile.name, 'HIGHPLUS')) {
+                            self.profile(profile);
+                        }
+                    }
+                });
             }
 
             var data = {

@@ -200,7 +200,6 @@ BEEwb.main = {
             geometry.applyMatrix( new THREE.Matrix4().makeTranslation( -xShift, -yShift, -zShift ) );
 
             // Calculates any possible translation in the X axis due to previously loaded models
-            debugger;
             xShift = 0;
             if (that.objects.children.length > 0) {
                 var counter = 0;
