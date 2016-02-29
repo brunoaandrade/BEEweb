@@ -199,22 +199,16 @@ BEEwb.main = {
             // Applies the transformation matrix for any necessary shift in position
             geometry.applyMatrix( new THREE.Matrix4().makeTranslation( -xShift, -yShift, -zShift ) );
 
-            // Calculates any possible translation in the X axis due to previously loaded models
+            // Calculates any possible translation in the X axis due to the previously loaded model
             xShift = 0;
             if (that.objects.children.length > 0) {
-                var counter = 0;
-                that.objects.children.forEach(function( obj ) {
-                    if (obj.geometry != null) {
-                        var objBox = new THREE.Box3().setFromObject( obj );
+                var lastObj = that.objects.children[that.objects.children.length-1];
 
-                        if (counter == 0)
-                            xShift += (objBox.size().x / 2);
-                        else
-                            xShift += objBox.size().x;
+                if (lastObj.geometry != null) {
+                    var objBox = new THREE.Box3().setFromObject( lastObj );
 
-                        counter++;
-                    }
-                });
+                    xShift = objBox.max.x;
+                }
 
                 // Final shift calculation with the "left" side of the new object
                 xShift = xShift - bbox.min.x + 1; // +1 for a small padding between the objects
