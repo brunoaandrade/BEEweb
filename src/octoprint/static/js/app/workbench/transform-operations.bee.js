@@ -156,6 +156,8 @@ BEEwb.transformOps.centerModel = function() {
         BEEwb.main.selectedObject.position.set( 0, 0, 0 );
         BEEwb.main.transformControls.update();
 
+        this.updatePositionInputs();
+
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
     }
@@ -177,6 +179,7 @@ BEEwb.transformOps.placeOnBed = function() {
             BEEwb.main.selectedObject.position.setZ( BEEwb.main.selectedObject.position.z - bbox.min.z );
 
         BEEwb.main.transformControls.update();
+        this.updatePositionInputs();
 
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
