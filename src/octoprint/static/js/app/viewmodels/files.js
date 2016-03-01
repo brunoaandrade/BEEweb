@@ -228,6 +228,12 @@ $(function() {
             self.slicing.show(file.origin, file.name, true);
         };
 
+        self.loadToWorkbench = function(file) {
+            if (!file) return;
+
+            BEEwb.main.loadModel(file.name);
+        };
+
         self.initSdCard = function() {
             self._sendSdCommand("init");
         };

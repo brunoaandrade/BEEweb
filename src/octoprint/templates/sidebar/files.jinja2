@@ -51,6 +51,7 @@
         <div class="uploaded">{{ _('Uploaded') }}: <span data-bind="text: formatTimeAgo(date)"></span></div>
         <div class="size">{{ _('Size') }}: <span data-bind="text: formatSize(size)"></span></div>
         <div class="btn-group action-buttons">
+            <div class="btn btn-mini"  data-bind="click: function() { $root.loadToWorkbench($data); }" title="{{ _('Load to Workbench') }}"><i class="icon-edit"></i></div>
             <div class="btn btn-mini"  data-bind="click: function() { if ($root.enableSlicing($data)) { $root.sliceFile($data); } else { return; } }, css: {disabled: !$root.enableSlicing($data)}" title="{{ _('Slice') }}"><i class="icon-magic"></i></div>
             <a class="btn btn-mini" data-bind="attr: {href: $root.downloadLink($data), css: {disabled: !$root.downloadLink($data)}}" title="{{ _('Download') }}"><i class="icon-download-alt"></i></a>
             <div class="btn btn-mini" data-bind="click: function() { if ($root.enableRemove($data)) { $root.removeFile($data); } else { return; } }, css: {disabled: !$root.enableRemove($data)}" title="{{ _('Remove') }}"><i class="icon-trash"></i></div>
