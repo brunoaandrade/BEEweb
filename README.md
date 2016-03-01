@@ -1,9 +1,8 @@
 BEEsoft.web
 ===========
 
-.. image:: https://pbs.twimg.com/profile_images/378800000057657890/e4420ccca1d3d9307434370b6ab1d7d7_200x200.png
-.. :scale: 30 %
-.. :alt: BEEsoft.web logo
+![alt text](https://pbs.twimg.com/profile_images/378800000057657890/e4420ccca1d3d9307434370b6ab1d7d7_200x200.png "BEEsoft.web logo")
+
 
 BEEsoft.web is a web interface designed to run in a RaspberryPi and it is used for controlling a Beeverycreative printer (BEETHEFIRST, BEETHEFIRST+, ...).
 It is Free Software and released under the [GNU Affero General Public License V3](http://www.gnu.org/licenses/agpl.html).
