@@ -174,9 +174,14 @@ BEEwb.transformOps.placeOnBed = function() {
 
         // Computes the box after any transformations
         var bbox = new THREE.Box3().setFromObject( BEEwb.main.selectedObject );
+        debugger;
+        if (bbox.min.z != 0) {
 
-        if (bbox.min.z != 0)
-            BEEwb.main.selectedObject.position.setZ( BEEwb.main.selectedObject.position.z - bbox.min.z );
+            var zShift = BEEwb.main.selectedObject.position.z - bbox.min.z;
+            if (zShift < 0)
+                zShift = 0;
+            BEEwb.main.selectedObject.position.setZ( zShift );
+        }
 
         BEEwb.main.transformControls.update();
         this.updatePositionInputs();
@@ -222,7 +227,7 @@ BEEwb.transformOps.removeModel = function(modelObj) {
         BEEwb.main.objects.remove(modelObj);
         BEEwb.main.scene.remove(BEEwb.main.transformControls);
 
-         BEEwb.main.toggleObjectOutOfBounds(BEEwb.main.selectedObject, false);
+        BEEwb.main.toggleObjectOutOfBounds(BEEwb.main.selectedObject, false);
     }
 }
 
@@ -237,6 +242,9 @@ BEEwb.transformOps.removeSelected = function() {
 
         BEEwb.main.selectedObject = null;
         $('.model-selection').prop('disabled', true);
+
+        // Hides the side panel and removes selections
+        BEEwb.main.removeAllSelections();
     }
 }
 
