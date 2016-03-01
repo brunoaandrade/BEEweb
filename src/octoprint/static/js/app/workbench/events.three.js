@@ -78,3 +78,38 @@ BEEwb.events.onMouseUp = function( e ) {
         BEEwb.transformOps.updateRotationInputs();
     }
 }
+
+/**
+ * OnWindowResize event function
+ */
+BEEwb.events.onKeyDown = function( event ) {
+
+    switch ( event.keyCode ) {
+
+        case 46: // Delete model
+            BEEwb.transformOps.removeSelected();
+            break;
+
+        case 77: // M - Move
+            BEEwb.main.transformControls.setMode( "translate" );
+            break;
+
+        case 82: // R - Rotate
+            BEEwb.main.transformControls.setMode( "rotate" );
+            break;
+
+        case 83: // S - Scale
+            BEEwb.main.transformControls.setMode( "scale" );
+            break;
+
+        case 187:
+        case 107: // +, =, num+
+            BEEwb.main.transformControls.setSize( BEEwb.main.transformControls.size + 0.1 );
+            break;
+
+        case 189:
+        case 109: // -, _, num-
+            BEEwb.main.transformControls.setSize( Math.max( BEEwb.main.transformControls.size - 0.1, 0.1 ) );
+            break;
+    }
+}

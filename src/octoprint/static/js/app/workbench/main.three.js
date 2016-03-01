@@ -124,6 +124,7 @@ BEEwb.main = {
         this._addBed();
 
         window.addEventListener( 'resize', BEEwb.events.onWindowResize, false );
+        window.addEventListener( 'keydown', BEEwb.events.onKeyDown);
         //container.addEventListener( 'click', onMouseClick, false );
         this.container.addEventListener( 'mouseup', BEEwb.events.onMouseUp, false );
         this.container.addEventListener( 'mousedown', BEEwb.events.onMouseDown, false );
