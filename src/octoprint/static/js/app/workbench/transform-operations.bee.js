@@ -140,9 +140,6 @@ BEEwb.transformOps.scaleToMax = function() {
         BEEwb.main.transformControls.update();
 
         this.updateScaleSizeInputs();
-
-        // Checks if the selected object is out of bounds
-        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -157,9 +154,6 @@ BEEwb.transformOps.centerModel = function() {
         BEEwb.main.transformControls.update();
 
         this.updatePositionInputs();
-
-        // Checks if the selected object is out of bounds
-        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -178,16 +172,19 @@ BEEwb.transformOps.placeOnBed = function() {
         if (bbox.min.z != 0) {
 
             var zShift = BEEwb.main.selectedObject.position.z - bbox.min.z;
-            if (zShift < 0)
-                zShift = 0;
+
+            BEEwb.main.selectedObject.position.setZ( zShift );
+        }
+
+        // Recomputes the bounding box to check for rounding errors
+        bbox = new THREE.Box3().setFromObject( BEEwb.main.selectedObject );
+        if (bbox.min.z < 0) {
+            zShift += (-bbox.min.z + 0.0001); // Increment the shift by a small amount in case of the model being below the platform
             BEEwb.main.selectedObject.position.setZ( zShift );
         }
 
         BEEwb.main.transformControls.update();
         this.updatePositionInputs();
-
-        // Checks if the selected object is out of bounds
-        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -210,9 +207,6 @@ BEEwb.transformOps.resetSelectedModel = function() {
         this.updateScaleSizeInputs();
 
         this.updateRotationInputs();
-
-        // Checks if the selected object is out of bounds
-        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
