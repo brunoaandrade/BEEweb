@@ -19,13 +19,20 @@ BEEwb.helpers.generateSTLFromScene = function( objects ) {
     // plain text ascii
     //var blob = new Blob([stlData], {type: 'text/plain'});
     // binary
-    var blob = new Blob([stlData], {type: 'application/octet-binary'});
+    return new Blob([stlData], {type: 'application/octet-binary'});
+}
 
+/**
+ * Generates the workbench scene name based on current date/time
+ *
+ * Return string with the generated name
+ */
+BEEwb.helpers.generateSceneName = function( ) {
     var now = new Date();
     var sceneName = 'bee_' + now.getFullYear() + '_' + (now.getMonth()+1) + '_' + now.getDate()
     + '_' + now.getHours() + '_' + now.getMinutes() + '_' + now.getSeconds() + '.stl';
 
-    return {'stl': blob, 'sceneName': sceneName};
+    return sceneName;
 }
 
 /**

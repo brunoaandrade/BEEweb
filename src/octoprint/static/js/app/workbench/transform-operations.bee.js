@@ -168,7 +168,7 @@ BEEwb.transformOps.placeOnBed = function() {
 
         // Computes the box after any transformations
         var bbox = new THREE.Box3().setFromObject( BEEwb.main.selectedObject );
-        debugger;
+
         if (bbox.min.z != 0) {
 
             var zShift = BEEwb.main.selectedObject.position.z - bbox.min.z;

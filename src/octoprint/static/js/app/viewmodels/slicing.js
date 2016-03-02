@@ -165,11 +165,10 @@ $(function() {
         };
 
         self.slice = function() {
-            var gcodeFilename = self._sanitize(self.gcodeFilename());
-            if (!_.endsWith(gcodeFilename.toLowerCase(), ".gco")
-                && !_.endsWith(gcodeFilename.toLowerCase(), ".gcode")
-                && !_.endsWith(gcodeFilename.toLowerCase(), ".g")) {
-                gcodeFilename = gcodeFilename + ".gco";
+
+            // Checks if the slicing was called on a workbench scene and finally saves it
+            if (self.file.indexOf('bee_') != -1 ) {
+                BEEwb.main.saveScene(self.file);
             }
 
             // Selects the slicing profile based on the color and resolution
@@ -197,6 +196,13 @@ $(function() {
                 });
             }
 
+            var gcodeFilename = self._sanitize(self.gcodeFilename());
+            if (!_.endsWith(gcodeFilename.toLowerCase(), ".gco")
+                && !_.endsWith(gcodeFilename.toLowerCase(), ".gcode")
+                && !_.endsWith(gcodeFilename.toLowerCase(), ".g")) {
+                gcodeFilename = gcodeFilename + ".gco";
+            }
+
             var data = {
                 command: "slice",
                 slicer: self.slicer(),
@@ -216,7 +222,12 @@ $(function() {
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
-                data: JSON.stringify(data)
+                data: JSON.stringify(data),
+                success: function ( response ) {
+                    // Shows the status panel
+                    if (data["select"] || data["print"])
+                        $("#state").collapse("show");
+                }
             });
 
             $("#slicing_configuration_dialog").modal("hide");

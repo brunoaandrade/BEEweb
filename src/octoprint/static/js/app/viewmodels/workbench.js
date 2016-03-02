@@ -24,14 +24,12 @@ $(function () {
 		};
 
 		self.updateFileList = function () {
-			self.FileList(_.filter(self.files.allItems, self.files.supportedFilters["model"]));
+			self.files(_.filter(self.files.allItems, self.files.supportedFilters["model"]));
 		};
 
         self.startPrint = function () {
-			var location = "local";
-            var filename = BEEwb.main.saveScene();
 
-            self.slicing.show(location, filename);
+            self.slicing.show('local', BEEwb.helpers.generateSceneName());
 		};
 
 	}

@@ -235,12 +235,16 @@ BEEwb.main = {
      *
      * Returns the name of the generated scene STL file
      */
-    saveScene: function () {
+    saveScene: function ( filename ) {
         var scope = this;
         var stlData = BEEwb.helpers.generateSTLFromScene( this.objects );
 
+        if (filename === undefined) {
+            filename = BEEwb.helpers.generateSceneName();
+        }
+
         var data = new FormData();
-        data.append('file', stlData['stl'], stlData['sceneName']);
+        data.append('file', stlData, filename);
 
         $.ajax({
             url: API_BASEURL + "files/local",
@@ -251,13 +255,14 @@ BEEwb.main = {
             success: function(data) {
 
                 scope.savedScenesFiles.push(data.files.local.name);
+
+                return true;
             },
             error: function() {
 
+                return false;
             }
         });
-
-        return stlData['sceneName'];
     },
 
     /**
