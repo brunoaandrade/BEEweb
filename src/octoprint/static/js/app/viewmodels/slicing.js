@@ -166,6 +166,7 @@ $(function() {
 
         self.slice = function() {
 
+            debugger;
             // Checks if the slicing was called on a workbench scene and finally saves it
             if (self.file.indexOf('bee_') != -1 ) {
                 BEEwb.main.saveScene(self.file);
@@ -178,19 +179,19 @@ $(function() {
                     if (_.contains(profile.name, self.selColor())) {
                         if (self.selResolution() == 'med'
                             && (_.contains(profile.name, 'MED') || _.contains(profile.name, 'MEDIUM'))) {
-                                self.profile(profile);
+                                self.profile(profile.key);
                         }
 
                         if (self.selResolution() == 'low' && _.contains(profile.name, 'LOW')) {
-                            self.profile(profile);
+                            self.profile(profile.key);
                         }
 
                         if (self.selResolution() == 'high' && _.contains(profile.name, 'HIGH')) {
-                            self.profile(profile);
+                            self.profile(profile.key);
                         }
 
                         if (self.selResolution() == 'high_plus' && _.contains(profile.name, 'HIGHPLUS')) {
-                            self.profile(profile);
+                            self.profile(profile.key);
                         }
                     }
                 });
