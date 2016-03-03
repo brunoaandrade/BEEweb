@@ -166,7 +166,6 @@ $(function() {
 
         self.slice = function() {
 
-            debugger;
             // Checks if the slicing was called on a workbench scene and finally saves it
             if (self.file.indexOf('bee_') != -1 ) {
                 BEEwb.main.saveScene(self.file);

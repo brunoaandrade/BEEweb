@@ -24,7 +24,7 @@ $(function () {
 		};
 
 		self.updateFileList = function () {
-			self.files(_.filter(self.files.allItems, self.files.supportedFilters["model"]));
+			self.files.updateItems(_.filter(self.files.allItems, self.files.supportedFilters["model"]));
 		};
 
         self.startPrint = function () {
