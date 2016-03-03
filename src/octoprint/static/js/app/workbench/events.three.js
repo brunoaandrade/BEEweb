@@ -91,25 +91,15 @@ BEEwb.events.onKeyDown = function( event ) {
             break;
 
         case 77: // M - Move
-            BEEwb.main.transformControls.setMode( "translate" );
+            BEEwb.transformOps.activateMove();
             break;
 
         case 82: // R - Rotate
-            BEEwb.main.transformControls.setMode( "rotate" );
+            BEEwb.transformOps.activateRotate();
             break;
 
         case 83: // S - Scale
-            BEEwb.main.transformControls.setMode( "scale" );
-            break;
-
-        case 187:
-        case 107: // +, =, num+
-            BEEwb.main.transformControls.setSize( BEEwb.main.transformControls.size + 0.1 );
-            break;
-
-        case 189:
-        case 109: // -, _, num-
-            BEEwb.main.transformControls.setSize( Math.max( BEEwb.main.transformControls.size - 0.1, 0.1 ) );
+            BEEwb.transformOps.activateScale();
             break;
     }
 }
