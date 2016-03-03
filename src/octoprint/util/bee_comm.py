@@ -8,7 +8,7 @@ import Queue as queue
 from octoprint.settings import settings
 from octoprint.events import eventManager, Events
 from octoprint.util.comm import MachineCom, get_interval
-from beedriver.connection import Conn as BeeConn
+from beedriver.connection import Conn as BeePrinterConn
 from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer
 
 __author__ = "BEEVC - Electronic Systems"
@@ -48,7 +48,7 @@ class BeeCom(MachineCom):
         :return: True if the connection was successful
         """
         if self._beeConn is None:
-            self._beeConn = BeeConn(self._connShutdownHook)
+            self._beeConn = BeePrinterConn(self._connShutdownHook)
             self._beeConn.connectToFirstPrinter()
 
         if self._beeConn.isConnected():

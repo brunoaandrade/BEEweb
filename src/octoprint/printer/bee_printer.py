@@ -6,6 +6,7 @@ import os
 from octoprint.printer.standard import Printer
 from octoprint.printer import PrinterInterface
 from octoprint.settings import settings
+from octoprint.server.util.connection_util import detect_bvc_printer_connection
 
 __author__ = "BEEVC - Electronic Systems "
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
@@ -48,6 +49,18 @@ class BeePrinter(Printer):
         # selects the printer profile based on the connected printer name
         printer_name = self.get_printer_name()
         self._printerProfileManager.select(printer_name)
+
+    def disconnect(self):
+        """
+        Closes the connection to the printer.
+        """
+        super(BeePrinter, self).disconnect()
+
+        # Starts the connection monitor thread
+        import threading
+        bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(self.connect, ))
+        bvc_conn_thread.daemon = True
+        bvc_conn_thread.start()
 
     def updateProgress(self, progressData):
         """
