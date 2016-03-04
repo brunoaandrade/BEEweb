@@ -383,7 +383,7 @@ class Server():
 			# online indicators - text file with "online" as content and a transparent gif
 			(r"/online.txt", util.tornado.StaticDataHandler, dict(data="online\n")),
 			(r"/online.gif", util.tornado.StaticDataHandler, dict(data=bytes(base64.b64decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")), content_type="image/gif")),
-			(r"/stl/([^/]*\.stl)", util.tornado.LargeResponseHandler, dict(path=os.path.join(s.getBaseFolder("stls")), access_validation=util.tornado.access_validation_factory(app, loginManager, util.flask.user_validator)))
+			(r"/stl/([^/]*\.stl)", util.tornado.LargeResponseHandler, dict(path=os.path.join(s.getBaseFolder("stls"))))
 		]
 		for name, hook in pluginManager.get_hooks("octoprint.server.http.routes").items():
 			try:
