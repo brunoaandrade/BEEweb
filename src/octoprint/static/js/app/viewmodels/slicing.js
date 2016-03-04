@@ -227,6 +227,10 @@ $(function() {
                     // Shows the status panel
                     if (data["select"] || data["print"])
                         $("#state").collapse("show");
+                },
+                error: function ( response ) {
+                    html = _.sprintf(gettext("Could not slice the selected file. Please make sure your printer is connected."));
+                    new PNotify({title: gettext("Slicing failed"), text: html, type: "error", hide: false});
                 }
             });
 
