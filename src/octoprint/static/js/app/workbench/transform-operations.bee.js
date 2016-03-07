@@ -150,10 +150,9 @@ BEEwb.transformOps.scaleToMax = function() {
 BEEwb.transformOps.centerModel = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        BEEwb.main.selectedObject.position.set( 0, 0, 0 );
-        BEEwb.main.transformControls.update();
-
-        this.updatePositionInputs();
+        BEEwb.main.selectedObject.position.setX( 0 );
+        BEEwb.main.selectedObject.position.setY( 0 );
+        this.placeOnBed();
     }
 }
 
