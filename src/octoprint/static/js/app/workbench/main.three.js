@@ -273,7 +273,7 @@ BEEwb.main = {
 
         var stlData = BEEwb.helpers.generateSTLFromScene( this.objects );
 
-        saveAs(stlData['stl'], stlData['sceneName']);
+        saveAs(stlData, BEEwb.helpers.generateSceneName());
     },
 
     /**
