@@ -163,7 +163,7 @@ class BeeCom(MachineCom):
         :return:
         """
         if self._state == self.STATE_WAITING_FOR_BTF:
-            return "No printer detected. Please turn on your printer and press Connect."
+            return "No printer detected. Please turn on your printer."
         elif self._state == self.STATE_PREPARING_PRINT:
             return "Preparing to print, please wait..."
         elif self._state == self.STATE_HEATING:

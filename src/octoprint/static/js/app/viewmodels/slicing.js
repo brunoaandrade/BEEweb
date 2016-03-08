@@ -164,12 +164,24 @@ $(function() {
             self.defaultProfile = selectedProfile;
         };
 
-        self.slice = function() {
-
+        self.prepareAndSlice = function() {
             // Checks if the slicing was called on a workbench scene and finally saves it
             if (self.file.indexOf('bee_') != -1 ) {
-                BEEwb.main.saveScene(self.file);
+                var saveCall = BEEwb.main.saveScene(self.file);
+
+                // waits for the save operation
+                saveCall.done( function () {
+
+                    self.slice();
+                });
+
+            } else {
+                self.slice();
             }
+
+        };
+
+        self.slice = function() {
 
             // Selects the slicing profile based on the color and resolution
             if (self.selColor() != null && self.selResolution() != null) {

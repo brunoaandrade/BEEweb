@@ -233,7 +233,7 @@ BEEwb.main = {
     /**
      * Saves the current scene
      *
-     * Returns the name of the generated scene STL file
+     * Returns the Promise object of the Ajax call to the server
      */
     saveScene: function ( filename ) {
         var scope = this;
@@ -246,21 +246,21 @@ BEEwb.main = {
         var data = new FormData();
         data.append('file', stlData, filename);
 
-        $.ajax({
+        return $.ajax({
             url: API_BASEURL + "files/local",
             type: 'POST',
             data: data,
             contentType: false,
             processData: false,
             success: function(data) {
-
                 scope.savedScenesFiles.push(data.files.local.name);
 
-                return true;
+                html = _.sprintf(gettext("The scene was saved!"));
+                new PNotify({title: gettext("Save success"), text: html, type: "success", hide: false});
             },
             error: function() {
-
-                return false;
+                html = _.sprintf(gettext("Could not save the scene in the server filesystem. Make sure you have the right permissions and disk space."));
+                new PNotify({title: gettext("Save failed"), text: html, type: "error", hide: false});
             }
         });
     },
