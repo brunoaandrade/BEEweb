@@ -81,6 +81,6 @@
     </div>
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</a>
-        <a href="#" class="btn btn-primary" data-bind="click: function() { if ($root.enableSliceButton()) { $root.prepareAndSlice() } }, enabled: enableSliceButton, css: {disabled: !$root.enableSliceButton()}">{{ _('Slice') }}</a>
+        <a id="slice_button" href="#" class="btn btn-primary" data-bind="click: function() { if ($root.enableSliceButton()) { $root.prepareAndSlice() } }, enabled: enableSliceButton, css: {disabled: !$root.enableSliceButton()}">{{ _('Slice') }}</a>
     </div>
 </div>

@@ -246,6 +246,8 @@ BEEwb.main = {
         var data = new FormData();
         data.append('file', stlData, filename);
 
+        scope.savedScenesFiles.push(filename);
+
         return $.ajax({
             url: API_BASEURL + "files/local",
             type: 'POST',
@@ -253,14 +255,21 @@ BEEwb.main = {
             contentType: false,
             processData: false,
             success: function(data) {
-                scope.savedScenesFiles.push(data.files.local.name);
 
                 html = _.sprintf(gettext("The scene was saved!"));
-                new PNotify({title: gettext("Save success"), text: html, type: "success", hide: false});
+                new PNotify({title: gettext("Save success"), text: html, type: "success", hide: true});
             },
             error: function() {
                 html = _.sprintf(gettext("Could not save the scene in the server filesystem. Make sure you have the right permissions and disk space."));
                 new PNotify({title: gettext("Save failed"), text: html, type: "error", hide: false});
+
+                // removes the generated file name from the names array
+                for (var i = scope.savedScenesFiles.length-1; i >= 0; i--) {
+                    if (scope.savedScenesFiles[i] === filename) {
+                        array.splice(i, 1);
+                        break;
+                    }
+                }
             }
         });
     },

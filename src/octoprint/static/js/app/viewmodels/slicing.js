@@ -26,6 +26,8 @@ $(function() {
         self.selDensity = ko.observable(5);
         self.selResolution = ko.observable("med");
 
+        self.sliceButtonControl = true;
+
         self.configured_slicers = ko.pureComputed(function() {
             return _.filter(self.slicers(), function(slicer) {
                 return slicer.configured;
@@ -65,7 +67,8 @@ $(function() {
         self.enableSliceButton = ko.pureComputed(function() {
             return self.gcodeFilename() != undefined
                 && self.gcodeFilename().trim() != ""
-                && self.slicer() != undefined;
+                && self.slicer() != undefined
+                && self.sliceButtonControl == true;
                 //&& self.profile() != undefined;
         });
 
@@ -165,6 +168,8 @@ $(function() {
         };
 
         self.prepareAndSlice = function() {
+            self.sliceButtonControl = false; // Disables the slice button to avoid multiple clicks
+
             // Checks if the slicing was called on a workbench scene and finally saves it
             if (self.file.indexOf('bee_') != -1 ) {
                 var saveCall = BEEwb.main.saveScene(self.file);
@@ -239,10 +244,14 @@ $(function() {
                     // Shows the status panel
                     if (data["select"] || data["print"])
                         $("#state").collapse("show");
+
+                    self.sliceButtonControl = true;
                 },
                 error: function ( response ) {
                     html = _.sprintf(gettext("Could not slice the selected file. Please make sure your printer is connected."));
                     new PNotify({title: gettext("Slicing failed"), text: html, type: "error", hide: false});
+
+                    self.sliceButtonControl = true;
                 }
             });
 
