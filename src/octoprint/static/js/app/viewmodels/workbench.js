@@ -6,6 +6,7 @@ $(function () {
 		self.loginState = parameters[1];
 		self.connection = parameters[2];
         self.slicing = parameters[3];
+        self.state = parameters[4];
 
 		//resize canvas after Workbench tab is made active.
 		self.onAfterTabChange = function (current, previous) {
@@ -43,7 +44,7 @@ $(function () {
 			// This is a list of dependencies to inject into the plugin, the order which you request here is the order
 			// in which the dependencies will be injected into your view model upon instantiation via the parameters
 			// argument
-			["gcodeFilesViewModel", "loginStateViewModel", "connectionViewModel", "slicingViewModel"],
+			["gcodeFilesViewModel", "loginStateViewModel", "connectionViewModel", "slicingViewModel", "printerStateViewModel"],
 
 			// Finally, this is the list of all elements we want this view model to be bound to.
 			[("#workbench")]

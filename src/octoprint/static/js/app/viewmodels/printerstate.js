@@ -13,6 +13,7 @@ $(function() {
         self.isReady = ko.observable(undefined);
         self.isLoading = ko.observable(undefined);
         self.isSdReady = ko.observable(undefined);
+        self.stateClass = ko.observable(undefined);
 
         self.enablePrint = ko.pureComputed(function() {
             return self.isOperational() && self.isReady() && !self.isPrinting() && self.loginState.isUser() && self.filename() != undefined;
@@ -123,12 +124,30 @@ $(function() {
             self.timelapse(data);
         };
 
+        self._proccessStateClass = function() {
+            if (self.isErrorOrClosed()) {
+                self.stateClass("text-error");
+            } else {
+                self.stateClass("text-info");
+            }
+
+            if (self.isOperational()) {
+                self.stateClass("text-success");
+            }
+
+            if (self.isPrinting()) {
+                self.stateClass("text-primary");
+            }
+        };
+
         self._fromData = function(data) {
             self._processStateData(data.state);
             self._processJobData(data.job);
             self._processProgressData(data.progress);
             self._processZData(data.currentZ);
             self._processBusyFiles(data.busyFiles);
+
+            self._proccessStateClass();
         };
 
         self._processStateData = function(data) {
@@ -228,7 +247,17 @@ $(function() {
         };
 
         self.cancel = function() {
-            self._jobCommand("cancel");
+            $('#job_cancel').prop('disabled', true);
+
+            self._jobCommand("cancel", function() {
+
+                $('#job_cancel').prop('disabled', false);
+
+                // Hides the status panel
+                if ($("#state").hasClass('in')) {
+                    $("#state").collapse("hide");
+                }
+            });
         };
 
         self._jobCommand = function(command, callback) {

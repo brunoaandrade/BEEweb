@@ -207,7 +207,9 @@ $(function() {
             });
 
             // Shows the status panel
-            $("#state").collapse("show");
+            if (!$("#state").hasClass('in')) {
+                $("#state").collapse("show");
+            }
         };
 
         self.removeFile = function(file) {

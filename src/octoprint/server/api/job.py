@@ -46,8 +46,9 @@ def controlJob():
 		printer.toggle_pause_print()
 	elif command == "cancel":
 		if not activePrintjob:
-			return make_response("Printer is neither printing nor paused, 'cancel' command cannot be performed", 409)
-		printer.cancel_print()
+			printer.unselect_file()
+		else:
+			printer.cancel_print()
 	return NO_CONTENT
 
 
