@@ -29,8 +29,8 @@ BEEwb.helpers.generateSTLFromScene = function( objects ) {
  */
 BEEwb.helpers.generateSceneName = function( ) {
     var now = new Date();
-    var sceneName = 'bee_' + now.getFullYear() + '_' + (now.getMonth()+1) + '_' + now.getDate()
-    + '_' + now.getHours() + '_' + now.getMinutes() + '_' + now.getSeconds() + '.stl';
+    var sceneName = 'bee_' + now.getDate() + '_' + (now.getMonth()+1) + '_' + now.getFullYear()
+    + '-' + now.getHours() + '_' + now.getMinutes() + '_' + now.getSeconds() + '.stl';
 
     return sceneName;
 }

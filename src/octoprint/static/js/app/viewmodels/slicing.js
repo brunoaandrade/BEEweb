@@ -25,6 +25,8 @@ $(function() {
         self.selColor = ko.observable();
         self.selDensity = ko.observable(5);
         self.selResolution = ko.observable("med");
+        self.raft = ko.observable(false);
+        self.support = ko.observable(false);
 
         self.sliceButtonControl = true;
 
@@ -232,6 +234,37 @@ $(function() {
                 data["print"] = true;
             } else if (self.afterSlicing() == "select") {
                 data["select"] = true;
+            }
+
+            // BVC Raft Support
+            if (self.raft() == true) {
+                data['profile.platform_adhesion'] = 'raft';
+                data['profile.raft_airgap'] = 0.220;
+                data['profile.raft_line_spacing'] = 3.0;
+                data['profile.raft_base_linewidth'] = 1.000;
+                data['profile.raft_surface_layers'] = 2;
+
+                data['profile.raft_interface_linewidth'] = 0.4;
+                data['profile.raft_interface_thickness'] = 0.270;
+
+                data['profile.raft_margin'] = 5.000;
+                data['profile.raft_base_thickness'] = 0.300;
+
+                data['profile.bottom_layer_speed'] = 20; // used also for raftSurfaceSpeed
+                data['profile.raft_fan_speed'] = 0; //?? 100 in profile
+                //data['profile.raft_surface_thickness'] = 270; // used also for raftSurfaceSpeed
+            } else {
+                data['profile.platform_adhesion'] = 'none';
+                data['profile.raft_base_thickness'] = 0;
+                data['profile.raft_interface_thickness'] = 0.;
+            }
+
+            // BVC Support
+            if (self.support() == true) {
+                data['profile.support'] = 'everywhere';
+                data['profile.support_angle'] = 60;
+                data['profile.support_xy_distance'] = 0.7;
+                data['profile.support_z_distance'] = 0.15;
             }
 
             $.ajax({

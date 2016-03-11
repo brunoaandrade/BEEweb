@@ -125,11 +125,7 @@ $(function() {
         };
 
         self._proccessStateClass = function() {
-            if (self.isErrorOrClosed()) {
-                self.stateClass("text-error");
-            } else {
-                self.stateClass("text-info");
-            }
+            self.stateClass("text-warning");
 
             if (self.isOperational()) {
                 self.stateClass("text-success");
@@ -137,6 +133,10 @@ $(function() {
 
             if (self.isPrinting()) {
                 self.stateClass("text-primary");
+            }
+
+            if (self.isErrorOrClosed()) {
+                self.stateClass("text-error");
             }
         };
 

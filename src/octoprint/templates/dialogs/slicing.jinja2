@@ -8,7 +8,7 @@
             <p>{{ _('Slicing is currently disabled since no slicer has been configured yet. Please configure a slicer under "Settings".') }}</p>
         </div>
         <div data-bind="visible: enableSlicingDialog()">
-            <p>{{ _('Please configure which slicer and which slicing profile to use and name the GCode file to slice to below, or click "Cancel" if you do not wish to slice the file now.') }}</p>
+            <!--<p>{{ _('Please configure which slicer and which slicing profile to use and name the GCode file to slice to below, or click "Cancel" if you do not wish to slice the file now.') }}</p>-->
             <form class="form-horizontal">
                <!-- <div class="control-group">
                     <label class="control-label">{{ _('Slicer') }}</label>
@@ -44,9 +44,23 @@
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label">{{ _('Density') }} %</label>
+                    <label class="control-label">{{ _('Density') }} (%)</label>
                     <div class="controls">
                         <input type="text" style="width: 200%" data-bind="slider: {value: selDensity, min:0, max: 100, step: 1, tooltip: 'show'}"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">{{ _('Raft') }}</label>
+                    <div class="controls">
+                        <input type="checkbox" data-bind="checked: raft"/> <br />
+                        <small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">{{ _('Support') }}</label>
+                    <div class="controls">
+                        <input type="checkbox" data-bind="checked: support"/> <br />
+                        <small>{{ _('This option automatically creates a detachable structure beneath an overhang or highly inclined areas, so as to allow the model to be printed.') }}</small>
                     </div>
                 </div>
                 <div class="control-group">
