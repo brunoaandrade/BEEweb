@@ -265,6 +265,12 @@ $(function() {
                 data['profile.support_angle'] = 60;
                 data['profile.support_xy_distance'] = 0.7;
                 data['profile.support_z_distance'] = 0.15;
+                data['profile.support_type'] = 'lines';
+                data['profile.support_dual_extrusion'] = 'both';
+                data['profile.support_fill_rate'] = 15; // ?? supportLineDistance
+            } else {
+                data['profile.support_angle'] = -1;
+                data['profile.support'] = 'none';
             }
 
             $.ajax({
