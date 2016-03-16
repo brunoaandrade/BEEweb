@@ -103,7 +103,7 @@ BEEwb.main = {
         this.loadModel('BEE.stl', true);
 
         this.trackballControls = new THREE.TrackballControls( this.camera, this.container );
-        this.trackballControls.rotateSpeed = 1.0;
+        this.trackballControls.rotateSpeed = 1.2;
         this.trackballControls.zoomSpeed = 0.7;
         this.trackballControls.panSpeed = 0.8;
 
@@ -171,7 +171,7 @@ BEEwb.main = {
         var that = this;
         // Colored binary STL
         loader.load(folder + modelName, function ( geometry ) {
-            var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 200 } );
+            var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 100 } );
 
             // Updates the bounding box for the next calculations
             geometry.computeBoundingBox();
@@ -256,7 +256,7 @@ BEEwb.main = {
             processData: false,
             success: function(data) {
 
-                html = _.sprintf(gettext("The scene was saved!"));
+                html = _.sprintf(gettext("The scene was saved to the local filesystem."));
                 new PNotify({title: gettext("Save success"), text: html, type: "success", hide: true});
             },
             error: function() {

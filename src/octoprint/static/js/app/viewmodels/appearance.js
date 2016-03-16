@@ -16,18 +16,6 @@ $(function() {
             return brandText;
         });
 
-        self.printerName = ko.computed(function() {
-            var printer = "";
-
-            if (!self.connection.isErrorOrClosed()) {
-                var profileName = self.printerProfiles.currentProfileData().name();
-
-                printer = "@ " + profileName;
-            }
-
-            return printer;
-        });
-
         self.title = ko.pureComputed(function() {
             if (self.name())
                 return "[" + gettext("BEEsoft") + "]" + self.name();

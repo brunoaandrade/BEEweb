@@ -3,6 +3,7 @@ $(function() {
         var self = this;
 
         self.loginState = parameters[0];
+        self.printerProfiles = parameters[1];
 
         self.stateString = ko.observable(undefined);
         self.isErrorOrClosed = ko.observable(undefined);
@@ -49,6 +50,18 @@ $(function() {
 
         self.titlePrintButton = ko.observable(self.TITLE_PRINT_BUTTON_UNPAUSED);
         self.titlePauseButton = ko.observable(self.TITLE_PAUSE_BUTTON_UNPAUSED);
+
+        self.printerLogo = ko.computed(function() {
+            var logo = "";
+
+            if (!self.isErrorOrClosed()) {
+                var profileName = self.printerProfiles.currentProfileData().name();
+
+                logo = "/static/img/logo_" + profileName.toLowerCase() + ".png";
+            }
+
+            return logo;
+        });
 
         self.estimatedPrintTimeString = ko.pureComputed(function() {
             if (self.lastPrintTime())
@@ -278,7 +291,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push([
         PrinterStateViewModel,
-        ["loginStateViewModel"],
+        ["loginStateViewModel", "printerProfilesViewModel"],
         ["#state_wrapper", "#drop_overlay"]
     ]);
 });

@@ -10,7 +10,7 @@ def detect_bvc_printer_connection(connection_callback):
 	:param connection_callback: Callback function to call when a printer is detected
 	:return:
 	"""
-	USB_POLL_INTERVAL = 5 # seconds
+	USB_POLL_INTERVAL = 1 # seconds
 	printerConnIntf = BeePrinterConn()
 
 	_logger = logging.getLogger()

@@ -22,7 +22,7 @@
                         <a class="brand" href="#">
                             <span class="brand-label-fix"><strong data-bind="text: appearance.brand">BEEsoft</strong>.web</span>
                         </a>
-                        <span id="printer-name-label" class="brand" data-bind="text: appearance.printerName"></span>
+
                         <div class="nav-collapse">
                             <!-- Navbar -->
                             <ul class="nav pull-right">
@@ -54,7 +54,7 @@
                             <div id="state_wrapper" class="accordion-group">
                                 <div class="accordion-heading text-center">
                                     <a id="state-header-link" class="accordion-toggle collapsed" data-toggle="collapse" data-target="#state">
-                                        <i class="icon-print"></i> {{ _('Printer Status')}}:
+                                        <img data-bind="attr:{ 'src': printerLogo }" />
                                         <strong data-bind="text: stateString, css: stateClass"></strong>
                                     </a>
                                 </div>
