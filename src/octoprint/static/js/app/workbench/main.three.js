@@ -100,7 +100,14 @@ BEEwb.main = {
         this.scene.add(this.objects);
 
         // Loads the model
-        this.loadModel('BEE.stl', true);
+        var lastModel = document.cookie.replace(/(?:(?:^|.*;\s*)lastModel\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+
+        if (!lastModel) {
+            lastModel = 'BEE.stl';
+            this.loadModel(lastModel, true);
+        } else {
+            this.loadModel(lastModel, false);
+        }
 
         this.trackballControls = new THREE.TrackballControls( this.camera, this.container );
         this.trackballControls.rotateSpeed = 1.2;
@@ -264,6 +271,9 @@ BEEwb.main = {
 
                 html = _.sprintf(gettext("The scene was saved to the local filesystem."));
                 new PNotify({title: gettext("Save success"), text: html, type: "success", hide: true});
+
+                document.cookie="lastModel=" + filename;
+
             },
             error: function() {
                 html = _.sprintf(gettext("Could not save the scene in the server filesystem. Make sure you have the right permissions and disk space."));
