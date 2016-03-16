@@ -17,11 +17,14 @@ BEEwb.transformOps.resetObjectData = function() {
 BEEwb.transformOps.move = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        var x = $('#x-axis').val();
-        var y = $('#y-axis').val();
-        var z = $('#z-axis').val();
+        var x = parseFloat($('#x-axis').val().replace(",", "."));
+        var y = parseFloat($('#y-axis').val().replace(",", "."));
+        var z = parseFloat($('#z-axis').val().replace(",", "."));
         BEEwb.main.selectedObject.position.set( x, y, z );
         BEEwb.main.transformControls.update();
+
+        // Checks if the selected object is out of bounds
+        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -32,12 +35,15 @@ BEEwb.transformOps.move = function() {
 BEEwb.transformOps.scale = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        var x = $('#scalex-axis').val();
-        var y = $('#scaley-axis').val();
-        var z = $('#scalez-axis').val();
+        var x = parseFloat($('#scalex-axis').val().replace(",", "."));
+        var y = parseFloat($('#scaley-axis').val().replace(",", "."));
+        var z = parseFloat($('#scalez-axis').val().replace(",", "."));
 
         this.scaleBySize(x, y ,z);
         BEEwb.main.transformControls.update();
+
+        // Checks if the selected object is out of bounds
+        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 
@@ -48,12 +54,15 @@ BEEwb.transformOps.scale = function() {
 BEEwb.transformOps.rotate = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        var x = $('#rotx-axis').val();
-        var y = $('#roty-axis').val();
-        var z = $('#rotz-axis').val();
+        var x = parseFloat($('#rotx-axis').val().replace(",", "."));
+        var y = parseFloat($('#roty-axis').val().replace(",", "."));
+        var z = parseFloat($('#rotz-axis').val().replace(",", "."));
 
         this._rotateByDegrees(x, y ,z);
         BEEwb.main.transformControls.update();
+
+        // Checks if the selected object is out of bounds
+        BEEwb.main.isSelectedObjectOutOfBounds();
     }
 }
 

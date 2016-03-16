@@ -226,6 +226,12 @@ BEEwb.main = {
 
             that.objects.add(mesh);
 
+            // Runs the placeOnBed algorithm
+            that.selectModel(mesh);
+            BEEwb.transformOps.placeOnBed();
+            that.removeAllSelections();
+
+
             $('#loadingDialog').modal('hide');
         });
     },
