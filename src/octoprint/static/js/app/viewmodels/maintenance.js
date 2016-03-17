@@ -26,7 +26,11 @@ $(function() {
         self.show = function() {
             // show settings, ensure centered position
             self.maintenanceDialog.modal({
-                minHeight: function() { return Math.max($.fn.modal.defaults.maxHeight() - 80, 250); }
+                backdrop: 'static',
+                keyboard: false,
+                minHeight: function() {
+                    return Math.max($.fn.modal.defaults.maxHeight() - 80, 250);
+                }
             }).css({
                 width: 'auto',
                 'margin-left': function() { return -($(this).width() /2); }
@@ -60,6 +64,16 @@ $(function() {
         /***************************************************************************/
         /*******                   Filament Change functions            ************/
         /***************************************************************************/
+        self.showFilamentChange = function() {
+            $('#maintenanceList').addClass('hidden');
+            $('#cancelMaintenance').removeClass('hidden');
+
+            $('#maintenance_changeFilament').removeClass('hidden');
+
+            // Starts heating automatically
+            self.startHeating();
+        }
+
         self.startHeating = function() {
             cancelTemperatureUpdate = false;
             self.commandLock(true);
@@ -135,9 +149,8 @@ $(function() {
                             // Heating is finished, let's move on
                             self._heatingDone();
 
-                            $('#step2').removeClass('hidden');
-                            $('#step1').addClass('hidden');
-                            $('#reset-change-filament').removeClass('hidden');
+                            $('#step3').removeClass('hidden');
+                            $('#step2').addClass('hidden');
                         } else {
 
                             setTimeout(function() { self._updateTempProgress() }, 2000);
@@ -185,18 +198,24 @@ $(function() {
         }
 
         self.nextStep2 = function() {
+            $('#step2').removeClass('hidden');
+            $('#step3').addClass('hidden');
+            $('#step1').addClass('hidden');
+        }
+
+        self.nextStep3 = function() {
             $('#step3').removeClass('hidden');
             $('#step2').addClass('hidden');
             $('#step1').addClass('hidden');
         }
 
-        self.nextStep3 = function() {
+        self.nextStep4 = function() {
             $('#step4').removeClass('hidden');
             $('#step3').addClass('hidden');
             $('#step2').addClass('hidden');
         }
 
-        self.nextStep4 = function() {
+        self.nextStep5 = function() {
             $('#step5').removeClass('hidden');
             $('#step4').addClass('hidden');
             $('#step3').addClass('hidden');
@@ -253,7 +272,9 @@ $(function() {
                         self.operationLock(false);
 
                         // Goes to home position
-                        self._sendCustomCommand('G28');
+                        //self._sendCustomCommand('G28');
+
+                        self.nextStep2();
                     } else {
                         self.filamentResponseError(true);
                         self.commandLock(false);
