@@ -3,11 +3,13 @@ var BEEwb = BEEwb || {};
 
 BEEwb.transformOps = {
     selectedMode: 'translate',
-    initialSize: null
+    initialSize: null,
+    previousSize: null
 }
 
 BEEwb.transformOps.resetObjectData = function() {
     this.initialSize = null;
+    this.previousSize = null;
 }
 
 /**
@@ -386,13 +388,53 @@ BEEwb.transformOps.updateRotationInputs = function() {
  */
 BEEwb.transformOps.scaleBySize = function(x, y, z) {
 
+    if (x < 0 || y < 0 || z < 0)
+        return null;
+
     if (BEEwb.main.selectedObject != null) {
         var xScale = x / this.initialSize['x'];
         var yScale = y / this.initialSize['y'];
         var zScale = z / this.initialSize['z'];
 
+        // Checks which axis was changed
+        if (x != this.previousSize['x']) {
+
+            if ($('#lock-y').is(':checked')) {
+                yScale = xScale;
+            }
+
+            if ($('#lock-z').is(':checked')) {
+                zScale = xScale;
+            }
+        }
+
+        if (y != this.previousSize['y']) {
+
+            if ($('#lock-x').is(':checked')) {
+                xScale = yScale;
+            }
+
+            if ($('#lock-z').is(':checked')) {
+                zScale = yScale;
+            }
+        }
+
+        if (z != this.previousSize['z']) {
+
+            if ($('#lock-y').is(':checked')) {
+                yScale = zScale;
+            }
+
+            if ($('#lock-x').is(':checked')) {
+                xScale = zScale;
+            }
+        }
+
         BEEwb.main.selectedObject.scale.set( xScale, yScale, zScale );
         BEEwb.main.transformControls.update();
+        this.updateScaleSizeInputs();
+
+        this.previousSize = { 'x': x, 'y': y, 'z': z};
     }
 }
 
@@ -420,5 +462,10 @@ BEEwb.transformOps.setInitialSize = function() {
 
     if (BEEwb.main.selectedObject != null) {
         this.initialSize = BEEwb.helpers.objectSize(BEEwb.main.selectedObject.geometry);
+        this.previousSize = {
+            'x': this.initialSize['x'].toFixed(2),
+            'y': this.initialSize['y'].toFixed(2),
+            'z': this.initialSize['z'].toFixed(2)
+        };
     }
 }
