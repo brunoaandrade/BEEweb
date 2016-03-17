@@ -54,7 +54,7 @@ $(function() {
         self.printerLogo = ko.computed(function() {
             var logo = "";
 
-            if (!self.isErrorOrClosed() && !self.isError()) {
+            if (self.isErrorOrClosed() !== undefined && !self.isErrorOrClosed() && !self.isError()) {
                 var profileName = self.printerProfiles.currentProfileData().name();
 
                 logo = "/static/img/logo_" + profileName.toLowerCase() + ".png";
