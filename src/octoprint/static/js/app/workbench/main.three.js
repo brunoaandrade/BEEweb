@@ -75,9 +75,8 @@ BEEwb.main = {
         this.camera = new THREE.PerspectiveCamera(
          45, this.renderer.domElement.clientWidth / this.renderer.domElement.clientHeight, 1, 3000
         );
-        this.camera.position.set( 0, -200, 100 );
-        this.camera.up.set( 0, 0, 1 ); // Without this the model is seen upside down
-        this.camera.lookAt( new THREE.Vector3( 0, -100, 0 ) );
+
+        this.resetCamera();
 
         this.scene = new THREE.Scene();
         //scene.add( new THREE.GridHelper( 90, 30 ) );
@@ -110,8 +109,8 @@ BEEwb.main = {
         }
 
         this.trackballControls = new THREE.TrackballControls( this.camera, this.container );
-        this.trackballControls.rotateSpeed = 1.2;
-        this.trackballControls.zoomSpeed = 0.7;
+        this.trackballControls.rotateSpeed = 1.7;
+        this.trackballControls.zoomSpeed = 0.9;
         this.trackballControls.panSpeed = 0.8;
 
         this.trackballControls.noZoom = false;
@@ -407,6 +406,18 @@ BEEwb.main = {
             }
         }
     },
+
+    /**
+     * Resets the camera position
+     */
+     resetCamera: function() {
+
+        this.camera.position.set( 0, -200, 100 );
+
+        this.camera.up.set( 0, 0, 1 ); // Without this the model is seen upside down
+        this.camera.lookAt( new THREE.Vector3( 0, -100, 0 ) );
+
+     },
 
     /**
      * Adds the printer bed to the canvas
