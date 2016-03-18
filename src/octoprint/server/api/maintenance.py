@@ -177,6 +177,41 @@ def filamentProfiles():
 
 	return jsonify(profiles)
 
+@api.route("/maintenance/nozzle_sizes", methods=["GET"])
+@restricted_access
+def nozzleSizes():
+	"""
+	Gets the nozzle sizes available
+	:return:
+	"""
+	availableSizes = dict()
+	availableSizes["nozzleType1"] = {'value': 0.4}
+	availableSizes["nozzleType2"] = {'value': 0.6}
+
+	return jsonify(availableSizes)
+
+@api.route("/maintenance/save_nozzle", methods=["POST"])
+@restricted_access
+def saveNozzle():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	valid_commands = {
+		"nozzle": ["nozzleType"]
+	}
+	command, data, response = get_json_command_from_request(request, valid_commands)
+	if response is not None:
+		return response
+
+	nozzle = data['nozzleType']
+
+	#resp = printer.setNozzleType(nozzle)
+	resp = 'ok'
+
+	return jsonify({
+		"response": resp
+	})
 
 def _getSlicingProfilesData(slicer, printer_name, require_configured=False):
 	if printer_name is None:

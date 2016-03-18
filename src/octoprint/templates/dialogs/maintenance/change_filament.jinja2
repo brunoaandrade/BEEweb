@@ -25,37 +25,31 @@
             </div>
             <form class="form-horizontal">
                 <div class="control-group">
-                    <div class="">
+                    <div class="row-fluid">
                         <select data-bind="options: filamentProfiles, optionsText: 'name', optionsValue: 'name', value: selectedFilament, optionsCaption: '{{ _('Select filament type...') }}'"></select>
 
-                        <button id="submit-filament" title="Save Filament" class="btn btn-primary"
+                        <button id="submit-filament" title="Save Filament" class="btn btn-primary pull-right"
                         data-bind="click: saveFilament, enable: printerState.isOperational() && !commandLock()
-                        && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                        && printerState.isReady() && !printerState.isPrinting() && loginState.isUser() && selectedFilament">
                             <i class="icon-arrow-right"></i> {{ _('Next')}}
                         </button>
                     </div>
                 </div>
-                <div class="alert alert-success text-center" data-bind="visible: filamentResponse">
-                     <span><i class="icon-ok"></i> {{ _('The filament code was saved.')}}</span>
-                </div>
+
                 <div class="alert alert-danger text-center" data-bind="visible: filamentResponseError">
                      <span><i class="icon-exclamation-sign"></i> {{ _('An error occurred while saving. Please make sure a filament code is selected and try again.')}}</span>
                 </div>
             </form>
         </div>
     </div>
-    <div class="row-fluid">
-        <button id ="next-change-filament-step2" title="Next" class="btn btn-primary pull-right"
-            data-bind="click: nextStep3" ><i class="icon-arrow-right"></i> {{ _('Next')}}
-        </button>
-    </div>
+
 </div>
 
 <div id="step2" class="hidden">
 
     <div class="row-fluid">
         <div class="span6">
-            <strong>{{ _('Step 1')}}: {{ _('Extruder nozzle temperature') }}</strong>
+            <strong>{{ _('Step 2')}}: {{ _('Extruder nozzle temperature') }}</strong>
         </div>
     </div>
     <div class="row-fluid">
@@ -70,18 +64,16 @@
         </p>
     </div>
     <div id="progress-bar-div" class="row-fluid hidden">
-        <span>{{ _('Heating, please wait...') }}</span>
+        <span><strong>{{ _('Heating, please wait...') }}</strong></span><br />
         <div id="temperature_progress" class="progress" style="width: 100%;">
             <div class="bar" style="width: 0%"></div>
         </div>
-        <button id ="cancel-heating-btn" title="Cancel" class="btn btn-default pull-right"
-            data-bind="click: cancelHeating" ><i class="icon-stop"></i> {{ _('Cancel Heating')}}</button>
     </div>
 
     <br /><br /><br />
     <div class="row-fluid text-center">
         <span class="span12"><i class="icon-exclamation-sign"></i>
-            {{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}
+            <strong>{{ _('WARNING: NEVER TOUCH THE EXTRUDER NOZZLE WHEN THE PRINTER IS ON.') }}</strong>
         </span>
     </div>
     <br />
