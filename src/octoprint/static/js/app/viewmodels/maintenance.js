@@ -92,6 +92,7 @@ $(function() {
             self.changeFilamentStep0();
             self.calibrationStep0();
             self.replaceNozzleStep0();
+            self.extMaintStep0();
 
             // Goes to home position
             self._sendCustomCommand('G28');
@@ -109,6 +110,8 @@ $(function() {
             // Returns the operations to the initial step screens
             self.changeFilamentStep0();
             self.calibrationStep0();
+            self.replaceNozzleStep0();
+            self.extMaintStep0();
 
             // Goes to home position
             self._sendCustomCommand('G28');
@@ -209,6 +212,8 @@ $(function() {
 
                     self.commandLock(false);
                     self.operationLock(false);
+
+                    self.heatingDone(false);
 
                 },
                 error: function() {
@@ -609,25 +614,17 @@ $(function() {
             self.startHeatingExtMaint();
         }
 
-        self.restartExtMaint = function() {
-            self.cancelHeatingExtMaint();
-
-            self.extMaintStep0();
-        }
 
         self.extMaintStep0 = function() {
             $('#extMaintStep2').addClass('hidden');
             $('#extMaintStep3').addClass('hidden');
-            $('#extMaintStep4').addClass('hidden');
-            $('#reset-extruder-maint').addClass('hidden');
 
             $('#extMaintStep1').removeClass('hidden');
-            $('#start-heating-ext-mtn').removeClass('hidden');
-
         }
 
-        self.nextStepExtMaintenance1 = function() {
+        self.nextStepExtMaint1 = function() {
             $('#extMaintStep2').removeClass('hidden');
+            $('#extMaintStep3').addClass('hidden');
             $('#extMaintStep1').addClass('hidden');
         }
 
@@ -635,20 +632,16 @@ $(function() {
             $('#extMaintStep3').removeClass('hidden');
             $('#extMaintStep2').addClass('hidden');
             $('#extMaintStep1').addClass('hidden');
-            $('#next-step-ext-mtn-3').addClass('hidden');
-        }
 
-        self.nextStepExtMaint3 = function() {
-            $('#extMaintStep3').addClass('hidden');
-            $('#extMaintStep2').addClass('hidden');
-            $('#extMaintStep1').addClass('hidden');
-            $('#extMaintStep4').removeClass('hidden');
+            $('#maintenanceOkButton').removeClass('hidden');
+            $('#maintenanceCloseButton').addClass('hidden');
         }
 
         self.startHeatingExtMaint = function() {
             cancelTemperatureUpdate = false;
             self.commandLock(true);
             self.operationLock(true);
+            self.heatingDone(false);
 
             $.ajax({
                 url: API_BASEURL + "maintenance/start_heating",
@@ -665,36 +658,6 @@ $(function() {
                 },
                 error: function() { self.commandLock(false);  }
             });
-        }
-
-        self.cancelHeatingExtMaint = function() {
-
-            $.ajax({
-                url: API_BASEURL + "maintenance/cancel_heating",
-                type: "POST",
-                dataType: "json",
-                contentType: "application/json; charset=UTF-8",
-                success: function() {
-                    $('#start-heating-ext-mtn').removeClass('hidden');
-                    $('#progress-bar-ext-mtn').addClass('hidden');
-
-                    self.commandLock(false);
-                    self.operationLock(false);
-
-                    var tempProgress = $("#temperature-progress-ext-mtn");
-                    var tempProgressBar = $(".bar", tempProgress);
-                    tempProgressBar.css('width', '0%');
-                    tempProgressBar.text('0%');
-
-                    self.extMaintStep0();
-                },
-                error: function() {
-                    self.commandLock(false);
-                    self.operationLock(false);
-                }
-            });
-
-            cancelTemperatureUpdate = true;
         }
 
         self._updateTempProgressExtMaint = function() {
@@ -720,7 +683,7 @@ $(function() {
                             // Heating is finished, let's move on
                             self._heatingDone();
 
-                            $('#next-step-ext-mtn-3').removeClass('hidden');
+                            $('#ext-mtn-3').removeClass('hidden');
                             $('#progress-bar-ext-mtn').addClass('hidden');
                         } else {
 
@@ -772,6 +735,9 @@ $(function() {
             $('#replaceNozzleStep3').removeClass('hidden');
             $('#replaceNozzleStep1').addClass('hidden');
             $('#replaceNozzleStep2').addClass('hidden');
+
+            $('#maintenanceOkButton').removeClass('hidden');
+            $('#maintenanceCloseButton').addClass('hidden');
         }
 
         self.saveNozzle = function() {
@@ -822,6 +788,7 @@ $(function() {
             cancelTemperatureUpdate = false;
             self.commandLock(true);
             self.operationLock(true);
+            self.heatingDone(false);
 
             $.ajax({
                 url: API_BASEURL + "maintenance/start_heating",
