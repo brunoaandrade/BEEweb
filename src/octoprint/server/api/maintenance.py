@@ -184,9 +184,7 @@ def nozzleSizes():
 	Gets the nozzle sizes available
 	:return:
 	"""
-	availableSizes = dict()
-	availableSizes["nozzleType1"] = {'value': 0.4}
-	availableSizes["nozzleType2"] = {'value': 0.6}
+	availableSizes = printer.nozzleSizes
 
 	return jsonify(availableSizes)
 
@@ -206,8 +204,10 @@ def saveNozzle():
 
 	nozzle = data['nozzleType']
 
-	#resp = printer.setNozzleType(nozzle)
-	resp = 'ok'
+	if not printer.isValidNozzleSize(nozzle):
+		return make_response("Invalid nozzle size", 409)
+
+	resp = printer.setNozzleSize(nozzle)
 
 	return jsonify({
 		"response": resp

@@ -27,6 +27,10 @@ class BeePrinter(Printer):
         self._currentFeedRate = None
         self._runningCalibrationTest = False
 
+        self.nozzleSizes = dict()
+        self.nozzleSizes["nozzleType1"] = {'value': 0.4}
+        self.nozzleSizes["nozzleType2"] = {'value': 0.6}
+
     def connect(self, port=None, baudrate=None, profile=None):
         """
          Connects to the printer. If port and/or baudrate is provided, uses these settings, otherwise autodetection
@@ -272,9 +276,18 @@ class BeePrinter(Printer):
     def setFilamentString(self, filamentStr):
         """
         Saves the filament reference string in the printer memory
+        :param filamentStr:
         :return:
         """
         return self._comm.getCommandsInterface().setFilamentString(filamentStr)
+
+    def setNozzleSize(self, nozzleSize):
+        """
+        Saves the selected nozzle size
+        :param nozzleSize:
+        :return:
+        """
+        return self._comm.getCommandsInterface().setNozzleSize(nozzleSize)
 
     def startCalibration(self, repeat=False):
         """
@@ -329,6 +342,18 @@ class BeePrinter(Printer):
         :return:
         """
         return self._runningCalibrationTest
+
+    def isValidNozzleSize(self, nozzleSize):
+        """
+        Checks if the passed nozzleSize value is valid
+        :param nozzleSize:
+        :return:
+        """
+        for k,v in self.nozzleSizes.iteritems():
+            if v['value'] == nozzleSize:
+                return True
+
+        return False
 
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
         """
