@@ -53,7 +53,7 @@ $(function() {
 
         self.printerLogo = ko.computed(function() {
             var logo = "";
-            debugger;
+
             if (self.isErrorOrClosed() !== undefined && !self.isErrorOrClosed() && !self.isError()) {
                 var profileName = self.printerProfiles.currentProfileData().name();
 
