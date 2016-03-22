@@ -73,29 +73,6 @@ def loadFilament():
 
 	return NO_CONTENT
 
-
-@api.route("/maintenance/save_filament", methods=["POST"])
-@restricted_access
-def saveFilament():
-
-	if not printer.is_operational():
-		return make_response("Printer is not operational", 409)
-
-	valid_commands = {
-		"filament": ["filamentStr"]
-	}
-	command, data, response = get_json_command_from_request(request, valid_commands)
-	if response is not None:
-		return response
-
-	filamentStr = data['filamentStr']
-
-	resp = printer.setFilamentString(filamentStr)
-
-	return jsonify({
-		"response": resp
-	})
-
 @api.route("/maintenance/start_calibration", methods=["POST"])
 @restricted_access
 def startCalibration():
@@ -188,6 +165,67 @@ def nozzleSizes():
 
 	return jsonify(availableSizes)
 
+@api.route("/maintenance/save_filament", methods=["POST"])
+@restricted_access
+def saveFilament():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	valid_commands = {
+		"filament": ["filamentStr"]
+	}
+	command, data, response = get_json_command_from_request(request, valid_commands)
+	if response is not None:
+		return response
+
+	filamentStr = data['filamentStr']
+
+	resp = printer.setFilamentString(filamentStr)
+
+	return jsonify({
+		"response": resp
+	})
+
+@api.route("/maintenance/get_filament", methods=["GET"])
+@restricted_access
+def getFilament():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	resp = printer.getFilamentString()
+
+	return jsonify({
+		"filament": resp
+	})
+
+
+@api.route("/maintenance/get_nozzles_and_filament", methods=["GET"])
+@restricted_access
+def getNozzlesAndFilament():
+	"""
+	Returns the list of available nozzle, the current selected nozzle and the current selected filament
+	:return:
+	"""
+	nozzle_list = printer.getNozzleTypes()
+
+	if not printer.is_operational():
+		return jsonify({
+			"nozzle": None,
+			"nozzleList": nozzle_list,
+			"filament": None
+		})
+
+	filament = printer.getFilamentString()
+	nozzle = printer.getNozzleSize()
+
+	return jsonify({
+		"nozzle": nozzle,
+		"nozzleList": nozzle_list,
+		"filament": filament
+	})
+
 @api.route("/maintenance/save_nozzle", methods=["POST"])
 @restricted_access
 def saveNozzle():
@@ -211,6 +249,30 @@ def saveNozzle():
 
 	return jsonify({
 		"response": resp
+	})
+
+@api.route("/maintenance/get_nozzle", methods=["GET"])
+@restricted_access
+def getSavedNozzle():
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	resp = printer.getNozzleSize()
+
+	return jsonify({
+		"nozzle": resp
+	})
+
+@api.route("/maintenance/get_nozzle_list", methods=["GET"])
+@restricted_access
+def getNozzleList():
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	resp = printer.getNozzleTypes()
+
+	return jsonify({
+		"nozzles": resp
 	})
 
 def _getSlicingProfilesData(slicer, printer_name, require_configured=False):

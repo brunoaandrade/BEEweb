@@ -4,6 +4,7 @@ $(function() {
 
         self.loginState = parameters[0];
         self.printerProfiles = parameters[1];
+        self.printerState = parameters[2];
 
         self.target = undefined;
         self.file = undefined;
@@ -27,6 +28,8 @@ $(function() {
         self.selResolution = ko.observable("med");
         self.raft = ko.observable(false);
         self.support = ko.observable(false);
+        self.nozzleTypes = ko.observableArray();
+        self.selNozzle = ko.observable();
 
         self.sliceButtonControl = true;
 
@@ -48,7 +51,7 @@ $(function() {
                 return;
             }
 
-            self.requestData();
+            self.requestData(self._nozzleFilamentUpdate);
             self.target = target;
             self.file = file;
             self.title(_.sprintf(gettext("Slicing %(filename)s"), {filename: self.file}));
@@ -87,6 +90,46 @@ $(function() {
                 }
             });
         };
+
+        self._nozzleFilamentUpdate = function() {
+            $.ajax({
+                url: API_BASEURL + "maintenance/get_nozzles_and_filament",
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    self.nozzleTypes.removeAll();
+                    var nozzleList = data.nozzleList;
+
+                    for (var key in nozzleList) {
+                        self.nozzleTypes.push(nozzleList[key].value);
+                    }
+
+                    self.selNozzle(data.nozzle);
+
+                    if (data.filament != null) {
+                        self.colors().forEach(function(elem) {
+                            var color = elem.toLowerCase();
+
+                            if (color == data.filament.toLowerCase()) {
+                                self.selColor(color);
+                            }
+                        });
+                    } else {
+                        // Selects the first color from the list by default
+                        if (self.colors().length > 0) {
+                            self.selColor(self.colors()[0]);
+                        }
+                    }
+                }
+            });
+        }
+
+        self.forPrint = function() {
+            if (self.afterSlicing() != "none")
+                return true;
+
+            return false;
+        }
 
         self.fromResponse = function(data) {
             self.data = data;
@@ -147,18 +190,12 @@ $(function() {
 
                 // Parses the list and filters for BVC colors
                 // Assumes the '_' nomenclature separation for the profile names
-
                 var profile_parts = name.split('_');
                 if (profile_parts[0] != null) {
                     var color = profile_parts[0];
                     if (!_.findWhere(self.colors(), color)) {
                         self.colors.push(color);
                     }
-                }
-
-                // Selects the first color from the list by default
-                if (self.colors().length > 0) {
-                    self.selColor(self.colors()[0]);
                 }
             });
 
@@ -316,7 +353,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push([
         SlicingViewModel,
-        ["loginStateViewModel", "printerProfilesViewModel"],
+        ["loginStateViewModel", "printerProfilesViewModel", "printerStateViewModel"],
         "#slicing_configuration_dialog"
     ]);
 });

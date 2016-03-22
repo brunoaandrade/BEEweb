@@ -28,8 +28,8 @@ class BeePrinter(Printer):
         self._runningCalibrationTest = False
 
         self.nozzleSizes = dict()
-        self.nozzleSizes["nozzleType1"] = {'value': 0.4}
-        self.nozzleSizes["nozzleType2"] = {'value': 0.6}
+        self.nozzleSizes["nozzleType1"] = { 'value': 0.4 }
+        self.nozzleSizes["nozzleType2"] = { 'value': 0.6 }
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
@@ -281,6 +281,13 @@ class BeePrinter(Printer):
         """
         return self._comm.getCommandsInterface().setFilamentString(filamentStr)
 
+    def getFilamentString(self):
+        """
+        Gets the current filament reference string in the printer memory
+        :return: string
+        """
+        return self._comm.getCommandsInterface().getFilamentString()
+
     def setNozzleSize(self, nozzleSize):
         """
         Saves the selected nozzle size
@@ -288,6 +295,20 @@ class BeePrinter(Printer):
         :return:
         """
         return self._comm.getCommandsInterface().setNozzleSize(nozzleSize)
+
+    def getNozzleSize(self):
+        """
+        Gets the current selected nozzle size in the printer memory
+        :return: float
+        """
+        return self._comm.getCommandsInterface().getNozzleSize()
+
+    def getNozzleTypes(self):
+        """
+        Gets the current list of available nozzle types
+        :return: float
+        """
+        return self.nozzleSizes
 
     def startCalibration(self, repeat=False):
         """
