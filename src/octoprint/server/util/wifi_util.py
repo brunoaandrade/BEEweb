@@ -138,15 +138,20 @@ def check_usb_dongle_thread():
 	_logger = logging.getLogger()
 
 	USB_POLL_INTERVAL = 5 # seconds
-	USB_VENDOR_ID = 0x0bda
-	USB_PRODUCT_ID = 0x8176
+	USB_VENDOR_ID_0 = 0x0bda
+	USB_PRODUCT_ID_0 = 0x8176
+	USB_VENDOR_ID_1 = 0x7392
+	USB_PRODUCT_ID_1 = 0x7811
 
 	wifi_dongle_removed = False
 
 	_logger.info("Starting USB dongle connectivity monitor thread...")
 	while True:
 		dev_list = []
-		for dev in usb.core.find(idVendor=USB_VENDOR_ID, idProduct=USB_PRODUCT_ID, find_all=True):
+		for dev in usb.core.find(idVendor=USB_VENDOR_ID_0, idProduct=USB_PRODUCT_ID_0, find_all=True):
+			dev_list.append(dev)
+
+		for dev in usb.core.find(idVendor=USB_VENDOR_ID_1, idProduct=USB_PRODUCT_ID_1, find_all=True):
 			dev_list.append(dev)
 
 		# If the dongle is not found but the removed flag is False switches it to True
