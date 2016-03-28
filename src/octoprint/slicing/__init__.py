@@ -450,7 +450,7 @@ class SlicingManager(object):
 			return
 		os.remove(path)
 
-	def all_profiles(self, slicer, require_configured=False):
+	def all_profiles(self, slicer, require_configured=False, from_current_printer=False):
 		"""
 		Retrieves all profiles for slicer ``slicer``.
 
@@ -462,7 +462,7 @@ class SlicingManager(object):
 		    require_configured (boolean): Whether to require the slicer ``slicer`` to be already configured (True)
 		        or not (False, default). If False and the slicer is not yet configured, a :class:`~octoprint.slicing.exceptions.SlicerNotConfigured`
 		        exception will be raised.
-
+			from_current_printer (boolean): Whether to select only profiles from the current or default printer
 		Returns:
 		    list of SlicingProfile: A list of all :class:`SlicingProfile` instances available for the slicer ``slicer``.
 
@@ -488,6 +488,56 @@ class SlicingManager(object):
 
 			profiles[profile_name] = self._load_profile_from_path(slicer, path, require_configured=require_configured)
 		return profiles
+
+	def all_profiles_list(self, slicer, require_configured=False, from_current_printer=True):
+		"""
+		Retrieves all profiles for slicer ``slicer`` but avoiding to parse every single profile file for better performance
+
+		If ``require_configured`` is set to True (default is False), only will return the profiles if the ``slicer``
+		is already configured, otherwise a :class:`SlicerNotConfigured` exception will be raised.
+
+		Arguments:
+			slicer (str): Identifier of the slicer for which to retrieve all slicer profiles
+			require_configured (boolean): Whether to require the slicer ``slicer`` to be already configured (True)
+				or not (False, default). If False and the slicer is not yet configured, a :class:`~octoprint.slicing.exceptions.SlicerNotConfigured`
+				exception will be raised.
+			from_current_printer (boolean): Whether to select only profiles from the current or default printer
+		Returns:
+			list of SlicingProfile: A list of all :class:`SlicingProfile` instances available for the slicer ``slicer``.
+
+		Raises:
+			~octoprint.slicing.exceptions.UnknownSlicer: The slicer ``slicer`` is unknown.
+			~octoprint.slicing.exceptions.SlicerNotConfigured: The slicer ``slicer`` is not configured and ``require_configured`` was True.
+		"""
+
+		if not slicer in self.registered_slicers:
+			raise UnknownSlicer(slicer)
+		if require_configured and not slicer in self.configured_slicers:
+			raise SlicerNotConfigured(slicer)
+
+		profiles = dict()
+		slicer_profile_path = self.get_slicer_profile_path(slicer)
+
+		if from_current_printer:
+			# adds an '_' to the end to avoid false positive string lookups for the printer names
+			printer_id = self._printer_profile_manager.get_current_or_default()['id'] + "_"
+			printer_id = printer_id.replace('-', '')
+
+		for entry in os.listdir(slicer_profile_path):
+			if not entry.endswith(".profile") or octoprint.util.is_hidden_path(entry):
+				# we are only interested in profiles and no hidden files
+				continue
+
+			if from_current_printer and printer_id.lower() not in entry.lower():
+				continue
+
+			#path = os.path.join(slicer_profile_path, entry)
+			profile_name = entry[:-len(".profile")]
+
+			# creates a shallow slicing profile
+			profiles[profile_name] = self._create_shallow_profile(profile_name, slicer, require_configured)
+		return profiles
+
 
 	def get_slicer_profile_path(self, slicer):
 		"""
@@ -576,4 +626,29 @@ class SlicingManager(object):
 
 		return self.get_slicer(slicer).get_slicer_default_profile()
 
+	def _create_shallow_profile(self, profile_name, slicer, require_configured):
 
+		# reverses the name sanitization
+		formatted_name = profile_name.replace('_', ' ').title()
+		name_parts = formatted_name.split(' ')
+
+		underscore_flag = False
+		formatted_name = ''
+		for part in name_parts:
+			if "Bee" in part or "Nz" in part:
+				formatted_name += '_' + part.upper()
+				underscore_flag = True
+			else:
+				if underscore_flag:
+					formatted_name += '_' + part
+				else:
+					formatted_name += ' ' + part
+
+		description = profile_name
+		profile_dict = {'_display_name': formatted_name}
+
+		properties = self.get_slicer(slicer, require_configured=require_configured).get_slicer_properties()
+
+		return octoprint.slicing.SlicingProfile(properties["type"],
+												"unknown", profile_dict, display_name=formatted_name,
+												description=description)

@@ -150,7 +150,7 @@ def filamentProfiles():
 	"""
 	default_slicer = s().get(["slicing", "defaultSlicer"])
 
-	profiles = _getSlicingProfilesData(default_slicer, printer.getPrinterName())
+	profiles = _getSlicingProfilesData(default_slicer, printer.getCurrentProfile()['name'])
 
 	return jsonify(profiles)
 
@@ -276,10 +276,8 @@ def getNozzleList():
 	})
 
 def _getSlicingProfilesData(slicer, printer_name, require_configured=False):
-	if printer_name is None:
-		printer_name = "BEETHEFIRST"
 
-	profiles = slicingManager.all_profiles(slicer, require_configured=require_configured)
+	profiles = slicingManager.all_profiles_list(slicer, require_configured=require_configured)
 
 	result = dict()
 	for name, profile in profiles.items():
@@ -315,10 +313,13 @@ def _getSlicingProfileData(slicer, name, profile, printer_name):
 	# filters the display name
 	if printer_name is not None:
 		filtered_name = result["displayName"]\
-			.replace('_'+printer_name, '')\
-			.replace('_MED','').replace('_LOW','').replace('_MEDIUM','')\
-			.replace('_HIGHPLUS','').replace('_HIGH','')
+			.replace('_'+printer_name.lower(), '') \
+			.replace('_medium', '').replace('_med','').replace('_low','')\
+			.replace('_highplus','').replace('_high','')\
+			.replace('_nz400', '').replace('_nz600', '')
 
+		# sanitizes the string for display
+		filtered_name = filtered_name.replace('_', ' ').title()
 		result["displayName"] = filtered_name
 
 	return result
