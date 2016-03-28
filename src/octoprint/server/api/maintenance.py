@@ -211,9 +211,9 @@ def getNozzlesAndFilament():
 
 	if not printer.is_operational():
 		return jsonify({
-			"nozzle": None,
+			"nozzle": '0.4',
 			"nozzleList": nozzle_list,
-			"filament": None
+			"filament": 'A023 - Black'
 		})
 
 	filament = printer.getFilamentString()

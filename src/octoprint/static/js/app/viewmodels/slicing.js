@@ -25,7 +25,7 @@ $(function() {
         self.colors = ko.observableArray();
         self.selColor = ko.observable();
         self.selDensity = ko.observable(5);
-        self.selResolution = ko.observable("med");
+        self.selResolution = ko.observable("Medium");
         self.raft = ko.observable(false);
         self.support = ko.observable(false);
         self.nozzleTypes = ko.observableArray();
@@ -108,10 +108,9 @@ $(function() {
 
                     if (data.filament != null) {
                         self.colors().forEach(function(elem) {
-                            var color = elem.toLowerCase();
 
-                            if (color == data.filament.toLowerCase()) {
-                                self.selColor(color);
+                            if (elem == data.filament) {
+                                self.selColor(elem);
                             }
                         });
                     } else {
@@ -122,14 +121,14 @@ $(function() {
                     }
                 }
             });
-        }
+        };
 
         self.forPrint = function() {
             if (self.afterSlicing() != "none")
                 return true;
 
             return false;
-        }
+        };
 
         self.fromResponse = function(data) {
             self.data = data;
@@ -192,7 +191,7 @@ $(function() {
                 // Assumes the '_' nomenclature separation for the profile names
                 var profile_parts = name.split('_');
                 if (profile_parts[0] != null) {
-                    var color = profile_parts[0];
+                    var color = profile_parts[0].trim();
                     if (!_.findWhere(self.colors(), color)) {
                         self.colors.push(color);
                     }
@@ -229,24 +228,18 @@ $(function() {
 
             // Selects the slicing profile based on the color and resolution
             if (self.selColor() != null && self.selResolution() != null) {
+                var nozzleSizeNorm = self.selNozzle() * 1000;
+                var nozzleSizeStr = 'NZ' + nozzleSizeNorm;
+
                 _.each(self.profiles(), function(profile) {
-                    // checks if the profile contains the selected color
+                    // checks if the profile contains the selected color and nozzle size
                     if (_.contains(profile.name, self.selColor())) {
-                        if (self.selResolution() == 'med'
-                            && (_.contains(profile.name, 'MED') || _.contains(profile.name, 'MEDIUM'))) {
+
+                        if (_.contains(profile.name, self.selResolution())) {
+
+                            if (_.contains(profile.name, nozzleSizeStr)) {
                                 self.profile(profile.key);
-                        }
-
-                        if (self.selResolution() == 'low' && _.contains(profile.name, 'LOW')) {
-                            self.profile(profile.key);
-                        }
-
-                        if (self.selResolution() == 'high' && _.contains(profile.name, 'HIGH')) {
-                            self.profile(profile.key);
-                        }
-
-                        if (self.selResolution() == 'high_plus' && _.contains(profile.name, 'HIGHPLUS')) {
-                            self.profile(profile.key);
+                            }
                         }
                     }
                 });
