@@ -27,10 +27,6 @@ class BeePrinter(Printer):
         self._currentFeedRate = None
         self._runningCalibrationTest = False
 
-        self.nozzleSizes = dict()
-        self.nozzleSizes["nozzleType1"] = { 'value': 0.4 }
-        self.nozzleSizes["nozzleType2"] = { 'value': 0.6 }
-
     def connect(self, port=None, baudrate=None, profile=None):
         """
          Connects to the printer. If port and/or baudrate is provided, uses these settings, otherwise autodetection
@@ -303,13 +299,6 @@ class BeePrinter(Printer):
         """
         return self._comm.getCommandsInterface().getNozzleSize()
 
-    def getNozzleTypes(self):
-        """
-        Gets the current list of available nozzle types
-        :return: float
-        """
-        return self.nozzleSizes
-
     def startCalibration(self, repeat=False):
         """
         Starts the calibration procedure
@@ -370,7 +359,7 @@ class BeePrinter(Printer):
         :param nozzleSize:
         :return:
         """
-        for k,v in self.nozzleSizes.iteritems():
+        for k,v in self.nozzleTypes.iteritems():
             if v['value'] == nozzleSize:
                 return True
 

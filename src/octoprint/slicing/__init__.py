@@ -634,9 +634,19 @@ class SlicingManager(object):
 
 		underscore_flag = False
 		formatted_name = ''
+		printer_models = settings().get(["printerModels"])
+		nozzle_types = settings().get(["nozzleTypes"]).itervalues()
+		nozzle_ids = []
+		for nzt in nozzle_types:
+			nozzle_ids.append(nzt['id'])
+
 		for part in name_parts:
-			if "Bee" in part or "Nz" in part:
-				formatted_name += '_' + part.upper()
+			part_upper_version = part.upper()
+			if part == 'Pla' or part == 'Beesupply':
+				part = part_upper_version
+
+			if part_upper_version in printer_models or part_upper_version in nozzle_ids:
+				formatted_name += '_' + part_upper_version
 				underscore_flag = True
 			else:
 				if underscore_flag:

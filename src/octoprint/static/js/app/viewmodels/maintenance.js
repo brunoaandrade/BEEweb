@@ -352,10 +352,15 @@ $(function() {
 
                     _.each(profiles, function(profile) {
 
-                        self.filamentProfiles.push({
-                            key: profile.key,
-                            name: profile.displayName
-                        });
+                        // Parses the list and filters for BVC colors
+                        // Assumes the '_' nomenclature separation for the profile names
+                        var profile_parts = profile.displayName.split('_');
+                        if (profile_parts[0] != null) {
+                            var color = profile_parts[0];
+                            if (!_.findWhere(self.filamentProfiles(), color)) {
+                                self.filamentProfiles.push(color);
+                            }
+                        }
                     });
                 }
             });

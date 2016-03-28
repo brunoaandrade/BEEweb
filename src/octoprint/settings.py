@@ -72,6 +72,11 @@ def settings(init=False, basedir=None, configfile=None):
 	return _instance
 
 default_settings = {
+	"printerModels": ['BEETHEFIRST', 'BEETHEFIRSTPLUS', 'BEEINSCHOOL', 'BEEME'],
+	"nozzleTypes": {
+		"nz1": { 'value': 0.4, 'id': 'NZ400'},
+		"nz2": { 'value': 0.6, 'id': 'NZ600'},
+	},
 	"usb": {
 		"autoconnect": True,
 	},

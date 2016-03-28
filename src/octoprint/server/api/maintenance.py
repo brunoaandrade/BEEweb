@@ -10,9 +10,8 @@ from flask import request, make_response, jsonify, url_for
 from octoprint.server import printer, NO_CONTENT
 from octoprint.server.util.flask import restricted_access, get_json_command_from_request
 from octoprint.server.api import api
-from octoprint.settings import settings as s, valid_boolean_trues
-from octoprint.slicing import UnknownSlicer, SlicerNotConfigured
-from octoprint.server import slicingManager
+from octoprint.settings import settings as s
+from octoprint.server.api.slicing import _getSlicingProfilesData as getSlicingProfilesData
 
 @api.route("/maintenance/start_heating", methods=["POST"])
 @restricted_access
@@ -150,7 +149,7 @@ def filamentProfiles():
 	"""
 	default_slicer = s().get(["slicing", "defaultSlicer"])
 
-	profiles = _getSlicingProfilesData(default_slicer, printer.getCurrentProfile()['name'])
+	profiles = getSlicingProfilesData(default_slicer, printer.getCurrentProfile()['name'])
 
 	return jsonify(profiles)
 
@@ -161,9 +160,9 @@ def nozzleSizes():
 	Gets the nozzle sizes available
 	:return:
 	"""
-	availableSizes = printer.nozzleSizes
+	nozzles = s().get(["nozzleTypes"])
 
-	return jsonify(availableSizes)
+	return jsonify(nozzles)
 
 @api.route("/maintenance/save_filament", methods=["POST"])
 @restricted_access
@@ -208,7 +207,7 @@ def getNozzlesAndFilament():
 	Returns the list of available nozzle, the current selected nozzle and the current selected filament
 	:return:
 	"""
-	nozzle_list = printer.getNozzleTypes()
+	nozzle_list = s().get(["nozzleTypes"])
 
 	if not printer.is_operational():
 		return jsonify({
@@ -274,52 +273,3 @@ def getNozzleList():
 	return jsonify({
 		"nozzles": resp
 	})
-
-def _getSlicingProfilesData(slicer, printer_name, require_configured=False):
-
-	profiles = slicingManager.all_profiles_list(slicer, require_configured=require_configured)
-
-	result = dict()
-	for name, profile in profiles.items():
-		profileData = _getSlicingProfileData(slicer, name, profile, printer_name)
-
-		if profileData["displayName"] in result:
-			continue
-
-		if printer_name is not None:
-			profile_key = profileData["key"]
-
-			if printer_name.lower() in profile_key.lower():
-				# Uses the filament filtered name as the key for the results array
-				result[profileData["displayName"]] = profileData
-		else:
-			result[profileData["displayName"]] = profileData
-
-	return result
-
-def _getSlicingProfileData(slicer, name, profile, printer_name):
-
-	defaultProfiles = s().get(["slicing", "defaultProfiles"])
-	result = dict(
-		key=name,
-		default=defaultProfiles and slicer in defaultProfiles and defaultProfiles[slicer] == name,
-		resource=url_for(".slicingGetSlicerProfile", slicer=slicer, name=name, _external=True)
-	)
-	if profile.display_name is not None:
-		result["displayName"] = profile.display_name
-	if profile.description is not None:
-		result["description"] = profile.description
-
-	# filters the display name
-	if printer_name is not None:
-		filtered_name = result["displayName"]\
-			.replace('_'+printer_name.lower(), '') \
-			.replace('_medium', '').replace('_med','').replace('_low','')\
-			.replace('_highplus','').replace('_high','')\
-			.replace('_nz400', '').replace('_nz600', '')
-
-		# sanitizes the string for display
-		filtered_name = filtered_name.replace('_', ' ').title()
-		result["displayName"] = filtered_name
-
-	return result
