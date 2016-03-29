@@ -520,15 +520,20 @@ class SlicingManager(object):
 
 		if from_current_printer:
 			# adds an '_' to the end to avoid false positive string lookups for the printer names
-			printer_id = self._printer_profile_manager.get_current_or_default()['id'] + "_"
-			printer_id = printer_id.replace('-', '')
+			printer_name = self._printer_profile_manager.get_current_or_default()['name']
+			printer_id = printer_name.replace(' ', '')
+			# removes the A suffix of some models for filament lookup matching
+			if printer_id.endswith('A'):
+				printer_id = printer_id[:-1]
+
+			printer_id = "_" + printer_id.lower()
 
 		for entry in os.listdir(slicer_profile_path):
 			if not entry.endswith(".profile") or octoprint.util.is_hidden_path(entry):
 				# we are only interested in profiles and no hidden files
 				continue
 
-			if from_current_printer and printer_id.lower() not in entry.lower():
+			if from_current_printer and printer_id not in entry.lower():
 				continue
 
 			#path = os.path.join(slicer_profile_path, entry)

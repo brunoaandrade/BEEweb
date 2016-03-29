@@ -140,7 +140,7 @@ class PrinterProfileManager(object):
 	"""
 
 	default = dict(
-		id = "_beethefirst",
+		id = "_default",
 		name = "BEETHEFIRST",
 		model = "Generic BEEVERYCREATIVE Printer",
 		color = "default",

@@ -55,9 +55,11 @@ $(function() {
             var logo = "";
 
             if (self.isErrorOrClosed() !== undefined && !self.isErrorOrClosed() && !self.isError()) {
-                var profileName = self.printerProfiles.currentProfileData().name();
-
-                logo = "/static/img/logo_" + profileName.toLowerCase() + ".png";
+                var profile = self.printerProfiles.currentProfileData().id();
+                if (profile == "_default") {
+                    profile = "beethefirst";
+                }
+                logo = "/static/img/logo_" + profile + ".png";
             }
 
             return logo;

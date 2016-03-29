@@ -22,7 +22,7 @@ def connectionState():
 		"state": state,
 		"port": port,
 		"baudrate": baudrate,
-		"printerProfile": printer_profile["id"] if printer_profile is not None and "id" in printer_profile else "_default"
+		"printerProfile": printer_profile["id"] if printer_profile is not None and "id" in printer_profile else "beethefirst"
 	}
 
 	return jsonify({"current": current, "options": _get_options()})

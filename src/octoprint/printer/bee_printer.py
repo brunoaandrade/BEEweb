@@ -48,7 +48,9 @@ class BeePrinter(Printer):
 
         # selects the printer profile based on the connected printer name
         printer_name = self.get_printer_name()
-        self._printerProfileManager.select(printer_name)
+        # converts the name to the id
+        printer_id = printer_name.lower().replace(' ', '')
+        self._printerProfileManager.select(printer_id)
 
     def disconnect(self):
         """
@@ -359,7 +361,7 @@ class BeePrinter(Printer):
         :param nozzleSize:
         :return:
         """
-        for k,v in self.nozzleTypes.iteritems():
+        for k,v in settings().get(['nozzleTypes']).iteritems():
             if v['value'] == nozzleSize:
                 return True
 

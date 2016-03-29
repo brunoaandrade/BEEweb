@@ -7,7 +7,7 @@ __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agp
 
 from flask import request, make_response, jsonify, url_for
 
-from octoprint.server import printer, NO_CONTENT
+from octoprint.server import printer, printerProfileManager, NO_CONTENT
 from octoprint.server.util.flask import restricted_access, get_json_command_from_request
 from octoprint.server.api import api
 from octoprint.settings import settings as s
@@ -149,7 +149,7 @@ def filamentProfiles():
 	"""
 	default_slicer = s().get(["slicing", "defaultSlicer"])
 
-	profiles = getSlicingProfilesData(default_slicer, printer.getCurrentProfile()['name'])
+	profiles = getSlicingProfilesData(default_slicer)
 
 	return jsonify(profiles)
 
@@ -245,6 +245,15 @@ def saveNozzle():
 		return make_response("Invalid nozzle size", 409)
 
 	resp = printer.setNozzleSize(nozzle)
+
+	printer_profile = printerProfileManager.get_current()
+	if printer_profile is not None:
+		printer_profile['extruder']['nozzleDiameter'] = nozzle
+		printerProfileManager.save(printer_profile, allow_overwrite=True)
+	else:
+		return jsonify({
+			"response": "Could not find printer profile for saving."
+		})
 
 	return jsonify({
 		"response": resp

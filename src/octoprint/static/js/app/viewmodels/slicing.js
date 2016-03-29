@@ -266,6 +266,9 @@ $(function() {
                 data["select"] = true;
             }
 
+            // Density support
+            data['profile.fill_density'] = self.selDensity();
+
             // BVC Raft Support
             if (self.raft() == true) {
                 data['profile.platform_adhesion'] = 'raft';

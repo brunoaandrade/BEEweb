@@ -151,7 +151,9 @@ def slicingDelSlicerProfile(slicer, name):
 	return NO_CONTENT
 
 def _getSlicingProfilesData(slicer, require_configured=False):
-	profiles = slicingManager.all_profiles_list(slicer, require_configured=require_configured)
+	profiles = slicingManager.all_profiles_list(slicer,
+												require_configured=require_configured,
+												from_current_printer=True)
 
 	result = dict()
 	for name, profile in profiles.items():
