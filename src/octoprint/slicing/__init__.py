@@ -526,7 +526,7 @@ class SlicingManager(object):
 			if printer_id.endswith('A'):
 				printer_id = printer_id[:-1]
 
-			printer_id = "_" + printer_id.lower()
+			printer_id = "_" + printer_id.lower() + "_"
 
 		for entry in os.listdir(slicer_profile_path):
 			if not entry.endswith(".profile") or octoprint.util.is_hidden_path(entry):
