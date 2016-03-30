@@ -218,6 +218,8 @@ def getNozzlesAndFilament():
 
 	filament = printer.getFilamentString()
 	nozzle = printer.getNozzleSize()
+	# converts the nozzle size to float
+	nozzle = float(nozzle) / 1000.0
 
 	return jsonify({
 		"nozzle": nozzle,
@@ -244,6 +246,8 @@ def saveNozzle():
 	if not printer.isValidNozzleSize(nozzle):
 		return make_response("Invalid nozzle size", 409)
 
+	# converts the nozzle to integer
+	nozzle = int(nozzle * 1000)
 	resp = printer.setNozzleSize(nozzle)
 
 	printer_profile = printerProfileManager.get_current()
@@ -266,6 +270,7 @@ def getSavedNozzle():
 		return make_response("Printer is not operational", 409)
 
 	resp = printer.getNozzleSize()
+	resp = float(resp / 1000)
 
 	return jsonify({
 		"nozzle": resp

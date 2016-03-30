@@ -49,7 +49,9 @@ class BeePrinter(Printer):
         # selects the printer profile based on the connected printer name
         printer_name = self.get_printer_name()
         # converts the name to the id
-        printer_id = printer_name.lower().replace(' ', '')
+        printer_id = None
+        if printer_name is not None:
+            printer_id = printer_name.lower().replace(' ', '')
         self._printerProfileManager.select(printer_id)
 
     def disconnect(self):
