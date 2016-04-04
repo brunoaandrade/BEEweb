@@ -4,6 +4,7 @@ $(function() {
 
         self.loginState = parameters[0];
         self.printerProfiles = parameters[1];
+        self.maintenance = parameters[2];
 
         self.stateString = ko.observable(undefined);
         self.isErrorOrClosed = ko.observable(undefined);
@@ -257,6 +258,10 @@ $(function() {
 
         };
 
+        self.shutdown = function() {
+            self._jobCommand("shutdown");
+        };
+
         self.pause = function() {
             self._jobCommand("pause");
         };
@@ -288,7 +293,15 @@ $(function() {
                     }
                 }
             });
-        }
+        };
+
+        self.showFilamentChange = function() {
+
+            // show maintenance dialog
+            self.maintenance.show();
+
+            self.maintenance.showFilamentChange();
+        };
     }
 
     OCTOPRINT_VIEWMODELS.push([

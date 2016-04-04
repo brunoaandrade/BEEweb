@@ -18,6 +18,7 @@ class BeeCom(MachineCom):
     STATE_WAITING_FOR_BTF = 21
     STATE_PREPARING_PRINT = 22
     STATE_HEATING = 23
+    STATE_SHUTDOWN = 24
 
     _beeConn = None
     _beeCommands = None
@@ -48,7 +49,7 @@ class BeeCom(MachineCom):
         :return: True if the connection was successful
         """
         if self._beeConn is None:
-            self._beeConn = BeePrinterConn(self._connShutdownHook)
+            self._beeConn = BeePrinterConn(self._connShutdownHook, True)
             self._beeConn.connectToFirstPrinter()
 
         if self._beeConn.isConnected():
@@ -293,6 +294,30 @@ class BeeCom(MachineCom):
             self._beeCommands.pausePrint()
 
             eventManager().fire(Events.PRINT_PAUSED, payload)
+
+    def enterShutdownMode(self):
+        """
+        Enters the printer shutdown mode
+        :return:
+        """
+        if self.isStreaming():
+            return
+
+        if not self._currentFile:
+            return
+
+        payload = {
+            "file": self._currentFile.getFilename(),
+            "filename": os.path.basename(self._currentFile.getFilename()),
+            "origin": self._currentFile.getFileLocation()
+        }
+
+        self._changeState(self.STATE_PAUSED)
+
+        # enter shutdown mode
+        self._beeCommands.enterShutdown()
+
+        eventManager().fire(Events.POWER_OFF, payload)
 
     def initSdCard(self):
         """

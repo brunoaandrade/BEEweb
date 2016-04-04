@@ -23,7 +23,8 @@ def controlJob():
 		"start": [],
 		"restart": [],
 		"pause": [],
-		"cancel": []
+		"cancel": [],
+		"shutdown": []
 	}
 
 	command, data, response = get_json_command_from_request(request, valid_commands)
@@ -49,6 +50,11 @@ def controlJob():
 			printer.unselect_file()
 		else:
 			printer.cancel_print()
+	elif command == "shutdown":
+		if not printer.is_paused():
+			return make_response("Printer does not have an active print job or is not paused", 409)
+		printer.enter_shutdown_mode()
+
 	return NO_CONTENT
 
 

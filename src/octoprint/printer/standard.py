@@ -426,6 +426,12 @@ class Printer(PrinterInterface, comm.MachineComPrintCallback):
 
 		self._comm.setPause(not self._comm.isPaused())
 
+	def enter_shutdown_mode(self):
+		"""
+        This action puts the printer in shutdown mode saving the current printing operation
+        """
+		return self._comm.enterShutdownMode()
+
 	def cancel_print(self):
 		"""
 		 Cancel the current printjob.
