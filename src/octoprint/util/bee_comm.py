@@ -18,7 +18,6 @@ class BeeCom(MachineCom):
     STATE_WAITING_FOR_BTF = 21
     STATE_PREPARING_PRINT = 22
     STATE_HEATING = 23
-    STATE_SHUTDOWN = 24
 
     _beeConn = None
     _beeCommands = None

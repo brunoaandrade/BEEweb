@@ -4,7 +4,6 @@ $(function() {
 
         self.loginState = parameters[0];
         self.printerProfiles = parameters[1];
-        self.maintenance = parameters[2];
 
         self.stateString = ko.observable(undefined);
         self.isErrorOrClosed = ko.observable(undefined);
@@ -141,14 +140,17 @@ $(function() {
         };
 
         self._proccessStateClass = function() {
-            self.stateClass("text-warning");
+            self.stateClass("text-primary");
 
             if (self.isOperational()) {
                 self.stateClass("text-success");
             }
+            if (self.isPaused()) {
+                self.stateClass("text-primary");
+            }
 
             if (self.isPrinting()) {
-                self.stateClass("text-primary");
+                self.stateClass("text-warning");
             }
 
             if (self.isErrorOrClosed()) {
@@ -303,6 +305,15 @@ $(function() {
             self.maintenance.showFilamentChange();
         };
     }
+
+    /**
+     * This function show the maitenance panel and
+     * automatically displays the change filament dialog
+     */
+    self.showMaintenanceFilamentChange = function() {
+        $('#navbar_show_maintenance').click();
+
+    };
 
     OCTOPRINT_VIEWMODELS.push([
         PrinterStateViewModel,

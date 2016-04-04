@@ -31,24 +31,26 @@
     <button class="btn span2" id="job_cancel" data-bind="click: cancel, enable: isOperational()  && loginState.isUser()" title="{{ _('Cancels the print job') }}"><i class="icon-stop"></i> {{ _('Cancel') }}</button>
 </div>
 <br />
-<div class="row-fluid" data-bind="visible: loginState.isUser && isPaused()">
+<div id="shutdown_panel" class="row-fluid" data-bind="visible: loginState.isUser && isPaused()">
 
     <a class="btn btn-danger span3" data-bind="click: shutdown" id="job_shutdown">
         <i class="icon-off"></i>
         <span >{{ _('Shutdown') }}</span>
     </a>
-    <br />
+    <br /><br />
     <span>
+        <i class="icon-warning-sign"></i>
         {{ _('The shutdown operation saves the print state. You can power off your printer and resume printing at a later time.') }}
     </span>
     <br /><br /><br />
 
-    <a href="#maintenance_dialog" data-bind="click: showFilamentChange" class="btn btn-primary" >
+    <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn btn-primary" >
         <i class="icon-wrench"></i>
         {{ _('Change filament now') }}
     </a>
-    <br />
+    <br /><br />
     <span>
+        <i class="icon-warning-sign"></i>
         {{ _('This operation is needed if you want to print with a different color or if the filament available in the spool is not enough.') }}
     </span>
 </div>
