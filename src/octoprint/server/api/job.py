@@ -31,7 +31,7 @@ def controlJob():
 	if response is not None:
 		return response
 
-	activePrintjob = printer.is_printing() or printer.is_paused()
+	activePrintjob = printer.is_printing() or printer.is_paused() or printer.is_preparing_print()
 
 	if command == "start":
 		if activePrintjob:

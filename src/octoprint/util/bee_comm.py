@@ -154,8 +154,13 @@ class BeeCom(MachineCom):
         return self._state == self.STATE_PREPARING_PRINT or self._state == self.STATE_HEATING
 
     def isPrinting(self):
-        return self._state == self.STATE_PRINTING or self._state == self.STATE_PREPARING_PRINT \
-               or self._state == self.STATE_HEATING
+        return self._state == self.STATE_PRINTING
+
+    def preparingPrint(self):
+        return self._state == self.STATE_PREPARING_PRINT or self._state == self.STATE_HEATING
+
+    def isHeating(self):
+        return self._state == self.STATE_HEATING
 
     def getStateString(self):
         """

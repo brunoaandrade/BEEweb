@@ -31,6 +31,19 @@ $(function() {
         self.nozzleSelected = ko.observable(false);
         self.saveNozzleResponseError = ko.observable(false);
 
+        self.onStartup = function() {
+
+            /**
+             * Binds the function to automatically show the Change filament dialog to the printer state model
+             * for usage in the shutdown panel
+             */
+            self.printerState.showMaintenanceFilamentChange = function() {
+                self.show();
+
+                self.showFilamentChange();
+            };
+        }
+
         self.show = function() {
             // show maintenance panel, ensure centered position
             self.maintenanceDialog.modal({

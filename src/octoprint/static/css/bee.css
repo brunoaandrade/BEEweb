@@ -37,3 +37,6 @@ canvas { width: 100% !important; }
 .workbench-alert {
     padding: 4px 35px 4px 14px;
 }
+.printer-status {
+    font-size: large;
+}

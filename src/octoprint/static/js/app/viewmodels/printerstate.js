@@ -9,6 +9,7 @@ $(function() {
         self.isErrorOrClosed = ko.observable(undefined);
         self.isOperational = ko.observable(undefined);
         self.isPrinting = ko.observable(undefined);
+        self.isHeating = ko.observable(undefined);
         self.isPaused = ko.observable(undefined);
         self.isError = ko.observable(undefined);
         self.isReady = ko.observable(undefined);
@@ -146,13 +147,14 @@ $(function() {
                 self.stateClass("text-success");
             }
             if (self.isPaused()) {
-                self.stateClass("text-primary");
-            }
-
-            if (self.isPrinting()) {
                 self.stateClass("text-warning");
             }
-
+            if (self.isHeating()) {
+                self.stateClass("text-warning");
+            }
+            if (self.isPrinting()) {
+                self.stateClass("text-primary");
+            }
             if (self.isErrorOrClosed()) {
                 self.stateClass("text-error");
             }
@@ -179,6 +181,7 @@ $(function() {
             self.isError(data.flags.error);
             self.isReady(data.flags.ready);
             self.isSdReady(data.flags.sdReady);
+            self.isHeating(data.flags.heating);
 
             if (self.isPaused() != prevPaused) {
                 if (self.isPaused()) {
@@ -257,19 +260,32 @@ $(function() {
             } else {
                 self._jobCommand("start");
             }
-
         };
 
         self.shutdown = function() {
-            self._jobCommand("shutdown");
+            $('#job_shutdown').prop('disabled', true);
+
+            self._jobCommand("shutdown", function () {
+                $('#shutdown_confirmation').removeClass('hidden');
+                $('#shutdown_panel').addClass('hidden');
+            });
         };
 
         self.pause = function() {
             self._jobCommand("pause");
+
+            self._restoreShutdown();
         };
+
+        self._restoreShutdown = function() {
+            $('#job_shutdown').prop('disabled', false);
+            $('#shutdown_confirmation').addClass('hidden');
+            $('#shutdown_panel').removeClass('hidden');
+        }
 
         self.cancel = function() {
             $('#job_cancel').prop('disabled', true);
+            self._restoreShutdown();
 
             self._jobCommand("cancel", function() {
 
@@ -297,23 +313,15 @@ $(function() {
             });
         };
 
-        self.showFilamentChange = function() {
+        /**
+         * This function shows the maintenance panel and
+         * automatically displays the change filament dialog
+         */
+        self.showMaintenanceFilamentChange = function() {
+            $('#navbar_show_maintenance').click();
 
-            // show maintenance dialog
-            self.maintenance.show();
-
-            self.maintenance.showFilamentChange();
         };
     }
-
-    /**
-     * This function show the maitenance panel and
-     * automatically displays the change filament dialog
-     */
-    self.showMaintenanceFilamentChange = function() {
-        $('#navbar_show_maintenance').click();
-
-    };
 
     OCTOPRINT_VIEWMODELS.push([
         PrinterStateViewModel,

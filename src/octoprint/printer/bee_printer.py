@@ -369,6 +369,12 @@ class BeePrinter(Printer):
 
         return False
 
+    def is_preparing_print(self):
+        return self._comm is not None and self._comm.preparingPrint()
+
+    def is_heating(self):
+        return self._comm is not None and self._comm.isHeating()
+
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
         """
         Auxiliar method to control the print progress status data
@@ -412,6 +418,17 @@ class BeePrinter(Printer):
                 self._lastProgressReport = progress_int
                 self._reportPrintProgressToPlugins(progress_int)
 
+    def _getStateFlags(self):
+        return {
+            "operational": self.is_operational(),
+            "printing": self.is_printing(),
+            "closedOrError": self.is_closed_or_error(),
+            "error": self.is_error(),
+            "paused": self.is_paused(),
+            "ready": self.is_ready(),
+            "sdReady": self.is_sd_ready(),
+            "heating": self.is_heating()
+        }
 
 class CalibrationGCoder:
 
