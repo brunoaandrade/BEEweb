@@ -55,13 +55,13 @@ class BeePrinter(Printer):
             printer_id = printer_name.lower().replace(' ', '')
         self._printerProfileManager.select(printer_id)
 
-        # if the printer is in shutdown mode selects the last selected file for print
+        # if the printer is printing or in shutdown mode selects the last selected file for print
         lastFile = settings().get(['lastPrintJobFile'])
-        if lastFile is not None and self.is_shutdown():
+        if lastFile is not None and (self.is_shutdown() or self.is_printing()):
             self.select_file(lastFile, False)
 
         # subscribes the unselect_file function with the PRINT_FAILED event
-        eventManager().subscribe(Events.PRINT_FAILED, self.unselect_file)
+        eventManager().subscribe(Events.PRINT_FAILED, self.on_print_cancelled)
 
 
     def disconnect(self):
@@ -412,6 +412,12 @@ class BeePrinter(Printer):
         # waits a bit before unselecting the file
         import time
         time.sleep(2)
+        self.unselect_file()
+
+    def on_print_cancelled(self, event, payload):
+        """
+        Print cancelled callback for the EventManager.
+        """
         self.unselect_file()
 
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
