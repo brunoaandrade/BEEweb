@@ -15,7 +15,9 @@ $(function() {
         self.isReady = ko.observable(undefined);
         self.isLoading = ko.observable(undefined);
         self.isSdReady = ko.observable(undefined);
+
         self.stateClass = ko.observable(undefined);
+        self.isShutdown = ko.observable(undefined);
 
         self.enablePrint = ko.pureComputed(function() {
             return self.isOperational() && self.isReady() && !self.isPrinting() && self.loginState.isUser() && self.filename() != undefined;
@@ -141,22 +143,25 @@ $(function() {
         };
 
         self._proccessStateClass = function() {
-            self.stateClass("text-primary");
+            self.stateClass("text-black");
 
             if (self.isOperational()) {
                 self.stateClass("text-success");
             }
             if (self.isPaused()) {
-                self.stateClass("text-warning");
+                self.stateClass("text-black");
             }
             if (self.isHeating()) {
-                self.stateClass("text-warning");
+                self.stateClass("text-error");
             }
             if (self.isPrinting()) {
                 self.stateClass("text-primary");
             }
+            if (self.isShutdown()) {
+                self.stateClass("text-black");
+            }
             if (self.isErrorOrClosed()) {
-                self.stateClass("text-error");
+                self.stateClass("text-warning");
             }
         };
 
@@ -182,6 +187,7 @@ $(function() {
             self.isReady(data.flags.ready);
             self.isSdReady(data.flags.sdReady);
             self.isHeating(data.flags.heating);
+            self.isShutdown(data.flags.shutdown);
 
             if (self.isPaused() != prevPaused) {
                 if (self.isPaused()) {

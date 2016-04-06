@@ -18,6 +18,7 @@ class BeeCom(MachineCom):
     STATE_WAITING_FOR_BTF = 21
     STATE_PREPARING_PRINT = 22
     STATE_HEATING = 23
+    STATE_SHUTDOWN = 24
 
     _beeConn = None
     _beeCommands = None
@@ -122,6 +123,8 @@ class BeeCom(MachineCom):
         if self._beeConn.isConnected():
             if self._beeCommands.isPrinting():
                 self._changeState(self.STATE_PRINTING)
+            elif self._beeCommands.isShutdown():
+                self._changeState(self.STATE_SHUTDOWN)
             else:
                 self._changeState(self.STATE_OPERATIONAL)
         else:
@@ -139,8 +142,11 @@ class BeeCom(MachineCom):
 
     def isOperational(self):
         return self._state == self.STATE_OPERATIONAL \
-               or self._state == self.STATE_PRINTING or self._state == self.STATE_PAUSED \
-               or self._state == self.STATE_TRANSFERING_FILE or self._state == self.STATE_PREPARING_PRINT \
+               or self._state == self.STATE_PRINTING \
+			   or self._state == self.STATE_PAUSED \
+			   or self._state == self.STATE_SHUTDOWN \
+               or self._state == self.STATE_TRANSFERING_FILE \
+			   or self._state == self.STATE_PREPARING_PRINT \
                or self._state == self.STATE_HEATING
 
     def isClosedOrError(self):
@@ -156,11 +162,11 @@ class BeeCom(MachineCom):
     def isPrinting(self):
         return self._state == self.STATE_PRINTING
 
-    def preparingPrint(self):
-        return self._state == self.STATE_PREPARING_PRINT or self._state == self.STATE_HEATING
-
     def isHeating(self):
         return self._state == self.STATE_HEATING
+
+    def isShutdown(self):
+        return self._state == self.STATE_SHUTDOWN
 
     def getStateString(self):
         """
@@ -173,6 +179,8 @@ class BeeCom(MachineCom):
             return "Preparing to print, please wait..."
         elif self._state == self.STATE_HEATING:
             return "Heating..."
+        elif self._state == self.STATE_SHUTDOWN:
+            return "Shutdown"
         else:
             return super(BeeCom, self).getStateString()
 
@@ -277,7 +285,7 @@ class BeeCom(MachineCom):
             "origin": self._currentFile.getFileLocation()
         }
 
-        if not pause and self.isPaused():
+        if (not pause and self.isPaused()) or self.isShutdown():
             if self._pauseWaitStartTime:
                 self._pauseWaitTimeLost = self._pauseWaitTimeLost + (time.time() - self._pauseWaitStartTime)
                 self._pauseWaitStartTime = None
@@ -316,7 +324,7 @@ class BeeCom(MachineCom):
             "origin": self._currentFile.getFileLocation()
         }
 
-        self._changeState(self.STATE_PAUSED)
+        self._changeState(self.STATE_SHUTDOWN)
 
         # enter shutdown mode
         self._beeCommands.enterShutdown()

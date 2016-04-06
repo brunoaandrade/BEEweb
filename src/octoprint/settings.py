@@ -77,6 +77,7 @@ default_settings = {
 		"nz1": { 'value': 0.4, 'id': 'NZ400'},
 		"nz2": { 'value': 0.6, 'id': 'NZ600'},
 	},
+	"lastPrintJobFile": None,
 	"usb": {
 		"autoconnect": True,
 	},

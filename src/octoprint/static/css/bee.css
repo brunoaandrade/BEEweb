@@ -40,3 +40,6 @@ canvas { width: 100% !important; }
 .printer-status {
     font-size: large;
 }
+.text-black {
+    color: black;
+}

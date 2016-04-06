@@ -7,6 +7,7 @@ from octoprint.printer.standard import Printer
 from octoprint.printer import PrinterInterface
 from octoprint.settings import settings
 from octoprint.server.util.connection_util import detect_bvc_printer_connection
+from octoprint.events import eventManager, Events
 
 __author__ = "BEEVC - Electronic Systems "
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
@@ -29,13 +30,12 @@ class BeePrinter(Printer):
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
-         Connects to the printer. If port and/or baudrate is provided, uses these settings, otherwise autodetection
-         will be attempted.
+         Connects to a BVC printer. Ignores port, baudrate parameters.
+         They are kept just for interface compatibility
         """
 
         if self._comm is not None:
             self._comm.close()
-        #self._printerProfileManager.select(profile)
 
         self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
         self._comm.confirmConnection()
@@ -48,11 +48,21 @@ class BeePrinter(Printer):
 
         # selects the printer profile based on the connected printer name
         printer_name = self.get_printer_name()
+
         # converts the name to the id
         printer_id = None
         if printer_name is not None:
             printer_id = printer_name.lower().replace(' ', '')
         self._printerProfileManager.select(printer_id)
+
+        # if the printer is in shutdown mode selects the last selected file for print
+        lastFile = settings().get(['lastPrintJobFile'])
+        if lastFile is not None and self.is_shutdown():
+            self.select_file(lastFile, False)
+
+        # subscribes the unselect_file function with the PRINT_FAILED event
+        eventManager().subscribe(Events.PRINT_FAILED, self.unselect_file)
+
 
     def disconnect(self):
         """
@@ -370,10 +380,39 @@ class BeePrinter(Printer):
         return False
 
     def is_preparing_print(self):
-        return self._comm is not None and self._comm.preparingPrint()
+        return self._comm is not None and self._comm.isPreparingPrint()
 
     def is_heating(self):
         return self._comm is not None and self._comm.isHeating()
+
+    def is_shutdown(self):
+        return self._comm is not None and self._comm.isShutdown()
+
+    def get_state_string(self):
+        """
+         Returns a human readable string corresponding to the current communication state.
+        """
+        if self._comm is None:
+            return "Attempting to connect..."
+        else:
+            return self._comm.getStateString()
+
+    def select_file(self, path, sd, printAfterSelect=False, pos=None):
+        super(BeePrinter, self).select_file(path, sd, printAfterSelect, pos)
+
+        # saves the path to the selected file
+        settings().set(['lastPrintJobFile'], path)
+        settings().save()
+
+    def cancel_print(self):
+        """
+         Cancel the current printjob.
+        """
+        super(BeePrinter, self).cancel_print()
+        # waits a bit before unselecting the file
+        import time
+        time.sleep(2)
+        self.unselect_file()
 
     def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
         """
@@ -427,7 +466,8 @@ class BeePrinter(Printer):
             "paused": self.is_paused(),
             "ready": self.is_ready(),
             "sdReady": self.is_sd_ready(),
-            "heating": self.is_heating()
+            "heating": self.is_heating(),
+            "shutdown": self.is_shutdown()
         }
 
 class CalibrationGCoder:

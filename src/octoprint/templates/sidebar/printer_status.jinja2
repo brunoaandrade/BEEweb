@@ -22,40 +22,28 @@
 </div>
 
 <div class="row-fluid print-control" style="display: none;" data-bind="visible: loginState.isUser">
-    <button class="btn btn-primary span3" data-bind="click: print, enable: enablePrint(), visible: !isPaused(), css: {'btn-info': isPaused()}, attr: {title: titlePrintButton}" id="job_print">
+    <button class="btn btn-primary span3" data-bind="click: print, enable: enablePrint(), visible: (!isPaused() && !isShutdown()), css: {'btn-info': isPaused()}, attr: {title: titlePrintButton}" id="job_print">
         <i data-bind="css: {'icon-print': !isPaused(), 'icon-undo': isPaused()}"></i>
         <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
     </button>
     <div class="span5"></div>
-    <button class="btn span2" id="job_pause" data-bind="click: pause, enable: isOperational() && (isPrinting() || isPaused()) && loginState.isUser(), css: {active: isPaused()}, attr: {title: titlePauseButton}">
-        <i data-bind="css: {'icon-pause': !isPaused(), 'icon-play': isPaused()}"></i>
-        <span data-bind="visible: !isPaused()">{{ _('Pause') }}</span>
-        <span data-bind="visible: isPaused()">{{ _('Resume') }}</span>
+    <button class="btn span2" id="job_pause" data-bind="click: pause, enable: isOperational() && (isPrinting() || isPaused() || isShutdown()) && loginState.isUser(), css: {active: isPaused() }, attr: {title: titlePauseButton}">
+        <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>
+        <span data-bind="visible: !isPaused() && !isShutdown()">{{ _('Pause') }}</span>
+        <span data-bind="visible: isPaused() || isShutdown()">{{ _('Resume') }}</span>
     </button>
     <button class="btn span2" id="job_cancel" data-bind="click: cancel, enable: isOperational() && loginState.isUser()" title="{{ _('Cancels the print job') }}">
         <i class="icon-stop"></i> {{ _('Cancel') }}
     </button>
 </div>
 <br />
-<div id="pause_panel" class="row-fluid" data-bind="visible: loginState.isUser && isPaused()">
+<div id="pause_panel" class="row-fluid" data-bind="visible: loginState.isUser && (isPaused() || isShutdown())">
 
-    <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn btn-primary" >
-        <i class="icon-wrench"></i>
-        {{ _('Change filament now') }}
-    </a>
-    <br /><br />
-    <span>
-        <i class="icon-warning-sign"></i>
-        {{ _('This operation is needed if you want to print with a different color or if the filament available in the spool is not enough.') }}
-    </span>
-
-    <br /><br /><br />
-
-    <div id="shutdown_panel" >
-        <a id="job_shutdown" class="btn btn-danger span3" data-bind="click: shutdown" >
+    <div id="shutdown_panel" data-bind="visible: !isShutdown()">
+        <button id="job_shutdown" class="btn btn-danger span3" data-bind="click: shutdown" >
             <i class="icon-off"></i>
             <span >{{ _('Shutdown') }}</span>
-        </a>
+        </button>
         <br /><br />
         <span>
             <i class="icon-warning-sign"></i>
@@ -63,12 +51,26 @@
         </span>
     </div>
 
-    <div id="shutdown_confirmation" class="row-fluid hidden text-center">
+    <div id="shutdown_confirmation" class="row-fluid text-center" data-bind="visible: isShutdown()">
         <span >
             <strong>
                 <i class="icon-warning-sign"></i>
                 {{ _('You can power off your printer. Alternatively you can resume or cancel your print.') }}
             </strong>
+        </span>
+    </div>
+
+    <br /><br /><br />
+
+    <div id="shutdown_panel_change_filament">
+        <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn btn-primary" >
+            <i class="icon-wrench"></i>
+            {{ _('Change filament now') }}
+        </a>
+        <br /><br />
+        <span>
+            <i class="icon-warning-sign"></i>
+            {{ _('This operation is needed if you want to print with a different color or if the filament available in the spool is not enough.') }}
         </span>
     </div>
 </div>
