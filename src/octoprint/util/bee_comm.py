@@ -7,7 +7,7 @@ import Queue as queue
 
 from octoprint.settings import settings
 from octoprint.events import eventManager, Events
-from octoprint.util.comm import MachineCom, get_interval
+from octoprint.util.comm import MachineCom
 from beedriver.connection import Conn as BeePrinterConn
 from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer
 
@@ -210,8 +210,7 @@ class BeeCom(MachineCom):
                 print_resp = self._beeCommands.startSDPrint(self._currentFile.getFilename())
 
                 if print_resp:
-                    self._sd_status_timer = RepeatedTimer(lambda: get_interval("sdStatus", default_value=1.0),
-                                                          self._poll_sd_status, run_first=True)
+                    self._sd_status_timer = RepeatedTimer(self._timeout_intervals.get("sdStatus", 1.0), self._poll_sd_status, run_first=True)
                     self._sd_status_timer.start()
             else:
                 print_resp = self._beeCommands.printFile(payload['file'])
@@ -663,7 +662,7 @@ class BeeCom(MachineCom):
         # starts the connection monitor thread
         self._beeConn.startConnectionMonitor()
 
-        self._temperature_timer = RepeatedTimer(lambda: get_interval("temperature", default_value=4.0), self._poll_temperature, run_first=True)
+        self._temperature_timer = RepeatedTimer(self._timeout_intervals.get("temperature", 4.0), self._poll_temperature, run_first=True)
         self._temperature_timer.start()
 
         if self._sdAvailable:
@@ -684,7 +683,7 @@ class BeeCom(MachineCom):
         try:
             if self.isOperational() and not self.isStreaming() and not self._long_running_command and not self._heating:
                 self.sendCommand("M105", cmd_type="temperature_poll")
-        except Exception, e:
+        except Exception as e:
             self._log("Error polling temperature %s" % str(e))
 
 
