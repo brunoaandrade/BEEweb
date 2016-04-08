@@ -420,35 +420,35 @@ class BeePrinter(Printer):
         """
         self.unselect_file()
 
-    def _setProgressData(self, progress, filepos, printTime, cleanedPrintTime):
+    def _setProgressData(self, completion=None, filepos=None, printTime=None, printTimeLeft=None):
         """
         Auxiliar method to control the print progress status data
-        :param progress:
+        :param completion:
         :param filepos:
         :param printTime:
-        :param cleanedPrintTime:
+        :param printTimeLeft:
         :return:
         """
-        estimatedTotalPrintTime = self._estimateTotalPrintTime(progress, cleanedPrintTime)
+        estimatedTotalPrintTime = self._estimateTotalPrintTime(completion, printTimeLeft)
         totalPrintTime = estimatedTotalPrintTime
 
         if self._selectedFile and "estimatedPrintTime" in self._selectedFile \
                 and self._selectedFile["estimatedPrintTime"]:
 
             statisticalTotalPrintTime = self._selectedFile["estimatedPrintTime"]
-            if progress and cleanedPrintTime:
+            if completion and printTimeLeft:
                 if estimatedTotalPrintTime is None:
                     totalPrintTime = statisticalTotalPrintTime
                 else:
-                    if progress < 0.5:
-                        sub_progress = progress * 2
+                    if completion < 0.5:
+                        sub_progress = completion * 2
                     else:
                         sub_progress = 1.0
                     totalPrintTime = (1 - sub_progress) * statisticalTotalPrintTime + sub_progress * estimatedTotalPrintTime
 
-        self._progress = progress
+        self._progress = completion
         self._printTime = printTime
-        self._printTimeLeft = totalPrintTime - cleanedPrintTime if (totalPrintTime is not None and cleanedPrintTime is not None) else None
+        self._printTimeLeft = totalPrintTime - printTimeLeft if (totalPrintTime is not None and printTimeLeft is not None) else None
 
         self._stateMonitor.set_progress({
             "completion": self._progress * 100 if self._progress is not None else None,
@@ -457,8 +457,8 @@ class BeePrinter(Printer):
             "printTimeLeft": int(self._printTimeLeft) if self._printTimeLeft is not None else None
         })
 
-        if progress:
-            progress_int = int(progress * 100)
+        if completion:
+            progress_int = int(completion * 100)
             if self._lastProgressReport != progress_int:
                 self._lastProgressReport = progress_int
                 self._reportPrintProgressToPlugins(progress_int)
