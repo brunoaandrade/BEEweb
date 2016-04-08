@@ -73,7 +73,8 @@ $(function() {
             return self.gcodeFilename() != undefined
                 && self.gcodeFilename().trim() != ""
                 && self.slicer() != undefined
-                && self.sliceButtonControl == true;
+                && self.sliceButtonControl == true
+                && (self.printerState.isErrorOrClosed() == true && self.afterSlicing() == "none");
                 //&& self.profile() != undefined;
         });
 
