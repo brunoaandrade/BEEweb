@@ -414,7 +414,7 @@ class BeePrinter(Printer):
         time.sleep(2)
         self.unselect_file()
 
-    def current_firware(self):
+    def current_firmware(self):
         """
         Gets the current firmware version
         :return:
@@ -429,18 +429,37 @@ class BeePrinter(Printer):
     def update_firmware(self):
         """
         Updates the printer firmware if a newer version is available
-        :return:
+        :return: if no printer is connected just returns void
         """
-        # gets the current firmware version
 
-
-        # get the latest firmware file
+        # get the latest firmware file for the connected printer
         conn_printer = self.getCurrentProfile()
         if conn_printer is None:
             return
 
         printer_name = conn_printer.get('name').replace(' ', '')
 
+        if printer_name:
+            from os import listdir
+            from os.path import isfile, join
+
+            firmware_path = settings().getBaseFolder('firmware')
+            firmware_files = [f for f in listdir(firmware_path) if isfile(join(firmware_path, f))]
+
+            for ff in firmware_files:
+                fname_parts = ff.split('-')
+                if len(fname_parts) == 3 and printer_name == fname_parts[1]:
+                    # gets the current firmware version
+                    curr_version = self.current_firmware()
+                    if curr_version is not "Not available":
+                        curr_version_parts = curr_version.split('.')
+                        file_version_parts = fname_parts[2].split('.')
+
+                        for i in xrange(3):
+                            if int(file_version_parts[i]) > int(curr_version_parts[i]):
+                                # version update found
+                                self._comm.getCommandsInterface().flashFirmware(firmware_path + '/' + ff)
+                                return
 
     def on_print_cancelled(self, event, payload):
         """
