@@ -188,7 +188,8 @@ default_settings = {
 		"scripts": None,
 		"translations": None,
 		"generated": None,
-		"data": None
+		"data": None,
+		"firmware": None
 	},
 	"temperature": {
 		"profiles": [

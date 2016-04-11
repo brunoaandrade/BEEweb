@@ -414,6 +414,34 @@ class BeePrinter(Printer):
         time.sleep(2)
         self.unselect_file()
 
+    def current_firware(self):
+        """
+        Gets the current firmware version
+        :return:
+        """
+        firmware_v = self._comm.getCommandsInterface().getFirmwareVersion()
+
+        if firmware_v is not None:
+            return firmware_v
+        else:
+            return 'Not available'
+
+    def update_firmware(self):
+        """
+        Updates the printer firmware if a newer version is available
+        :return:
+        """
+        # gets the current firmware version
+
+
+        # get the latest firmware file
+        conn_printer = self.getCurrentProfile()
+        if conn_printer is None:
+            return
+
+        printer_name = conn_printer.get('name').replace(' ', '')
+
+
     def on_print_cancelled(self, event, payload):
         """
         Print cancelled callback for the EventManager.
