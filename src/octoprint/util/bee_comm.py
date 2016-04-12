@@ -44,7 +44,7 @@ class BeeCom(MachineCom):
 
     def _openConnection(self):
         """
-        Opens a new connection using the BeeVC driver
+        Opens a new connection using the BEEcom driver
 
         :return: True if the connection was successful
         """

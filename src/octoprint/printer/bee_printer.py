@@ -1,6 +1,10 @@
 # coding=utf-8
 
 from __future__ import absolute_import
+
+import logging
+
+import time
 from octoprint.util.bee_comm import BeeCom
 import os
 from octoprint.printer.standard import Printer
@@ -45,6 +49,9 @@ class BeePrinter(Printer):
         # homes all axis
         if bee_commands is not None and bee_commands.isPrinting() is False:
             bee_commands.home()
+
+            # checks for firmware upgrades
+            self.update_firmware()
 
         # selects the printer profile based on the connected printer name
         printer_name = self.get_printer_name()
@@ -431,7 +438,7 @@ class BeePrinter(Printer):
         Updates the printer firmware if a newer version is available
         :return: if no printer is connected just returns void
         """
-
+        _logger = logging.getLogger()
         # get the latest firmware file for the connected printer
         conn_printer = self.getCurrentProfile()
         if conn_printer is None:
@@ -443,23 +450,36 @@ class BeePrinter(Printer):
             from os import listdir
             from os.path import isfile, join
 
+            _logger.info("Checking for firmware updates...")
+
             firmware_path = settings().getBaseFolder('firmware')
-            firmware_files = [f for f in listdir(firmware_path) if isfile(join(firmware_path, f))]
 
-            for ff in firmware_files:
-                fname_parts = ff.split('-')
-                if len(fname_parts) == 3 and printer_name == fname_parts[1]:
-                    # gets the current firmware version
-                    curr_version = self.current_firmware()
-                    if curr_version is not "Not available":
-                        curr_version_parts = curr_version.split('.')
-                        file_version_parts = fname_parts[2].split('.')
+            for ff in listdir(firmware_path):
 
-                        for i in xrange(3):
-                            if int(file_version_parts[i]) > int(curr_version_parts[i]):
-                                # version update found
-                                self._comm.getCommandsInterface().flashFirmware(firmware_path + '/' + ff)
-                                return
+                if isfile(join(firmware_path, ff)):
+                    firmware_file = os.path.splitext(ff)[0]
+                    fname_parts = firmware_file.split('-')
+
+                    if len(fname_parts) == 3 and printer_name == fname_parts[1]:
+
+                        # gets the current firmware version
+                        curr_version = self.current_firmware()
+                        if curr_version is not "Not available":
+                            curr_version_parts = curr_version.split('.')
+                            file_version_parts = fname_parts[2].split('.')
+
+                            for i in xrange(3):
+                                if int(file_version_parts[i]) > int(curr_version_parts[i]):
+                                    # version update found
+                                    _logger.info("Updating printer firmware...")
+                                    self._comm.getCommandsInterface().flashFirmware(firmware_path + '/' + ff, fname_parts[2])
+
+                                    # waits for transfer to finish
+                                    while self._comm.getCommandsInterface().getTransferCompletionState() is not None:
+                                        time.sleep(0.5)
+
+                                    _logger.info("Firmware updated to %s" % fname_parts[2])
+                                    return
 
     def on_print_cancelled(self, event, payload):
         """

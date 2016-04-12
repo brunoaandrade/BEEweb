@@ -91,7 +91,7 @@ def hostnameSave():
 @api.route("/firmware/latest/version", methods=["GET"])
 def getLatestFirwareVersion():
 
-	version = '10.4.16' # default base version
+	version = '0.0.0' # default base version
 	firmware_path = settings().getBaseFolder('firmware')
 	if printer is not None:
 		printer_name = printer.get_printer_name()
@@ -124,16 +124,16 @@ def getFirmwareFileLink(printer_name, version):
 
 	if printer_name:
 		firmware_path = settings().getBaseFolder('firmware')
-		firmware_files = [f for f in listdir(firmware_path) if isfile(join(firmware_path, f))]
 
-		for ff in firmware_files:
+		for ff in listdir(firmware_path):
+			if isfile(join(firmware_path, ff)):
 
-			if ff == filename:
-				link = url_for("index", _external=True) + "firmware/" + filename
+				if ff == filename:
+					link = url_for("index", _external=True) + "firmware/" + filename
 
-				return jsonify({
-					"file": link
-				})
+					return jsonify({
+						"file": link
+					})
 
 	return NO_CONTENT
 
