@@ -464,15 +464,17 @@ class BeePrinter(Printer):
 
                         # gets the current firmware version
                         curr_version = self.current_firmware()
-                        if curr_version is not "Not available":
-                            curr_version_parts = curr_version.split('.')
+                        currversion_parts = curr_version.split('-')
+
+                        if len(currversion_parts) == 3 and curr_version is not "Not available":
+                            curr_version_parts = currversion_parts[2].split('.')
                             file_version_parts = fname_parts[2].split('.')
 
                             for i in xrange(3):
                                 if int(file_version_parts[i]) > int(curr_version_parts[i]):
                                     # version update found
                                     _logger.info("Updating printer firmware...")
-                                    self._comm.getCommandsInterface().flashFirmware(firmware_path + '/' + ff, fname_parts[2])
+                                    self._comm.getCommandsInterface().flashFirmware(firmware_path + '/' + ff, firmware_file)
 
                                     # waits for transfer to finish
                                     while self._comm.getCommandsInterface().getTransferCompletionState() is not None:
