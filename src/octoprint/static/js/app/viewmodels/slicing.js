@@ -74,7 +74,8 @@ $(function() {
                 && self.gcodeFilename().trim() != ""
                 && self.slicer() != undefined
                 && self.sliceButtonControl == true
-                && (self.printerState.isErrorOrClosed() == true && self.afterSlicing() == "none");
+                && (self.printerState.isOperational() ||
+                    self.afterSlicing() == "none" && self.printerState.isErrorOrClosed() == true);
                 //&& self.profile() != undefined;
         });
 
