@@ -132,6 +132,8 @@ class BeeCom(MachineCom):
                                     _logger.info("Firmware updated to %s" % fname_parts[2])
                                     return
 
+            _logger.info("Checking for firmware updates...")
+
     def sendCommand(self, cmd, cmd_type=None, processed=False):
         """
         Sends a custom command through the open connection
