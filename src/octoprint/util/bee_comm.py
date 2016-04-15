@@ -8,7 +8,7 @@ import logging
 
 from octoprint.settings import settings
 from octoprint.events import eventManager, Events
-from octoprint.util.comm import MachineCom
+from octoprint.util.comm import MachineCom, regex_sdPrintingByte, regex_sdFileOpened
 from beedriver.connection import Conn as BeePrinterConn
 from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer
 
@@ -134,12 +134,13 @@ class BeeCom(MachineCom):
 
             _logger.info("Checking for firmware updates...")
 
-    def sendCommand(self, cmd, cmd_type=None, processed=False):
+    def sendCommand(self, cmd, cmd_type=None, processed=False, force=False):
         """
         Sends a custom command through the open connection
         :param cmd:
         :param cmd_type:
         :param processed:
+        :param force:
         :return:
         """
         cmd = cmd.encode('ascii', 'replace')
@@ -169,10 +170,14 @@ class BeeCom(MachineCom):
                     if "Error" in r:
                         self._logger.warning(r)
 
-    def close(self, isError = False):
+    def close(self, is_error=False, wait=True, timeout=10.0, *args, **kwargs):
         """
-        Closes the connection if its active
-        :param isError:
+        Closes the connection to the printer if it's active
+        :param is_error:
+        :param wait: unused parameter (kept for interface compatibility)
+        :param timeout:
+        :param args:
+        :param kwargs:
         :return:
         """
         if self._beeConn is not None:
@@ -304,9 +309,10 @@ class BeeCom(MachineCom):
             eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
 
 
-    def cancelPrint(self):
+    def cancelPrint(self, firmware_error=None):
         """
         Cancels the print operation
+        :type firmware_error: unused parameter, just to keep the interface compatible with octoprint
         """
         if not self.isOperational() or self.isStreaming():
             return
@@ -325,7 +331,8 @@ class BeeCom(MachineCom):
             payload = {
                 "file": self._currentFile.getFilename(),
                 "filename": os.path.basename(self._currentFile.getFilename()),
-                "origin": self._currentFile.getFileLocation()
+                "origin": self._currentFile.getFileLocation(),
+                "firmwareError": firmware_error
             }
 
             eventManager().fire(Events.PRINT_CANCELLED, payload)
@@ -607,12 +614,12 @@ class BeeCom(MachineCom):
                     self._callback.on_comm_sd_files(self._sdFiles)
                 elif 'SD printing byte' in line and self.isSdPrinting():
                     # answer to M27, at least on Marlin, Repetier and Sprinter: "SD printing byte %d/%d"
-                    match = self._regex_sdPrintingByte.search(line)
+                    match = regex_sdPrintingByte.search(line)
                     self._currentFile.setFilepos(int(match.group(1)))
                     self._callback.on_comm_progress()
                 elif 'File opened' in line and not self._ignore_select:
                     # answer to M23, at least on Marlin, Repetier and Sprinter: "File opened:%s Size:%d"
-                    match = self._regex_sdFileOpened.search(line)
+                    match = regex_sdFileOpened.search(line)
                     if self._sdFileToSelect:
                         name = self._sdFileToSelect
                         self._sdFileToSelect = None
