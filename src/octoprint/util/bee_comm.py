@@ -4,6 +4,7 @@ import os
 import threading
 import time
 import Queue as queue
+import logging
 
 from octoprint.settings import settings
 from octoprint.events import eventManager, Events
@@ -57,6 +58,9 @@ class BeeCom(MachineCom):
 
             # change to firmware
             if self._beeCommands.getPrinterMode() == 'Bootloader':
+                # checks for firmware updates
+                self.update_firmware()
+
                 self._beeCommands.goToFirmware()
 
             # restart connection
@@ -69,6 +73,64 @@ class BeeCom(MachineCom):
         else:
             return False
 
+    def current_firmware(self):
+        """
+        Gets the current firmware version
+        :return:
+        """
+        firmware_v = self.getCommandsInterface().getFirmwareVersion()
+
+        if firmware_v is not None:
+            return firmware_v
+        else:
+            return 'Not available'
+
+    def update_firmware(self):
+        """
+        Updates the printer firmware if a newer version is available
+        :return: if no printer is connected just returns void
+        """
+        _logger = logging.getLogger()
+        # get the latest firmware file for the connected printer
+        conn_printer = self.getConnectedPrinterName()
+        if conn_printer is None:
+            return
+
+        printer_name = conn_printer.replace(' ', '')
+
+        if printer_name:
+            from os import listdir
+            from os.path import isfile, join
+
+            _logger.info("Checking for firmware updates...")
+
+            firmware_path = settings().getBaseFolder('firmware')
+
+            for ff in listdir(firmware_path):
+
+                if isfile(join(firmware_path, ff)):
+                    firmware_file = os.path.splitext(ff)[0]
+                    fname_parts = firmware_file.split('-')
+
+                    if len(fname_parts) == 3 and printer_name == fname_parts[1]:
+
+                        # gets the current firmware version
+                        curr_version = self.current_firmware()
+                        currversion_parts = curr_version.split('-')
+
+                        if len(currversion_parts) == 3 and curr_version is not "Not available":
+                            curr_version_parts = currversion_parts[2].split('.')
+                            file_version_parts = fname_parts[2].split('.')
+
+                            for i in xrange(3):
+                                if int(file_version_parts[i]) > int(curr_version_parts[i]):
+                                    # version update found
+                                    _logger.info("Updating printer firmware...")
+                                    self.getCommandsInterface().flashFirmware(firmware_path + '/' + ff,
+                                                                                    firmware_file)
+
+                                    _logger.info("Firmware updated to %s" % fname_parts[2])
+                                    return
 
     def sendCommand(self, cmd, cmd_type=None, processed=False):
         """
@@ -143,10 +205,10 @@ class BeeCom(MachineCom):
     def isOperational(self):
         return self._state == self.STATE_OPERATIONAL \
                or self._state == self.STATE_PRINTING \
-			   or self._state == self.STATE_PAUSED \
-			   or self._state == self.STATE_SHUTDOWN \
+               or self._state == self.STATE_PAUSED \
+               or self._state == self.STATE_SHUTDOWN \
                or self._state == self.STATE_TRANSFERING_FILE \
-			   or self._state == self.STATE_PREPARING_PRINT \
+               or self._state == self.STATE_PREPARING_PRINT \
                or self._state == self.STATE_HEATING
 
     def isClosedOrError(self):
