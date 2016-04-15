@@ -9,41 +9,39 @@
         </div>
     </div>
     <div class="row-fluid">
-        <div class="span2"></div>
-        <div class="span5 text-center">
+        <div class="span3"></div>
+        <div class="span6 text-center">
             <img src="{{ url_for('static', filename='img/maintenance/calibracao.png') }}" />
         </div>
-        <div class="span5">
+        <div class="span3">
             <strong>{{ _('Table Fine Tuning')}}</strong>
             <br /><br />
             <div class="row-fluid">
-                <div class="span6">
-                    <button id="upbigstep-btn" title="Up 0.05" class="btn btn-primary btn-block"
-                       data-bind="click: upBigStep, enable: printerState.isOperational() && !commandLock()
-                       && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
-                        <i class="icon-arrow-up"></i> {{ _('0.5 millimeters')}}</button>
-                </div>
-                <div class="span6">
-                    <button id="downbigstep-btn" title="Up 0.05" class="btn btn-primary btn-block"
-                       data-bind="click: downBigStep, enable: printerState.isOperational() && !commandLock()
-                       && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
-                        <i class="icon-arrow-down"></i> {{ _('0.5 millimeters')}}</button>
-                </div>
-            </div>
-            <br />
-            <div class="row-fluid">
-                <div class="span6">
-                    <button id="upsmallstep-btn" title="Up 0.05" class="btn btn-primary btn-block"
-                       data-bind="click: upSmallStep, enable: printerState.isOperational() && !commandLock()
-                       && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
-                        <i class="icon-chevron-up"></i> {{ _('0.05 millimeters')}}</button>
-                </div>
-                <div class="span6">
-                    <button id="downsmallstep-btn" title="Down 0.05" class="btn btn-primary btn-block"
-                       data-bind="click: downSmallStep, enable: printerState.isOperational() && !commandLock()
-                       && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
-                        <i class="icon-chevron-down"></i> {{ _('0.05 millimeters')}}</button>
-                </div>
+
+                <button id="upsmallstep-btn" title="Up 0.05" class="btn btn-primary btn-block"
+                   data-bind="click: upSmallStep, enable: printerState.isOperational() && !commandLock()
+                   && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                    <i class="icon-chevron-up"></i> {{ _('0.05 millimeters')}}</button>
+
+                <br />
+                <button id="downbigstep-btn" title="Up 0.05" class="btn btn-primary btn-block"
+                   data-bind="click: downBigStep, enable: printerState.isOperational() && !commandLock()
+                   && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                    <i class="icon-arrow-down"></i> {{ _('0.5 millimeters')}}</button>
+
+                <br /><br />
+
+                <button id="upbigstep-btn" title="Up 0.05" class="btn btn-primary btn-block"
+                   data-bind="click: upBigStep, enable: printerState.isOperational() && !commandLock()
+                   && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                    <i class="icon-arrow-up"></i> {{ _('0.5 millimeters')}}</button>
+
+                <br />
+                <button id="downsmallstep-btn" title="Down 0.05" class="btn btn-primary btn-block"
+                   data-bind="click: downSmallStep, enable: printerState.isOperational() && !commandLock()
+                   && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+                    <i class="icon-chevron-down"></i> {{ _('0.05 millimeters')}}</button>
+
             </div>
 
         </div>

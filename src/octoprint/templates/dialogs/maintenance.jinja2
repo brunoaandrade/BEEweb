@@ -7,8 +7,12 @@
     </div>
     <div class="modal-body">
         <div class="full-sized-box">
-            <div class="tabbable row-fluid">
+            <div id="maintenance_warning_box" class="hidden text-center alert alert-warning">
+                <i class="icon-warning-sign"></i>
+                <span id="maintenance_warning_text">{{ _('Moving...please wait') }}</span>
+            </div>
 
+            <div class="tabbable row-fluid">
                 <div id="maintenanceList" class="operationsList">
                     <div class="row-fluid">
                         <h3>{{ _('Filament change') }}</h3>

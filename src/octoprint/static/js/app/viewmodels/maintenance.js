@@ -109,6 +109,8 @@ $(function() {
 
             // Goes to home position
             self._sendCustomCommand('G28');
+
+            self._hideMovingMessage();
         };
 
         self.finishOperations = function() {
@@ -128,6 +130,16 @@ $(function() {
 
             // Goes to home position
             self._sendCustomCommand('G28');
+
+            self._hideMovingMessage();
+        };
+
+        self._showMovingMessage = function() {
+            $('#maintenance_warning_box').removeClass('hidden');
+        };
+
+        self._hideMovingMessage = function() {
+            $('#maintenance_warning_box').addClass('hidden');
         };
 
         /***************************************************************************/
@@ -282,6 +294,7 @@ $(function() {
 
         self.loadFilament = function() {
             self.commandLock(true);
+            self._showMovingMessage();
 
             $.ajax({
                 url: API_BASEURL + "maintenance/load",
@@ -290,13 +303,18 @@ $(function() {
                 success: function() {
                     self.changeFilamentStepFinalStep();
                     self.commandLock(false);
+                    self._hideMovingMessage();
                 },
-                error: function() { self.commandLock(false); }
+                error: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
+                }
             });
         };
 
         self.unloadFilament = function() {
             self.commandLock(true);
+            self._showMovingMessage();
 
             $.ajax({
                 url: API_BASEURL + "maintenance/unload",
@@ -305,8 +323,12 @@ $(function() {
                 success: function() {
 
                     self.commandLock(false);
+                    self._hideMovingMessage();
                 },
-                error: function() { self.commandLock(false); }
+                error: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
+                }
             });
         };
 
@@ -572,6 +594,7 @@ $(function() {
 
 
         self._sendJogCommand = function (axis, direction, distance) {
+            self._showMovingMessage();
             self.commandLock(true);
             var data = {
                 "command": "jog"
@@ -586,8 +609,12 @@ $(function() {
                 data: JSON.stringify(data),
                 success: function() {
                     self.commandLock(false);
+                    self._hideMovingMessage();
                 },
-                error: function() { self.commandLock(false); }
+                error: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
+                }
             });
         };
 
