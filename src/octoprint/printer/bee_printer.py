@@ -1,6 +1,7 @@
 # coding=utf-8
 
 from __future__ import absolute_import
+
 from octoprint.util.bee_comm import BeeCom
 import os
 from octoprint.printer.standard import Printer

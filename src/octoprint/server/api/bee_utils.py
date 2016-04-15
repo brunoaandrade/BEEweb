@@ -7,10 +7,11 @@ __copyright__ = "Copyright (C) 2014 The OctoPrint Project - Released under terms
 
 from octoprint.server.util.wifi_util import get_ssid_list, switch_wifi_client_mode
 from octoprint.server.util.hostname_util import is_valid_hostname, update_hostname, get_hostname
-from octoprint.server.api import api
 from octoprint.server import printer, NO_CONTENT
-from flask import Blueprint, jsonify, request, make_response
-
+from flask import Blueprint, jsonify, request, make_response, url_for
+from octoprint.settings import settings
+from os import listdir
+from os.path import isfile, join
 
 #~~ BVC custom API
 api = Blueprint("beeapi", __name__)
@@ -84,6 +85,55 @@ def hostnameSave():
 	# Updates the hostname
 	# NOTE: This operation will force the server to reboot
 	update_hostname(new_hostname)
+
+	return NO_CONTENT
+
+@api.route("/firmware/latest/version", methods=["GET"])
+def getLatestFirwareVersion():
+
+	version = '0.0.0' # default base version
+	firmware_path = settings().getBaseFolder('firmware')
+	if printer is not None:
+		printer_name = printer.get_printer_name()
+
+		if printer_name:
+			printer_name = printer_name.replace(' ','')
+			firmware_files = [f for f in listdir(firmware_path) if isfile(join(firmware_path, f))]
+
+			for ff in firmware_files:
+				file_parts = ff.split('-')
+				if file_parts[1] == printer_name:
+					version = file_parts[2].replace('.BIN', '')
+					break
+
+	return jsonify({
+		"version": version
+	})
+
+@api.route("/firmware/<string:printer_name>/<string:version>", methods=["GET"])
+def getFirmwareFileLink(printer_name, version):
+	"""
+	Gets the download link for a firmware file of a specific printer and version.
+	If the file does not exist returns a NO_CONTENT response
+
+	:param printer_name: The printer name must be the name without spaces. E.g: BEETHEFIRSTPLUSA
+	:param version:
+	:return:
+	"""
+	filename = 'BEEVC-' + printer_name + '-' + version + '.BIN'
+
+	if printer_name:
+		firmware_path = settings().getBaseFolder('firmware')
+
+		for ff in listdir(firmware_path):
+			if isfile(join(firmware_path, ff)):
+
+				if ff == filename:
+					link = url_for("index", _external=True) + "firmware/" + filename
+
+					return jsonify({
+						"file": link
+					})
 
 	return NO_CONTENT
 
