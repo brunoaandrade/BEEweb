@@ -554,7 +554,6 @@ $(function() {
                 dataType: "json",
                 success: function() {
                     self.calibrationStep0();
-                    self.nextStepCalibration1();
 
                     self.commandLock(false);
                 },
@@ -665,6 +664,7 @@ $(function() {
         self.extMaintStep0 = function() {
             $('#extMaintStep2').addClass('hidden');
             $('#extMaintStep3').addClass('hidden');
+            $('#extMaintStep4').addClass('hidden');
 
             $('#extMaintStep1').removeClass('hidden');
         };
@@ -673,10 +673,19 @@ $(function() {
             $('#extMaintStep2').removeClass('hidden');
             $('#extMaintStep3').addClass('hidden');
             $('#extMaintStep1').addClass('hidden');
+            $('#extMaintStep4').addClass('hidden');
         };
 
         self.nextStepExtMaint2 = function() {
             $('#extMaintStep3').removeClass('hidden');
+            $('#extMaintStep2').addClass('hidden');
+            $('#extMaintStep1').addClass('hidden');
+            $('#extMaintStep4').addClass('hidden');
+        };
+
+        self.nextStepExtMaint3 = function() {
+            $('#extMaintStep4').removeClass('hidden');
+            $('#extMaintStep3').addClass('hidden');
             $('#extMaintStep2').addClass('hidden');
             $('#extMaintStep1').addClass('hidden');
 
@@ -730,7 +739,7 @@ $(function() {
                             // Heating is finished, let's move on
                             self._heatingDone();
 
-                            $('#ext-mtn-3').removeClass('hidden');
+                            $('#ext-mtn-4').removeClass('hidden');
                             $('#progress-bar-ext-mtn').addClass('hidden');
                         } else {
 
