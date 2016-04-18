@@ -114,7 +114,7 @@ BEEwb.main = {
         this.trackballControls.panSpeed = 0.8;
 
         this.trackballControls.noZoom = false;
-        this.trackballControls.noPan = false;
+        this.trackballControls.noPan = true;
 
         this.trackballControls.staticMoving = true;
         this.trackballControls.dynamicDampingFactor = 0.3;
