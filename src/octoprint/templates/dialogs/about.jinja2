@@ -4,10 +4,14 @@
         <h3 id="about_dialog_label">{{ _('About') }}</h3>
     </div>
     <div class="modal-body">
-        <div class="full-sized-box">
-            <h4><strong>{{ _('BEEsoft.web') }}</strong> &copy BEEVC - Electronic Systems</h4>
-            <br/><br />
-            <p>{{ _('Software version:') }} <span class="version">{{ display_version|e }}</span></p>
+        <div id="about_body">
+            <div class="full-sized-box">
+                <h4><strong>{{ _('BEEsoft.web') }}</strong> &copy BEEVC - Electronic Systems</h4>
+                <br/><br />
+                <p><strong>{{ _('Software version:') }}</strong> <span class="version">{{ display_version|e }}</span></p>
+                <br/><br />
+                <p><strong>{{ _('Firmware version:') }}</strong> <span data-bind="text: currentFirmware"> </span></p>
+            </div>
         </div>
     </div>
     <div class="modal-footer">

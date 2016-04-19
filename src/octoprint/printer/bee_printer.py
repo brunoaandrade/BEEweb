@@ -421,6 +421,21 @@ class BeePrinter(Printer):
         """
         self.unselect_file()
 
+    def getCurrentFirmware(self):
+        """
+        Gets the current printer firmware version
+        :return: string
+        """
+        if self._comm is not None:
+            firmware_v = self._comm.getCommandsInterface().getFirmwareVersion()
+
+            if firmware_v is not None:
+                return firmware_v
+            else:
+                return 'Not available'
+        else:
+            return 'Not available'
+
     def _setProgressData(self, completion=None, filepos=None, printTime=None, printTimeLeft=None):
         """
         Auxiliar method to control the print progress status data

@@ -88,6 +88,15 @@ def hostnameSave():
 
 	return NO_CONTENT
 
+@api.route("/firmware/current/version", methods=["GET"])
+def getCurrentFirwareVersion():
+
+	version = printer.getCurrentFirmware()
+
+	return jsonify({
+		"version": version
+	})
+
 @api.route("/firmware/latest/version", methods=["GET"])
 def getLatestFirwareVersion():
 
