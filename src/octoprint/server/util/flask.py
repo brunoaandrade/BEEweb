@@ -910,6 +910,7 @@ def collect_plugin_assets(enable_gcodeviewer=True, preferred_stylesheet="css"):
 		'js/app/viewmodels/usersettings.js',
 		'js/app/viewmodels/maintenance.js',
 		'js/app/viewmodels/workbench.js',
+		'js/app/viewmodels/about.js',
 	]
 	if enable_gcodeviewer:
 		assets["js"] += [

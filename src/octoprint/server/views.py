@@ -116,7 +116,8 @@ def index():
 
 	templates["navbar"]["entries"] = dict(
 		settings=dict(template="navbar/settings.jinja2", _div="navbar_settings", styles=["display: none"], data_bind="visible: loginState.isAdmin"),
-		maintenance=dict(template="navbar/maintenance.jinja2", _div="navbar_maintenance")
+		maintenance=dict(template="navbar/maintenance.jinja2", _div="navbar_maintenance"),
+		help=dict(template="navbar/help.jinja2", _div="navbar_help")
 	)
 	if enable_accesscontrol:
 		templates["navbar"]["entries"]["login"] = dict(template="navbar/login.jinja2", _div="navbar_login", classes=["dropdown"], custom_bindings=False)

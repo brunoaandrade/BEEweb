@@ -1,0 +1,22 @@
+<div id="about_dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="about_dialog_label" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 id="about_dialog_label">{{ _('About') }}</h3>
+    </div>
+    <div class="modal-body">
+        <div class="full-sized-box">
+            <h4><strong>{{ _('BEEsoft.web') }}</strong> &copy BEEVC - Electronic Systems</h4>
+            <br/><br />
+            <p>{{ _('Software version:') }} <span class="version">{{ display_version|e }}</span></p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="row-fluid">
+            <div class="span2"></div>
+            <div class="span8"></div>
+            <div class="span2">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Close') }}</button>
+            </div>
+        </div>
+    </div>
+</div>

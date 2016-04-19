@@ -219,7 +219,7 @@ default_settings = {
 		"defaultLanguage": "_default",
 		"components": {
 			"order": {
-				"navbar": ["maintenance", "settings", "systemmenu", "login"],
+				"navbar": ["maintenance", "settings", "systemmenu", "help", "login"],
 				"sidebar": ["workbench_controls", "state", "files", "connection"],
 				"tab": ["workbench", "gcodeviewer", "control", "temperature", "terminal", "timelapse"],
 				"settings": [
