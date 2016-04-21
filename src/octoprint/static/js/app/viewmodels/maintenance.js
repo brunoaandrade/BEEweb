@@ -31,6 +31,8 @@ $(function() {
         self.nozzleSelected = ko.observable(false);
         self.saveNozzleResponseError = ko.observable(false);
 
+        self.calibrationTestCancelled = false;
+
         self.onStartup = function() {
 
             /**
@@ -108,7 +110,7 @@ $(function() {
             self.extMaintStep0();
 
             // Goes to home position
-            self._sendCustomCommand('G28');
+            //self._sendCustomCommand('G28');
 
             self._hideMovingMessage();
         };
@@ -507,6 +509,11 @@ $(function() {
 
             $('#calibrationTest1').removeClass('hidden');
 
+            $('#maintenanceOkButton').addClass('hidden');
+            $('#cancelMaintenance').addClass('hidden');
+
+            self.calibrationTestCancelled = false;
+
             $.ajax({
                 url: API_BASEURL + "maintenance/start_calibration_test",
                 type: "POST",
@@ -531,9 +538,14 @@ $(function() {
                 dataType: "json",
                 success: function() {
                     self.commandLock(false);
+                    self.calibrationTestCancelled = true;
 
                     $('#calibrationStep4').removeClass('hidden');
                     $('#calibrationTest1').addClass('hidden');
+                    $('#calibrationTest2').addClass('hidden');
+
+                    $('#maintenanceOkButton').removeClass('hidden');
+                    $('#cancelMaintenance').removeClass('hidden');
                 },
                 error: function() {
                     self.commandLock(false);
@@ -546,7 +558,12 @@ $(function() {
             $('#calibrationTest2').addClass('hidden');
             $('#calibrationTest1').removeClass('hidden');
 
+            $('#maintenanceOkButton').addClass('hidden');
+            $('#cancelMaintenance').removeClass('hidden');
+            $('#maintenanceCloseButton').removeClass('hidden');
+
             self.commandLock(true);
+            self.calibrationTestCancelled = false;
 
             $.ajax({
                 url: API_BASEURL + "maintenance/repeat_calibration",
@@ -577,16 +594,18 @@ $(function() {
 
                     var printing = data['response'];
 
-                    if (printing == false) {
+                    if (printing == false && self.calibrationTestCancelled == false) {
                         //If the test is finished goes to step2
                         self.calibrationTestStep2();
                         return;
                     }
-                    setTimeout(function() { self._isRunningCalibrationTest(); }, 10000);
 
+                    if (!self.calibrationTestCancelled) {
+                        setTimeout(function() { self._isRunningCalibrationTest(); }, 5000);
+                    }
                 },
                 error: function() {
-                    setTimeout(function() { self._isRunningCalibrationTest(); }, 10000);
+                    setTimeout(function() { self._isRunningCalibrationTest(); }, 5000);
                 }
             });
         };

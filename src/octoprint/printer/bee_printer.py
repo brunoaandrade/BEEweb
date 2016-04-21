@@ -358,6 +358,7 @@ class BeePrinter(Printer):
         :return:
         """
         self.cancel_print()
+        self._runningCalibrationTest = False
 
         return None
 
