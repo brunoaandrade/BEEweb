@@ -585,6 +585,31 @@ def dict_filter(dictionary, filter_function):
 	return dict((k, v) for k, v in dictionary.items() if filter_function(k, v))
 
 
+def parsePropertiesFile(filePath):
+	"""
+	Parses a .properties file to a dictonary object
+	:param filePath: complete path to the file
+	:return:
+	"""
+	separator = "="
+	result = {}
+
+	from os.path import isfile
+	if not isfile(filePath):
+		return
+
+	with open(filePath) as f:
+
+		for line in f:
+			if separator in line:
+				# Find the name and value by splitting the string
+				name, value = line.split(separator, 1)
+
+				# strip() removes white space from the ends of strings
+				result[name.strip()] = value.strip()
+
+	return result
+
 class Object(object):
 	pass
 

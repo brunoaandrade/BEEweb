@@ -10,7 +10,7 @@ from octoprint.settings import settings
 from octoprint.events import eventManager, Events
 from octoprint.util.comm import MachineCom, regex_sdPrintingByte, regex_sdFileOpened
 from beedriver.connection import Conn as BeePrinterConn
-from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer
+from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer, parsePropertiesFile
 
 __author__ = "BEEVC - Electronic Systems"
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
@@ -87,7 +87,8 @@ class BeeCom(MachineCom):
 
     def update_firmware(self):
         """
-        Updates the printer firmware if a newer version is available
+        Updates the printer firmware if the value in the firmware.properties file is different
+        from the current printer firmware
         :return: if no printer is connected just returns void
         """
         _logger = logging.getLogger()
@@ -96,43 +97,45 @@ class BeeCom(MachineCom):
         if conn_printer is None:
             return
 
-        printer_name = conn_printer.replace(' ', '')
+        printer_id = conn_printer.replace(' ', '').lower()
 
-        if printer_name:
-            from os import listdir
+        if printer_id:
             from os.path import isfile, join
 
             _logger.info("Checking for firmware updates...")
 
             firmware_path = settings().getBaseFolder('firmware')
+            firmware_config_file = join(firmware_path, 'firmware.properties')
 
-            for ff in listdir(firmware_path):
+            firmware_properties = parsePropertiesFile(firmware_config_file)
 
-                if isfile(join(firmware_path, ff)):
-                    firmware_file = os.path.splitext(ff)[0]
-                    fname_parts = firmware_file.split('-')
+            firmware_file_name = firmware_properties['firmware.'+printer_id]
 
-                    if len(fname_parts) == 3 and printer_name == fname_parts[1]:
+            if firmware_file_name is not None and isfile(join(firmware_path, firmware_file_name)):
 
-                        # gets the current firmware version
-                        curr_version = self.current_firmware()
-                        currversion_parts = curr_version.split('-')
+                fname_parts = firmware_file_name.split('-')
 
-                        if len(currversion_parts) == 3 and curr_version is not "Not available":
-                            curr_version_parts = currversion_parts[2].split('.')
-                            file_version_parts = fname_parts[2].split('.')
+                # gets the current firmware version
+                curr_firmware = self.current_firmware()
+                curr_firmware_parts = curr_firmware.split('-')
 
-                            for i in xrange(3):
-                                if int(file_version_parts[i]) > int(curr_version_parts[i]):
-                                    # version update found
-                                    _logger.info("Updating printer firmware...")
-                                    self.getCommandsInterface().flashFirmware(firmware_path + '/' + ff,
-                                                                                    firmware_file)
+                if len(curr_firmware_parts) == 3 and curr_firmware is not "Not available":
+                    curr_version_parts = curr_firmware_parts[2].split('.')
+                    file_version_parts = fname_parts[2].split('.')
 
-                                    _logger.info("Firmware updated to %s" % fname_parts[2])
-                                    return
+                    for i in xrange(3):
+                        if int(file_version_parts[i]) != int(curr_version_parts[i]):
+                            # version update found
+                            _logger.info("Updating printer firmware...")
+                            self.getCommandsInterface().flashFirmware(join(firmware_path, firmware_file_name),
+                                                                      firmware_file_name)
 
-            _logger.info("Checking for firmware updates...")
+                            _logger.info("Firmware updated to %s" % fname_parts[2])
+                            return
+            else:
+                _logger.error("No firmware configuration for printer %s found" % conn_printer)
+
+            _logger.info("No firmware updates found")
 
     def sendCommand(self, cmd, cmd_type=None, processed=False, force=False):
         """
