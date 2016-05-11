@@ -187,20 +187,33 @@ BEEwb.main = {
             var yShift = 0;
             var zShift = 0;
 
+            var centerX = 0.5 * ( bbox.max.x - bbox.min.x );
+            var centerY = 0.5 * ( bbox.max.y - bbox.min.y );
+            var centerZ = 0.5 * ( bbox.max.z - bbox.min.z );
+
             // Checks if the object is out of center in any axis
             if ( bbox.min.x > 0 ) {
-                var centerX = 0.5 * ( bbox.max.x - bbox.min.x );
                 xShift = bbox.min.x + centerX;
             }
 
             if ( bbox.min.y > 0 ) {
-                var centerY = 0.5 * ( bbox.max.y - bbox.min.y );
                 yShift = bbox.min.y + centerY;
             }
 
             if ( bbox.min.z > 0 ) {
-                var centerZ = 0.5 * ( bbox.max.z - bbox.min.z );
                 zShift = bbox.min.z + centerZ;
+            }
+
+            if ( bbox.max.x < 0 ) {
+                xShift = bbox.max.x - centerX;
+            }
+
+            if ( bbox.min.y < 0 ) {
+                yShift = bbox.max.y - centerY;
+            }
+
+            if ( bbox.min.z < 0 ) {
+                zShift = bbox.max.z - centerZ;
             }
 
             // Applies the transformation matrix for any necessary shift in position

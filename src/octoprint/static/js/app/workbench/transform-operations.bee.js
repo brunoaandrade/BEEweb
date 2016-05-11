@@ -127,7 +127,7 @@ BEEwb.transformOps._rotateStep = function( degrees ) {
 }
 
 /**
- * Centers the selected model on the platform
+ * Scales the selected model on the platform the the maximum possible size
  *
  */
 BEEwb.transformOps.scaleToMax = function() {
