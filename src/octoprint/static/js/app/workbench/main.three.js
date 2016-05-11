@@ -73,7 +73,7 @@ BEEwb.main = {
         this.container.appendChild( this.renderer.domElement );
 
         this.camera = new THREE.PerspectiveCamera(
-         45, this.renderer.domElement.clientWidth / this.renderer.domElement.clientHeight, 1, 3000
+         53, this.renderer.domElement.clientWidth / this.renderer.domElement.clientHeight, 1, 3000
         );
 
         this.resetCamera();
@@ -119,14 +119,14 @@ BEEwb.main = {
         this.trackballControls.staticMoving = true;
         this.trackballControls.dynamicDampingFactor = 0.3;
 
-        // Auxiliar objects for model selection
+        // Auxiliary objects for model selection
         this.raycaster = new THREE.Raycaster();
         this.mouseVector = new THREE.Vector3();
 
         this.selectedObject = null;
         this.transformControls = null;
 
-        // Adds the printer bed auxiliar object
+        // Adds the printer bed auxiliary object
         this._addBed();
 
         window.addEventListener( 'resize', BEEwb.events.onWindowResize, false );
