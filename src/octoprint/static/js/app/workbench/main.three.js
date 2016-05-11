@@ -476,5 +476,4 @@ BEEwb.main = {
 
         this.scene.add( this.bed );
     }
-
-}
+};

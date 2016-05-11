@@ -7,14 +7,7 @@ $(function () {
 		self.connection = parameters[2];
         self.slicing = parameters[3];
         self.state = parameters[4];
-
-		//resize canvas after Workbench tab is made active.
-		self.onAfterTabChange = function (current, previous) {
-			if (current == "#workbench") {
-				self.updateFileList();
-			}
-		};
-
+        
 		//append file list with newly updated stl file.
 		self.onEventUpload = function (file) {
 
