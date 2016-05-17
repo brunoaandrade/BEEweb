@@ -8,8 +8,6 @@ WIFI_CMODE_SCRIPT = 'wifi_client_mode.sh'
 WIFI_AP_SCRIPT = 'wifi_ap_mode.sh'
 RM_WPA_SUPPLICANT_CONF = 'remove_wpa_supplicant_conf.sh'
 
-wifi_cthread_flag = False
-
 def match(line, keyword):
 	"""
 	If the first part of line (modulo blanks) matches keyword,
@@ -102,15 +100,6 @@ def switch_wifi_client_mode(network_name, password):
 		except:
 			print ('Error executing wi-fi client mode script.')
 
-	# Starts the wifi dongle monitor thread
-	import octoprint.server.util.wifi_util as wifi_module
-
-	if wifi_module.wifi_cthread_flag is False:
-		import threading
-		threading.Thread(target=check_usb_dongle_thread).start()
-		wifi_module.wifi_cthread_flag = True
-
-
 def switch_wifi_ap_mode():
 	"""
 	Switches the Wifi interface to AP mode
@@ -128,44 +117,6 @@ def switch_wifi_ap_mode():
 			subprocess.call([script_path])
 		except:
 			print ('Error executing wi-fi AP mode script.')
-
-
-def check_usb_dongle_thread():
-	"""
-	Thread function to check if usb connection with a specific Wifi dongle is detected.
-	:return:
-	"""
-	_logger = logging.getLogger()
-
-	USB_POLL_INTERVAL = 5 # seconds
-	USB_VENDOR_ID_0 = 0x0bda
-	USB_PRODUCT_ID_0 = 0x8176
-	USB_VENDOR_ID_1 = 0x7392
-	USB_PRODUCT_ID_1 = 0x7811
-
-	wifi_dongle_removed = False
-
-	_logger.info("Starting USB dongle connectivity monitor thread...")
-	while True:
-		dev_list = []
-		for dev in usb.core.find(idVendor=USB_VENDOR_ID_0, idProduct=USB_PRODUCT_ID_0, find_all=True):
-			dev_list.append(dev)
-
-		for dev in usb.core.find(idVendor=USB_VENDOR_ID_1, idProduct=USB_PRODUCT_ID_1, find_all=True):
-			dev_list.append(dev)
-
-		# If the dongle is not found but the removed flag is False switches it to True
-		if len(dev_list) == 0 and wifi_dongle_removed is False:
-			_logger.info("USB dongle removed")
-			wifi_dongle_removed = True
-
-		# Detects if the dongle was reconnected and switches to the AP mode
-		if len(dev_list) > 0 and wifi_dongle_removed is True:
-			_logger.info("USB dongle detected. Switching to AP mode.")
-			switch_wifi_ap_mode()
-			wifi_dongle_removed = False
-
-		sleep (USB_POLL_INTERVAL)
 
 def internet_on():
 	"""

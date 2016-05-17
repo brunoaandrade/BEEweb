@@ -504,17 +504,7 @@ class Server():
 
 			import threading
 			threading.Thread(target=work).start()
-
-			# Starts the wifi dongle monitor thread
-			import octoprint.server.util.wifi_util as wifi_module
-			from octoprint.server.util.wifi_util import check_usb_dongle_thread
-
-			if wifi_module.wifi_cthread_flag is False:
-				wth = threading.Thread(target=check_usb_dongle_thread)
-				wth.daemon = True
-				wth.start()
-				wifi_module.wifi_cthread_flag = True
-
+			
 			from octoprint.server.util.connection_util import detect_bvc_printer_connection
 			if printer.is_closed_or_error():
 				bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(printer.connect, ))
