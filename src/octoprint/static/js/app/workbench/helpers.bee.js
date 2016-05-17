@@ -29,7 +29,11 @@ BEEwb.helpers.generateSTLFromScene = function( objects ) {
  */
 BEEwb.helpers.generateSceneName = function( ) {
     var now = new Date();
-    var sceneName = 'bee_' + now.getDate() + '_' + (now.getMonth()+1) + '_' + now.getFullYear()
+    var prefix = 'bee_';
+    if (BEEwb.main.lastLoadedModel != null) {
+        prefix = BEEwb.main.lastLoadedModel + '_';
+    }
+    var sceneName = prefix + now.getDate() + '_' + (now.getMonth()+1) + '_' + now.getFullYear()
     + '-' + now.getHours() + '_' + now.getMinutes() + '_' + now.getSeconds() + '.stl';
 
     return sceneName;

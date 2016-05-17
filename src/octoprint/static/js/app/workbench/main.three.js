@@ -26,6 +26,7 @@ BEEwb.main = {
     bedWidth: 0,
     bedDepth: 0,
     savedScenesFiles: [],
+    lastLoadedModel: null,
 
     /**
      * Main initialization function
@@ -165,6 +166,7 @@ BEEwb.main = {
         if (systemFile === true) {
             folder = './stl/';
         } else {
+            this.lastLoadedModel = modelName.substr(0, modelName.lastIndexOf("."));
             // Only shows the loading modal if it's model loaded by the user
             $('#loadingDialog').modal('show');
         }
@@ -246,10 +248,9 @@ BEEwb.main = {
             that.objects.add(mesh);
 
             // Runs the placeOnBed algorithm
+            that.removeAllSelections();
             that.selectModel(mesh);
             BEEwb.transformOps.placeOnBed();
-            that.removeAllSelections();
-
 
             $('#loadingDialog').modal('hide');
         });
