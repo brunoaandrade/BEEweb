@@ -5,12 +5,12 @@ BEEwb.transformOps = {
     selectedMode: 'translate',
     initialSize: null,
     previousSize: null
-}
+};
 
 BEEwb.transformOps.resetObjectData = function() {
     this.initialSize = null;
     this.previousSize = null;
-}
+};
 
 /**
  * Moves the selected model to the input text boxes axis values
@@ -28,7 +28,7 @@ BEEwb.transformOps.move = function() {
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
     }
-}
+};
 
 /**
  * Scales the selected model to the input text boxes axis values
@@ -47,7 +47,7 @@ BEEwb.transformOps.scale = function() {
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
     }
-}
+};
 
 /**
  * Rotates the selected model to the input text boxes axis values
@@ -66,7 +66,7 @@ BEEwb.transformOps.rotate = function() {
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
     }
-}
+};
 
 /**
  * Rotates the selected model 90 degrees to the left (counter clockwise)
@@ -76,11 +76,11 @@ BEEwb.transformOps.rotate = function() {
 BEEwb.transformOps.rotateCCW = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        this._rotateStep(90);
+        this._rotateStep(-90);
 
         this.updateRotationInputs();
     }
-}
+};
 
 /**
  * Rotates the selected model 90 degrees to the right (clockwise)
@@ -90,11 +90,11 @@ BEEwb.transformOps.rotateCCW = function() {
 BEEwb.transformOps.rotateCW = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        this._rotateStep(-90);
+        this._rotateStep(90);
 
         this.updateRotationInputs();
     }
-}
+};
 
 /**
  * Rotates the selected model 'n' degrees
@@ -122,9 +122,9 @@ BEEwb.transformOps._rotateStep = function( degrees ) {
         BEEwb.main.selectedObject.rotation.set(
             BEEwb.main.selectedObject.rotation.x,
             BEEwb.main.selectedObject.rotation.y,
-            BEEwb.main.selectedObject.rotation.z + radStep
+            BEEwb.main.selectedObject.rotation.z - radStep
         );
-}
+};
 
 /**
  * Scales the selected model on the platform the the maximum possible size
@@ -152,7 +152,7 @@ BEEwb.transformOps.scaleToMax = function() {
 
         this.updateScaleSizeInputs();
     }
-}
+};
 
 /**
  * Centers the selected model on the platform
@@ -165,7 +165,7 @@ BEEwb.transformOps.centerModel = function() {
         BEEwb.main.selectedObject.position.setY( 0 );
         this.placeOnBed();
     }
-}
+};
 
 
 /**
@@ -196,7 +196,7 @@ BEEwb.transformOps.placeOnBed = function() {
         BEEwb.main.transformControls.update();
         this.updatePositionInputs();
     }
-}
+};
 
 /**
  * Resets the transformations of the selected object
@@ -218,7 +218,7 @@ BEEwb.transformOps.resetSelectedModel = function() {
 
         this.updateRotationInputs();
     }
-}
+};
 
 /**
  * Removes a model from the scene
@@ -233,7 +233,7 @@ BEEwb.transformOps.removeModel = function(modelObj) {
 
         BEEwb.main.toggleObjectOutOfBounds(BEEwb.main.selectedObject, false);
     }
-}
+};
 
 /**
  * Removes the selected model from the scene
@@ -250,7 +250,7 @@ BEEwb.transformOps.removeSelected = function() {
         // Hides the side panel and removes selections
         BEEwb.main.removeAllSelections();
     }
-}
+};
 
 
 /**
@@ -273,7 +273,7 @@ BEEwb.transformOps.activateRotate = function() {
         $('#scale-values-form').slideUp();
         $('#rotate-values-form').slideDown();
     }
-}
+};
 
 /**
  * Activates the scale mode for the selected object
@@ -297,7 +297,7 @@ BEEwb.transformOps.activateScale = function() {
 
         this.updateScaleSizeInputs();
     }
-}
+};
 
 /**
  * Activates the translate (move) mode for the selected object
@@ -319,7 +319,7 @@ BEEwb.transformOps.activateMove = function() {
         $('#scale-values-form').slideUp();
         $('#rotate-values-form').slideUp();
     }
-}
+};
 
 /**
  * Updates the selected object position input boxes
@@ -335,7 +335,7 @@ BEEwb.transformOps.updatePositionInputs = function() {
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
     }
-}
+};
 
 /**
  * Updates the selected object scale/size input boxes
@@ -359,7 +359,7 @@ BEEwb.transformOps.updateScaleSizeInputs = function() {
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
     }
-}
+};
 
 /**
  * Updates the selected object rotation angles input boxes
@@ -380,7 +380,7 @@ BEEwb.transformOps.updateRotationInputs = function() {
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
     }
-}
+};
 
 /**
  * Scales the selected object converting size passed in the parameters to the appropriate scale
@@ -436,7 +436,7 @@ BEEwb.transformOps.scaleBySize = function(x, y, z) {
 
         this.previousSize = { 'x': x, 'y': y, 'z': z};
     }
-}
+};
 
 /**
  * Rotates the selected object converting size passed in the parameters to the appropriate scale
@@ -451,7 +451,7 @@ BEEwb.transformOps._rotateByDegrees = function(x, y, z) {
 
         BEEwb.main.selectedObject.rotation.set( xRotation, yRotation, zRotation );
     }
-}
+};
 
 
 /**
@@ -468,4 +468,4 @@ BEEwb.transformOps.setInitialSize = function() {
             'z': this.initialSize['z'].toFixed(2)
         };
     }
-}
+};
