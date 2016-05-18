@@ -132,8 +132,16 @@ class BeeCom(MachineCom):
 
                             _logger.info("Firmware updated to %s" % fname_parts[2])
                             return
+                elif curr_firmware == '0.0.0':
+                    # If curr_firmware is 0.0.0 it means something went wrong with a previous firmware update
+                    _logger.info("Updating printer firmware...")
+                    self.getCommandsInterface().flashFirmware(join(firmware_path, firmware_file_name),
+                                                              firmware_file_name)
+
+                    _logger.info("Firmware updated to %s" % fname_parts[2])
+                    return
             else:
-                _logger.error("No firmware configuration for printer %s found" % conn_printer)
+                _logger.error("No firmware file matching the configuration for printer %s found" % conn_printer)
 
             _logger.info("No firmware updates found")
 
