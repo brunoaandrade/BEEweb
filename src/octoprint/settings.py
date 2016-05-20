@@ -195,7 +195,8 @@ default_settings = {
 		"translations": None,
 		"generated": None,
 		"data": None,
-		"firmware": None
+		"firmware": None,
+		"bi": None,
 	},
 	"temperature": {
 		"profiles": [

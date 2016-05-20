@@ -50,7 +50,7 @@ class BeeCom(MachineCom):
         :return: True if the connection was successful
         """
         if self._beeConn is None:
-            self._beeConn = BeePrinterConn(self._connShutdownHook)
+            self._beeConn = BeePrinterConn(self._connShutdownHook, True)
             self._beeConn.connectToFirstPrinter()
 
         if self._beeConn.isConnected():
@@ -220,6 +220,16 @@ class BeeCom(MachineCom):
         else:
             return ""
 
+    def getConnectedPrinterSN(self):
+        """
+        Returns the current connected printer serial nu,ber
+        :return:
+        """
+        if self._beeConn is not None:
+            return self._beeConn.getConnectedPrinterSN()
+        else:
+            return None
+
     def isOperational(self):
         return self._state == self.STATE_OPERATIONAL \
                or self._state == self.STATE_PRINTING \
@@ -347,6 +357,10 @@ class BeeCom(MachineCom):
             }
 
             eventManager().fire(Events.PRINT_CANCELLED, payload)
+
+            # sends usage statistics
+            self._sendUsageStatistics('cancel')
+
 
     def setPause(self, pause):
         """
@@ -529,6 +543,7 @@ class BeeCom(MachineCom):
         self._sdFilePos = 0
         self._callback.on_comm_print_job_done()
         self._changeState(self.STATE_OPERATIONAL)
+
         eventManager().fire(Events.PRINT_DONE, {
             "file": self._currentFile.getFilename(),
             "filename": os.path.basename(self._currentFile.getFilename()),
@@ -540,6 +555,9 @@ class BeeCom(MachineCom):
                 self._sd_status_timer.cancel()
             except:
                 pass
+
+        # sends usage statistics
+        self._sendUsageStatistics('stop')
 
     def _monitor(self):
         """
@@ -801,6 +819,9 @@ class BeeCom(MachineCom):
 
         self._changeState(self.STATE_PRINTING)
 
+        # sends usage statistics
+        self._sendUsageStatistics('start')
+
         # starts the progress status thread
         self._beeCommands.startStatusMonitor(self._statusProgressQueueCallback)
 
@@ -808,3 +829,33 @@ class BeeCom(MachineCom):
             self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
             self._heatupWaitStartTime = None
             self._heating = False
+
+    def _sendUsageStatistics(self, operation):
+        """
+        Calls and external executable to send usage statistics to a remote cloud server
+        :param operation: Supports 'start' (Start Print), 'cancel' (Cancel Print), 'stop' (Print finished) operations
+        :return: true in case the operation was successfull or false if not
+        """
+        biExePath = settings().getBaseFolder('bi') + '/bi_azure'
+
+        if operation != 'start' and operation != 'cancel' and operation != 'stop':
+            return
+
+        printerSN = self.getConnectedPrinterSN()
+
+        if printerSN is None:
+            return False
+        else:
+            if os.path.exists(biExePath) and os.path.isfile(biExePath):
+                cmd = "%s %s %s" % (biExePath, printerSN, operation)
+                import subprocess  ## call date command ##
+                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+
+                (output, err) = p.communicate()
+
+                p_status = p.wait()
+
+                if p_status == 0 and output == 'IOTHUB_CLIENT_CONFIRMATION_OK':
+                    return True
+
+        return False
