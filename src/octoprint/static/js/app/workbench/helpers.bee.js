@@ -1,7 +1,7 @@
 // global namespace
 var BEEwb = BEEwb || {};
 
-BEEwb.helpers = {}
+BEEwb.helpers = {};
 
 /**
  * Auxiliar function to generate the STL file and Scene name from the current canvas scene.
@@ -20,7 +20,7 @@ BEEwb.helpers.generateSTLFromScene = function( objects ) {
     //var blob = new Blob([stlData], {type: 'text/plain'});
     // binary
     return new Blob([stlData], {type: 'application/octet-binary'});
-}
+};
 
 /**
  * Generates the workbench scene name based on current date/time
@@ -37,7 +37,7 @@ BEEwb.helpers.generateSceneName = function( ) {
     + '-' + now.getHours() + '_' + now.getMinutes() + '_' + now.getSeconds() + '.stl';
 
     return sceneName;
-}
+};
 
 /**
  * Calculates Geometry object size
@@ -98,7 +98,7 @@ BEEwb.helpers.objectSize = function( geometry ) {
     }
 
     return { 'x': xSize, 'y': ySize, 'z': zSize};
-}
+};
 
 /**
  * Checks if the object is out of bounds
@@ -124,7 +124,7 @@ BEEwb.helpers.objectOutOfBounds = function( obj, bboxSize ) {
     }
 
     return false;
-}
+};
 
 /**
  * Converts radians to degrees
@@ -139,7 +139,7 @@ BEEwb.helpers.convertToDegrees = function( radians ) {
     } else {
         return 0;
     }
-}
+};
 
 /**
  * Converts degress to radians
@@ -154,4 +154,4 @@ BEEwb.helpers.convertToRadians = function( degrees ) {
     } else {
         return 0;
     }
-}
+};

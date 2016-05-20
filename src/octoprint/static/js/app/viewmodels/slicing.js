@@ -207,11 +207,11 @@ $(function() {
             self.defaultProfile = selectedProfile;
         };
 
-        self.prepareAndSlice = function() {
+        self.prepareAndSlice = function(workbenchFile) {
             self.sliceButtonControl = false; // Disables the slice button to avoid multiple clicks
 
             // Checks if the slicing was called on a workbench scene and finally saves it
-            if (self.file.indexOf('bee_') != -1 ) {
+            if (workbenchFile) {
                 var saveCall = BEEwb.main.saveScene(self.file);
 
                 // waits for the save operation
