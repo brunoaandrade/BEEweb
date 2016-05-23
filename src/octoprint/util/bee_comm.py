@@ -836,6 +836,7 @@ class BeeCom(MachineCom):
         :param operation: Supports 'start' (Start Print), 'cancel' (Cancel Print), 'stop' (Print finished) operations
         :return: true in case the operation was successfull or false if not
         """
+        _logger = logging.getLogger()
         biExePath = settings().getBaseFolder('bi') + '/bi_azure'
 
         if operation != 'start' and operation != 'cancel' and operation != 'stop':
@@ -856,6 +857,9 @@ class BeeCom(MachineCom):
                 p_status = p.wait()
 
                 if p_status == 0 and output == 'IOTHUB_CLIENT_CONFIRMATION_OK':
+                    _logger.info("Statistics sent to remote server. (Operation: %s)" % operation)
                     return True
+                else:
+                    _logger.info("Failed sending statistics to remote server. (Operation: %s)" % operation)
 
         return False
