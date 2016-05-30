@@ -105,9 +105,8 @@ class BeeCom(MachineCom):
             _logger.info("Checking for firmware updates...")
 
             firmware_path = settings().getBaseFolder('firmware')
-            firmware_config_file = join(firmware_path, 'firmware.properties')
 
-            firmware_properties = parsePropertiesFile(firmware_config_file)
+            firmware_properties = parsePropertiesFile(join(firmware_path, 'firmware.properties'))
 
             firmware_file_name = firmware_properties['firmware.'+printer_id]
 
@@ -842,10 +841,10 @@ class BeeCom(MachineCom):
         if operation != 'start' and operation != 'cancel' and operation != 'stop':
             return
 
-        printerSN = self.getConnectedPrinterSN()
+        printerSN = str(self.getConnectedPrinterSN())
 
         if printerSN is None:
-            return False
+            _logger.warn("Could not get Printer Serial Number for statistics communication.")
         else:
             if os.path.exists(biExePath) and os.path.isfile(biExePath):
                 cmd = "%s %s %s" % (biExePath, printerSN, operation)
@@ -856,7 +855,7 @@ class BeeCom(MachineCom):
 
                 p_status = p.wait()
 
-                if p_status == 0 and output == 'IOTHUB_CLIENT_CONFIRMATION_OK':
+                if p_status == 0 and 'IOTHUB_CLIENT_CONFIRMATION_OK' in output:
                     _logger.info("Statistics sent to remote server. (Operation: %s)" % operation)
                     return True
                 else:
