@@ -841,14 +841,14 @@ class BeeCom(MachineCom):
         if operation != 'start' and operation != 'cancel' and operation != 'stop':
             return
 
-        printerSN = str(self.getConnectedPrinterSN())
+        printerSN = self.getConnectedPrinterSN()
 
         if printerSN is None:
             _logger.warn("Could not get Printer Serial Number for statistics communication.")
         else:
             if os.path.exists(biExePath) and os.path.isfile(biExePath):
-                cmd = "%s %s %s" % (biExePath, printerSN, operation)
-                import subprocess  ## call date command ##
+                cmd = biExePath + ' ' + str(printerSN) + ' ' + str(operation)
+                import subprocess
                 p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
 
                 (output, err) = p.communicate()
