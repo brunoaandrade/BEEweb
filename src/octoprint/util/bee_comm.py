@@ -847,12 +847,12 @@ class BeeCom(MachineCom):
             _logger.warn("Could not get Printer Serial Number for statistics communication.")
         else:
             if os.path.exists(biExePath) and os.path.isfile(biExePath):
-                args = [printerSN, operation]
+                args = ['/bi_azure', printerSN, operation]
 
                 _logger.info(u"Running %r in %s" % (" ".join(args), biExePath))
 
                 import sarge
-                p = sarge.run(args, cwd=biExePath, async=True, stdout=sarge.Capture(), stderr=sarge.Capture())
+                p = sarge.run(args, cwd=settings().getBaseFolder('bi'), async=True, stdout=sarge.Capture(), stderr=sarge.Capture())
                 p.wait_events()
 
                 try:
