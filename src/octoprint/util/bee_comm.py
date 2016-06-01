@@ -225,7 +225,7 @@ class BeeCom(MachineCom):
         :return:
         """
         if self._beeConn is not None:
-            return self._beeConn.getConnectedPrinterSN().strip('\x00')
+            return self._beeConn.getConnectedPrinterSN()
         else:
             return None
 
