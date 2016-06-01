@@ -385,7 +385,7 @@ class BeePrinter(Printer):
         return self._comm is not None and self._comm.isPreparingPrint()
 
     def is_heating(self):
-        return self._comm is not None and self._comm.isHeating()
+        return self._comm is not None and (self._comm.isHeating() or self._comm.isPreparingPrint())
 
     def is_shutdown(self):
         return self._comm is not None and self._comm.isShutdown()

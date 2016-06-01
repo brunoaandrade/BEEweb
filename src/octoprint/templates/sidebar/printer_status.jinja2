@@ -22,10 +22,12 @@
 </div>
 
 <div class="row-fluid print-control" style="display: none;" data-bind="visible: loginState.isUser">
-    <button class="btn btn-primary span3" data-bind="click: print, enable: enablePrint(), visible: (!isPaused() && !isShutdown()), css: {'btn-info': isPaused()}, attr: {title: titlePrintButton}" id="job_print">
-        <i data-bind="css: {'icon-print': !isPaused(), 'icon-undo': isPaused()}"></i>
-        <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
-    </button>
+    <div class="span3">
+        <button id="job_print" class="btn btn-primary span12" data-bind="click: print, visible: enablePrint() && (!isPaused() && !isShutdown()), css: {'btn-info': isPaused()}, attr: {title: titlePrintButton}" >
+            <i data-bind="css: {'icon-print': !isPaused(), 'icon-undo': isPaused()}"></i>
+            <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
+        </button>
+    </div>
     <div class="span5"></div>
     <button class="btn span2" id="job_pause" data-bind="click: pause, enable: isOperational() && (isPrinting() || isPaused() || isShutdown()) && loginState.isUser(), css: {active: isPaused() }, attr: {title: titlePauseButton}">
         <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>
