@@ -848,7 +848,7 @@ class BeeCom(MachineCom):
         else:
             if os.path.exists(biExePath) and os.path.isfile(biExePath):
 
-                cmd = '%s %s %s' % biExePath,str(printerSN), str(operation)
+                cmd = '%s %s %s' % (biExePath,str(printerSN), str(operation))
                 _logger.info(u"Running %s" % cmd)
 
                 import subprocess
