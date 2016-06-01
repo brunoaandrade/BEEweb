@@ -847,18 +847,49 @@ class BeeCom(MachineCom):
             _logger.warn("Could not get Printer Serial Number for statistics communication.")
         else:
             if os.path.exists(biExePath) and os.path.isfile(biExePath):
-                cmd = biExePath + ' ' + str(printerSN) + ' ' + str(operation)
-                import subprocess
-                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+                args = [printerSN, operation]
 
-                (output, err) = p.communicate()
+                _logger.info(u"Running %r in %s" % (" ".join(args), biExePath))
 
-                p_status = p.wait()
+                import sarge
+                p = sarge.run(args, cwd=biExePath, async=True, stdout=sarge.Capture(), stderr=sarge.Capture())
+                p.wait_events()
 
-                if p_status == 0 and 'IOTHUB_CLIENT_CONFIRMATION_OK' in output:
-                    _logger.info("Statistics sent to remote server. (Operation: %s)" % operation)
+                try:
+                    while p.returncode is None:
+                        stderr = p.stderr.readline(timeout=0.5)
+                        if not stderr:
+                            p.commands[0].poll()
+                            continue
+
+                        stdout = p.stdout.readline(timeout=0.5)
+                        if not stdout:
+                            p.commands[0].poll()
+                            continue
+                except Exception as ex:
+                    _logger.exception(u"Could not send usage statistics! " + ex.message)
+                    return False
+                finally:
+                    p.close()
+
+                if p.returncode == 0 and 'IOTHUB_CLIENT_CONFIRMATION_OK' in stdout:
+                    _logger.info(u"Statistics sent to remote server. (Operation: %s)" % operation)
                     return True
                 else:
-                    _logger.info("Failed sending statistics to remote server. (Operation: %s)" % operation)
+                    _logger.info(u"Failed sending statistics to remote server. (Operation: %s)" % operation)
+
+                # cmd = biExePath + ' ' + str(printerSN) + ' ' + str(operation)
+                # import subprocess
+                # p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+                #
+                # (output, err) = p.communicate()
+                #
+                # p_status = p.wait()
+                #
+                # if p_status == 0 and 'IOTHUB_CLIENT_CONFIRMATION_OK' in output:
+                #     _logger.info(u"Statistics sent to remote server. (Operation: %s)" % operation)
+                #     return True
+                # else:
+                #     _logger.info(u"Failed sending statistics to remote server. (Operation: %s)" % operation)
 
         return False
