@@ -99,7 +99,8 @@ default_settings = {
 		"helloCommand": "M110 N0",
 		"disconnectOnErrors": True,
 		"ignoreErrorsFromFirmware": False,
-		"logResends": False,
+		"logResends": True,
+		"supportResendsWithoutOk": False,
 
 		# command specific flags
 		"triggerOkForM29": True
@@ -229,6 +230,7 @@ default_settings = {
 					"section_beeweb", "server", "folders", "appearance", "logs", "plugin_pluginmanager", "plugin_softwareupdate"
 				],
 				"usersettings": ["access", "interface"],
+				"about": ["about", "supporters", "authors", "changelog", "license", "thirdparty", "plugin_pluginmanager"],
 				"generic": []
 			},
 			"disabled": {

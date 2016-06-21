@@ -156,6 +156,7 @@ $(function() {
 
             if (selectedSlicer != undefined) {
                 self.slicer(selectedSlicer);
+                self.profilesForSlicer(selectedSlicer);
             }
 
             self.defaultSlicer = selectedSlicer;
