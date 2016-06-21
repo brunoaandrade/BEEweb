@@ -1,7 +1,7 @@
 $(function() {
-    function AboutViewModel(parameters) {
+    function AboutBeeViewModel(parameters) {
         var self = this;
-        self.aboutDialog = $('#about_dialog');
+        self.aboutDialog = $('#aboutbee_dialog');
         self.currentFirmware = ko.observable('Undefined');
 
         self.show = function() {
@@ -29,8 +29,8 @@ $(function() {
     }
 
     OCTOPRINT_VIEWMODELS.push([
-        AboutViewModel,
+        AboutBeeViewModel,
         [],
-        ["#navbar_help","#about_body"]
+        ["#navbar_help","#aboutbee_body"]
     ]);
 });
