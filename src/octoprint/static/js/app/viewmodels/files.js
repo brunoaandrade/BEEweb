@@ -407,6 +407,7 @@ $(function() {
                 self.localTarget = $("#drop_locally");
             } else {
                 self.localTarget = $("#drop");
+                self.listHelper.removeFilter('sd');
             }
             self.sdTarget = $("#drop_sd");
 
@@ -452,12 +453,7 @@ $(function() {
             self.requestData(payload.remote, "sdcard");
         };
 
-        self.onServerConnect = function(payload) {
-            self._enableDragNDrop(true);
-            self.requestData();
-        };
-
-        self.onServerReconnect = function(payload) {
+        self.onServerConnect = self.onServerReconnect = function(payload) {
             self._enableDragNDrop(true);
             self.requestData();
         };
