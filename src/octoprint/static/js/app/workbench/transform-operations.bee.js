@@ -31,17 +31,57 @@ BEEwb.transformOps.move = function() {
 };
 
 /**
+ * Change metric values for scale
+ *
+ */
+BEEwb.transformOps.scaleBy = function() {
+
+    valorinicialx = BEEwb.helpers.objectSize(BEEwb.main.selectedObject.geometry)['x'].toFixed(2);
+    valorinicialy = BEEwb.helpers.objectSize(BEEwb.main.selectedObject.geometry)['y'].toFixed(2);
+    valorinicialz = BEEwb.helpers.objectSize(BEEwb.main.selectedObject.geometry)['z'].toFixed(2);
+    //radiocheck = $('input[name=scaleBy]:checked').val();
+    //if (document.getElementById("scaleby-size").checked)
+    if ($('#scaleby-size').is(':checked'))
+    {
+        $('#scalex-axis-label').text("X (mm)");
+        $('#scaley-axis-label').text("Y (mm)");
+        $('#scalez-axis-label').text("Z (mm)");
+        $('#scalex-axis').val(x);
+        $('#scaley-axis').val(y);
+        $('#scalez-axis').val(z);
+    }
+    else
+    {
+        x = $('#scalex-axis').val();
+        y = $('#scaley-axis').val();
+        z = $('#scalez-axis').val();
+        $('#scalex-axis-label').text("X (%)");
+        $('#scaley-axis-label').text("Y (%)");
+        $('#scalez-axis-label').text("Z (%)");
+        $('#scalex-axis').val((x/valorinicialx*100).toFixed(2) + '%');
+        $('#scaley-axis').val((y/valorinicialy*100).toFixed(2) + '%');
+        $('#scalez-axis').val((z/valorinicialz*100).toFixed(2) + '%');
+    }
+
+};
+
+/**
  * Scales the selected model to the input text boxes axis values
  *
  */
 BEEwb.transformOps.scale = function() {
-
+    
     if (BEEwb.main.selectedObject !== null) {
         var x = parseFloat($('#scalex-axis').val().replace(",", "."));
         var y = parseFloat($('#scaley-axis').val().replace(",", "."));
         var z = parseFloat($('#scalez-axis').val().replace(",", "."));
-
-        this.scaleBySize(x, y ,z);
+        if ($('#scaleby-per').is(':checked'))
+        {
+            x = parseFloat($('#scalex-axis').val().replace("%", ""));
+            y = parseFloat($('#scaley-axis').val().replace("%", ""));
+            z = parseFloat($('#scalez-axis').val().replace("%", ""));
+        }
+        this.scaleBySize(x ,y ,z);
         BEEwb.main.transformControls.update();
 
         // Checks if the selected object is out of bounds
@@ -356,6 +396,10 @@ BEEwb.transformOps.updateScaleSizeInputs = function() {
         $('#scaley-axis').val(newY.toFixed(2));
         $('#scalez-axis').val(newZ.toFixed(2));
 
+        $('#scalex-axis-label').text("X (mm)");
+        $('#scaley-axis-label').text("Y (mm)");
+        $('#scalez-axis-label').text("Z (mm)");
+        $('#scaleby-size').prop("checked", true);
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
     }
@@ -392,10 +436,19 @@ BEEwb.transformOps.scaleBySize = function(x, y, z) {
         return null;
 
     if (BEEwb.main.selectedObject != null) {
-        var xScale = x / this.initialSize['x'];
-        var yScale = y / this.initialSize['y'];
-        var zScale = z / this.initialSize['z'];
-
+        if ($('#scaleby-size').is(':checked'))
+        {
+            var xScale = x / this.initialSize['x'];
+            var yScale = y / this.initialSize['y'];
+            var zScale = z / this.initialSize['z'];
+        }
+        else
+        {
+            var xScale = x / 100;
+            var yScale = y / 100;
+            var zScale = z / 100;
+        }
+        
         // Checks which axis was changed
         if (x != this.previousSize['x']) {
 

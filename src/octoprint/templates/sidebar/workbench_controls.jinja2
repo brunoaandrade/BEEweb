@@ -33,25 +33,31 @@
         <span><strong>{{ _('Object Dimensions') }}</strong></span><br /><br />
         <div id="scale-axis-form" class="row-fluid form-inline">
             <input type="text" class="span8 axis-input-box" id="scalex-axis" name="x-axis" onchange="BEEwb.transformOps.scale();"/>
-            <label class="span3" for="scalex-axis">X (mm)</label>
+            <label class="span3" for="scalex-axis" id="scalex-axis-label">X (mm)</label>
             <input type="checkbox" id="lock-x" title="{{ _('Lock X aspect ratio') }}" checked />
             <br /><br />
 
             <input type="text" class="span8 axis-input-box" id="scaley-axis" name="y-axis" onchange="BEEwb.transformOps.scale();"/>
-            <label class="span3" for="scaley-axis">Y (mm)</label>
+            <label class="span3" for="scaley-axis" id="scaley-axis-label">Y (mm)</label>
             <input type="checkbox" id="lock-y" title="{{ _('Lock Y aspect ratio') }}" checked />
             <br /><br />
 
             <input type="text" class="span8 axis-input-box" id="scalez-axis" name="z-axis" onchange="BEEwb.transformOps.scale();"/>
-            <label class="span3" for="scalez-axis">Z (mm)</label>
+            <label class="span3" for="scalez-axis" id="scalez-axis-label">Z (mm)</label>
             <input type="checkbox" id="lock-z" title="{{ _('Lock Z aspect ratio') }}" checked />
             <br /><br />
+
+            <span class="span2"></span>
+            <input type="radio" id="scaleby-size" name="scaleby" value="size" checked onchange="BEEwb.transformOps.scaleBy();"/> Size
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="radio" id="scaleby-per"  name="scaleby" value="percentage" onchange="BEEwb.transformOps.scaleBy();" /> Percentage<br /><br />            
+
             <span class="span2"></span>
             <button id="btn-scale-max" class="span8 btn btn-sm btn-default model-selection" onclick="BEEwb.transformOps.scaleToMax();" disabled="true">
                 <i class="icon-crop" ></i>
                 <span>{{ _('Scale to Max') }}</span>
             </button>
-            <span class="span2"></span>
+            <br />
             <hr />
         </div>
     </div>
