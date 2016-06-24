@@ -155,9 +155,15 @@ BEEwb.main = {
      *
      */
     clearBed: function () {
-
-        this.objects.traverse(BEEwb.transformOps.removeModel);
-        this.scene.remove(this.objects);
+        if (this.objects !== null) {
+            if (this.objects.children.length > 0) {
+                var iter = this.objects.children.length;
+                for (var i=0; i < iter; i++) {
+                    var targetObj = this.objects.children[0];
+                    BEEwb.transformOps.removeModel(targetObj);
+                }
+            }
+        }
     },
 
     /**
