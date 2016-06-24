@@ -154,29 +154,12 @@ BEEwb.main = {
      * Clear the build platform
      *
      */
-    cleanBed: function () {
-        this.removeAllSelections();
-        this.scene = new THREE.Scene();
+    clearBed: function () {
 
-        var light1 = new THREE.PointLight( 0xffffff, 0.5 );
-        light1.position.set( 200, 200, 200 );
-        var light2 = new THREE.PointLight( 0xffffff, 0.5 );
-        light2.position.set( -200, 200, 200 );
-        var light3 = new THREE.PointLight( 0xffffff, 0.5 );
-        light3.position.set( 200, -200, 200 );
-        var light4 = new THREE.PointLight( 0xffffff, 0.5 );
-        light4.position.set( -200, -200, 200 );
+        this.objects.traverse(BEEwb.transformOps.removeModel);
+        this.scene.remove(this.objects);
+    },
 
-        this.scene.add( light1 );
-        this.scene.add( light2 );
-        this.scene.add( light3 );
-        this.scene.add( light4 );
-
-        this.objects = new THREE.Object3D();
-        this.scene.add(this.objects);
-        this._addBed();
-
-        },
     /**
      * Loads an STL model into the canvas
      *
