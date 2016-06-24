@@ -164,6 +164,8 @@ BEEwb.main = {
                 }
             }
         }
+
+        this.removeAllSelections();
     },
 
     /**
