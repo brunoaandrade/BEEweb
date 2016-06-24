@@ -71,7 +71,11 @@ BEEwb.events.onMouseUp = function( e ) {
     }
 
     if (BEEwb.transformOps.selectedMode == 'scale') {
-        BEEwb.transformOps.updateScaleSizeInputs();
+        if ($('#scaleby-per').is(':checked')) {
+            BEEwb.transformOps.updateScaleSizeInputsByPercentage();
+        } else {
+            BEEwb.transformOps.updateScaleSizeInputs();
+        }
     }
 
     if (BEEwb.transformOps.selectedMode == 'rotate') {
