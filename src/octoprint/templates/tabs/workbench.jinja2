@@ -20,6 +20,7 @@
         <i class="icon-print" ></i>
         {{ _('Start Print...') }}
     </button>
+
 </div>
 
 <div id="stl_container" ></div>
@@ -27,7 +28,10 @@
 <div id="workbench-buttons-bottom" class="row-fluid">
 
     <div class="span3">
-
+    <button class="btn" id="clean_bed" onclick="BEEwb.main.clearBed();" >
+        <i class="icon-eraser" ></i>
+        {{ _('Clear Platform') }}
+    </button>
     </div>
     <div class="span6">
 

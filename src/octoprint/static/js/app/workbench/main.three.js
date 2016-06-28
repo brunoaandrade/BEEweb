@@ -150,6 +150,23 @@ BEEwb.main = {
         this.trackballControls.update();
         this.renderer.render( this.scene, this.camera );
     },
+    /**
+     * Clear the build platform
+     *
+     */
+    clearBed: function () {
+        if (this.objects !== null) {
+            if (this.objects.children.length > 0) {
+                var iter = this.objects.children.length;
+                for (var i=0; i < iter; i++) {
+                    var targetObj = this.objects.children[0];
+                    BEEwb.transformOps.removeModel(targetObj);
+                }
+            }
+        }
+
+        this.removeAllSelections();
+    },
 
     /**
      * Loads an STL model into the canvas
@@ -244,7 +261,6 @@ BEEwb.main = {
             mesh.castShadow = true;
 
             that.scene.add( mesh );
-
             that.objects.add(mesh);
 
             // Runs the placeOnBed algorithm
@@ -255,7 +271,6 @@ BEEwb.main = {
             $('#loadingDialog').modal('hide');
         });
     },
-
     /**
      * Saves the current scene
      *
