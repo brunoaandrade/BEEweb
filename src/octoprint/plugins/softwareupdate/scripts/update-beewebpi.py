@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 from distutils.dir_util import copy_tree
+from distutils.file_util import copy_file
 from octoprint.settings import settings
 import errno
 import subprocess
@@ -95,7 +96,14 @@ def install_support_files(folder, target_folder):
 	settings_folder_path = folder + '/src/filesystem/home/pi/.beeweb'
 
 	try:
+		# creates a backup of the user config.yaml file
+		copy_file(target_folder + '/config.yaml', target_folder + 'config-backup.yaml')
+
 		files_copied = copy_tree(settings_folder_path, target_folder)
+
+		# overwrites the settings file from the repository with the backup
+		copy_file(target_folder + '/config-backup.yaml', target_folder + 'config.yaml')
+
 	except Exception as ex:
 		raise RuntimeError(
 			"Could not update, copying the files to .beeweb directory failed with error: %s" % ex.message)
