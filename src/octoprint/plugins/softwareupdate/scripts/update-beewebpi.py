@@ -97,18 +97,18 @@ def install_support_files(folder, target_folder):
 
 	try:
 		# creates a backup of the user config.yaml file
-		copy_file(target_folder + '/config.yaml', target_folder + 'config-backup.yaml')
+		copy_file(target_folder + '/config.yaml', target_folder + '/config-backup.yaml')
 
 		files_copied = copy_tree(settings_folder_path, target_folder)
 
 		# overwrites the settings file from the repository with the backup
-		copy_file(target_folder + '/config-backup.yaml', target_folder + 'config.yaml')
+		copy_file(target_folder + '/config-backup.yaml', target_folder + '/config.yaml')
 
 	except Exception as ex:
 		raise RuntimeError(
 			"Could not update, copying the files to .beeweb directory failed with error: %s" % ex.message)
 	finally:
-		if len(files_copied) > 0:
+		if files_copied:
 			print("BEEweb settings files copied!")
 
 def parse_arguments():
@@ -144,7 +144,7 @@ def main():
 		raise RuntimeError("Could not update, base folder is not writable")
 
 	# folder where the installation settings files are located
-	target_folder = settings().getBaseFolder('base')
+	target_folder = settings(init=True).getBaseFolder('base')
 
 	update_source(git_executable, folder, target, force=args.force)
 	install_support_files(folder, target_folder)
