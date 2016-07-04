@@ -276,7 +276,7 @@ default_settings = {
 		{ "name": "Suppress M27 requests/responses", "regex": "(Send: M27)|(Recv: SD printing byte)" }
 	],
 	"plugins": {
-		"_disabled": []
+		"_disabled": ['announcements']
 	},
 	"scripts": {
 		"gcode": {
