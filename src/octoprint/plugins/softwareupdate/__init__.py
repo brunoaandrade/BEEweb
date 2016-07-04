@@ -147,6 +147,14 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 					"update_script": "{{python}} \"{update_script}\" --python=\"{{python}}\" \"{{folder}}\" {{target}}".format(update_script=os.path.join(self._basefolder, "scripts", "update-octoprint.py")),
 					"restart": "octoprint"
 				},
+				"BEEsoft configurations": {
+					"type": "github_commit",
+					"user": "beeverycreative",
+					"repo": "BEEwebPi",
+					"update_script": "{{python}} \"{update_script}\" \"{{folder}}\" {{target}}".format(
+						update_script=os.path.join(self._basefolder, "scripts", "update-beewebpi.py")),
+					"restart": "octoprint"
+				},
 			},
 			"pip_command": None,
 			"check_providers": {},

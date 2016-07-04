@@ -1,36 +1,45 @@
 $(function() {
     function AboutViewModel(parameters) {
         var self = this;
-        self.aboutDialog = $('#about_dialog');
-        self.currentFirmware = ko.observable('Undefined');
+
+        self.aboutDialog = undefined;
+        self.aboutContent = undefined;
+        self.aboutTabs = undefined;
 
         self.show = function() {
-
-            // show settings, ensure centered position
+            $("a:first", self.aboutTabs).tab("show");
+            self.aboutContent.scrollTop(0);
             self.aboutDialog.modal({
-                minHeight: function() { return Math.max($.fn.modal.defaults.maxHeight() - 500, 250); }
+                minHeight: function() { return Math.max($.fn.modal.defaults.maxHeight() - 80, 250); }
             }).css({
                 width: 'auto',
                 'margin-left': function() { return -($(this).width() /2); }
             });
-
-            $.ajax({
-                url: "bee/api/firmware/current/version",
-                type: "GET",
-                dataType: "json",
-                contentType: "application/json; charset=UTF-8",
-                success: function(data) {
-                    self.currentFirmware(data.version);
-                }
-            });
-
             return false;
+        };
+
+        self.hide = function() {
+            self.aboutDialog.modal("hide");
+        };
+
+        self.onStartup = function() {
+            self.aboutDialog = $("#about_dialog");
+            self.aboutTabs = $("#about_dialog_tabs");
+            self.aboutContent = $("#about_dialog_content");
+
+            $('a[data-toggle="tab"]', self.aboutTabs).on("show", function() {
+                self.aboutContent.scrollTop(0);
+            });
+        };
+
+        self.showTab = function(tab) {
+            $("a[href=#" + tab + "]", self.aboutTabs).tab("show");
         };
     }
 
     OCTOPRINT_VIEWMODELS.push([
         AboutViewModel,
         [],
-        ["#navbar_help","#about_body"]
+        ["#about_dialog", "#footer_about"]
     ]);
 });
