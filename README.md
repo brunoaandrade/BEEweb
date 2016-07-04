@@ -77,3 +77,6 @@ Install the tool lessc using npm, and compile the main less file using the follo
 
 $ lessc -x octoprint.less ../css/octoprint.css
 
+
+Software Updates
+----------------
