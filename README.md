@@ -80,5 +80,5 @@ $ lessc -x octoprint.less ../css/octoprint.css
 
 Software Updates
 ----------------
-
+...
 ...
