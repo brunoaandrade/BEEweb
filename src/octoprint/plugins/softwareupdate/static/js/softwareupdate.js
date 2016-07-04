@@ -384,7 +384,7 @@ $(function() {
                     }
 
                     self._updatePopup({
-                        text: _.sprintf(gettext("Now updating %(name)s to %(version)s"), {name: name, version: messageData.version})
+                        text: _.sprintf(gettext("Now updating to %(version)s"), {name: name, version: messageData.version})
                     });
                     break;
                 }
