@@ -506,7 +506,7 @@ class Server(object):
 
 			import threading
 			threading.Thread(target=work).start()
-			
+
 			from octoprint.server.util.connection_util import detect_bvc_printer_connection
 			if printer.is_closed_or_error():
 				bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(printer.connect, ))
@@ -1043,8 +1043,6 @@ class Server(object):
 		]
 
 		threejs_libs = [
-			"js/lib/jquery/jquery.min.js",
-			"js/lib/bootstrap/bootstrap-modal.js",
 			"js/lib/threejs/three.min.js",
 			"js/lib/threejs/STLLoader.js",
 			"js/lib/threejs/STLExporter.js",

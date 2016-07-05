@@ -13,6 +13,9 @@
 
         {% include 'stylesheets.jinja2' %}
         {% include 'initscript.jinja2' %}
+        {% assets "js_libs" %}
+            <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
     </head>
     <body>
         <div class="page-container">

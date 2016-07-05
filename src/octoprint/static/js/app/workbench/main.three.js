@@ -297,14 +297,14 @@ BEEwb.main = {
             processData: false,
             success: function(data) {
 
-                html = _.sprintf(gettext("The scene was saved to the local filesystem."));
+                var html = _.sprintf(gettext("The scene was saved to the local filesystem."));
                 new PNotify({title: gettext("Save success"), text: html, type: "success", hide: true});
 
                 document.cookie="lastModel=" + filename;
 
             },
             error: function() {
-                html = _.sprintf(gettext("Could not save the scene in the server filesystem. Make sure you have the right permissions and disk space."));
+                var html = _.sprintf(gettext("Could not save the scene in the server filesystem. Make sure you have the right permissions and disk space."));
                 new PNotify({title: gettext("Save failed"), text: html, type: "error", hide: false});
 
                 // removes the generated file name from the names array
