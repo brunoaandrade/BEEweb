@@ -148,7 +148,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 					"restart": "octoprint"
 				},
 				"BEEsoft configurations": {
-					"type": "github_commit",
+					"type": "github_release",
 					"user": "beeverycreative",
 					"repo": "BEEwebPi",
 					"update_script": "{{python}} \"{update_script}\" \"{{folder}}\" {{target}}".format(
