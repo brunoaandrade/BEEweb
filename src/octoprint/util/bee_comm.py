@@ -50,7 +50,7 @@ class BeeCom(MachineCom):
         :return: True if the connection was successful
         """
         if self._beeConn is None:
-            self._beeConn = BeePrinterConn(self._connShutdownHook)
+            self._beeConn = BeePrinterConn(self._connShutdownHook, True)
             self._beeConn.connectToFirstPrinter()
 
         if self._beeConn.isConnected():
@@ -719,9 +719,7 @@ class BeeCom(MachineCom):
                 elif self._state == self.STATE_OPERATIONAL or self._state == self.STATE_PAUSED:
                     if "ok" in line:
                         # if we still have commands to process, process them
-                        if self._resendSwallowNextOk:
-                            self._resendSwallowNextOk = False
-                        elif self._resendDelta is not None:
+                        if self._resendDelta is not None:
                             self._resendNextCommand()
                         elif self._sendFromQueue():
                             pass
@@ -730,11 +728,11 @@ class BeeCom(MachineCom):
                     elif line.lower().startswith("resend") or line.lower().startswith("rs"):
                         self._handleResendRequest(line)
 
-            except:
+            except Exception as ex:
                 self._logger.exception("Something crashed inside the USB connection.")
 
                 errorMsg = "See octoprint.log for details"
-                self._log(errorMsg)
+                self._log(ex.message)
                 self._errorValue = errorMsg
                 self._changeState(self.STATE_ERROR)
                 eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
