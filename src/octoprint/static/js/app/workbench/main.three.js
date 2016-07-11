@@ -106,7 +106,17 @@ BEEwb.main = {
             lastModel = 'BEE.stl';
             this.loadModel(lastModel, true);
         } else {
-            this.loadModel(lastModel, false);
+            var that = this;
+            $.ajax({
+                url:'./downloads/files/local/' + lastModel,
+                type:'HEAD',
+                error: function() {
+                    console.log('Last printed model does not exist.')
+                },
+                success: function() {
+                    that.loadModel(lastModel, false);
+                }
+            });
         }
 
         this.trackballControls = new THREE.TrackballControls( this.camera, this.container );
