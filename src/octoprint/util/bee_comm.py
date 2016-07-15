@@ -565,13 +565,11 @@ class BeeCom(MachineCom):
         """
         feedback_controls, feedback_matcher = comm.convert_feedback_controls(settings().get(["controls"]))
         feedback_errors = []
-        pause_triggers = comm.convert_pause_triggers(settings().get(["printerParameters", "pauseTriggers"]))
 
         #exits if no connection is active
         if not self._beeConn.isConnected():
             return
 
-        startSeen = False
         supportWait = settings().getBoolean(["feature", "supportWait"])
 
         while self._monitoring_active:
@@ -579,34 +577,6 @@ class BeeCom(MachineCom):
                 line = self._getResponse()
                 if line is None:
                     continue
-
-                ##~~ debugging output handling
-                if line.startswith("//"):
-                    debugging_output = line[2:].strip()
-                    if debugging_output.startswith("action:"):
-                        action_command = debugging_output[len("action:"):].strip()
-
-                        if action_command == "pause":
-                            self._log("Pausing on request of the printer...")
-                            self.setPause(True)
-                        elif action_command == "resume":
-                            self._log("Resuming on request of the printer...")
-                            self.setPause(False)
-                        elif action_command == "disconnect":
-                            self._log("Disconnecting on request of the printer...")
-                            self._callback.on_comm_force_disconnect()
-                        else:
-                            for hook in self._printer_action_hooks:
-                                try:
-                                    self._printer_action_hooks[hook](self, line, action_command)
-                                except:
-                                    self._logger.exception("Error while calling hook {} with action command {}".format(self._printer_action_hooks[hook], action_command))
-                                    continue
-                    else:
-                        continue
-
-                ##~~ Error handling
-                line = self._handleErrors(line)
 
                 ##~~ process oks
                 if line.strip().startswith("ok") or (self.isPrinting() and supportWait and line.strip().startswith("wait")):
@@ -640,20 +610,6 @@ class BeeCom(MachineCom):
                 elif 'End file list' in line:
                     self._sdFileList = False
                     self._callback.on_comm_sd_files(self._sdFiles)
-                elif 'SD printing byte' in line and self.isSdPrinting():
-                    # answer to M27, at least on Marlin, Repetier and Sprinter: "SD printing byte %d/%d"
-                    match = regex_sdPrintingByte.search(line)
-                    self._currentFile.setFilepos(int(match.group(1)))
-                    self._callback.on_comm_progress()
-                elif 'File opened' in line and not self._ignore_select:
-                    # answer to M23, at least on Marlin, Repetier and Sprinter: "File opened:%s Size:%d"
-                    match = regex_sdFileOpened.search(line)
-                    if self._sdFileToSelect:
-                        name = self._sdFileToSelect
-                        self._sdFileToSelect = None
-                    else:
-                        name = match.group(1)
-                    self._currentFile = comm.PrintingSdFileInformation(name, int(match.group(2)))
                 elif 'File selected' in line:
                     if self._ignore_select:
                         self._ignore_select = False
@@ -664,18 +620,6 @@ class BeeCom(MachineCom):
                             "file": self._currentFile.getFilename(),
                             "origin": self._currentFile.getFileLocation()
                         })
-                elif 'Writing to file' in line:
-                    # answer to M28, at least on Marlin, Repetier and Sprinter: "Writing to file: %s"
-                    self._changeState(self.STATE_PRINTING)
-                    self._clear_to_send.set()
-                    line = "ok"
-
-                elif 'Done saving file' in line:
-                    self.refreshSdFiles()
-                elif 'File deleted' in line and line.strip().endswith("ok"):
-                    # buggy Marlin version that doesn't send a proper \r after the "File deleted" statement, fixed in
-                    # current versions
-                    self._clear_to_send.set()
 
                 ##~~ Message handling
                 elif line.strip() != '' \
@@ -684,36 +628,6 @@ class BeeCom(MachineCom):
                         and line != 'echo:Unknown command:""\n' \
                         and self.isOperational():
                     self._callback.on_comm_message(line)
-
-                ##~~ Parsing for feedback commands
-                if feedback_controls and feedback_matcher and not "_all" in feedback_errors:
-                    try:
-                        self._process_registered_message(line, feedback_matcher, feedback_controls, feedback_errors)
-                    except:
-                        # something went wrong while feedback matching
-                        self._logger.exception("Error while trying to apply feedback control matching, disabling it")
-                        feedback_errors.append("_all")
-
-                ##~~ Parsing for pause triggers
-                if pause_triggers and not self.isStreaming():
-                    if "enable" in pause_triggers.keys() and pause_triggers["enable"].search(line) is not None:
-                        self.setPause(True)
-                    elif "disable" in pause_triggers.keys() and pause_triggers["disable"].search(line) is not None:
-                        self.setPause(False)
-                    elif "toggle" in pause_triggers.keys() and pause_triggers["toggle"].search(line) is not None:
-                        self.setPause(not self.isPaused())
-                        self.setPause(not self.isPaused())
-
-                ### Connection attempt
-                elif self._state == self.STATE_CONNECTING:
-                    if "start" in line and not startSeen:
-                        startSeen = True
-                        self._sendCommand("M110")
-                        self._clear_to_send.set()
-                    elif "ok" in line:
-                        self._onConnected()
-                    elif time.time() > self._timeout:
-                        self.close()
 
                 ### Operational
                 elif self._state == self.STATE_OPERATIONAL or self._state == self.STATE_PAUSED:
