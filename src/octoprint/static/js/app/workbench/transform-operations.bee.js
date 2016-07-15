@@ -52,10 +52,11 @@ BEEwb.transformOps.toggleScaleType = function() {
 BEEwb.transformOps.scale = function() {
 
     if (BEEwb.main.selectedObject !== null) {
+    debugger;
         var x = parseFloat($('#scalex-axis').val().replace(",", "."));
         var y = parseFloat($('#scaley-axis').val().replace(",", "."));
         var z = parseFloat($('#scalez-axis').val().replace(",", "."));
-        
+
         if ($('#scaleby-per').is(':checked')) {
             this.scaleByPercentage(x, y, z);
 
@@ -514,15 +515,9 @@ BEEwb.transformOps.scaleBySize = function(x, y, z) {
 
     if (BEEwb.main.selectedObject != null) {
 
-        if (!scaleByPercentage) {
-            var xScale = x / this.initialSize['x'];
-            var yScale = y / this.initialSize['y'];
-            var zScale = z / this.initialSize['z'];
-        } else {
-            var xScale = x / 100;
-            var yScale = y / 100;
-            var zScale = z / 100;
-        }
+        var xScale = x / this.initialSize['x'];
+        var yScale = y / this.initialSize['y'];
+        var zScale = z / this.initialSize['z'];
 
         // Checks which axis was changed
         if (x != this.previousSize['x']) {
