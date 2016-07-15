@@ -107,6 +107,16 @@ def install_support_files(folder, target_folder):
 	except Exception as ex:
 		raise RuntimeError(
 			"Could not update, copying the files to .beeweb directory failed with error: %s" % ex.message)
+
+	try:
+		# copies the files in the /etc directory
+		copy_tree(folder + '/src/filesystem/root/etc/default', '/etc/default')
+		copy_tree(folder + '/src/filesystem/root/etc/haproxy', '/etc/haproxy')
+		copy_tree(folder + '/src/filesystem/root/etc/init.d', '/etc/init.d')
+
+	except Exception as ex:
+		raise RuntimeError(
+			"Could not update, copying the folders to /etc directory failed with error: %s" % ex.message)
 	finally:
 		if files_copied:
 			print("BEEweb settings files copied!")
