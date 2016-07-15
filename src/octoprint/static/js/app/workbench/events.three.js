@@ -1,7 +1,7 @@
 // global namespace
 var BEEwb = BEEwb || {};
 
-BEEwb.events = {}
+BEEwb.events = {};
 
 /**
  * OnWindowResize event function
@@ -13,7 +13,7 @@ BEEwb.events.onWindowResize = function() {
     BEEwb.main.renderer.setSize( window.innerWidth, window.innerHeight / 1.5 );
 
     BEEwb.main.render();
-}
+};
 
 /**
  * OnMouseDown event function
@@ -28,7 +28,7 @@ BEEwb.events.onMouseDown = function( e ) {
         BEEwb.main.renderer.domElement.clientHeight );
 
     BEEwb.main.mouseVector.z = 0.5;
-}
+};
 
 /**
  * OnMouseUp event function
@@ -39,13 +39,11 @@ BEEwb.events.onMouseUp = function( e ) {
 
     BEEwb.main.mouseVector.x = 2 * ( (e.clientX - BEEwb.main.containerWidthOffset) /
         BEEwb.main.renderer.domElement.clientWidth) - 1;
-
     BEEwb.main.mouseVector.y = 1 - 2 * ( (e.clientY - BEEwb.main.containerHeightOffset) /
         BEEwb.main.renderer.domElement.clientHeight );
-
     BEEwb.main.mouseVector.z = 0.5;
 
-    BEEwb.main.raycaster.setFromCamera( BEEwb.main.mouseVector, BEEwb.main.camera );
+    BEEwb.main.raycaster.setFromCamera( BEEwb.main.mouseVector.clone(), BEEwb.main.camera );
 
     var intersects = BEEwb.main.raycaster.intersectObjects( BEEwb.main.objects.children );
 
@@ -60,7 +58,8 @@ BEEwb.events.onMouseUp = function( e ) {
 
     } else if (prevMouseVector.x == BEEwb.main.mouseVector.x
         && prevMouseVector.y == BEEwb.main.mouseVector.y
-        && prevMouseVector.z == BEEwb.main.mouseVector.z) { // It means the scene wasn't dragged and so we should remove all selections
+        && prevMouseVector.z == BEEwb.main.mouseVector.z) {
+        // It means the scene wasn't dragged and so we should remove all selections
 
         BEEwb.main.removeAllSelections();
     }
@@ -81,7 +80,7 @@ BEEwb.events.onMouseUp = function( e ) {
     if (BEEwb.transformOps.selectedMode == 'rotate') {
         BEEwb.transformOps.updateRotationInputs();
     }
-}
+};
 
 /**
  * OnWindowResize event function
@@ -106,4 +105,4 @@ BEEwb.events.onKeyDown = function( event ) {
             BEEwb.transformOps.activateScale();
             break;
     }
-}
+};
