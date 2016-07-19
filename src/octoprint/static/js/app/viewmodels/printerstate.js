@@ -240,6 +240,11 @@ $(function() {
         self._processProgressData = function(data) {
             if (data.completion) {
                 self.progress(data.completion);
+
+                if (data.completion == 100) {
+                    // Empties the progress bar
+                    self.progress(0);
+                }
             } else {
                 self.progress(undefined);
             }
