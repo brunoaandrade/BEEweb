@@ -86,10 +86,14 @@ class BeePrinter(Printer):
         :return:
         """
         if progressData is not None and self._selectedFile is not None:
-            self._elapsedTime = progressData['Elapsed Time'] if 'Elapsed Time' in progressData else None
-            self._estimatedTime = progressData['Estimated Time'] if 'Estimated Time' in progressData else None
-            self._executedLines = progressData['Executed Lines'] if 'Executed Lines' in progressData else None
-            self._numberLines = progressData['Lines'] if 'Lines' in progressData else None
+            if 'Elapsed Time' in progressData:
+                self._elapsedTime = progressData['Elapsed Time']
+            if 'Estimated Time' in progressData:
+                self._estimatedTime = progressData['Estimated Time']
+            if 'Executed Lines' in progressData:
+                self._executedLines = progressData['Executed Lines']
+            if 'Lines' in progressData:
+                self._numberLines = progressData['Lines']
 
     def refresh_sd_files(self, blocking=False):
         """
