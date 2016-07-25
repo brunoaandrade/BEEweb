@@ -199,6 +199,14 @@ $(function() {
                     self.titlePauseButton(self.TITLE_PAUSE_BUTTON_UNPAUSED);
                 }
             }
+
+            // If the print job is running show the print panel (print or shutdown states)
+            // This is used when the page is reloaded and the print info must be shown
+            if (self.isPrinting() || self.isShutdown()) {
+                if (!$("#state").hasClass('in')) {
+                    $("#state").collapse("show");
+                }
+            }
         };
 
         self._processJobData = function(data) {
@@ -232,6 +240,11 @@ $(function() {
         self._processProgressData = function(data) {
             if (data.completion) {
                 self.progress(data.completion);
+
+                if (data.completion == 100) {
+                    // Empties the progress bar
+                    self.progress(0);
+                }
             } else {
                 self.progress(undefined);
             }

@@ -83,7 +83,7 @@ BEEwb.events.onMouseUp = function( e ) {
 };
 
 /**
- * OnWindowResize event function
+ * OnKeyDown event function
  */
 BEEwb.events.onKeyDown = function( event ) {
 
