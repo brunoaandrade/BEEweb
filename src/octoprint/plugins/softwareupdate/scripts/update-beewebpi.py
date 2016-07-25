@@ -82,7 +82,7 @@ def update_source(git_executable, folder, target, branch, force=False):
 	print(stdout)
 
 	print(">>> Running: git checkout")
-	returncode, stdout = _git(["checkout " + branch], folder, git_executable=git_executable)
+	returncode, stdout = _git(["checkout", branch], folder, git_executable=git_executable)
 	if returncode != 0:
 		raise RuntimeError("Could not update, \"git checkout %s\" failed with returncode %d: %s" % (branch, returncode, stdout))
 	print(stdout)
@@ -113,7 +113,9 @@ def install_support_files(folder, target_folder):
 	except Exception as ex:
 		raise RuntimeError(
 			"Could not update, copying the files to .beeweb directory failed with error: %s" % ex.message)
-
+	finally:
+		if files_copied:
+			print("BEEweb settings files copied!")
 	try:
 		# copies the files in the /etc directory
 		copy_tree(folder + '/src/filesystem/root/etc/default', '/etc/default')
@@ -123,10 +125,10 @@ def install_support_files(folder, target_folder):
 
 	except Exception as ex:
 		raise RuntimeError(
-			"Could not update, copying the folders to /etc directory failed with error: %s" % ex.message)
+			"Could not update, copying the system files to /etc directories failed with error: %s" % ex.message)
 	finally:
 		if files_copied:
-			print("BEEweb settings files copied!")
+			print("BEEwebPi system files copied!")
 
 def parse_arguments():
 	import argparse
