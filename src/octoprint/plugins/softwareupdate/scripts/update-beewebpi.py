@@ -50,7 +50,7 @@ def _git(args, cwd, hide_stderr=False, verbose=False, git_executable=None):
 
 	return p.returncode, stdout
 
-def update_source(git_executable, folder, target, force=False):
+def update_source(git_executable, folder, target, branch, force=False):
 	print(">>> Running: git diff --shortstat")
 	returncode, stdout = _git(["diff", "--shortstat"], folder, git_executable=git_executable)
 	if returncode != 0:
@@ -79,6 +79,12 @@ def update_source(git_executable, folder, target, force=False):
 	returncode, stdout = _git(["pull"], folder, git_executable=git_executable)
 	if returncode != 0:
 		raise RuntimeError("Could not update, \"git pull\" failed with returncode %d: %s" % (returncode, stdout))
+	print(stdout)
+
+	print(">>> Running: git checkout")
+	returncode, stdout = _git(["checkout " + branch], folder, git_executable=git_executable)
+	if returncode != 0:
+		raise RuntimeError("Could not update, \"git checkout %s\" failed with returncode %d: %s" % (branch, returncode, stdout))
 	print(stdout)
 
 	if force:
@@ -113,6 +119,7 @@ def install_support_files(folder, target_folder):
 		copy_tree(folder + '/src/filesystem/root/etc/default', '/etc/default')
 		copy_tree(folder + '/src/filesystem/root/etc/haproxy', '/etc/haproxy')
 		copy_tree(folder + '/src/filesystem/root/etc/init.d', '/etc/init.d')
+		copy_tree(folder + '/src/filesystem/root/etc/init.d', '/etc/hostapd')
 
 	except Exception as ex:
 		raise RuntimeError(
@@ -132,6 +139,8 @@ def parse_arguments():
 	                    help="Set this to force the update to only the specified version (nothing newer)")
 	parser.add_argument("folder", type=str,
 	                    help="Specify the base folder of the BEEsoft installation to update")
+	parser.add_argument("branch", type=str,
+	                    help="Specify the branch from which to install the update")
 	parser.add_argument("target", type=str,
 	                    help="Specify the commit or tag to which to update")
 
@@ -148,6 +157,7 @@ def main():
 
 	folder = args.folder
 	target = args.target
+	branch = args.branch
 
 	import os
 	if not os.access(folder, os.W_OK):
@@ -156,7 +166,7 @@ def main():
 	# folder where the installation settings files are located
 	target_folder = settings(init=True).getBaseFolder('base')
 
-	update_source(git_executable, folder, target, force=args.force)
+	update_source(git_executable, folder, target, branch, force=args.force)
 	install_support_files(folder, target_folder)
 
 if __name__ == "__main__":
