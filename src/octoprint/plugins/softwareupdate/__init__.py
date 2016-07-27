@@ -155,8 +155,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 					"repo": "BEEwebPi",
 					"branch": configurationsReleaseBranch,
 					"update_script": "{{python}} \"{update_script}\" \"{{folder}}\" {{target}} {release_branch}".format(
-						update_script=os.path.join(self._basefolder, "scripts", "update-beewebpi.py",
-						release_branch=configurationsReleaseBranch)),
+						update_script=os.path.join(self._basefolder, "scripts", "update-beewebpi.py"),
+						release_branch=configurationsReleaseBranch),
 					"restart": "octoprint",
 					"checkout_folder": "/home/pi/beewebpi-repo" # default checkout path
 				},
