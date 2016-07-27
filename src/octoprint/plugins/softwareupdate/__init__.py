@@ -138,6 +138,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 	#~~ SettingsPlugin API
 
 	def get_settings_defaults(self):
+		configurationsReleaseBranch = "release/configurations"
+
 		return {
 			"checks": {
 				"octoprint": {
@@ -151,9 +153,10 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 					"type": "github_commit",
 					"user": "beeverycreative",
 					"repo": "BEEwebPi",
-					"branch": "release/configurations",
-					"update_script": "{{python}} \"{update_script}\" \"{{folder}}\" {{target}} test/configurations".format(
-						update_script=os.path.join(self._basefolder, "scripts", "update-beewebpi.py")),
+					"branch": configurationsReleaseBranch,
+					"update_script": "{{python}} \"{update_script}\" \"{{folder}}\" {{target}} {release_branch}".format(
+						update_script=os.path.join(self._basefolder, "scripts", "update-beewebpi.py",
+						release_branch=configurationsReleaseBranch)),
 					"restart": "octoprint",
 					"checkout_folder": "/home/pi/beewebpi-repo" # default checkout path
 				},
