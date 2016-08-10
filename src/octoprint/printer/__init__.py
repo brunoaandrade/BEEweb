@@ -334,6 +334,13 @@ class PrinterInterface(object):
 		"""
 		raise NotImplementedError()
 
+	def is_shutdown(self):
+		"""
+		Returns:
+		    (boolean) Whether the printer is currently in shutdown mode.
+		"""
+		raise NotImplementedError()
+
 	def is_error(self):
 		"""
 		Returns:

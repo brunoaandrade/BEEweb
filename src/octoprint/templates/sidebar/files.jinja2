@@ -4,23 +4,27 @@
             <span class="btn btn-primary fileinput-button span6" data-bind="css: {disabled: !$root.loginState.isUser()}" style="margin-bottom: 10px">
                 <i class="icon-upload-alt icon-white"></i>
                 <span>{{ _('Upload') }}</span>
-                <input id="gcode_upload" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser()">
+                <input id="gcode_upload" accept="{{ ",".join(supportedExtensions) }}" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser()">
             </span>
             <span class="btn btn-primary fileinput-button span6" data-bind="css: {disabled: !$root.loginState.isUser() || !$root.isSdReady()}" style="margin-bottom: 10px">
                 <i class="icon-upload-alt icon-white"></i>
                 <span>{{ _('Upload to SD') }}</span>
-                <input id="gcode_upload_sd" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser() && isSdReady()">
+                <input id="gcode_upload_sd" accept="{{ ",".join(supportedExtensions) }}" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser() && isSdReady()">
             </span>
         {% else %}
             <span class="btn btn-primary fileinput-button span12" data-bind="css: {disabled: !$root.loginState.isUser()}" style="margin-bottom: 10px">
                 <i class="icon-upload-alt icon-white"></i>
-                <span>{{ _('Import Model') }}</span>
-                <input id="gcode_upload" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser()">
+                <span>{{ _('Upload') }}</span>
+                <input id="gcode_upload" accept="{{ ",".join(supportedExtensions) }}" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser()">
             </span>
         {% endif %}
     </div>
-    <div id="gcode_upload_progress" class="progress" style="width: 100%;">
-        <div class="bar" style="width: 0%"></div>
+    <div id="gcode_upload_progress" class="progress progress-text-centered">
+        <span class="progress-text-back" data-bind="text: uploadProgressText"></span>
+        <div class="bar">
+            <span class="progress-text-front"
+            data-bind="copyWidth: ':parent :parent :parent :parent form', text: uploadProgressText"></span>
+        </div>
     </div>
     <div>
         <small class="muted">{{ _('Hint: You can also drag and drop files on this page to upload them.') }}</small>
@@ -65,34 +69,4 @@
 <div class="text-right muted" data-bind="attr: {title: diskusageString}, css: {'text-error': diskusageCritical}, style: {'font-weight': diskusageCritical() || diskusageWarning() ? 'bold' : 'normal'}">
     <small>{{ _('Free') }}: <span data-bind="text: freeSpaceString"></span> / {{ _('Total') }}: <span data-bind="text: totalSpaceString"></span> <i class="icon-exclamation-sign" data-bind="visible: diskusageWarning" style="display: none"></i></small>
 </div>
-<div style="display: none;" data-bind="visible: loginState.isUser">
-    <div class="row-fluid upload-buttons">
-        {% if enableSdSupport %}
-            <span class="btn btn-primary fileinput-button span6" data-bind="css: {disabled: !$root.loginState.isUser()}" style="margin-bottom: 10px">
-                                <i class="icon-upload-alt icon-white"></i>
-                                <span>{{ _('Upload') }}</span>
-                                <input id="gcode_upload" accept="{{ ",".join(supportedExtensions) }}" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser()">
-                            </span>
-            <span class="btn btn-primary fileinput-button span6" data-bind="css: {disabled: !$root.loginState.isUser() || !$root.isSdReady()}" style="margin-bottom: 10px">
-                                <i class="icon-upload-alt icon-white"></i>
-                                <span>{{ _('Upload to SD') }}</span>
-                                <input id="gcode_upload_sd" accept="{{ ",".join(supportedExtensions) }}" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser() && isSdReady()">
-                            </span>
-        {% else %}
-            <span class="btn btn-primary fileinput-button span12" data-bind="css: {disabled: !$root.loginState.isUser()}" style="margin-bottom: 10px">
-                                <i class="icon-upload-alt icon-white"></i>
-                                <span>{{ _('Upload') }}</span>
-                                <input id="gcode_upload" accept="{{ ",".join(supportedExtensions) }}" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser()">
-                            </span>
-        {% endif %}
-    </div>
-    <div id="gcode_upload_progress" class="progress progress-text-centered">
-        <span class="progress-text-back" data-bind="text: uploadProgressText"></span>
-        <div class="bar">
-            <span class="progress-text-front" data-bind="copyWidth: ':parent :parent :parent :parent form', text: uploadProgressText"></span>
-        </div>
-    </div>
-    <div>
-        <small class="muted">{{ _('Hint: You can also drag and drop files on this page to upload them.') }}</small>
-    </div>
-</div>
+

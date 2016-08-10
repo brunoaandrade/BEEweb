@@ -394,12 +394,33 @@ class BeePrinter(Printer):
     def is_shutdown(self):
         return self._comm is not None and self._comm.isShutdown()
 
+    def toggle_pause_print(self):
+        """
+        Pauses the current print job if it is currently running or resumes it if it is currently paused.
+        """
+        if self.is_printing():
+            self.pause_print()
+        elif self.is_paused() or self.is_shutdown():
+            self.resume_print()
+
+    def resume_print(self):
+        """
+        Resume the current printjob.
+        """
+        if self._comm is None:
+            return
+
+        if not self._comm.isPaused() and not self._comm.isShutdown():
+            return
+
+        self._comm.setPause(False)
+
     def get_state_string(self):
         """
          Returns a human readable string corresponding to the current communication state.
         """
         if self._comm is None:
-            return "Attempting to connect..."
+            return "Connecting..."
         else:
             return self._comm.getStateString()
 

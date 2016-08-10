@@ -314,7 +314,7 @@ $(function() {
 
             // Checks if the slicing was called on a workbench scene and finally saves it
             if (workbenchFile) {
-                var saveCall = BEEwb.main.saveScene(self.file);
+                var saveCall = BEEwb.main.saveScene(self.file());
 
                 // waits for the save operation
                 saveCall.done( function () {

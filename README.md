@@ -77,3 +77,7 @@ Install the tool lessc using npm, and compile the main less file using the follo
 
 $ lessc -x octoprint.less ../css/octoprint.css
 
+If you want to generate the translation binary files from the .po files run the following command:
+
+$ msgfmt messages.po --output-file messages.mo
+

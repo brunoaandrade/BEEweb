@@ -52,7 +52,6 @@ BEEwb.transformOps.toggleScaleType = function() {
 BEEwb.transformOps.scale = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-    debugger;
         var x = parseFloat($('#scalex-axis').val().replace(",", "."));
         var y = parseFloat($('#scaley-axis').val().replace(",", "."));
         var z = parseFloat($('#scalez-axis').val().replace(",", "."));

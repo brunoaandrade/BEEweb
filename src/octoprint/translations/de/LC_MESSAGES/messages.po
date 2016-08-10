@@ -2563,7 +2563,7 @@ msgid "Print Time"
 msgstr "Druckdauer"
 
 #: src/octoprint/templates/sidebar/state.jinja2:11
-msgid "Print Time Left"
+msgid "Approx. Time Left"
 msgstr "Verbleibende Druckdauer"
 
 #: src/octoprint/templates/sidebar/state.jinja2:12

@@ -343,8 +343,9 @@ $(function() {
             });
         };
 
-        self.pause = function() {
-            self._jobCommand("pause");
+        self.pause = function(action) {
+            action = action || "toggle";
+            self._jobCommand("pause", {"action": action});
 
             self._restoreShutdown();
         };
@@ -361,7 +362,7 @@ $(function() {
             $('#job_shutdown').prop('disabled', false);
             $('#shutdown_confirmation').addClass('hidden');
             $('#shutdown_panel').removeClass('hidden');
-        }
+        };
 
         self.cancel = function() {
             $('#job_cancel').prop('disabled', true);

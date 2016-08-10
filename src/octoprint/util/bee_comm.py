@@ -50,6 +50,7 @@ class BeeCom(MachineCom):
         :return: True if the connection was successful
         """
         if self._beeConn is None:
+            self._changeState(self.STATE_CONNECTING)
             self._beeConn = BeePrinterConn(self._connShutdownHook)
             self._beeConn.connectToFirstPrinter()
 
@@ -262,7 +263,7 @@ class BeeCom(MachineCom):
         Returns the current printer state
         :return:
         """
-        if self._state == self.STATE_WAITING_FOR_BTF:
+        if self._state == self.STATE_WAITING_FOR_BTF or self._state == self.STATE_CLOSED:
             return "No printer detected. Please turn on your printer."
         elif self._state == self.STATE_PREPARING_PRINT:
             return "Preparing to print, please wait..."
@@ -270,6 +271,8 @@ class BeeCom(MachineCom):
             return "Heating..."
         elif self._state == self.STATE_SHUTDOWN:
             return "Shutdown"
+        elif self._state == self.STATE_OPERATIONAL:
+            return "Ready"
         else:
             return super(BeeCom, self).getStateString()
 
@@ -749,7 +752,6 @@ class BeeCom(MachineCom):
         # calls the Printer object to update the progress values
         self._callback.updateProgress(status_obj)
         self._callback.on_comm_progress()
-
 
     def _onConnected(self):
         """
