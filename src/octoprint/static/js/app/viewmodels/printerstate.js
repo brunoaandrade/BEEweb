@@ -36,6 +36,7 @@ $(function() {
         self.filepos = ko.observable(undefined);
         self.printTime = ko.observable(undefined);
         self.printTimeLeft = ko.observable(undefined);
+        self.printTimeLeftOrigin = ko.observable(undefined);
         self.sd = ko.observable(undefined);
         self.timelapse = ko.observable(undefined);
 
@@ -71,9 +72,9 @@ $(function() {
 
         self.estimatedPrintTimeString = ko.pureComputed(function() {
             if (self.lastPrintTime())
-                return formatDuration(self.lastPrintTime());
+                return formatFuzzyEstimation(self.lastPrintTime());
             if (self.estimatedPrintTime())
-                return formatDuration(self.estimatedPrintTime());
+                return formatFuzzyEstimation(self.estimatedPrintTime());
             return "-";
         });
         self.byteString = ko.pureComputed(function() {
@@ -90,7 +91,7 @@ $(function() {
         self.printTimeString = ko.pureComputed(function() {
             if (!self.printTime())
                 return "-";
-            return formatDurationHoursMinutes(self.printTime());
+            return formatDuration(self.printTime());
         });
         self.printTimeLeftString = ko.pureComputed(function() {
             if (self.printTimeLeft() == undefined) {
@@ -103,10 +104,60 @@ $(function() {
                 return formatFuzzyEstimation(self.printTimeLeft());
             }
         });
+        self.printTimeLeftOriginString = ko.pureComputed(function() {
+            var value = self.printTimeLeftOrigin();
+            switch (value) {
+                case "linear": {
+                    return gettext("Based on a linear approximation (accuracy highly dependent on the model)");
+                }
+                case "analysis": {
+                    return gettext("Based on the estimate from analysis of file (medium accuracy)");
+                }
+                case "mixed-analysis": {
+                    return gettext("Based on a mix of estimate from analysis and calculation (medium accuracy)");
+                }
+                case "average": {
+                    return gettext("Based on the average total of past prints of this model with the same printer profile (usually good accuracy)");
+                }
+                case "mixed-average": {
+                    return gettext("Based on a mix of average total from past prints and calculation (usually good accuracy)");
+                }
+                case "estimate": {
+                    return gettext("Based on the calculated estimate (best accuracy)");
+                }
+                default: {
+                    return "";
+                }
+            }
+        });
+        self.printTimeLeftOriginClass = ko.pureComputed(function() {
+            var value = self.printTimeLeftOrigin();
+            switch (value) {
+                default:
+                case "linear": {
+                    return "text-error";
+                }
+                case "analysis":
+                case "mixed-analysis": {
+                    return "text-warning";
+                }
+                case "average":
+                case "mixed-average":
+                case "estimate": {
+                    return "text-success";
+                }
+            }
+        });
         self.progressString = ko.pureComputed(function() {
             if (!self.progress())
                 return 0;
             return self.progress();
+        });
+        self.progressBarString = ko.pureComputed(function() {
+            if (!self.progress()) {
+                return "";
+            }
+            return _.sprintf("%d%%", self.progress());
         });
         self.pauseString = ko.pureComputed(function() {
             if (self.isPaused())
@@ -251,6 +302,7 @@ $(function() {
             self.filepos(data.filepos);
             self.printTime(data.printTime);
             self.printTimeLeft(data.printTimeLeft);
+            self.printTimeLeftOrigin(data.printTimeLeftOrigin);
         };
 
         self._processZData = function(data) {
@@ -297,6 +349,14 @@ $(function() {
             self._restoreShutdown();
         };
 
+        self.onlyPause = function() {
+            self.pause("pause");
+        };
+
+        self.onlyResume = function() {
+            self.pause("resume");
+        };
+
         self._restoreShutdown = function() {
             $('#job_shutdown').prop('disabled', false);
             $('#shutdown_confirmation').addClass('hidden');
@@ -318,13 +378,24 @@ $(function() {
             });
         };
 
-        self._jobCommand = function(command, callback) {
+        self._jobCommand = function(command, payload, callback) {
+            if (arguments.length == 1) {
+                payload = {};
+                callback = undefined;
+            } else if (arguments.length == 2 && typeof payload === "function") {
+                callback = payload;
+                payload = {};
+            }
+
+            var data = _.extend(payload, {});
+            data.command = command;
+
             $.ajax({
                 url: API_BASEURL + "job",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
-                data: JSON.stringify({command: command}),
+                data: JSON.stringify(data),
                 success: function(response) {
                     if (callback != undefined) {
                         callback();

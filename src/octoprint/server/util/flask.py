@@ -420,7 +420,7 @@ class PreemptiveCache(object):
 					self._logger.debug("Removed root {} from preemptive cache".format(root))
 				elif len(entries) < old_count:
 					all_data[root] = entries
-					self._logger.debug("Removed {} from preemptive cache for root {}".format(old_count - len(entries), root))
+					self._logger.debug("Removed {} entries from preemptive cache for root {}".format(old_count - len(entries), root))
 			self.set_all_data(all_data)
 
 		return all_data
@@ -488,6 +488,12 @@ class PreemptiveCache(object):
 			return matched, unmatched
 
 		with self._lock:
+			if not self._log_access:
+				self._logger.debug(
+					"Not updating timestamp and counter for {} and {!r}, currently flagged as disabled".format(root,
+					                                                                                           data))
+				return
+
 			cache_data = self.get_all_data()
 
 			if not root in cache_data:
@@ -509,12 +515,10 @@ class PreemptiveCache(object):
 				to_persist["_timestamp"] = time.time()
 				to_persist["_count"] = 1
 				self._logger.info("Adding entry for {} and {!r}".format(root, to_persist))
-			elif self._log_access:
+			else:
 				to_persist["_timestamp"] = time.time()
 				to_persist["_count"] = to_persist.get("_count", 0) + 1
 				self._logger.debug("Updating timestamp and counter for {} and {!r}".format(root, data))
-			else:
-				self._logger.debug("Not updating timestamp and counter for {} and {!r}, currently flagged as disabled".format(root, data))
 
 			self.set_data(root, [to_persist] + other)
 

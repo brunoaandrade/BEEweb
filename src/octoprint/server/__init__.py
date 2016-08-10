@@ -14,7 +14,6 @@ from flask.ext.login import LoginManager, current_user
 from flask.ext.principal import Principal, Permission, RoleNeed, identity_loaded, UserNeed
 from flask.ext.babel import Babel, gettext, ngettext
 from flask.ext.assets import Environment, Bundle
-from flaskext.markdown import Markdown
 from babel import Locale
 from watchdog.observers import Observer
 from watchdog.observers.polling import PollingObserver
@@ -668,7 +667,8 @@ class Server(object):
 			response.headers.add("X-Clacks-Overhead", "GNU Terry Pratchett")
 			return response
 
-		Markdown(app)
+		from octoprint.util.jinja import MarkdownFilter
+		MarkdownFilter(app)
 
 	def _setup_i18n(self, app):
 		global babel
@@ -700,6 +700,7 @@ class Server(object):
 		import re
 
 		app.jinja_env.add_extension("jinja2.ext.do")
+		app.jinja_env.add_extension("octoprint.util.jinja.trycatch")
 
 		def regex_replace(s, find, replace):
 			return re.sub(find, replace, s)
@@ -797,10 +798,25 @@ class Server(object):
 		preemptive_cache_timeout = settings().getInt(["server", "preemptiveCache", "until"])
 		cutoff_timestamp = time.time() - preemptive_cache_timeout * 24 * 60 * 60
 
-		def filter_old_entries(entry):
+		def filter_current_entries(entry):
+			"""Returns True for entries younger than the cutoff date"""
 			return "_timestamp" in entry and entry["_timestamp"] > cutoff_timestamp
 
-		cache_data = preemptive_cache.clean_all_data(lambda root, entries: filter(filter_old_entries, entries))
+		def filter_http_entries(entry):
+			"""Returns True for entries targeting http or https."""
+			return "base_url" in entry \
+			       and entry["base_url"] \
+			       and (entry["base_url"].startswith("http://")
+			            or entry["base_url"].startswith("https://"))
+
+		def filter_entries(entry):
+			"""Combined filter."""
+			filters = (filter_current_entries,
+			           filter_http_entries)
+			return all([f(entry) for f in filters])
+
+		# filter out all old and non-http entries
+		cache_data = preemptive_cache.clean_all_data(lambda root, entries: filter(filter_entries, entries))
 		if not cache_data:
 			return
 
@@ -812,6 +828,7 @@ class Server(object):
 					additional_request_data = kwargs.get("_additional_request_data", dict())
 					kwargs = dict((k, v) for k, v in kwargs.items() if not k.startswith("_") and not k == "plugin")
 					kwargs.update(additional_request_data)
+
 					try:
 						if plugin:
 							self._logger.info("Preemptively caching {} (plugin {}) for {!r}".format(route, plugin, kwargs))
@@ -823,6 +840,7 @@ class Server(object):
 					except:
 						self._logger.exception("Error while trying to preemptively cache {} for {!r}".format(route, kwargs))
 
+		# asynchronous caching
 		import threading
 		cache_thread = threading.Thread(target=execute_caching, name="Preemptive Cache Worker")
 		cache_thread.daemon = True

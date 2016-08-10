@@ -6,14 +6,15 @@ $(function() {
         self.printerProfiles = parameters[1];
         self.printerState = parameters[2];
 
+        self.file = ko.observable(undefined);
         self.target = undefined;
-        self.file = undefined;
         self.data = undefined;
 
         self.defaultSlicer = undefined;
         self.defaultProfile = undefined;
 
-        self.gcodeFilename = ko.observable();
+        self.destinationFilename = ko.observable();
+        self.gcodeFilename = self.destinationFilename; // TODO: for backwards compatiblity, mark deprecated ASAP
 
         self.title = ko.observable();
         self.slicer = ko.observable();
@@ -33,10 +34,82 @@ $(function() {
 
         self.sliceButtonControl = true;
 
-        self.configured_slicers = ko.pureComputed(function() {
+        self.slicersForFile = function(file) {
+            if (file === undefined) {
+                return [];
+            }
+
+            return _.filter(self.configuredSlicers(), function(slicer) {
+                return _.any(slicer.sourceExtensions, function(extension) {
+                    return _.endsWith(file.toLowerCase(), "." + extension.toLowerCase());
+                });
+            });
+        };
+
+        self.profilesForSlicer = function(key) {
+            if (key == undefined) {
+                key = self.slicer();
+            }
+            if (key == undefined || !self.data.hasOwnProperty(key)) {
+                return;
+            }
+            var slicer = self.data[key];
+
+            var selectedProfile = undefined;
+            self.profiles.removeAll();
+            _.each(_.values(slicer.profiles), function(profile) {
+                var name = profile.displayName;
+                if (name == undefined) {
+                    name = profile.key;
+                }
+
+                if (profile.default) {
+                    selectedProfile = profile.key;
+                }
+
+                self.profiles.push({
+                    key: profile.key,
+                    name: name
+                })
+            });
+
+            self.profile(selectedProfile);
+            self.defaultProfile = selectedProfile;
+        };
+
+        self.resetProfiles = function() {
+            self.profiles.removeAll();
+            self.profile(undefined);
+        };
+
+        self.configuredSlicers = ko.pureComputed(function() {
             return _.filter(self.slicers(), function(slicer) {
                 return slicer.configured;
             });
+        });
+
+        self.matchingSlicers = ko.computed(function() {
+            var slicers = self.slicersForFile(self.file());
+
+            var containsSlicer = function(key) {
+                return _.any(slicers, function(slicer) {
+                    return slicer.key == key;
+                });
+            };
+
+            var current = self.slicer();
+            if (!containsSlicer(current)) {
+                if (self.defaultSlicer !== undefined && containsSlicer(self.defaultSlicer)) {
+                    self.slicer(self.defaultSlicer);
+                } else {
+                    self.slicer(undefined);
+                    self.resetProfiles();
+                }
+            } else {
+                self.profilesForSlicer(self.slicer());
+            }
+
+            return slicers;
         });
 
         self.afterSlicingOptions = [
@@ -53,25 +126,34 @@ $(function() {
 
             self.requestData(self._nozzleFilamentUpdate);
             self.target = target;
-            self.file = file;
-            self.title(_.sprintf(gettext("Slicing %(filename)s"), {filename: self.file}));
-            self.gcodeFilename(self.file.substr(0, self.file.lastIndexOf(".")));
+            self.file(file);
+            self.title(_.sprintf(gettext("Slicing %(filename)s"), {filename: self.file()}));
+            self.destinationFilename(self.file().substr(0, self.file().lastIndexOf(".")));
             self.printerProfile(self.printerProfiles.currentProfile());
             self.afterSlicing("print");
+
             $("#slicing_configuration_dialog").modal("show");
         };
 
         self.slicer.subscribe(function(newValue) {
-            self.profilesForSlicer(newValue);
+            if (newValue === undefined) {
+                self.resetProfiles();
+            } else {
+                self.profilesForSlicer(newValue);
+            }
         });
 
         self.enableSlicingDialog = ko.pureComputed(function() {
-            return self.configured_slicers().length > 0;
+            return self.configuredSlicers().length > 0;
         });
 
+        self.enableSlicingDialogForFile = function(file) {
+            return self.slicersForFile(file).length > 0;
+        };
+
         self.enableSliceButton = ko.pureComputed(function() {
-            return self.gcodeFilename() != undefined
-                && self.gcodeFilename().trim() != ""
+            return self.destinationFilename() != undefined
+                && self.destinationFilename().trim() != ""
                 && self.slicer() != undefined
                 && self.sliceButtonControl == true
                 && (self.printerState.isOperational() ||
@@ -92,6 +174,27 @@ $(function() {
                 }
             });
         };
+
+        self.destinationExtension = ko.pureComputed(function() {
+            var fallback = "???";
+            if (self.slicer() === undefined) {
+                return fallback;
+            }
+            var slicer = self.data[self.slicer()];
+            if (slicer === undefined) {
+                return fallback;
+            }
+            var extensions = slicer.extensions;
+            if (extensions === undefined) {
+                return fallback;
+            }
+            var destinationExtensions = extensions.destination;
+            if (destinationExtensions === undefined || !destinationExtensions.length) {
+                return fallback;
+            }
+
+            return destinationExtensions[0] || fallback;
+        });
 
         self._nozzleFilamentUpdate = function() {
             $.ajax({
@@ -147,17 +250,15 @@ $(function() {
                     selectedSlicer = slicer.key;
                 }
 
-                self.slicers.push({
+                var props = {
                     key: slicer.key,
                     name: name,
-                    configured: slicer.configured
-                });
+                    configured: slicer.configured,
+                    sourceExtensions: slicer.extensions.source,
+                    destinationExtensions: slicer.extensions.destination
+                };
+                self.slicers.push(props);
             });
-
-            if (selectedSlicer != undefined) {
-                self.slicer(selectedSlicer);
-                self.profilesForSlicer(selectedSlicer);
-            }
 
             self.defaultSlicer = selectedSlicer;
         };
@@ -248,11 +349,15 @@ $(function() {
                 });
             }
 
-            var gcodeFilename = self._sanitize(self.gcodeFilename());
-            if (!_.endsWith(gcodeFilename.toLowerCase(), ".gco")
-                && !_.endsWith(gcodeFilename.toLowerCase(), ".gcode")
-                && !_.endsWith(gcodeFilename.toLowerCase(), ".g")) {
-                gcodeFilename = gcodeFilename + ".gco";
+            var destinationFilename = self._sanitize(self.destinationFilename());
+
+            var destinationExtensions = self.data[self.slicer()] && self.data[self.slicer()].extensions && self.data[self.slicer()].extensions.destination
+                                        ? self.data[self.slicer()].extensions.destination
+                                        : ["???"];
+            if (!_.any(destinationExtensions, function(extension) {
+                    return _.endsWith(destinationFilename.toLowerCase(), "." + extension.toLowerCase());
+                })) {
+                destinationFilename = destinationFilename + "." + destinationExtensions[0];
             }
 
             var data = {
@@ -260,7 +365,7 @@ $(function() {
                 slicer: self.slicer(),
                 profile: self.profile(),
                 printerProfile: self.printerProfile(),
-                gcode: gcodeFilename
+                destination: destinationFilename
             };
 
             if (self.afterSlicing() == "print") {
@@ -310,7 +415,7 @@ $(function() {
             }
 
             $.ajax({
-                url: API_BASEURL + "files/" + self.target + "/" + self.file,
+                url: API_BASEURL + "files/" + self.target + "/" + self.file(),
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
@@ -332,7 +437,7 @@ $(function() {
 
             $("#slicing_configuration_dialog").modal("hide");
 
-            self.gcodeFilename(undefined);
+            self.destinationFilename(undefined);
             self.slicer(self.defaultSlicer);
             self.profile(self.defaultProfile);
         };
