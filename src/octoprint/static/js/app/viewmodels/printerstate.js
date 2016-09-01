@@ -24,7 +24,7 @@ $(function() {
             && self.loginState.isUser() && self.filename() != undefined;
         });
         self.enablePause = ko.pureComputed(function() {
-            return self.isOperational() && (self.isPrinting() || self.isPaused()) && self.loginState.isUser();
+            return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown()) && self.loginState.isUser();
         });
         self.enableCancel = ko.pureComputed(function() {
             return self.isOperational() && (self.isPrinting() || self.isPaused()) && self.loginState.isUser();
