@@ -106,9 +106,7 @@ class BeeCom(MachineCom):
             _logger.info("Checking for firmware updates...")
 
             firmware_path = settings().getBaseFolder('firmware')
-
             firmware_properties = parsePropertiesFile(join(firmware_path, 'firmware.properties'))
-
             firmware_file_name = firmware_properties['firmware.'+printer_id]
 
             if firmware_file_name is not None and isfile(join(firmware_path, firmware_file_name)):
@@ -123,15 +121,16 @@ class BeeCom(MachineCom):
                     curr_version_parts = curr_firmware_parts[2].split('.')
                     file_version_parts = fname_parts[2].split('.')
 
-                    for i in xrange(3):
-                        if int(file_version_parts[i]) != int(curr_version_parts[i]):
-                            # version update found
-                            _logger.info("Updating printer firmware...")
-                            self.getCommandsInterface().flashFirmware(join(firmware_path, firmware_file_name),
-                                                                      firmware_file_name)
+                    if len(curr_version_parts) == 3 and len(file_version_parts) == 3:
+                        for i in xrange(3):
+                            if int(file_version_parts[i]) != int(curr_version_parts[i]):
+                                # version update found
+                                _logger.info("Updating printer firmware...")
+                                self.getCommandsInterface().flashFirmware(join(firmware_path, firmware_file_name),
+                                                                          firmware_file_name)
 
-                            _logger.info("Firmware updated to %s" % fname_parts[2])
-                            return
+                                _logger.info("Firmware updated to %s" % fname_parts[2])
+                                return
                 elif curr_firmware == '0.0.0':
                     # If curr_firmware is 0.0.0 it means something went wrong with a previous firmware update
                     _logger.info("Updating printer firmware...")
