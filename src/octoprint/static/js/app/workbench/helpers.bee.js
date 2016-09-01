@@ -31,10 +31,10 @@ BEEwb.helpers.generateSceneName = function( ) {
     var now = new Date();
     var prefix = 'bee_';
     if (BEEwb.main.lastLoadedModel != null) {
-        prefix = BEEwb.main.lastLoadedModel + '_';
+        prefix = BEEwb.main.lastLoadedModel;
     }
-    var sceneName = prefix + now.getDate() + '_' + (now.getMonth()+1) + '_' + now.getFullYear()
-    + '-' + now.getHours() + '_' + now.getMinutes() + '_' + now.getSeconds() + '.stl';
+    var sceneName = prefix + '__bee' + now.getDate() + (now.getMonth()+1) + now.getFullYear()
+    + '_' + now.getHours() + '-' + now.getMinutes() + '-' + now.getSeconds() + '.stl';
 
     return sceneName;
 };

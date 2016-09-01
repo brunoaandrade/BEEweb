@@ -193,7 +193,15 @@ BEEwb.main = {
         if (systemFile === true) {
             folder = './stl/';
         } else {
-            this.lastLoadedModel = modelName.substr(0, modelName.lastIndexOf("."));
+            // Extracts the extension from filename
+            var modelNameWOExtension = modelName.substr(0, modelName.lastIndexOf("."));
+
+            // Checks if the model name already contains a bee timestamp and removes it
+            if (modelNameWOExtension.indexOf('__bee') !== -1) {
+                modelNameWOExtension = modelNameWOExtension.split("__bee")[0];
+            }
+            this.lastLoadedModel = modelNameWOExtension;
+
             // Only shows the loading modal if it's model loaded by the user
             $('#loadingDialog').modal('show');
         }
