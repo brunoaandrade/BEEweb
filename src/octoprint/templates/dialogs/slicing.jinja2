@@ -67,6 +67,11 @@
                     <label class="control-label">{{ _('Filament Color') }}</label>
                     <div class="controls">
                         <select data-bind="options: colors, value: selColor, valueAllowUnset: false, enable: !forPrint()" ></select>
+                        <br />
+                        <small>
+                            <strong>{{ _('Filament in Spool') }}</strong>
+                            : <span data-bind="text: filamentInSpool" ></span> (g)
+                        </small>
                     </div>
                 </div>
                 <div class="control-group">

@@ -204,7 +204,8 @@ def getFilament():
 @restricted_access
 def getNozzlesAndFilament():
 	"""
-	Returns the list of available nozzle, the current selected nozzle and the current selected filament
+	Returns the list of available nozzles, the current selected nozzle, the current selected filament
+	and the amount of filament left in spool
 	:return:
 	"""
 	nozzle_list = s().get(["nozzleTypes"])
@@ -213,10 +214,12 @@ def getNozzlesAndFilament():
 		return jsonify({
 			"nozzle": '0.4',
 			"nozzleList": nozzle_list,
-			"filament": 'A023 - Black'
+			"filament": 'A023 - Black',
+			"filamentInSpool": 0.0
 		})
 
 	filament = printer.getFilamentString()
+	filamentInSpool = printer.getFilamentInSpool()
 	nozzle = printer.getNozzleSize()
 	# converts the nozzle size to float
 	nozzle = float(nozzle) / 1000.0
@@ -224,7 +227,8 @@ def getNozzlesAndFilament():
 	return jsonify({
 		"nozzle": nozzle,
 		"nozzleList": nozzle_list,
-		"filament": filament
+		"filament": filament,
+		"filamentInSpool": filamentInSpool
 	})
 
 @api.route("/maintenance/save_nozzle", methods=["POST"])
@@ -286,4 +290,17 @@ def getNozzleList():
 
 	return jsonify({
 		"nozzles": resp
+	})
+
+
+@api.route("/maintenance/get_filament_spool", methods=["GET"])
+@restricted_access
+def getFilamentInSpool():
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	resp = printer.getFilamentInSpool()
+
+	return jsonify({
+		"filament": resp
 	})

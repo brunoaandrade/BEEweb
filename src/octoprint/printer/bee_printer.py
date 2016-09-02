@@ -249,7 +249,10 @@ class BeePrinter(Printer):
         Returns the current extruder temperature
         :return:
         """
-        return self._comm.getCommandsInterface().getNozzleTemperature()
+        try:
+            return self._comm.getCommandsInterface().getNozzleTemperature()
+        except Exception as ex:
+            self._logger.error(ex)
 
 
     def startHeating(self, targetTemperature=200):
@@ -258,35 +261,50 @@ class BeePrinter(Printer):
         :param targetTemperature:
         :return:
         """
-        return self._comm.getCommandsInterface().startHeating(targetTemperature)
+        try:
+            return self._comm.getCommandsInterface().startHeating(targetTemperature)
+        except Exception as ex:
+            self._logger.error(ex)
 
     def cancelHeating(self):
         """
         Cancels the heating procedure
         :return:
         """
-        return self._comm.getCommandsInterface().cancelHeating()
+        try:
+            return self._comm.getCommandsInterface().cancelHeating()
+        except Exception as ex:
+            self._logger.error(ex)
 
     def heatingDone(self):
         """
         Runs the necessary commands after the heating operation is finished
         :return:
         """
-        return self._comm.getCommandsInterface().goToLoadUnloadPos()
+        try:
+            return self._comm.getCommandsInterface().goToLoadUnloadPos()
+        except Exception as ex:
+            self._logger.error(ex)
 
     def unload(self):
         """
         Unloads the filament from the printer
         :return:
         """
-        return self._comm.getCommandsInterface().unload()
+        try:
+            return self._comm.getCommandsInterface().unload()
+        except Exception as ex:
+            self._logger.error(ex)
 
     def load(self):
         """
         Loads the filament to the printer
         :return:
         """
-        return self._comm.getCommandsInterface().load()
+        try:
+            return self._comm.getCommandsInterface().load()
+        except Exception as ex:
+            self._logger.error(ex)
 
     def setFilamentString(self, filamentStr):
         """
@@ -294,14 +312,41 @@ class BeePrinter(Printer):
         :param filamentStr:
         :return:
         """
-        return self._comm.getCommandsInterface().setFilamentString(filamentStr)
+        try:
+            return self._comm.getCommandsInterface().setFilamentString(filamentStr)
+        except Exception as ex:
+            self._logger.error(ex)
 
     def getFilamentString(self):
         """
         Gets the current filament reference string in the printer memory
         :return: string
         """
-        return self._comm.getCommandsInterface().getFilamentString()
+        try:
+            return self._comm.getCommandsInterface().getFilamentString()
+        except Exception as ex:
+            self._logger.error(ex)
+
+    def getFilamentInSpool(self):
+        """
+        Gets the current amount of filament left in spool
+        :return: string
+        """
+        try:
+            return self._comm.getCommandsInterface().getFilamentInSpool()
+        except Exception as ex:
+            self._logger.error(ex)
+
+    def setFilamentInSpool(self, filamentInSpool):
+        """
+        Passes to the printer the amount of filament left in spool
+        :param filamentInSpool:
+        :return: string
+        """
+        try:
+            return self._comm.getCommandsInterface().setFilamentInSpool(filamentInSpool)
+        except Exception as ex:
+            self._logger.error(ex)
 
     def setNozzleSize(self, nozzleSize):
         """
@@ -309,14 +354,20 @@ class BeePrinter(Printer):
         :param nozzleSize:
         :return:
         """
-        return self._comm.getCommandsInterface().setNozzleSize(nozzleSize)
+        try:
+            return self._comm.getCommandsInterface().setNozzleSize(nozzleSize)
+        except Exception as ex:
+            self._logger.error(ex)
 
     def getNozzleSize(self):
         """
         Gets the current selected nozzle size in the printer memory
         :return: float
         """
-        return self._comm.getCommandsInterface().getNozzleSize()
+        try:
+            return self._comm.getCommandsInterface().getNozzleSize()
+        except Exception as ex:
+            self._logger.error(ex)
 
     def startCalibration(self, repeat=False):
         """
@@ -324,14 +375,20 @@ class BeePrinter(Printer):
         :param repeat:
         :return:
         """
-        return self._comm.getCommandsInterface().startCalibration(repeat=repeat)
+        try:
+            return self._comm.getCommandsInterface().startCalibration(repeat=repeat)
+        except Exception as ex:
+            self._logger.error(ex)
 
     def nextCalibrationStep(self):
         """
         Goes to the next calibration step
         :return:
         """
-        return self._comm.getCommandsInterface().goToNextCalibrationPoint()
+        try:
+            return self._comm.getCommandsInterface().goToNextCalibrationPoint()
+        except Exception as ex:
+            self._logger.error(ex)
 
     def startCalibrationTest(self):
         """
@@ -436,7 +493,7 @@ class BeePrinter(Printer):
          Cancel the current printjob.
         """
         super(BeePrinter, self).cancel_print()
-        # waits a bit before unselecting the file
+        # waits a bit before un-selecting the file
         import time
         time.sleep(2)
         self.unselect_file()

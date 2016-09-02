@@ -37,7 +37,7 @@ INSTALL_REQUIRES = [
 	"psutil>=3.2.1,<3.3",
 	"awesome-slugify>=1.6.5,<1.7",
 	"feedparser>=5.2.1,<5.3",
-	"beecom>=0.2.11",
+	"beecom>=0.3.0",
 	"pyusb>=1.0.0b2",
 	"setuptools==24.0.1"
 ]
