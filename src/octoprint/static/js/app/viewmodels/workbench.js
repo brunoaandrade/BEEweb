@@ -7,13 +7,13 @@ $(function () {
 		self.connection = parameters[2];
         self.slicing = parameters[3];
         self.state = parameters[4];
-        
+
 		//append file list with newly updated stl file.
 		self.onEventUpload = function (file) {
 
 			if (file.file.substr(file.file.length - 3).toLowerCase() == "stl") {
 
-				BEEwb.main.loadModel(file.file);
+				BEEwb.main.loadModel(file.file, false, false);
 			}
 		};
 
