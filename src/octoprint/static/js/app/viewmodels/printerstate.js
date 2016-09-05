@@ -19,6 +19,8 @@ $(function() {
         self.stateClass = ko.observable(undefined);
         self.isShutdown = ko.observable(undefined);
 
+        self.insufficientFilament = ko.observable(false);
+
         self.enablePrint = ko.pureComputed(function() {
             return self.isOperational() && self.isReady() && !self.isPrinting() && !self.isHeating()
             && self.loginState.isUser() && self.filename() != undefined;
@@ -261,6 +263,7 @@ $(function() {
         };
 
         self._processJobData = function(data) {
+
             if (data.file) {
                 self.filename(data.file.name);
                 self.filesize(data.file.size);
@@ -286,6 +289,11 @@ $(function() {
                 }
             }
             self.filament(result);
+
+            // Signals that there is no filament available
+            if (data.filament && data.filament['tool0'] && data.filament['tool0']['weight'] < 0) {
+                self.insufficientFilament(true);
+            }
         };
 
         self._processProgressData = function(data) {
