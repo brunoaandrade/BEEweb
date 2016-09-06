@@ -137,7 +137,7 @@
                 <input type="number" data-bind="value: filamentWeightInput"></input>
                 <button id="submit-filament-weight" title="Save Filament Weight" class="btn btn-primary"
                     data-bind="click: saveFilamentWeight, enable: printerState.isOperational() && !commandLock()
-                    && printerState.isReady() && !printerState.isPrinting() && loginState.isUser() && selectedFilament">
+                    && printerState.isReady() && !printerState.isPrinting() && loginState.isUser() && filamentWeightInput">
                     <i class="icon-save"></i> {{ _('Save')}}
                 </button>
                 <span data-bind="visible: filamentWeightSaveSuccess"><i class="icon-check alert-success"></i>

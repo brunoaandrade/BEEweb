@@ -323,7 +323,7 @@ def setFilamentWeight():
 
 	resp = "Invalid filament weight"
 
-	if float(filamentWeight) >= 0:
+	if filamentWeight and float(filamentWeight) >= 0:
 		resp = printer.setFilamentInSpool(float(filamentWeight))
 
 	return jsonify({
