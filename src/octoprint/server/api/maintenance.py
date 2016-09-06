@@ -304,3 +304,28 @@ def getFilamentInSpool():
 	return jsonify({
 		"filament": resp
 	})
+
+@api.route("/maintenance/set_filament_weight", methods=["POST"])
+@restricted_access
+def setFilamentWeight():
+
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
+
+	valid_commands = {
+		"filament": ["filamentWeight"]
+	}
+	command, data, response = get_json_command_from_request(request, valid_commands)
+	if response is not None:
+		return response
+
+	filamentWeight = data['filamentWeight']
+
+	resp = "Invalid filament weight"
+
+	if float(filamentWeight) >= 0:
+		resp = printer.setFilamentInSpool(float(filamentWeight))
+
+	return jsonify({
+		"response": resp
+	})

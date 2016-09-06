@@ -263,7 +263,6 @@ $(function() {
         };
 
         self._processJobData = function(data) {
-
             if (data.file) {
                 self.filename(data.file.name);
                 self.filesize(data.file.size);
@@ -290,7 +289,7 @@ $(function() {
             }
             self.filament(result);
 
-            // Signals that there is no filament available
+            // Signals that there is no filament available in the spool
             if (data.filament && data.filament['tool0'] && data.filament['tool0']['weight'] < 0) {
                 self.insufficientFilament(true);
             }

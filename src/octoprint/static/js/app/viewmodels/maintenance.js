@@ -33,6 +33,11 @@ $(function() {
 
         self.calibrationTestCancelled = false;
 
+        self.filamentInSpool = ko.observable(0.0);
+        self.filamentWeightInput = ko.observable();
+        self.filamentWeightResponseError = ko.observable(false);
+        self.filamentWeightSaveSuccess = ko.observable(false);
+
         self.onStartup = function() {
 
             /**
@@ -44,7 +49,7 @@ $(function() {
 
                 self.showFilamentChange();
             };
-        }
+        };
 
         self.show = function() {
             // show maintenance panel, ensure centered position
@@ -64,6 +69,9 @@ $(function() {
 
             // Gets the available nozzle size list
             self._getNozzleSizes();
+
+            // Gets the amount of filament left in spool
+            self._getFilamentInSpool();
 
             return false;
         };
@@ -175,6 +183,8 @@ $(function() {
 
             self.filamentSelected(false);
             self.filamentResponseError(false);
+            self.filamentWeightSaveSuccess(false);
+            self.filamentWeightResponseError(false);
 
             $('#maintenanceCloseButton').removeClass('hidden');
             $('#maintenanceOkButton').addClass('hidden');
@@ -357,9 +367,6 @@ $(function() {
                     if (response.indexOf('ok') > -1) {
                         self.filamentSelected(true);
 
-                        self.commandLock(false);
-                        self.operationLock(false);
-
                         if (self.heatingDone()) {
                             self.nextStep3();
                         } else {
@@ -367,13 +374,57 @@ $(function() {
                         }
                     } else {
                         self.filamentResponseError(true);
+                    }
+
+                    self.commandLock(false);
+                    self.operationLock(false);
+                },
+                error: function() {
+                    self.commandLock(false);
+                    self.operationLock(false);
+                    self.filamentResponseError(true);
+                }
+            });
+        };
+
+        self.saveFilamentWeight = function() {
+            self.commandLock(true);
+
+            self.filamentWeightSaveSuccess(false);
+            self.filamentWeightResponseError(false);
+
+            var data = {
+                command: "filament",
+                filamentWeight: self.filamentWeightInput()
+            };
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/set_filament_weight",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify(data),
+                success: function(data) {
+                    var response = data['response'];
+
+                    if (response.indexOf('ok') > -1) {
+                        self.filamentWeightSaveSuccess(true);
+
+                        // Updates the filament weight label
+                        self._getFilamentInSpool();
+
+                        self.commandLock(false);
+                        self.operationLock(false);
+
+                    } else {
+                        self.filamentWeightResponseError(true);
                         self.commandLock(false);
                     }
                 },
                 error: function() {
                     self.commandLock(false);
                     self.operationLock(false);
-                    self.filamentResponseError(true);
+                    self.filamentWeightResponseError(true);
                 }
             });
         };
@@ -400,6 +451,17 @@ $(function() {
                             }
                         }
                     });
+                }
+            });
+        };
+
+        self._getFilamentInSpool = function() {
+            $.ajax({
+                url: API_BASEURL + "maintenance/get_filament_spool",
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    self.filamentInSpool(data.filament);
                 }
             });
         };
