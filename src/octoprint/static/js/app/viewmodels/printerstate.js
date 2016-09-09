@@ -290,8 +290,13 @@ $(function() {
             self.filament(result);
 
             // Signals that there is no filament available in the spool
-            if (data.filament && data.filament['tool0'] && data.filament['tool0']['insufficient'] == true) {
-                self.insufficientFilament(true);
+            if (data.filament && data.filament['tool0']) {
+
+                self.insufficientFilament(false);
+
+                if (data.filament['tool0']['insufficient'] == true) {
+                    self.insufficientFilament(true);
+                }
             }
         };
 

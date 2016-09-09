@@ -29,6 +29,7 @@ class BeePrinter(Printer):
         self._executedLines = None
         self._currentFeedRate = None
         self._runningCalibrationTest = False
+        self._insufficientFilamentForCurrent = False
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
@@ -530,6 +531,25 @@ class BeePrinter(Printer):
         else:
             return 'Not available'
 
+    def on_comm_file_selected(self, filename, filesize, sd):
+        """
+        Override callback function to allow for print halt when there is not enough filament
+        :param filename:
+        :param filesize:
+        :param sd:
+        :return:
+        """
+        self._setJobData(filename, filesize, sd)
+        self._stateMonitor.set_state({"text": self.get_state_string(), "flags": self._getStateFlags()})
+
+        # checks if the insufficient filament flag is true and halts the print process
+        if self._insufficientFilamentForCurrent:
+            self._printAfterSelect = False
+
+        if self._printAfterSelect:
+            self._printAfterSelect = False
+            self.start_print(pos=self._posAfterSelect)
+
     def _setJobData(self, filename, filesize, sd):
         super(BeePrinter, self)._setJobData(filename, filesize, sd)
 
@@ -556,6 +576,10 @@ class BeePrinter(Printer):
                     # Signals that there is not enough filament
                     if filament["tool0"]['weight'] > current_filament_weight:
                         filament["tool0"]['insufficient'] = True
+                        self._insufficientFilamentForCurrent = True
+                    else:
+                        filament["tool0"]['insufficient'] = False
+                        self._insufficientFilamentForCurrent = False
 
     def _setProgressData(self, completion=None, filepos=None, printTime=None, printTimeLeft=None):
         """
