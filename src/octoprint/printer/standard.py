@@ -866,10 +866,6 @@ class Printer(PrinterInterface, comm.MachineComPrintCallback):
 						estimatedPrintTime = fileData["analysis"]["estimatedPrintTime"]
 					if "filament" in fileData["analysis"].keys():
 						filament = fileData["analysis"]["filament"]
-						current_filament_weight = self.getFilamentInSpool()
-						# Signals that there is not enough filament
-						if filament["tool0"]['weight'] > current_filament_weight:
-							filament["tool0"]['weight'] = -1
 				if "statistics" in fileData:
 					printer_profile = self._printerProfileManager.get_current_or_default()["id"]
 					if "averagePrintTime" in fileData["statistics"] and printer_profile in fileData["statistics"]["averagePrintTime"]:

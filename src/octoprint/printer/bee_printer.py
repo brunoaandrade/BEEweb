@@ -9,6 +9,7 @@ from octoprint.printer import PrinterInterface
 from octoprint.settings import settings
 from octoprint.server.util.connection_util import detect_bvc_printer_connection
 from octoprint.events import eventManager, Events
+from octoprint.filemanager import FileDestinations
 
 __author__ = "BEEVC - Electronic Systems "
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
@@ -118,6 +119,16 @@ class BeePrinter(Printer):
         if self.getPrintProgress() >= 1 \
                 and self._comm.getCommandsInterface().isPreparingOrPrinting() is False:
 
+            # Updates the amount of filament available in the printer
+            state_data = self._stateMonitor.get_current_data()
+
+            if state_data and state_data['job'] and state_data['job']['filament']:
+                filament = state_data['job']['filament']
+                if filament["tool0"]['weight']:
+                    filament_left = self.getFilamentInSpool() - filament["tool0"]['weight']
+                    self.setFilamentInSpool(filament_left)
+
+            # Runs the print finish communications callback
             self._comm.triggerPrintFinished()
 
             self._comm.getCommandsInterface().stopStatusMonitor()
@@ -518,6 +529,33 @@ class BeePrinter(Printer):
                 return 'Not available'
         else:
             return 'Not available'
+
+    def _setJobData(self, filename, filesize, sd):
+        super(BeePrinter, self)._setJobData(filename, filesize, sd)
+
+        if filename is not None:
+            if sd:
+                path_on_disk = None
+            else:
+                path_on_disk = self._fileManager.path_on_disk(FileDestinations.LOCAL, filename)
+        else:
+            return
+
+        try:
+            fileData = self._fileManager.get_metadata(FileDestinations.SDCARD if sd else FileDestinations.LOCAL,
+                                                      path_on_disk)
+        except:
+            fileData = None
+        if fileData is not None:
+            if "analysis" in fileData:
+                if "filament" in fileData["analysis"].keys():
+                    # gets the filament information for the filament weight to be used in the print job
+                    filament = fileData["analysis"]["filament"]
+                    current_filament_weight = self.getFilamentInSpool()
+
+                    # Signals that there is not enough filament
+                    if filament["tool0"]['weight'] > current_filament_weight:
+                        filament["tool0"]['insufficient'] = True
 
     def _setProgressData(self, completion=None, filepos=None, printTime=None, printTimeLeft=None):
         """

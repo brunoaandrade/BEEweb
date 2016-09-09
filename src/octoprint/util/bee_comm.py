@@ -121,7 +121,7 @@ class BeeCom(MachineCom):
                     curr_version_parts = curr_firmware_parts[2].split('.')
                     file_version_parts = fname_parts[2].split('.')
 
-                    if len(curr_version_parts) == 3 and len(file_version_parts) == 3:
+                    if len(curr_version_parts) == 4 and len(file_version_parts) == 4:
                         for i in xrange(3):
                             if int(file_version_parts[i]) != int(curr_version_parts[i]):
                                 # version update found
