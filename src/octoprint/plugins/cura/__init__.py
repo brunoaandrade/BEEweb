@@ -338,9 +338,6 @@ class CuraPlugin(octoprint.plugin.SlicerPlugin,
 									radius_in_cm = float(int(engine_settings["filamentDiameter"]) / 10000.0) / 2.0
 									filament_in_cm = filament / 10.0
 									analysis["filament"][tool_key]["volume"] = filament_in_cm * math.pi * radius_in_cm * radius_in_cm
-
-									# TODO: Replace constant with exact filament density
-									analysis["filament"][tool_key]["weight"] = analysis["filament"][tool_key]["volume"] * 1.27
 							except:
 								pass
 			finally:

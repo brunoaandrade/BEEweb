@@ -137,12 +137,13 @@
                 <input type="number" data-bind="value: filamentWeightInput"></input>
                 <button id="submit-filament-weight" title="Save Filament Weight" class="btn btn-primary"
                     data-bind="click: saveFilamentWeight, enable: printerState.isOperational() && !commandLock()
-                    && printerState.isReady() && !printerState.isPrinting() && loginState.isUser() && filamentWeightInput">
+                    && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                     <i class="icon-save"></i> {{ _('Save')}}
                 </button>
-                <span data-bind="visible: filamentWeightSaveSuccess"><i class="icon-check alert-success"></i>
+                <span class="alert alert-success" data-bind="visible: filamentWeightSaveSuccess">
+                    <i class="icon-check"></i>
+                    {{ _('Filament weight saved.')}}
                 </span>
-
                 <br />
                 <small>{{ _('Please insert the filament weight in the spool if you wish to be warned if there is not enough filament left for the print job' ) }}</small>
             </div>

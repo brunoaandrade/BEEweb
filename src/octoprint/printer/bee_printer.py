@@ -2,6 +2,7 @@
 
 from __future__ import absolute_import
 
+import math
 from octoprint.util.bee_comm import BeeCom
 import os
 from octoprint.printer.standard import Printer
@@ -10,6 +11,7 @@ from octoprint.settings import settings
 from octoprint.server.util.connection_util import detect_bvc_printer_connection
 from octoprint.events import eventManager, Events
 from octoprint.filemanager import FileDestinations
+from octoprint.slicing import SlicingManager
 
 __author__ = "BEEVC - Electronic Systems "
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
@@ -30,6 +32,11 @@ class BeePrinter(Printer):
         self._currentFeedRate = None
         self._runningCalibrationTest = False
         self._insufficientFilamentForCurrent = False
+
+        # Initializes the slicing manager for filament profile information
+        self._slicingManager = SlicingManager(settings().getBaseFolder("slicingProfiles"), printerProfileManager)
+        self._slicingManager.reload_slicers()
+        self._currentFilamentProfile = None
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
@@ -62,6 +69,9 @@ class BeePrinter(Printer):
         lastFile = settings().get(['lastPrintJobFile'])
         if lastFile is not None and (self.is_shutdown() or self.is_printing()):
             self.select_file(lastFile, False)
+
+        # gets current Filament profile data
+        self._currentFilamentProfile = self.getSelectedFilamentProfile()
 
         # subscribes the unselect_file function with the PRINT_FAILED event
         eventManager().subscribe(Events.PRINT_FAILED, self.on_print_cancelled)
@@ -119,15 +129,6 @@ class BeePrinter(Printer):
         # If the status from the printer is no longer printing runs the post-print trigger
         if self.getPrintProgress() >= 1 \
                 and self._comm.getCommandsInterface().isPreparingOrPrinting() is False:
-
-            # Updates the amount of filament available in the printer
-            state_data = self._stateMonitor.get_current_data()
-
-            if state_data and state_data['job'] and state_data['job']['filament']:
-                filament = state_data['job']['filament']
-                if filament["tool0"]['weight']:
-                    filament_left = self.getFilamentInSpool() - filament["tool0"]['weight']
-                    self.setFilamentInSpool(filament_left)
 
             # Runs the print finish communications callback
             self._comm.triggerPrintFinished()
@@ -329,6 +330,30 @@ class BeePrinter(Printer):
         except Exception as ex:
             self._logger.error(ex)
 
+    def getSelectedFilamentProfile(self):
+        """
+        Gets the slicing profile for the currently selected filament in the printer
+        Returns the first occurrence of filament name and printer. Ignores resolution and nozzle size.
+        :return: Profile or None
+        """
+        try:
+            filamentStr = self._comm.getCommandsInterface().getFilamentString()
+            if not filamentStr:
+                return None
+
+            filamentNormalizedName = filamentStr.lower().replace(' ', '_') + '_' + self.getPrinterName().lower()
+            profiles = self._slicingManager.all_profiles_list(self._slicingManager.default_slicer)
+
+            if len(profiles) > 0:
+                for key,value in profiles.items():
+                    if filamentNormalizedName in key:
+                        filamentProfile = self._slicingManager.load_profile(self._slicingManager.default_slicer, key, require_configured=False)
+                        return filamentProfile
+
+            return None
+        except Exception as ex:
+            self._logger.error(ex)
+
     def getFilamentString(self):
         """
         Gets the current filament reference string in the printer memory
@@ -342,21 +367,61 @@ class BeePrinter(Printer):
     def getFilamentInSpool(self):
         """
         Gets the current amount of filament left in spool
-        :return: string
+        :return: float filament amount in grams
         """
         try:
-            return self._comm.getCommandsInterface().getFilamentInSpool()
+            filament_mm = self._comm.getCommandsInterface().getFilamentInSpool()
+
+            if filament_mm:
+                filament_cm = filament_mm / 10.0
+
+                # converts the amount of filament in grams to mm
+                if self._currentFilamentProfile:
+                    # Fetchs the first position filament_diameter from the filament data and converts to microns
+                    filament_diameter = self._currentFilamentProfile.data['filament_diameter'][0] * 1000
+                    # TODO: The filament density should also be set based on profile data
+                    filament_density = 1.275  # default value
+                else:
+                    filament_diameter = 1.75 * 1000  # default value in microns
+                    filament_density = 1.275  # default value
+
+                filament_radius = float(int(filament_diameter) / 10000.0) / 2.0
+                filament_volume = filament_cm * (math.pi * filament_radius * filament_radius)
+
+                filament_weight = filament_volume * filament_density
+                return round(filament_weight, 2)
+            else:
+                return 0.0
         except Exception as ex:
             self._logger.error(ex)
 
     def setFilamentInSpool(self, filamentInSpool):
         """
         Passes to the printer the amount of filament left in spool
-        :param filamentInSpool:
-        :return: string
+        :param filamentInSpool: Amount of filament in grams
+        :return: string Command return value
         """
         try:
-            return self._comm.getCommandsInterface().setFilamentInSpool(filamentInSpool)
+            if filamentInSpool < 0:
+                self._logger.error('Unable to set invalid filament weight: %s' % filamentInSpool)
+                return
+
+            # converts the amount of filament in grams to mm
+            if self._currentFilamentProfile:
+                # Fetchs the first position filament_diameter from the filament data and converts to microns
+                filament_diameter = self._currentFilamentProfile.data['filament_diameter'][0] * 1000
+                # TODO: The filament density should also be set based on profile data
+                filament_density = 1.275  # default value
+            else:
+                filament_diameter = 1.75 * 1000  # default value in microns
+                filament_density = 1.275  # default value
+
+            filament_volume = filamentInSpool / filament_density
+            filament_radius = float(int(filament_diameter) / 10000.0) / 2.0
+            filament_cm = filament_volume / (math.pi * filament_radius * filament_radius)
+            filament_mm = filament_cm * 10.0
+
+            return self._comm.getCommandsInterface().setFilamentInSpool(filament_mm)
         except Exception as ex:
             self._logger.error(ex)
 
@@ -502,9 +567,10 @@ class BeePrinter(Printer):
 
     def cancel_print(self):
         """
-         Cancel the current printjob.
+         Cancels the current print job.
         """
         super(BeePrinter, self).cancel_print()
+
         # waits a bit before un-selecting the file
         import time
         time.sleep(2)
@@ -571,10 +637,10 @@ class BeePrinter(Printer):
                 if "filament" in fileData["analysis"].keys():
                     # gets the filament information for the filament weight to be used in the print job
                     filament = fileData["analysis"]["filament"]
-                    current_filament_weight = self.getFilamentInSpool()
+                    current_filament_length = self.getFilamentInSpool()
 
                     # Signals that there is not enough filament
-                    if filament["tool0"]['weight'] > current_filament_weight:
+                    if filament["tool0"]['length'] > current_filament_length:
                         filament["tool0"]['insufficient'] = True
                         self._insufficientFilamentForCurrent = True
                     else:
