@@ -31,6 +31,7 @@ $(function() {
         self.support = ko.observable(false);
         self.nozzleTypes = ko.observableArray();
         self.selNozzle = ko.observable();
+        self.filamentInSpool = ko.observable();
 
         self.sliceButtonControl = true;
 
@@ -224,6 +225,8 @@ $(function() {
                             self.selColor(self.colors()[0]);
                         }
                     }
+
+                    self.filamentInSpool(data.filamentInSpool)
                 }
             });
         };

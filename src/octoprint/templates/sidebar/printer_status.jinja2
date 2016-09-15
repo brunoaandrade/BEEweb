@@ -88,4 +88,19 @@
     </div>
 </div>
 
-
+<div id="insufficient_filament" class="row-fluid text-center" data-bind="visible: loginState.isUser && insufficientFilament">
+    <br />
+    <span class="alert alert-danger">
+        {{ _('There is not enough filament in the spool to complete the print job!') }}
+    </span>
+    <br /><br />
+    <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn btn-primary" >
+        <i class="icon-wrench"></i>
+        {{ _('Change filament now') }}
+    </a>
+    <br /><br />
+    <span>
+        <i class="icon-warning-sign"></i>
+        {{ _('This operation is needed if you want to print with a different color or if the filament available in the spool is not enough.') }}
+    </span>
+</div>

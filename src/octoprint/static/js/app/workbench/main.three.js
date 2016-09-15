@@ -104,7 +104,7 @@ BEEwb.main = {
 
         if (!lastModel) {
             lastModel = 'BEE.stl';
-            this.loadModel(lastModel, true);
+            this.loadModel(lastModel, true, true);
         } else {
             var that = this;
             $.ajax({
@@ -114,7 +114,7 @@ BEEwb.main = {
                     console.log('Last printed model does not exist.')
                 },
                 success: function() {
-                    that.loadModel(lastModel, false);
+                    that.loadModel(lastModel, false, true);
                 }
             });
         }
@@ -181,11 +181,12 @@ BEEwb.main = {
     /**
      * Loads an STL model into the canvas
      *
+     * The forceLoad parameter is used to force the loading of the model even if it is found in the list of saved scenes
      */
-    loadModel: function (modelName, systemFile) {
+    loadModel: function (modelName, systemFile, forceLoad) {
 
         // Workaround to prevent the "double" loading of a saved scene
-        if (this.savedScenesFiles.indexOf(modelName) > -1) {
+        if (this.savedScenesFiles.indexOf(modelName) !== -1 && !forceLoad) {
             return null;
         }
 

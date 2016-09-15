@@ -252,7 +252,7 @@ $(function() {
         self.loadToWorkbench = function(file) {
             if (!file) return;
 
-            BEEwb.main.loadModel(file.name);
+            BEEwb.main.loadModel(file.name, false, true);
         };
 
         self.initSdCard = function() {
