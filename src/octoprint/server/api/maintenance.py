@@ -219,7 +219,7 @@ def getNozzlesAndFilament():
 		})
 
 	filament = printer.getFilamentString()
-	filamentInSpool = printer.getFilamentInSpool()
+	filamentInSpool = printer.getFilamentWeightInSpool()
 	nozzle = printer.getNozzleSize()
 	# converts the nozzle size to float
 	nozzle = float(nozzle) / 1000.0
@@ -299,7 +299,7 @@ def getFilamentInSpool():
 	if not printer.is_operational():
 		return make_response("Printer is not operational", 409)
 
-	resp = printer.getFilamentInSpool()
+	resp = printer.getFilamentWeightInSpool()
 
 	return jsonify({
 		"filament": resp

@@ -379,6 +379,7 @@ $(function() {
         self.cancel = function() {
             $('#job_cancel').prop('disabled', true);
             self._restoreShutdown();
+            self.insufficientFilament(false);
 
             self._jobCommand("cancel", function() {
 

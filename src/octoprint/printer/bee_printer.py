@@ -10,7 +10,6 @@ from octoprint.printer import PrinterInterface
 from octoprint.settings import settings
 from octoprint.server.util.connection_util import detect_bvc_printer_connection
 from octoprint.events import eventManager, Events
-from octoprint.filemanager import FileDestinations
 from octoprint.slicing import SlicingManager
 
 __author__ = "BEEVC - Electronic Systems "
@@ -89,92 +88,28 @@ class BeePrinter(Printer):
         bvc_conn_thread.daemon = True
         bvc_conn_thread.start()
 
-    def updateProgress(self, progressData):
-        """
-        Receives a progress data object from the BVC communication layer
-        and updates the progress attributes
 
-        :param progressData:
-        :return:
-        """
-        if progressData is not None and self._selectedFile is not None:
-            if 'Elapsed Time' in progressData:
-                self._elapsedTime = progressData['Elapsed Time']
-            if 'Estimated Time' in progressData:
-                self._estimatedTime = progressData['Estimated Time']
-            if 'Executed Lines' in progressData:
-                self._executedLines = progressData['Executed Lines']
-            if 'Lines' in progressData:
-                self._numberLines = progressData['Lines']
+    def select_file(self, path, sd, printAfterSelect=False, pos=None):
+        super(BeePrinter, self).select_file(path, sd, printAfterSelect, pos)
 
-    def refresh_sd_files(self, blocking=False):
-        """
-        Refreshes the list of file stored on the SD card attached to printer (if available and printer communication
-        available).
-        """
-        if not self._comm or not self._comm.isSdReady():
-            return
+        # saves the path to the selected file
+        settings().set(['lastPrintJobFile'], path)
+        settings().save()
 
-        self._comm.refreshSdFiles()
+    # # # # # # # # # # # # # # # # # # # # # # #
+    ############# PRINTER ACTIONS ###############
+    # # # # # # # # # # # # # # # # # # # # # # #
+    def cancel_print(self):
+        """
+         Cancels the current print job.
+        """
+        super(BeePrinter, self).cancel_print()
 
-    def on_comm_progress(self):
-        """
-         Callback method for the comm object, called upon any change in progress of the print job.
-         Triggers storage of new values for printTime, printTimeLeft and the current progress.
-        """
+        # waits a bit before un-selecting the file
+        import time
+        time.sleep(2)
+        self.unselect_file()
 
-        self._setProgressData(self.getPrintProgress(), self.getPrintFilepos(),
-                              self._comm.getPrintTime(), self._comm.getCleanedPrintTime())
-
-        # If the status from the printer is no longer printing runs the post-print trigger
-        if self.getPrintProgress() >= 1 \
-                and self._comm.getCommandsInterface().isPreparingOrPrinting() is False:
-
-            # Runs the print finish communications callback
-            self._comm.triggerPrintFinished()
-
-            self._comm.getCommandsInterface().stopStatusMonitor()
-            self._runningCalibrationTest = False
-
-    def getPrintProgress(self):
-        """
-        Gets the current progress of the print job
-        :return:
-        """
-        if self._numberLines is not None and self._executedLines is not None and self._numberLines > 0:
-            return float(self._executedLines) / float(self._numberLines)
-        else:
-            return -1
-
-    def getPrintFilepos(self):
-        """
-        Gets the current position in file being printed
-        :return:
-        """
-        if self._executedLines is not None:
-            return self._executedLines
-        else:
-            return 0
-
-    def getCurrentProfile(self):
-        """
-        Returns current printer profile
-        :return:
-        """
-        if self._printerProfileManager is not None:
-            return self._printerProfileManager.get_current_or_default()
-        else:
-            return None
-
-    def getPrinterName(self):
-        """
-        Returns the name of the connected printer
-        :return:
-        """
-        if self._comm is not None:
-            return self._comm.getConnectedPrinterName()
-        else:
-            return None
 
     def jog(self, axis, amount):
         """
@@ -210,14 +145,6 @@ class BeePrinter(Printer):
         elif axis == 'z':
             bee_commands.move(0, 0, amount, None, movement_speed)
 
-    def feed_rate(self, factor):
-        """
-        Updates the feed rate factor
-        :param factor:
-        :return:
-        """
-        factor = self._convert_rate_value(factor, min=50, max=200)
-        self._currentFeedRate = factor
 
     def home(self, axes):
         """
@@ -242,6 +169,7 @@ class BeePrinter(Printer):
         elif 'x' in axes and 'y' in axes:
             bee_commands.homeXY()
 
+
     def extrude(self, amount):
         """
         Extrudes the defined amount
@@ -257,16 +185,6 @@ class BeePrinter(Printer):
         bee_commands = self._comm.getCommandsInterface()
         bee_commands.move(0, 0, 0, amount, extrusion_speed)
 
-    def get_current_temperature(self):
-        """
-        Returns the current extruder temperature
-        :return:
-        """
-        try:
-            return self._comm.getCommandsInterface().getNozzleTemperature()
-        except Exception as ex:
-            self._logger.error(ex)
-
 
     def startHeating(self, targetTemperature=200):
         """
@@ -279,6 +197,7 @@ class BeePrinter(Printer):
         except Exception as ex:
             self._logger.error(ex)
 
+
     def cancelHeating(self):
         """
         Cancels the heating procedure
@@ -288,6 +207,7 @@ class BeePrinter(Printer):
             return self._comm.getCommandsInterface().cancelHeating()
         except Exception as ex:
             self._logger.error(ex)
+
 
     def heatingDone(self):
         """
@@ -299,6 +219,7 @@ class BeePrinter(Printer):
         except Exception as ex:
             self._logger.error(ex)
 
+
     def unload(self):
         """
         Unloads the filament from the printer
@@ -308,6 +229,7 @@ class BeePrinter(Printer):
             return self._comm.getCommandsInterface().unload()
         except Exception as ex:
             self._logger.error(ex)
+
 
     def load(self):
         """
@@ -319,6 +241,7 @@ class BeePrinter(Printer):
         except Exception as ex:
             self._logger.error(ex)
 
+
     def setFilamentString(self, filamentStr):
         """
         Saves the filament reference string in the printer memory
@@ -329,6 +252,7 @@ class BeePrinter(Printer):
             return self._comm.getCommandsInterface().setFilamentString(filamentStr)
         except Exception as ex:
             self._logger.error(ex)
+
 
     def getSelectedFilamentProfile(self):
         """
@@ -354,6 +278,7 @@ class BeePrinter(Printer):
         except Exception as ex:
             self._logger.error(ex)
 
+
     def getFilamentString(self):
         """
         Gets the current filament reference string in the printer memory
@@ -364,7 +289,20 @@ class BeePrinter(Printer):
         except Exception as ex:
             self._logger.error(ex)
 
+
     def getFilamentInSpool(self):
+        """
+        Gets the current amount of filament left in spool
+        :return: float filament amount in mm
+        """
+        try:
+            return self._comm.getCommandsInterface().getFilamentInSpool()
+
+        except Exception as ex:
+            self._logger.error(ex)
+
+
+    def getFilamentWeightInSpool(self):
         """
         Gets the current amount of filament left in spool
         :return: float filament amount in grams
@@ -395,6 +333,7 @@ class BeePrinter(Printer):
         except Exception as ex:
             self._logger.error(ex)
 
+
     def setFilamentInSpool(self, filamentInSpool):
         """
         Passes to the printer the amount of filament left in spool
@@ -421,9 +360,15 @@ class BeePrinter(Printer):
             filament_cm = filament_volume / (math.pi * filament_radius * filament_radius)
             filament_mm = filament_cm * 10.0
 
-            return self._comm.getCommandsInterface().setFilamentInSpool(filament_mm)
+            comm_return = self._comm.getCommandsInterface().setFilamentInSpool(filament_mm)
+
+            # updates the current print job information with availability of filament
+            self._checkSufficientFilamentForPrint()
+
+            return comm_return
         except Exception as ex:
             self._logger.error(ex)
+
 
     def setNozzleSize(self, nozzleSize):
         """
@@ -436,6 +381,7 @@ class BeePrinter(Printer):
         except Exception as ex:
             self._logger.error(ex)
 
+
     def getNozzleSize(self):
         """
         Gets the current selected nozzle size in the printer memory
@@ -445,6 +391,7 @@ class BeePrinter(Printer):
             return self._comm.getCommandsInterface().getNozzleSize()
         except Exception as ex:
             self._logger.error(ex)
+
 
     def startCalibration(self, repeat=False):
         """
@@ -457,6 +404,7 @@ class BeePrinter(Printer):
         except Exception as ex:
             self._logger.error(ex)
 
+
     def nextCalibrationStep(self):
         """
         Goes to the next calibration step
@@ -466,6 +414,7 @@ class BeePrinter(Printer):
             return self._comm.getCommandsInterface().goToNextCalibrationPoint()
         except Exception as ex:
             self._logger.error(ex)
+
 
     def startCalibrationTest(self):
         """
@@ -490,6 +439,7 @@ class BeePrinter(Printer):
 
         return None
 
+
     def cancelCalibrationTest(self):
         """
         Cancels the running calibration test
@@ -500,33 +450,6 @@ class BeePrinter(Printer):
 
         return None
 
-    def isRunningCalibrationTest(self):
-        """
-        Updates the running calibration test flag
-        :return:
-        """
-        return self._runningCalibrationTest
-
-    def isValidNozzleSize(self, nozzleSize):
-        """
-        Checks if the passed nozzleSize value is valid
-        :param nozzleSize:
-        :return:
-        """
-        for k,v in settings().get(['nozzleTypes']).iteritems():
-            if v['value'] == nozzleSize:
-                return True
-
-        return False
-
-    def is_preparing_print(self):
-        return self._comm is not None and self._comm.isPreparingPrint()
-
-    def is_heating(self):
-        return self._comm is not None and (self._comm.isHeating() or self._comm.isPreparingPrint())
-
-    def is_shutdown(self):
-        return self._comm is not None and self._comm.isShutdown()
 
     def toggle_pause_print(self):
         """
@@ -536,6 +459,7 @@ class BeePrinter(Printer):
             self.pause_print()
         elif self.is_paused() or self.is_shutdown():
             self.resume_print()
+
 
     def resume_print(self):
         """
@@ -549,6 +473,108 @@ class BeePrinter(Printer):
 
         self._comm.setPause(False)
 
+    # # # # # # # # # # # # # # # # # # # # # # #
+    ########  GETTER/SETTER FUNCTIONS  ##########
+    # # # # # # # # # # # # # # # # # # # # # # #
+
+    def getPrintProgress(self):
+        """
+        Gets the current progress of the print job
+        :return:
+        """
+        if self._numberLines is not None and self._executedLines is not None and self._numberLines > 0:
+            return float(self._executedLines) / float(self._numberLines)
+        else:
+            return -1
+
+
+    def getPrintFilepos(self):
+        """
+        Gets the current position in file being printed
+        :return:
+        """
+        if self._executedLines is not None:
+            return self._executedLines
+        else:
+            return 0
+
+
+    def getCurrentProfile(self):
+        """
+        Returns current printer profile
+        :return:
+        """
+        if self._printerProfileManager is not None:
+            return self._printerProfileManager.get_current_or_default()
+        else:
+            return None
+
+
+    def getPrinterName(self):
+        """
+        Returns the name of the connected printer
+        :return:
+        """
+        if self._comm is not None:
+            return self._comm.getConnectedPrinterName()
+        else:
+            return None
+
+
+    def feed_rate(self, factor):
+        """
+        Updates the feed rate factor
+        :param factor:
+        :return:
+        """
+        factor = self._convert_rate_value(factor, min=50, max=200)
+        self._currentFeedRate = factor
+
+
+    def get_current_temperature(self):
+        """
+        Returns the current extruder temperature
+        :return:
+        """
+        try:
+            return self._comm.getCommandsInterface().getNozzleTemperature()
+        except Exception as ex:
+            self._logger.error(ex)
+
+
+    def isRunningCalibrationTest(self):
+        """
+        Updates the running calibration test flag
+        :return:
+        """
+        return self._runningCalibrationTest
+
+
+    def isValidNozzleSize(self, nozzleSize):
+        """
+        Checks if the passed nozzleSize value is valid
+        :param nozzleSize:
+        :return:
+        """
+        for k,v in settings().get(['nozzleTypes']).iteritems():
+            if v['value'] == nozzleSize:
+                return True
+
+        return False
+
+
+    def is_preparing_print(self):
+        return self._comm is not None and self._comm.isPreparingPrint()
+
+
+    def is_heating(self):
+        return self._comm is not None and (self._comm.isHeating() or self._comm.isPreparingPrint())
+
+
+    def is_shutdown(self):
+        return self._comm is not None and self._comm.isShutdown()
+
+
     def get_state_string(self):
         """
          Returns a human readable string corresponding to the current communication state.
@@ -558,29 +584,6 @@ class BeePrinter(Printer):
         else:
             return self._comm.getStateString()
 
-    def select_file(self, path, sd, printAfterSelect=False, pos=None):
-        super(BeePrinter, self).select_file(path, sd, printAfterSelect, pos)
-
-        # saves the path to the selected file
-        settings().set(['lastPrintJobFile'], path)
-        settings().save()
-
-    def cancel_print(self):
-        """
-         Cancels the current print job.
-        """
-        super(BeePrinter, self).cancel_print()
-
-        # waits a bit before un-selecting the file
-        import time
-        time.sleep(2)
-        self.unselect_file()
-
-    def on_print_cancelled(self, event, payload):
-        """
-        Print cancelled callback for the EventManager.
-        """
-        self.unselect_file()
 
     def getCurrentFirmware(self):
         """
@@ -596,6 +599,49 @@ class BeePrinter(Printer):
                 return 'Not available'
         else:
             return 'Not available'
+
+
+    # # # # # # # # # # # # # # # # # # # # # # #
+    ##########  CALLBACK FUNCTIONS  #############
+    # # # # # # # # # # # # # # # # # # # # # # #
+    def updateProgress(self, progressData):
+        """
+        Receives a progress data object from the BVC communication layer
+        and updates the progress attributes
+
+        :param progressData:
+        :return:
+        """
+        if progressData is not None and self._selectedFile is not None:
+            if 'Elapsed Time' in progressData:
+                self._elapsedTime = progressData['Elapsed Time']
+            if 'Estimated Time' in progressData:
+                self._estimatedTime = progressData['Estimated Time']
+            if 'Executed Lines' in progressData:
+                self._executedLines = progressData['Executed Lines']
+            if 'Lines' in progressData:
+                self._numberLines = progressData['Lines']
+
+
+    def on_comm_progress(self):
+        """
+         Callback method for the comm object, called upon any change in progress of the print job.
+         Triggers storage of new values for printTime, printTimeLeft and the current progress.
+        """
+
+        self._setProgressData(self.getPrintProgress(), self.getPrintFilepos(),
+                              self._comm.getPrintTime(), self._comm.getCleanedPrintTime())
+
+        # If the status from the printer is no longer printing runs the post-print trigger
+        if self.getPrintProgress() >= 1 \
+                and self._comm.getCommandsInterface().isPreparingOrPrinting() is False:
+
+            # Runs the print finish communications callback
+            self._comm.triggerPrintFinished()
+
+            self._comm.getCommandsInterface().stopStatusMonitor()
+            self._runningCalibrationTest = False
+
 
     def on_comm_file_selected(self, filename, filesize, sd):
         """
@@ -616,36 +662,40 @@ class BeePrinter(Printer):
             self._printAfterSelect = False
             self.start_print(pos=self._posAfterSelect)
 
+    def on_print_cancelled(self, event, payload):
+        """
+        Print cancelled callback for the EventManager.
+        """
+        self.unselect_file()
+
+    # # # # # # # # # # # # # # # # # # # # # # #
+    ########### AUXILIARY FUNCTIONS #############
+    # # # # # # # # # # # # # # # # # # # # # # #
+
     def _setJobData(self, filename, filesize, sd):
         super(BeePrinter, self)._setJobData(filename, filesize, sd)
 
-        if filename is not None:
-            if sd:
-                path_on_disk = None
+        self._checkSufficientFilamentForPrint()
+
+
+    def _checkSufficientFilamentForPrint(self):
+
+        # Gets the current print job data
+        state_data = self._stateMonitor.get_current_data()
+
+        if state_data and state_data['job'] and state_data['job']['filament']:
+            # gets the filament information for the filament weight to be used in the print job
+            filament = state_data['job']['filament']
+            # gets the current amount of filament left in printer
+            current_filament_length = self.getFilamentInSpool()
+
+            # Signals that there is not enough filament
+            if filament["tool0"]['length'] > current_filament_length:
+                filament["tool0"]['insufficient'] = True
+                self._insufficientFilamentForCurrent = True
             else:
-                path_on_disk = self._fileManager.path_on_disk(FileDestinations.LOCAL, filename)
-        else:
-            return
-
-        try:
-            fileData = self._fileManager.get_metadata(FileDestinations.SDCARD if sd else FileDestinations.LOCAL,
-                                                      path_on_disk)
-        except:
-            fileData = None
-        if fileData is not None:
-            if "analysis" in fileData:
-                if "filament" in fileData["analysis"].keys():
-                    # gets the filament information for the filament weight to be used in the print job
-                    filament = fileData["analysis"]["filament"]
-                    current_filament_length = self.getFilamentInSpool()
-
-                    # Signals that there is not enough filament
-                    if filament["tool0"]['length'] > current_filament_length:
-                        filament["tool0"]['insufficient'] = True
-                        self._insufficientFilamentForCurrent = True
-                    else:
-                        filament["tool0"]['insufficient'] = False
-                        self._insufficientFilamentForCurrent = False
+                filament["tool0"]['insufficient'] = False
+                self._insufficientFilamentForCurrent = False
 
     def _setProgressData(self, completion=None, filepos=None, printTime=None, printTimeLeft=None):
         """
