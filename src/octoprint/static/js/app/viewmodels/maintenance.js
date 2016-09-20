@@ -132,6 +132,8 @@ $(function() {
             $('#maintenance_extruderMaintenance').addClass('hidden');
             $('#maintenance_replaceNozzle').addClass('hidden');
 
+            $('#maintenanceCloseButton').removeClass('hidden');
+
             // Returns the operations to the initial step screens
             self.changeFilamentStep0();
             self.calibrationStep0();
@@ -153,7 +155,7 @@ $(function() {
         };
 
         /***************************************************************************/
-        /*******                   Filament Change functions            ************/
+        /************             Filament Change functions             ************/
         /***************************************************************************/
         self.showFilamentChange = function() {
             $('#maintenanceList').addClass('hidden');
@@ -161,11 +163,14 @@ $(function() {
 
             $('#maintenance_changeFilament').removeClass('hidden');
 
+            $('#maintenanceCloseButton').addClass('hidden');
+
             // Starts heating automatically
             self.startHeating();
         };
 
         self.changeFilamentStep0 = function() {
+            $('#step4').addClass('hidden');
             $('#step2').addClass('hidden');
             $('#step3').addClass('hidden');
             $('#step1').removeClass('hidden');
@@ -186,18 +191,26 @@ $(function() {
             self.filamentWeightSaveSuccess(false);
             self.filamentWeightResponseError(false);
 
-            $('#maintenanceCloseButton').removeClass('hidden');
             $('#maintenanceOkButton').addClass('hidden');
         };
 
         self.nextStep2 = function() {
             $('#step2').removeClass('hidden');
+            $('#step4').addClass('hidden');
             $('#step3').addClass('hidden');
             $('#step1').addClass('hidden');
         };
 
         self.nextStep3 = function() {
             $('#step3').removeClass('hidden');
+            $('#step4').addClass('hidden');
+            $('#step2').addClass('hidden');
+            $('#step1').addClass('hidden');
+        };
+
+        self.nextStep4 = function() {
+            $('#step4').removeClass('hidden');
+            $('#step3').addClass('hidden');
             $('#step2').addClass('hidden');
             $('#step1').addClass('hidden');
         };
@@ -411,7 +424,7 @@ $(function() {
                         self.filamentWeightSaveSuccess(true);
 
                         // Updates the filament weight label
-                        self._getFilamentInSpool();
+                        self.changeFilamentStepFinalStep();
 
                         self.commandLock(false);
                         self.operationLock(false);
@@ -461,7 +474,7 @@ $(function() {
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
-                    self.filamentInSpool(data.filament);
+                    self.filamentInSpool(Math.round(data.filament));
                 }
             });
         };
@@ -480,6 +493,8 @@ $(function() {
             $('#cancelMaintenance').removeClass('hidden');
 
             $('#maintenance_calibration').removeClass('hidden');
+
+            $('#maintenanceCloseButton').addClass('hidden');
 
             // Starts the calibration operation
             self.startCalibration();
@@ -739,6 +754,8 @@ $(function() {
 
             // Starts the heating operation
             self.startHeatingExtMaint();
+
+            $('#maintenanceCloseButton').addClass('hidden');
         };
 
 
@@ -850,6 +867,8 @@ $(function() {
             $('#cancelMaintenance').removeClass('hidden');
 
             $('#maintenance_replaceNozzle').removeClass('hidden');
+
+            $('#maintenanceCloseButton').addClass('hidden');
 
             // Starts the heating operation
             self.startHeatingReplaceNozzle();

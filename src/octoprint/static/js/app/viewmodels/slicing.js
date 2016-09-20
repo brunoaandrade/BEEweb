@@ -226,7 +226,7 @@ $(function() {
                         }
                     }
 
-                    self.filamentInSpool(data.filamentInSpool)
+                    self.filamentInSpool(Math.round(data.filamentInSpool))
                 }
             });
         };

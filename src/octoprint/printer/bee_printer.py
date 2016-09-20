@@ -313,15 +313,7 @@ class BeePrinter(Printer):
             if filament_mm:
                 filament_cm = filament_mm / 10.0
 
-                # converts the amount of filament in grams to mm
-                if self._currentFilamentProfile:
-                    # Fetchs the first position filament_diameter from the filament data and converts to microns
-                    filament_diameter = self._currentFilamentProfile.data['filament_diameter'][0] * 1000
-                    # TODO: The filament density should also be set based on profile data
-                    filament_density = 1.275  # default value
-                else:
-                    filament_diameter = 1.75 * 1000  # default value in microns
-                    filament_density = 1.275  # default value
+                filament_diameter, filament_density = self._getFilamentSettings()
 
                 filament_radius = float(int(filament_diameter) / 10000.0) / 2.0
                 filament_volume = filament_cm * (math.pi * filament_radius * filament_radius)
@@ -345,15 +337,7 @@ class BeePrinter(Printer):
                 self._logger.error('Unable to set invalid filament weight: %s' % filamentInSpool)
                 return
 
-            # converts the amount of filament in grams to mm
-            if self._currentFilamentProfile:
-                # Fetchs the first position filament_diameter from the filament data and converts to microns
-                filament_diameter = self._currentFilamentProfile.data['filament_diameter'][0] * 1000
-                # TODO: The filament density should also be set based on profile data
-                filament_density = 1.275  # default value
-            else:
-                filament_diameter = 1.75 * 1000  # default value in microns
-                filament_density = 1.275  # default value
+            filament_diameter, filament_density = self._getFilamentSettings()
 
             filament_volume = filamentInSpool / filament_density
             filament_radius = float(int(filament_diameter) / 10000.0) / 2.0
@@ -678,8 +662,29 @@ class BeePrinter(Printer):
         self._checkSufficientFilamentForPrint()
 
 
-    def _checkSufficientFilamentForPrint(self):
+    def _getFilamentSettings(self):
+        """
+        Gets the necessary filament settings for weight/size conversions
+        Returns tuple with (diameter,density)
+        """
+        # converts the amount of filament in grams to mm
+        if self._currentFilamentProfile:
+            # Fetches the first position filament_diameter from the filament data and converts to microns
+            filament_diameter = self._currentFilamentProfile.data['filament_diameter'][0] * 1000
+            # TODO: The filament density should also be set based on profile data
+            filament_density = 1.275  # default value
+        else:
+            filament_diameter = 1.75 * 1000  # default value in microns
+            filament_density = 1.275  # default value
 
+        return filament_diameter, filament_density
+
+    def _checkSufficientFilamentForPrint(self):
+        """
+        Checks if the current print job has enough filament to complete. By updating the
+        job setting, it will automatically update the interface through the web socket
+        :return:
+        """
         # Gets the current print job data
         state_data = self._stateMonitor.get_current_data()
 
@@ -690,12 +695,13 @@ class BeePrinter(Printer):
             current_filament_length = self.getFilamentInSpool()
 
             # Signals that there is not enough filament
-            if filament["tool0"]['length'] > current_filament_length:
-                filament["tool0"]['insufficient'] = True
-                self._insufficientFilamentForCurrent = True
-            else:
-                filament["tool0"]['insufficient'] = False
-                self._insufficientFilamentForCurrent = False
+            if "tool0" in filament:
+                if filament["tool0"]['length'] > current_filament_length:
+                    filament["tool0"]['insufficient'] = True
+                    self._insufficientFilamentForCurrent = True
+                else:
+                    filament["tool0"]['insufficient'] = False
+                    self._insufficientFilamentForCurrent = False
 
     def _setProgressData(self, completion=None, filepos=None, printTime=None, printTimeLeft=None):
         """
