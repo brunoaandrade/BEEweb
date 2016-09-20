@@ -1,7 +1,7 @@
 BEEsoft.web
 ===========
 
-![alt text](https://pbs.twimg.com/profile_images/378800000057657890/e4420ccca1d3d9307434370b6ab1d7d7_200x200.png "BEEsoft.web logo")
+![alt text](https://beeverycreative.com/wp-content/themes/beevc%20oficial/stylesheets/imgs/bee-soft-logo.png "BEEsoft logo")
 
 
 BEEsoft.web is a web interface designed to run in a RaspberryPi and it is used for controlling a Beeverycreative printer (BEETHEFIRST, BEETHEFIRST+, ...).
