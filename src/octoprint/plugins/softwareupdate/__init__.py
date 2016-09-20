@@ -146,7 +146,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 					"type": "github_release",
 					"user": "beeverycreative",
 					"repo": "BEEweb",
-					"update_script": "{{python}} \"{update_script}\" --python=\"{{python}}\" \"{{folder}}\" {{target}}".format(update_script=os.path.join(self._basefolder, "scripts", "update-octoprint.py")),
+					"update_script": "{{python}} \"{update_script}\" --python=\"{{python}}\" \"{{folder}}\" {{target}}".format(
+						update_script=os.path.join(self._basefolder, "scripts", "update-beeweb.py")),
 					"restart": "octoprint"
 				},
 				"BEEsoft configurations": {
