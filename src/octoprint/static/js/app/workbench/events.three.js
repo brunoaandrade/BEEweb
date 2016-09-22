@@ -24,7 +24,7 @@ BEEwb.events.onMouseDown = function( e ) {
     BEEwb.main.mouseVector.x = 2 * ( (e.clientX - BEEwb.main.containerWidthOffset) /
         BEEwb.main.renderer.domElement.clientWidth) - 1;
 
-    BEEwb.main.mouseVector.y = 1 - 2 * ( (e.clientY - BEEwb.main.containerHeightOffset) /
+    BEEwb.main.mouseVector.y = 1 - 2 * ( (e.clientY - BEEwb.main.containerHeightOffset - BEEwb.main.topPanelVerticalOffset) /
         BEEwb.main.renderer.domElement.clientHeight );
 
     BEEwb.main.mouseVector.z = 0.5;
@@ -39,7 +39,7 @@ BEEwb.events.onMouseUp = function( e ) {
 
     BEEwb.main.mouseVector.x = 2 * ( (e.clientX - BEEwb.main.containerWidthOffset) /
         BEEwb.main.renderer.domElement.clientWidth) - 1;
-    BEEwb.main.mouseVector.y = 1 - 2 * ( (e.clientY - BEEwb.main.containerHeightOffset) /
+    BEEwb.main.mouseVector.y = 1 - 2 * ( (e.clientY - BEEwb.main.containerHeightOffset - BEEwb.main.topPanelVerticalOffset) /
         BEEwb.main.renderer.domElement.clientHeight );
     BEEwb.main.mouseVector.z = 0.5;
 

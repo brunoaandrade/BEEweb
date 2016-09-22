@@ -27,6 +27,7 @@ BEEwb.main = {
     bedDepth: 0,
     savedScenesFiles: [],
     lastLoadedModel: null,
+    topPanelVerticalOffset: 0,
 
     /**
      * Main initialization function
@@ -39,15 +40,12 @@ BEEwb.main = {
             url: "bee/api/printer",
             type: 'GET',
             success: function(data) {
-
                 that.bedDepth = data.profile.volume.depth;
                 that.bedWidth = data.profile.volume.width;
                 that.bedHeight = data.profile.volume.height;
-
             },
-            error: function() {
-
-
+            error: function(error) {
+                console.log(error);
             },
             complete: function() {
                 that._initializeGraphics();
@@ -74,7 +72,7 @@ BEEwb.main = {
         this.container.appendChild( this.renderer.domElement );
 
         this.camera = new THREE.PerspectiveCamera(
-         53, this.renderer.domElement.clientWidth / this.renderer.domElement.clientHeight, 1, 3000
+            53, this.renderer.domElement.clientWidth / this.renderer.domElement.clientHeight, 1, 3000
         );
 
         this.resetCamera();
@@ -160,9 +158,9 @@ BEEwb.main = {
         this.trackballControls.update();
         this.renderer.render( this.scene, this.camera );
     },
+
     /**
-     * Clear the build platform
-     *
+     * Clears the 3D scene
      */
     clearBed: function () {
         if (this.objects !== null) {
@@ -290,6 +288,7 @@ BEEwb.main = {
             $('#loadingDialog').modal('hide');
         });
     },
+
     /**
      * Saves the current scene
      *

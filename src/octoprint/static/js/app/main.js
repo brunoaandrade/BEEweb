@@ -690,6 +690,19 @@ $(function() {
         log.info("Initial application setup done, connecting to server...");
         var dataUpdater = new DataUpdater(allViewModels);
         dataUpdater.connect(dataUpdaterConnectCallback);
+
+        //****************************************************************/
+        //****************        BEEweb JS hacks     ********************/
+        //****************************************************************/
+        $('#state_wrapper').on('shown.bs.collapse', function (e) {
+            // Sets the panel height as vertical offset to adjust the 3D canvas
+            BEEwb.main.topPanelVerticalOffset = $('#state').height();
+        });
+
+        $('#state_wrapper').on('hidden.bs.collapse', function (e) {
+            // Resets the offset to adjust the 3D canvas
+            BEEwb.main.topPanelVerticalOffset = 0;
+        });
     }
 );
 
