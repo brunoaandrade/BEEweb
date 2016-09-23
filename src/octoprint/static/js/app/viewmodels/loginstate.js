@@ -71,6 +71,10 @@ $(function() {
                         viewModel.onUserLoggedOut();
                     }
                 });
+
+                // Shows the login dialog modal if no session is active
+                var dialog = $('#login_dialog');
+                self.showLoginDialog(dialog);
             }
         };
 
@@ -90,6 +94,10 @@ $(function() {
                     self.loginUser("");
                     self.loginPass("");
                     self.loginRemember(false);
+
+                    // Hides the login modal in case is opened
+                    $("#login_dialog").modal('hide');
+
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     new PNotify({title: gettext("Login failed"), text: gettext("User unknown or wrong password"), type: "error"});
@@ -133,11 +141,25 @@ $(function() {
             if (self.allViewModels == undefined) return;
             self.requestData();
         };
+
+
+        self.showLoginDialog = function(loginDialog) {
+
+            // shows login modal, ensures centered position
+            loginDialog.modal({
+                minHeight: function() { return Math.max($.fn.modal.defaults.maxHeight() - 500, 250); }
+            }).css({
+                width: '50%',
+                'margin-left': function() { return -($(this).width() /2); }
+            });
+
+            return false;
+        };
     }
 
     OCTOPRINT_VIEWMODELS.push([
         LoginStateViewModel,
         [],
-        []
+        ["#login_form_body"]
     ]);
 });

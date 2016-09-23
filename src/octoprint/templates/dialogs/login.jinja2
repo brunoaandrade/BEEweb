@@ -1,0 +1,29 @@
+<div id="login_dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="login_dialog_label" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 id="login_dialog_label">{{ _('Start your session') }}</h3>
+    </div>
+    <div class="modal-body">
+        <div id="login_form_body" style="padding: 15px" class="" >
+            <label for="login_user">{{ _('Username') }}</label>
+            <input type="text" id="login_user" data-bind="value: $root.loginUser, event: {'keyup': $root.onLoginUserKeyup}"
+                placeholder="{{ _('Username') }}" autocapitalize="none" />
+            <label for="login_pass">{{ _('Password') }}</label>
+            <input type="password" id="login_pass" data-bind="value: $root.loginPass, event: {'keyup': $root.onLoginPassKeyup}"
+                placeholder="{{ _('Password') }}" />
+            <label class="checkbox">
+                <input type="checkbox" id="login_remember" data-bind="checked: $root.loginRemember" /> {{ _('Remember me') }}
+            </label>
+            <button class="btn btn-primary" id="login_button" data-bind="click: function() { $root.login(); }">{{ _('Login') }}</button>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="row-fluid">
+            <div class="span2"></div>
+            <div class="span8"></div>
+            <div class="span2">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Close') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
