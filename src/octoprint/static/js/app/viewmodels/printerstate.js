@@ -196,10 +196,10 @@ $(function() {
             self.timelapse(data);
         };
 
-        self._proccessStateClass = function() {
+        self._processStateClass = function() {
             self.stateClass("text-black");
 
-            if (self.isOperational()) {
+            /*if (self.isOperational()) {
                 self.stateClass("text-success");
             }
             if (self.isPaused()) {
@@ -216,7 +216,7 @@ $(function() {
             }
             if (self.isErrorOrClosed()) {
                 self.stateClass("text-warning");
-            }
+            } */
         };
 
         self._fromData = function(data) {
@@ -226,7 +226,7 @@ $(function() {
             self._processZData(data.currentZ);
             self._processBusyFiles(data.busyFiles);
 
-            self._proccessStateClass();
+            self._processStateClass();
         };
 
         self._processStateData = function(data) {

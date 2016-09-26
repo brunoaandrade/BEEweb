@@ -44,3 +44,12 @@ canvas { width: 100% !important; }
 .text-black {
     color: black;
 }
+.btn-delete {
+    color: #cd0200 !important;
+}
+.input-search-box {
+    width: 85%;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+}

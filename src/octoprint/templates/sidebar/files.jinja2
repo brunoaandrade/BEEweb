@@ -31,7 +31,7 @@
     </div>
 </div>
 <form class="form-search" data-bind="submit: performSearch">
-    <input type="text" class="input-block search-query" data-bind="value: searchQuery, valueUpdate: 'input'" placeholder="{{ _('Search...') }}">
+    <input type="text" class="input-search-box input-block" data-bind="value: searchQuery, valueUpdate: 'input'" placeholder="{{ _('Search...') }}">
 </form>
 <div class="gcode_files" data-bind="slimScrolledForeach: listHelper.paginatedItems">
     <div class="entry" data-bind="attr: { id: $root.getEntryId($data) }, template: { name: $root.templateFor($data), data: $data }"></div>
