@@ -392,9 +392,9 @@ BEEwb.transformOps.updateScaleSizeInputs = function() {
         $('#scaley-axis').val(newY.toFixed(2));
         $('#scalez-axis').val(newZ.toFixed(2));
 
-        $('#scalex-axis-label').text("X (mm)");
-        $('#scaley-axis-label').text("Y (mm)");
-        $('#scalez-axis-label').text("Z (mm)");
+        $('#scalex-axis-label').html("X <small>(mm)</small>");
+        $('#scaley-axis-label').html("Y <small>(mm)</small>");
+        $('#scalez-axis-label').html("Z <small>(mm)</small>");
 
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
@@ -417,9 +417,9 @@ BEEwb.transformOps.updateScaleSizeInputsByPercentage = function() {
         $('#scaley-axis').val(newY.toFixed(0));
         $('#scalez-axis').val(newZ.toFixed(0));
 
-        $('#scalex-axis-label').text("X (%)");
-        $('#scaley-axis-label').text("Y (%)");
-        $('#scalez-axis-label').text("Z (%)");
+        $('#scalex-axis-label').html("X <small>(%)</small>");
+        $('#scaley-axis-label').html("Y <small>(%)</small>");
+        $('#scalez-axis-label').html("Z <small>(%)</small>");
 
         // Checks if the selected object is out of bounds
         BEEwb.main.isSelectedObjectOutOfBounds();
