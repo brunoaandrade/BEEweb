@@ -53,3 +53,6 @@ canvas { width: 100% !important; }
     -moz-border-radius: 15px;
     border-radius: 15px;
 }
+.display-block {
+    display: block;
+}

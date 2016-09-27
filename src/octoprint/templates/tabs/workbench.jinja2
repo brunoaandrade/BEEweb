@@ -4,18 +4,18 @@
 
 <div id="workbench-buttons" class="row-fluid worbench-top-buttons">
 
-    <button class="btn span2" id="save_scene" onclick="BEEwb.main.saveScene();">
+    <button class="btn btn-block span3" id="save_scene" onclick="BEEwb.main.saveScene();">
         <i class="icon-save" ></i>
         {{ _('Save Scene') }}
     </button>
 
-    <div class="span7">
+    <div class="span6">
         <div id="out-bound-msg" class="alert alter-warning workbench-alert text-center" style="display: none;">
             <i class="icon-warning-sign"></i>
             {{ _('The model is out of the printing area.') }}
         </div>
     </div>
-    <button class="btn btn-primary span3" id="print_scene"
+    <button class="btn btn-block btn-primary span3" id="print_scene"
             data-bind="click: startPrint, enable: loginState.isUser() && !connection.isConnecting() && !state.enablePrint()">
         <i class="icon-print" ></i>
         {{ _('Start Print...') }}
@@ -28,7 +28,7 @@
 <div id="workbench-buttons-bottom" class="row-fluid">
 
     <div class="span3">
-    <button class="btn" id="clean_bed" onclick="BEEwb.main.clearBed();" >
+    <button class="btn btn-block" id="clean_bed" onclick="BEEwb.main.clearBed();" >
         <i class="icon-eraser" ></i>
         {{ _('Clear Platform') }}
     </button>

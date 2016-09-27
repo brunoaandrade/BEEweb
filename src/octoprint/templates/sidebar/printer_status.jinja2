@@ -90,11 +90,10 @@
 
 <div id="insufficient_filament" class="row-fluid text-center" data-bind="visible: loginState.isUser && insufficientFilament">
     <br />
-    <span class="alert alert-danger">
+    <span class="alert alert-danger display-block">
         <i class="icon-warning-sign"></i>
         {{ _('The estimated amount of filament in the spool is not enough to complete the print job!') }}
     </span>
-    <br /><br />
     <span>
         <i class="icon-info"></i>
         {{ _('You can either click below to change the filament or click Print to proceed at your own risk.') }}
