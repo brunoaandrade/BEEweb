@@ -1084,6 +1084,8 @@ class Server(object):
 			"js/lib/threejs/FileSaver.js",
 			"js/lib/threejs/TrackballControls.js",
 			"js/lib/threejs/TransformControls.js",
+			"js/lib/threejs/Detector.js",
+			"js/lib/threejs/OrbitControls.js",
 			"js/app/workbench/helpers.bee.js",
 			"js/app/workbench/events.three.js",
 			"js/app/workbench/main.three.js",

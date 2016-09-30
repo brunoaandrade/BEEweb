@@ -14,7 +14,7 @@ BEEwb.main = {
     camera: null,
     scene: null,
     renderer: null,
-    trackballControls: null,
+    sceneControls: null,
     objects: null,
     raycaster: null,
     mouseVector: null,
@@ -59,6 +59,8 @@ BEEwb.main = {
      * Initialization function callback
      */
     _initializeGraphics: function() {
+
+        if ( !Detector.webgl ) Detector.addGetWebGLMessage();
 
         this.container = document.getElementById( 'stl_container' );
         var bondingOffset = this.container.getBoundingClientRect();
@@ -117,16 +119,18 @@ BEEwb.main = {
             });
         }
 
-        this.trackballControls = new THREE.TrackballControls( this.camera, this.container );
-        this.trackballControls.rotateSpeed = 1.7;
-        this.trackballControls.zoomSpeed = 0.9;
-        this.trackballControls.panSpeed = 0.8;
+        // Discoment this if you want Trackbacll controls instead of Orbit controls
+        // this.sceneControls = new THREE.TrackballControls( this.camera, this.container );
+        // this.sceneControls.noZoom = false;
+        // this.sceneControls.dynamicDampingFactor = 0.3;
 
-        this.trackballControls.noZoom = false;
-        this.trackballControls.noPan = true;
-
-        this.trackballControls.staticMoving = true;
-        this.trackballControls.dynamicDampingFactor = 0.3;
+        this.sceneControls = new THREE.OrbitControls( this.camera, this.container );
+        this.sceneControls.enableZoom = true;
+        this.sceneControls.zoomSpeed = 0.9;
+        this.sceneControls.rotateSpeed = 0.1;
+        this.sceneControls.enablePan = false;
+        this.sceneControls.enableDamping = true;
+        this.sceneControls.dampingFactor = 0.25;
 
         // Auxiliary objects for model selection
         this.raycaster = new THREE.Raycaster();
@@ -155,7 +159,7 @@ BEEwb.main = {
 
     animate: function () {
         requestAnimationFrame( this.animate.bind(this) );
-        this.trackballControls.update();
+        this.sceneControls.update();
         this.renderer.render( this.scene, this.camera );
     },
 
