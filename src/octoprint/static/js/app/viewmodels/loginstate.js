@@ -58,6 +58,9 @@ $(function() {
                         viewModel.onUserLoggedIn(response);
                     }
                 });
+
+                //Reactivates workbench keyboard shortcuts
+                BEEwb.main.activateWorkbenchKeys();
             } else {
                 self.loggedIn(false);
                 self.username(undefined);
@@ -75,6 +78,9 @@ $(function() {
                 // Shows the login dialog modal if no session is active
                 var dialog = $('#login_dialog');
                 self.showLoginDialog(dialog);
+
+                // Deactivates the workbench keyboard shortcuts to prevent actions being trigger when user is typing
+                BEEwb.main.deactivateWorkbenchKeys();
             }
         };
 

@@ -142,11 +142,11 @@ BEEwb.main = {
         // Adds the printer bed auxiliary object
         this._addBed();
 
-        window.addEventListener( 'resize', BEEwb.events.onWindowResize, false );
-        window.addEventListener( 'keydown', BEEwb.events.onKeyDown);
-        //container.addEventListener( 'click', onMouseClick, false );
-        this.container.addEventListener( 'mouseup', BEEwb.events.onMouseUp, false );
-        this.container.addEventListener( 'mousedown', BEEwb.events.onMouseDown, false );
+        window.addEventListener('resize', BEEwb.events.onWindowResize, false );
+        this.container.addEventListener('mouseup', BEEwb.events.onMouseUp, false );
+        this.container.addEventListener('mousedown', BEEwb.events.onMouseDown, false );
+
+        this.activateWorkbenchKeys();
     },
 
     render: function () {
@@ -523,8 +523,24 @@ BEEwb.main = {
         */
 
         // Sets the global bed var
-        this.bed = mesh
+        this.bed = mesh;
 
         this.scene.add( this.bed );
+    },
+
+    /**
+     * Activates the workbench shortcut keys
+     *
+     */
+    activateWorkbenchKeys: function () {
+        window.addEventListener('keydown', BEEwb.events.onKeyDown);
+    },
+
+    /**
+     * De-activates the workbench shortcut keys
+     *
+     */
+    deactivateWorkbenchKeys: function () {
+        window.removeEventListener('keydown', BEEwb.events.onKeyDown);
     }
 };
