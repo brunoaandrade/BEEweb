@@ -67,7 +67,8 @@
                 <div class="control-group">
                     <label class="control-label">{{ _('Filament Color') }}</label>
                     <div class="controls">
-                        <select data-bind="options: colors, value: selColor, valueAllowUnset: false, enable: !forPrint()" ></select>
+                        <select data-bind="options: colors, value: selColor, valueAllowUnset: false, visible: !forPrint()" ></select>
+                        <span data-bind="text: selColor, visible: forPrint()"></span>
                         <br />
                         <small>
                             <strong>{{ _('Remaining filament') }}</strong>
@@ -78,7 +79,8 @@
                 <div class="control-group">
                     <label class="control-label">{{ _('Nozzle type') }}</label>
                     <div class="controls">
-                        <select data-bind="options: nozzleTypes, value: selNozzle, valueAllowUnset: false, enable: !forPrint()" ></select>
+                        <select data-bind="options: nozzleTypes, value: selNozzle, valueAllowUnset: false, visible: !forPrint()" ></select>
+                        <span data-bind="text: selNozzle, visible: forPrint()"></span>
                     </div>
                 </div>
                 <!--<div class="control-group">
