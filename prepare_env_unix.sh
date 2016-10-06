@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-sudo apt-get install python2.7
+sudo apt-get install -y git python2.7 python-setuptools python-dev build-essential
+sudo easy_install pip
 
 # Downloads BEEwebPi in order to install settings files
 echo "Installing settings files"
@@ -8,15 +9,14 @@ if [ -f BEEwebPi ]
 then
     cd BEEwebPi/
     git pull origin master
+    cd ..
 else
     git clone https://github.com/beeverycreative/BEEwebPi.git
-    cd BEEwebPi/
 fi
 
 # copies the files to the user directory
-cp -R src/filesystem/home/pi/.beeweb ~/.beeweb
+cp -R BEEwebPi/src/filesystem/home/pi/.beeweb ~/.beeweb
 
 # installs dependencies
-cd ../BEEweb
 python setup.py install
 
