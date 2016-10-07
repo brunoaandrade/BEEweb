@@ -5,17 +5,17 @@ sudo easy_install pip
 
 # Downloads BEEwebPi in order to install settings files
 echo "Installing settings files"
-if [ -f BEEwebPi ]
+if [ ! -d BEEwebPi ]
 then
-    cd BEEwebPi/
-    git pull origin master
-    cd ..
-else
     git clone https://github.com/beeverycreative/BEEwebPi.git
 fi
 
 # copies the files to the user directory
 cp -R BEEwebPi/src/filesystem/home/pi/.beeweb ~/.beeweb
+sudo cp BEEwebPi/src/filesystem/root/etc/init.d/beeweb /etc/init.d/
+sudo cp BEEwebPi/src/filesystem/root/etc/default/beeweb /etc/default/beeweb
+sudo sed -i 's/pi/vagrant/g' /etc/default/beeweb
+sudo sed -i 's/\/home\/pi\/oprint\/bin\/beeweb/\/usr\/local\/bin\/beeweb/g' /etc/default/beeweb
 
 # installs dependencies
 python setup.py install
