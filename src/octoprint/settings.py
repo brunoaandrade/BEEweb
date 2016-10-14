@@ -237,8 +237,8 @@ default_settings = {
 				"tab": ["workbench", "gcodeviewer", "control", "temperature", "terminal", "timelapse"],
 				"settings": [
 					"section_printer", "printerprofiles", "temperatures", "terminalfilters", "gcodescripts",
-					"section_features", "features", "webcam", "accesscontrol", "api",
-					"section_beeweb", "server", "folders", "appearance", "logs", "plugin_pluginmanager", "plugin_softwareupdate"
+					"section_features", "features",
+					"section_general_settings", "accesscontrol", "appearance", "server", "folders", "logs", "plugin_pluginmanager", "api", "webcam", "plugin_softwareupdate"
 				],
 				"usersettings": ["access", "interface"],
 				"about": ["about", "supporters", "authors", "changelog", "license", "thirdparty", "plugin_pluginmanager"],
