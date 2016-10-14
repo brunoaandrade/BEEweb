@@ -155,3 +155,76 @@ BEEwb.helpers.convertToRadians = function( degrees ) {
         return 0;
     }
 };
+
+
+/**
+ * Calculates any possible object shift to avoid overlapping of models in the scene
+ *
+ * param bbox: THREEJS.BufferGeometry Bounding box of new object to be loaded
+ *
+ * Returns float value with amount to shift the new object
+ */
+BEEwb.helpers.calculateObjectShift = function( bbox ) {
+
+    var shift = 0;
+    if (BEEwb.main.objects.children.length > 0) {
+        var lastObj = BEEwb.main.objects.children[BEEwb.main.objects.children.length-1];
+
+        if (lastObj.geometry != null) {
+            var objBox = new THREE.Box3().setFromObject( lastObj );
+
+            shift = objBox.max.x;
+        }
+
+        // Final shift calculation with the "left" side of the new object
+        shift = shift - bbox.min.x + 1; // +1 for a small padding between the objects
+    }
+
+    return shift;
+};
+
+/**
+ * Calculates and centers an object if its bounding box center does not match the scene center
+ *
+ * @param geometry
+ */
+BEEwb.helpers.centerModelBasedOnBoundingBox = function(geometry) {
+
+    var bbox = geometry.boundingBox;
+
+    var xShift = 0;
+    var yShift = 0;
+    var zShift = 0;
+
+    var centerX = 0.5 * ( bbox.max.x - bbox.min.x );
+    var centerY = 0.5 * ( bbox.max.y - bbox.min.y );
+    var centerZ = 0.5 * ( bbox.max.z - bbox.min.z );
+
+    // Checks if the object is out of center in any axis
+    if ( bbox.min.x > 0 ) {
+        xShift = bbox.min.x + centerX;
+    }
+
+    if ( bbox.min.y > 0 ) {
+        yShift = bbox.min.y + centerY;
+    }
+
+    if ( bbox.min.z > 0 ) {
+        zShift = bbox.min.z + centerZ;
+    }
+
+    if ( bbox.max.x < 0 ) {
+        xShift = bbox.max.x - centerX;
+    }
+
+    if ( bbox.min.y < 0 ) {
+        yShift = bbox.max.y - centerY;
+    }
+
+    if ( bbox.min.z < 0 ) {
+        zShift = bbox.max.z - centerZ;
+    }
+
+    // Applies the transformation matrix for any necessary shift in position
+    geometry.applyMatrix( new THREE.Matrix4().makeTranslation( -xShift, -yShift, -zShift ) );
+};

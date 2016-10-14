@@ -119,7 +119,7 @@ BEEwb.main = {
             });
         }
 
-        // Discoment this if you want Trackbacll controls instead of Orbit controls
+        // Uncomment this if you want Trackball controls instead of Orbit controls
         // this.sceneControls = new THREE.TrackballControls( this.camera, this.container );
         // this.sceneControls.noZoom = false;
         // this.sceneControls.dynamicDampingFactor = 0.3;
@@ -223,56 +223,11 @@ BEEwb.main = {
             geometry.computeBoundingBox();
             var bbox = geometry.boundingBox;
 
-            var xShift = 0;
-            var yShift = 0;
-            var zShift = 0;
-
-            var centerX = 0.5 * ( bbox.max.x - bbox.min.x );
-            var centerY = 0.5 * ( bbox.max.y - bbox.min.y );
-            var centerZ = 0.5 * ( bbox.max.z - bbox.min.z );
-
-            // Checks if the object is out of center in any axis
-            if ( bbox.min.x > 0 ) {
-                xShift = bbox.min.x + centerX;
-            }
-
-            if ( bbox.min.y > 0 ) {
-                yShift = bbox.min.y + centerY;
-            }
-
-            if ( bbox.min.z > 0 ) {
-                zShift = bbox.min.z + centerZ;
-            }
-
-            if ( bbox.max.x < 0 ) {
-                xShift = bbox.max.x - centerX;
-            }
-
-            if ( bbox.min.y < 0 ) {
-                yShift = bbox.max.y - centerY;
-            }
-
-            if ( bbox.min.z < 0 ) {
-                zShift = bbox.max.z - centerZ;
-            }
-
-            // Applies the transformation matrix for any necessary shift in position
-            geometry.applyMatrix( new THREE.Matrix4().makeTranslation( -xShift, -yShift, -zShift ) );
+            // Centers the object if it's not centered
+            BEEwb.helpers.centerModelBasedOnBoundingBox(geometry);
 
             // Calculates any possible translation in the X axis due to the previously loaded model
-            xShift = 0;
-            if (that.objects.children.length > 0) {
-                var lastObj = that.objects.children[that.objects.children.length-1];
-
-                if (lastObj.geometry != null) {
-                    var objBox = new THREE.Box3().setFromObject( lastObj );
-
-                    xShift = objBox.max.x;
-                }
-
-                // Final shift calculation with the "left" side of the new object
-                xShift = xShift - bbox.min.x + 1; // +1 for a small padding between the objects
-            }
+            xShift = BEEwb.helpers.calculateObjectShift( bbox );
 
             var mesh = new THREE.Mesh( geometry, material );
             mesh.position.set( xShift, 0, 0 );

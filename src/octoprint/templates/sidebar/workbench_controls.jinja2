@@ -120,25 +120,31 @@
         <hr />
     </div>
     <button class="btn btn-block model-selection" id="center_selection"
-            data-bind="" disabled="true" onclick="BEEwb.transformOps.centerModel();">
+            data-bind="" onclick="BEEwb.transformOps.centerModel();">
         <i class="icon-bullseye" ></i>
         {{ _('Center model') }}
     </button>
     <br />
     <button class="btn btn-block model-selection" id="place_bed_selection"
-            data-bind="" disabled="true" onclick="BEEwb.transformOps.placeOnBed();">
+            data-bind="" onclick="BEEwb.transformOps.placeOnBed();">
         <i class="icon-level-down" ></i>
         {{ _('Place on bed') }}
     </button>
     <br />
     <button class="btn btn-block model-selection" id="reset_selection"
-            data-bind="" disabled="true" onclick="BEEwb.transformOps.resetSelectedModel();">
+            data-bind="" onclick="BEEwb.transformOps.resetSelectedModel();">
         <i class="icon-reply-all" ></i>
         {{ _('Reset model') }}
     </button>
     <br />
+    <button class="btn btn-block model-selection" id="clone_selection"
+            data-bind="" onclick="BEEwb.transformOps.cloneSelected();">
+        <i class="icon-copy" ></i>
+        {{ _('Clone model') }}
+    </button>
+    <br />
     <button class="btn btn-block btn-delete model-selection" id="delete_selection"
-            data-bind="" disabled="true" onclick="BEEwb.transformOps.removeSelected();">
+            data-bind="" onclick="BEEwb.transformOps.removeSelected();">
         <i class="icon-trash" ></i>
         {{ _('Delete') }}
     </button>
