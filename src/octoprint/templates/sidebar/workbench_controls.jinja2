@@ -35,17 +35,17 @@
             <div id="size_text_fields">
 
                 <label for="scalex-axis" id="scalex-axis-label">X <small>(mm)</small></label><br />
-                <input type="text" class="span10 axis-input-box" id="scalex-axis" name="x-axis" onchange="BEEwb.transformOps.scale();"/>
+                <input type="text" class="span10 axis-input-box" id="scalex-axis" name="x-axis" onchange="BEEwb.transformOps.scale('x');"/>
                 <input type="checkbox" id="lock-x" title="{{ _('Lock X aspect ratio') }}" checked />
                 <br /><br />
 
                 <label for="scaley-axis" id="scaley-axis-label">Y <small>(mm)</small></label><br />
-                <input type="text" class="span10 axis-input-box" id="scaley-axis" name="y-axis" onchange="BEEwb.transformOps.scale();"/>
+                <input type="text" class="span10 axis-input-box" id="scaley-axis" name="y-axis" onchange="BEEwb.transformOps.scale('y');"/>
                 <input type="checkbox" id="lock-y" title="{{ _('Lock Y aspect ratio') }}" checked />
                 <br /><br />
 
                 <label for="scalez-axis" id="scalez-axis-label">Z <small>(mm)</small></label><br />
-                <input type="text" class="span10 axis-input-box" id="scalez-axis" name="z-axis" onchange="BEEwb.transformOps.scale();"/>
+                <input type="text" class="span10 axis-input-box" id="scalez-axis" name="z-axis" onchange="BEEwb.transformOps.scale('z');"/>
                 <input type="checkbox" id="lock-z" title="{{ _('Lock Z aspect ratio') }}" checked />
                 <br /><br />
             </div>

@@ -4,14 +4,10 @@ var BEEwb = BEEwb || {};
 BEEwb.transformOps = {
     selectedMode: 'translate',
     initialSize: null,
-    previousSize: null,
-    previousSizePercentage: null
 };
 
 BEEwb.transformOps.resetObjectData = function() {
     this.initialSize = null;
-    this.previousSize = null;
-    this.previousSizePercentage = null;
 };
 
 /**
@@ -49,19 +45,18 @@ BEEwb.transformOps.toggleScaleType = function() {
  * Scales the selected model to the input text boxes axis values
  *
  */
-BEEwb.transformOps.scale = function() {
-
+BEEwb.transformOps.scale = function(axisChanged) {
     if (BEEwb.main.selectedObject !== null) {
         var x = parseFloat($('#scalex-axis').val().replace(",", "."));
         var y = parseFloat($('#scaley-axis').val().replace(",", "."));
         var z = parseFloat($('#scalez-axis').val().replace(",", "."));
 
         if ($('#scaleby-per').is(':checked')) {
-            this.scaleByPercentage(x, y, z);
+            this.scaleByPercentage(x, y, z, axisChanged);
 
             this.updateScaleSizeInputsByPercentage();
         } else {
-            this.scaleBySize(x ,y ,z);
+            this.scaleBySize(x ,y ,z, axisChanged);
 
             this.updateScaleSizeInputs();
         }
@@ -489,7 +484,7 @@ BEEwb.transformOps.updateRotationInputs = function() {
  * Scales the selected object converting percentage size passed in the parameters to the appropriate scale
  *
  */
-BEEwb.transformOps.scaleByPercentage = function(x, y, z) {
+BEEwb.transformOps.scaleByPercentage = function(x, y, z, changedAxis) {
 
     if (x < 0 || y < 0 || z < 0)
         return null;
@@ -501,7 +496,7 @@ BEEwb.transformOps.scaleByPercentage = function(x, y, z) {
         var zScale = z / 100;
 
         // Checks which axis was changed
-        if (x != this.previousSizePercentage['x']) {
+        if (changedAxis == 'x') {
 
             if ($('#lock-y').is(':checked')) {
                 yScale = xScale;
@@ -510,9 +505,7 @@ BEEwb.transformOps.scaleByPercentage = function(x, y, z) {
             if ($('#lock-z').is(':checked')) {
                 zScale = xScale;
             }
-        }
-
-        if (y != this.previousSizePercentage['y']) {
+        } else if (changedAxis == 'y') {
 
             if ($('#lock-x').is(':checked')) {
                 xScale = yScale;
@@ -521,9 +514,7 @@ BEEwb.transformOps.scaleByPercentage = function(x, y, z) {
             if ($('#lock-z').is(':checked')) {
                 zScale = yScale;
             }
-        }
-
-        if (z != this.previousSizePercentage['z']) {
+        } else if (changedAxis == 'z') {
 
             if ($('#lock-y').is(':checked')) {
                 yScale = zScale;
@@ -535,8 +526,6 @@ BEEwb.transformOps.scaleByPercentage = function(x, y, z) {
         }
 
         BEEwb.main.selectedObject.scale.set( xScale, yScale, zScale );
-
-        this.previousSizePercentage = { 'x': xScale * 100, 'y': yScale * 100, 'z': zScale * 100};
     }
 };
 
@@ -545,19 +534,20 @@ BEEwb.transformOps.scaleByPercentage = function(x, y, z) {
  * Scales the selected object converting size passed in the parameters to the appropriate scale
  *
  */
-BEEwb.transformOps.scaleBySize = function(x, y, z) {
+BEEwb.transformOps.scaleBySize = function(x, y, z, changedAxis) {
 
-    if (x < 0 || y < 0 || z < 0)
+    if (x < 0 || y < 0 || z < 0) {
         return null;
+    }
 
-    if (BEEwb.main.selectedObject != null) {
+    if (BEEwb.main.selectedObject != null && changedAxis != null) {
 
         var xScale = x / this.initialSize['x'];
         var yScale = y / this.initialSize['y'];
         var zScale = z / this.initialSize['z'];
 
         // Checks which axis was changed
-        if (x != this.previousSize['x']) {
+        if (changedAxis == 'x') {
 
             if ($('#lock-y').is(':checked')) {
                 yScale = xScale;
@@ -566,9 +556,7 @@ BEEwb.transformOps.scaleBySize = function(x, y, z) {
             if ($('#lock-z').is(':checked')) {
                 zScale = xScale;
             }
-        }
-
-        if (y != this.previousSize['y']) {
+        } else if (changedAxis == 'y') {
 
             if ($('#lock-x').is(':checked')) {
                 xScale = yScale;
@@ -577,9 +565,7 @@ BEEwb.transformOps.scaleBySize = function(x, y, z) {
             if ($('#lock-z').is(':checked')) {
                 zScale = yScale;
             }
-        }
-
-        if (z != this.previousSize['z']) {
+        } else if (changedAxis == 'z') {
 
             if ($('#lock-y').is(':checked')) {
                 yScale = zScale;
@@ -591,8 +577,6 @@ BEEwb.transformOps.scaleBySize = function(x, y, z) {
         }
 
         BEEwb.main.selectedObject.scale.set( xScale, yScale, zScale );
-
-        this.previousSize = { 'x': x, 'y': y, 'z': z};
     }
 };
 
@@ -611,7 +595,6 @@ BEEwb.transformOps._rotateByDegrees = function(x, y, z) {
     }
 };
 
-
 /**
  * Sets the initial size for the transform operations
  *
@@ -620,15 +603,5 @@ BEEwb.transformOps.setInitialSize = function() {
 
     if (BEEwb.main.selectedObject != null) {
         this.initialSize = BEEwb.helpers.objectSize(BEEwb.main.selectedObject.geometry);
-        this.previousSize = {
-            'x': this.initialSize['x'].toFixed(2),
-            'y': this.initialSize['y'].toFixed(2),
-            'z': this.initialSize['z'].toFixed(2)
-        };
-        this.previousSizePercentage = {
-            'x': 100,
-            'y': 100,
-            'z': 100
-        };
     }
 };
