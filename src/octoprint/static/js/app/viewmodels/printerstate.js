@@ -29,7 +29,8 @@ $(function() {
             return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown()) && self.loginState.isUser();
         });
         self.enableCancel = ko.pureComputed(function() {
-            return self.isOperational() && (self.isPrinting() || self.isPaused()) && self.loginState.isUser();
+            return (self.isOperational() || (self.isPrinting() || self.isPaused()))
+            && self.loginState.isUser() && self.filename() != undefined;
         });
 
         self.filename = ko.observable(undefined);
@@ -419,12 +420,32 @@ $(function() {
         };
 
         /**
+         * Returns true if a the Cancel button should be enabled
+         *
+         * @returns {boolean}
+         */
+        self.isCancelEnabled = function() {
+            debugger;
+            if (!self.loginState.isUser()) {
+                return false;
+            }
+
+            if (self.filename() == undefined) {
+                return false;
+            }
+
+            if (!self.isOperational()) {
+                return false;
+            }
+
+            return true;
+        };
+        /**
          * This function shows the maintenance panel and
          * automatically displays the change filament dialog
          */
         self.showMaintenanceFilamentChange = function() {
             $('#navbar_show_maintenance').click();
-
         };
     }
 

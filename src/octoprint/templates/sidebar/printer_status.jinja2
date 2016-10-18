@@ -38,14 +38,16 @@
         </button>
     </div>
     <div class="span5"></div>
-    <button class="btn span2"
+    <div id="pause_filler" class="span2">
+        <button class="btn btn-block"
         id="job_pause" data-bind="click: function() { isPaused() ? onlyResume() : onlyPause(); },
-        enable: enablePause, css: {active: (isPaused() && isShutdown())}, attr: {title: titlePauseButton}">
+        visible: enablePause, css: {active: (isPaused() && isShutdown())}, attr: {title: titlePauseButton}">
         <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>
         <span data-bind="visible: !isPaused() && !isShutdown()">{{ _('Pause') }}</span>
         <span data-bind="visible: isPaused() || isShutdown()">{{ _('Resume') }}</span>
     </button>
-    <button class="btn span2" id="job_cancel" data-bind="click: cancel, enable: isOperational() && loginState.isUser()" title="{{ _('Cancels the print job') }}">
+    </div>
+    <button class="btn span2" id="job_cancel" data-bind="click: cancel, visible: enableCancel()" title="{{ _('Cancels the print job') }}">
         <i class="icon-stop"></i> {{ _('Cancel') }}
     </button>
 </div>
