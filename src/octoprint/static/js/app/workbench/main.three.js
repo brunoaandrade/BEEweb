@@ -240,7 +240,6 @@ BEEwb.main = {
             that.objects.add(mesh);
 
             // Runs the placeOnBed algorithm
-            that.removeAllSelections();
             that.selectModel(mesh);
             BEEwb.transformOps.placeOnBed();
 
@@ -326,12 +325,11 @@ BEEwb.main = {
             this.transformControls = new THREE.TransformControls( this.camera, this.renderer.domElement );
             this.transformControls.addEventListener( 'change', this.render.bind(this) );
             this.transformControls.attach( model );
-
             this.scene.add( this.transformControls );
-        }
 
-        // Sets the selected object to the first selected model
-        this.selectedObject = model;
+            // Sets the selected object to the first selected model
+            this.selectedObject = model;
+        }
 
         // Activates the side buttons
         $('.model-selection').prop('disabled', false);

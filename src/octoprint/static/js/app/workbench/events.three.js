@@ -49,13 +49,14 @@ BEEwb.events.onMouseUp = function( e ) {
 
     // Selects the first found intersection
     if (intersects.length > 0) {
-        BEEwb.main.removeAllSelections();
 
         var intersection = intersects[ 0 ];
         var model = intersection.object;
 
-        if (BEEwb.main.selectedObject !== model)
+        if (BEEwb.main.selectedObject !== model) {
+            BEEwb.main.removeAllSelections();
             BEEwb.main.selectModel(model);
+        }
 
     } else if (prevMouseVector.x == BEEwb.main.mouseVector.x
         && prevMouseVector.y == BEEwb.main.mouseVector.y
