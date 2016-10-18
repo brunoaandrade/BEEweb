@@ -313,7 +313,6 @@ BEEwb.main = {
 
         // De-selects other objects
         this.objects.children.forEach(function( obj ) {
-
             //sets the default color in the object
             obj.material.color = new THREE.Color(DEFAULT_COLOR) ;
         });
@@ -338,12 +337,12 @@ BEEwb.main = {
         $('.model-selection').prop('disabled', false);
 
         // Shows the controls panel
-        if ($('#workbench_ctrls_wrapper').css('display') == 'none') {
-            $('#workbench_ctrls_wrapper').slideDown();
-        } else {
+        if ($('#workbench_ctrls_wrapper').is(':visible')) {
             if (!$('#workbench_ctrls').hasClass('in')) {
                 $("#workbench_ctrls").collapse("show");
             }
+        } else {
+            $('#workbench_ctrls_wrapper').slideDown();
         }
 
         // Activates the default transform operation
@@ -387,7 +386,6 @@ BEEwb.main = {
      removeAllSelections: function() {
 
         this.objects.children.forEach(function( obj ) {
-
             //sets the default color in the object
             obj.material.color = new THREE.Color(DEFAULT_COLOR) ;
         });
@@ -406,8 +404,8 @@ BEEwb.main = {
         $('#btn-rotate').removeClass('btn-primary');
         $('#btn-move').removeClass('btn-primary');
 
-        if ($('#workbench_ctrls_wrapper').css('display') != 'none') {
-            if ($('#workbench_ctrls').hasClass('in')) {
+        if ($('#workbench_ctrls_wrapper').is(':visible')) {
+            if ($("#workbench_ctrls").hasClass('in')) {
                 $("#workbench_ctrls").collapse('hide');
             }
         }

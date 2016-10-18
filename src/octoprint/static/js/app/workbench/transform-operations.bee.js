@@ -283,7 +283,6 @@ BEEwb.transformOps.duplicateModel = function(modelObj) {
         BEEwb.main.objects.add(objClone);
 
         // Runs the placeOnBed algorithm
-        BEEwb.main.removeAllSelections();
         BEEwb.main.selectModel(objClone);
         BEEwb.transformOps.placeOnBed();
     }
@@ -314,7 +313,6 @@ BEEwb.transformOps.cloneSelected = function() {
 
     if (BEEwb.main.selectedObject != null) {
         this.duplicateModel(BEEwb.main.selectedObject);
-
     }
 };
 
