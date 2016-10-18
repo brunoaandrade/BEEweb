@@ -49,6 +49,7 @@ BEEwb.events.onMouseUp = function( e ) {
 
     // Selects the first found intersection
     if (intersects.length > 0) {
+        BEEwb.main.removeAllSelections();
 
         var intersection = intersects[ 0 ];
         var model = intersection.object;
