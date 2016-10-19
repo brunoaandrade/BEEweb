@@ -106,5 +106,9 @@ BEEwb.events.onKeyDown = function( event ) {
         case 83: // S - Scale
             BEEwb.transformOps.activateScale();
             break;
+
+        case 67: // C - Clone model
+            BEEwb.transformOps.cloneSelected();
+            break;
     }
 };
