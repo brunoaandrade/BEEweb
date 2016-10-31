@@ -1178,6 +1178,12 @@ def _default_basedir(applicationName):
 		# True for expanding the tilde into a fully qualified path
 		return os.path.join(NSSearchPathForDirectoriesInDomains(14, 1, True)[0], applicationName)
 	elif sys.platform == "win32":
-		return os.path.join(os.environ["APPDATA"], applicationName)
+		# Custom install path for settings in desktop installation
+		path, filename = os.path.split(os.path.abspath(os.path.realpath(__file__)))
+		print 'Windows Desktop version settings path: ' + path + '\\..\\..\\..\\settings'
+		if os.path.join(os.path.realpath(__file__) + '\\..\\..\\..\\', 'settings'):
+			return os.path.join(os.path.realpath(__file__) + '\\..\\..\\..\\', 'settings')
+		else:
+			return os.path.join(os.environ["APPDATA"], applicationName)
 	else:
 		return os.path.expanduser(os.path.join("~", "." + applicationName.lower()))
