@@ -1181,7 +1181,7 @@ def _default_basedir(applicationName):
 		# Custom install path for settings in desktop installation
 		path, filename = os.path.split(os.path.abspath(os.path.realpath(__file__)))
 		print 'Windows Desktop version settings path: ' + path + '\\..\\..\\..\\settings'
-		if os.path.join(os.path.realpath(__file__) + '\\..\\..\\..\\', 'settings'):
+		if os.path.exists(os.path.join(os.path.realpath(__file__) + '\\..\\..\\..\\', 'settings')):
 			return os.path.join(os.path.realpath(__file__) + '\\..\\..\\..\\', 'settings')
 		else:
 			return os.path.join(os.environ["APPDATA"], applicationName)
