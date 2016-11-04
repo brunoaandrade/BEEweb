@@ -203,7 +203,8 @@ $(function() {
                 var options = {
                     title: gettext("Update Available"),
                     text: text,
-                    hide: false
+                    hide: false,
+                    type: 'info'
                 };
                 var eventListeners = {};
 

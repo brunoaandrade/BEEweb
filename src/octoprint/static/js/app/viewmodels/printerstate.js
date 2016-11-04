@@ -379,12 +379,15 @@ $(function() {
 
         self.cancel = function() {
             $('#job_cancel').prop('disabled', true);
+            $('#job_pause').prop('disabled', true);
+
             self._restoreShutdown();
             self.insufficientFilament(false);
 
             self._jobCommand("cancel", function() {
 
                 $('#job_cancel').prop('disabled', false);
+                $('#job_pause').prop('disabled', false);
 
                 // Hides the status panel
                 if ($("#state").hasClass('in')) {

@@ -194,6 +194,15 @@ class BeeCom(MachineCom):
             self._beeConn.close()
             self._changeState(self.STATE_CLOSED)
 
+    def _changeState(self, newState):
+        if self._state == newState:
+            return
+
+        oldState = self.getStateString()
+        self._state = newState
+        self._log('Changing monitoring state from \'%s\' to \'%s\'' % (oldState, self.getStateString()))
+        self._callback.on_comm_state_change(newState)
+
     def confirmConnection(self):
         """
         Confirms the connection changing the internal state of the printer

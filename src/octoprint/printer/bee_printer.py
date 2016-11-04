@@ -296,8 +296,13 @@ class BeePrinter(Printer):
         :return: float filament amount in mm
         """
         try:
-            return self._comm.getCommandsInterface().getFilamentInSpool()
+            filament = self._comm.getCommandsInterface().getFilamentInSpool()
+            if filament < 0:
+                # In case the value returned from the printer is not valid returns a high value to prevent false
+                # positives of not enough filament available
+                return 1000000.0
 
+            return filament
         except Exception as ex:
             self._logger.error(ex)
 
@@ -310,7 +315,7 @@ class BeePrinter(Printer):
         try:
             filament_mm = self._comm.getCommandsInterface().getFilamentInSpool()
 
-            if filament_mm:
+            if filament_mm > 0:
                 filament_cm = filament_mm / 10.0
 
                 filament_diameter, filament_density = self._getFilamentSettings()
@@ -321,7 +326,9 @@ class BeePrinter(Printer):
                 filament_weight = filament_volume * filament_density
                 return round(filament_weight, 2)
             else:
-                return 0.0
+                # In case the value returned from the printer is not valid returns a high value to prevent false
+                # positives of not enough filament available
+                return 1000.0
         except Exception as ex:
             self._logger.error(ex)
 
@@ -612,19 +619,19 @@ class BeePrinter(Printer):
          Callback method for the comm object, called upon any change in progress of the print job.
          Triggers storage of new values for printTime, printTimeLeft and the current progress.
         """
+        if self._comm is not None:
+            self._setProgressData(self.getPrintProgress(), self.getPrintFilepos(),
+                                  self._comm.getPrintTime(), self._comm.getCleanedPrintTime())
 
-        self._setProgressData(self.getPrintProgress(), self.getPrintFilepos(),
-                              self._comm.getPrintTime(), self._comm.getCleanedPrintTime())
+            # If the status from the printer is no longer printing runs the post-print trigger
+            if self.getPrintProgress() >= 1 \
+                    and self._comm.getCommandsInterface().isPreparingOrPrinting() is False:
 
-        # If the status from the printer is no longer printing runs the post-print trigger
-        if self.getPrintProgress() >= 1 \
-                and self._comm.getCommandsInterface().isPreparingOrPrinting() is False:
+                # Runs the print finish communications callback
+                self._comm.triggerPrintFinished()
 
-            # Runs the print finish communications callback
-            self._comm.triggerPrintFinished()
-
-            self._comm.getCommandsInterface().stopStatusMonitor()
-            self._runningCalibrationTest = False
+                self._comm.getCommandsInterface().stopStatusMonitor()
+                self._runningCalibrationTest = False
 
 
     def on_comm_file_selected(self, filename, filesize, sd):
@@ -651,6 +658,25 @@ class BeePrinter(Printer):
         Print cancelled callback for the EventManager.
         """
         self.unselect_file()
+
+    def on_comm_state_change(self, state):
+        """
+        Callback method for the comm object, called if the connection state changes.
+        """
+        oldState = self._state
+
+        # forward relevant state changes to gcode manager
+        if oldState == BeeCom.STATE_PRINTING:
+            self._analysisQueue.resume()  # printing done, put those cpu cycles to good use
+
+        elif state == BeeCom.STATE_PRINTING:
+            self._analysisQueue.pause()  # do not analyse files while printing
+
+        elif state == BeeCom.STATE_CLOSED or state == BeeCom.STATE_CLOSED_WITH_ERROR:
+            if self._comm is not None:
+                self._comm = None
+
+        self._setState(state)
 
     # # # # # # # # # # # # # # # # # # # # # # #
     ########### AUXILIARY FUNCTIONS #############
