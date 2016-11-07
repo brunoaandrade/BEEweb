@@ -148,7 +148,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 			git_exec = '..\\Git\\bin\\git.exe'
 			python_exec = '..\\Python27\\python.exe'
 
-			update_script_callable_beeweb = "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} --git={git_executable} --python={python_executable} {{folder}} {{target}}".format(
+			update_script_callable_beeweb = "\"{{python}}\" \"{update_script}\" --branch={{branch}} --force={{force}} --git={git_executable} --python={python_executable} {{folder}} {{target}}".format(
 				update_script=update_script,
 				git_executable=git_exec,
 				python_executable=python_exec)
