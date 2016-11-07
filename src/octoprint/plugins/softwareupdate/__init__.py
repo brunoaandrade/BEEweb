@@ -21,7 +21,7 @@ from . import version_checks, updaters, exceptions, util
 from octoprint.server.util.flask import restricted_access
 from octoprint.server import admin_permission, VERSION, REVISION, BRANCH
 from octoprint.util import dict_merge
-import octoprint.settings
+from octoprint.settings import settings
 
 
 ##~~ Plugin
@@ -142,17 +142,35 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 		configurationsReleaseBranch = "release/configurations"
 		update_script = os.path.join(self._basefolder, "scripts", "update-beeweb.py")
 		update_script_configurations = os.path.join(self._basefolder, "scripts", "update-beewebpi.py")
+
 		# in case of windows desktop installation
 		if sys.platform == "win32":
-			desktop_git_path = os.path.join(os.path.realpath(__file__) + '\\..\\..\\..\\..\\..\\..\\', 'Git')
-			git_exec = os.path.join(desktop_git_path, 'bin\\git.exe')
-			update_script_callable_beeweb = "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} --git={git_executable} \"{{folder}}\" {{target}}".format(
+			git_exec = os.path.join(settings().getBaseFolder('base') + '\\..\\Git\\bin', 'git.exe')
+			python_exec = os.path.join(settings().getBaseFolder('base') + '\\..\\Python27', 'python.exe')
+
+			update_script_callable_beeweb = "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} --git={git_executable} --python={python_executable} \"{{folder}}\" {{target}}".format(
 				update_script=update_script,
-				git_executable=git_exec)
-			update_script_callable_beewebpi = "{{python}} \"{update_script}\" --git={git_executable} \"{{folder}}\" {{target}} {release_branch}".format(
-				update_script=update_script_configurations,
-				release_branch=configurationsReleaseBranch,
-				git_executable=git_exec)
+				git_executable=git_exec,
+				python_executable=python_exec)
+
+			default_settings = {
+				"checks": {
+					"octoprint": {
+						"type": "github_release",
+						"user": "beeverycreative",
+						"repo": "BEEweb",
+						"update_script": update_script_callable_beeweb,
+						"restart": "octoprint",
+						"stable_branch": dict(branch="master", name="Stable"),
+						"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
+												dict(branch="rc/devel", name="Devel RCs")]
+					}
+				},
+				"pip_command": None,
+				"check_providers": {},
+
+				"cache_ttl": 24 * 60,
+			}
 		else:
 			update_script_callable_beeweb = "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} \"{{folder}}\" {{target}}".format(
 				update_script=update_script)
@@ -160,36 +178,33 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				update_script=update_script_configurations,
 				release_branch=configurationsReleaseBranch)
 
-		default_settings = {
-			"checks": {
-				"octoprint": {
-					"type": "github_release",
-					"user": "beeverycreative",
-					"repo": "BEEweb",
-					"update_script": update_script_callable_beeweb,
-					"restart": "octoprint",
-					"stable_branch": dict(branch="master", name="Stable"),
-					"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
-					                        dict(branch="rc/devel", name="Devel RCs")]
+			default_settings = {
+				"checks": {
+					"octoprint": {
+						"type": "github_release",
+						"user": "beeverycreative",
+						"repo": "BEEweb",
+						"update_script": update_script_callable_beeweb,
+						"restart": "octoprint",
+						"stable_branch": dict(branch="master", name="Stable"),
+						"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
+												dict(branch="rc/devel", name="Devel RCs")]
+					},
+					"BEEsoft configurations": {
+						"type": "github_commit",
+						"user": "beeverycreative",
+						"repo": "BEEwebPi",
+						"branch": configurationsReleaseBranch,
+						"update_script": update_script_callable_beewebpi,
+						"restart": "octoprint",
+						"checkout_folder": "/home/pi/beewebpi-repo" # default checkout path
+					},
 				},
-				"BEEsoft configurations": {
-					"type": "github_commit",
-					"user": "beeverycreative",
-					"repo": "BEEwebPi",
-					"branch": configurationsReleaseBranch,
-					"update_script": update_script_callable_beewebpi,
-					"restart": "octoprint",
-					"checkout_folder": "/home/pi/beewebpi-repo" # default checkout path
-				},
-			},
-			"pip_command": None,
-			"check_providers": {},
+				"pip_command": None,
+				"check_providers": {},
 
-			"cache_ttl": 24 * 60,
-		}
-
-		if sys.platform == 'win32':
-			default_settings['checks'].pop('BEEsoft configurations')
+				"cache_ttl": 24 * 60,
+			}
 
 		return default_settings
 
