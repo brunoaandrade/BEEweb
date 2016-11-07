@@ -160,7 +160,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				update_script=update_script_configurations,
 				release_branch=configurationsReleaseBranch)
 
-		return {
+		default_settings = {
 			"checks": {
 				"octoprint": {
 					"type": "github_release",
@@ -187,6 +187,11 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 
 			"cache_ttl": 24 * 60,
 		}
+
+		if sys.platform == 'win32':
+			default_settings['checks'].pop('BEEsoft configurations')
+
+		return default_settings
 
 	def on_settings_load(self):
 		data = dict(octoprint.plugin.SettingsPlugin.on_settings_load(self))
