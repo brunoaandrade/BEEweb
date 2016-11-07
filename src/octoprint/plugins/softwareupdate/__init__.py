@@ -13,6 +13,7 @@ import os
 import threading
 import time
 import hashlib
+import sys
 
 from . import version_checks, updaters, exceptions, util
 
@@ -140,6 +141,24 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 	def get_settings_defaults(self):
 		configurationsReleaseBranch = "release/configurations"
 		update_script = os.path.join(self._basefolder, "scripts", "update-beeweb.py")
+		update_script_configurations = os.path.join(self._basefolder, "scripts", "update-beewebpi.py")
+		# in case of windows desktop installation
+		if sys.platform == "win32":
+			desktop_git_path = os.path.join(os.path.realpath(__file__) + '\\..\\..\\..\\..\\..\\..\\', 'Git')
+			git_exec = os.path.join(desktop_git_path, 'bin\\git.exe')
+			update_script_callable_beeweb = "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} --git={git_executable} \"{{folder}}\" {{target}}".format(
+				update_script=update_script,
+				git_executable=git_exec)
+			update_script_callable_beewebpi = "{{python}} \"{update_script}\" --git={git_executable} \"{{folder}}\" {{target}} {release_branch}".format(
+				update_script=update_script_configurations,
+				release_branch=configurationsReleaseBranch,
+				git_executable=git_exec)
+		else:
+			update_script_callable_beeweb = "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} \"{{folder}}\" {{target}}".format(
+				update_script=update_script)
+			update_script_callable_beewebpi = "{{python}} \"{update_script}\" \"{{folder}}\" {{target}} {release_branch}".format(
+				update_script=update_script_configurations,
+				release_branch=configurationsReleaseBranch)
 
 		return {
 			"checks": {
@@ -147,7 +166,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 					"type": "github_release",
 					"user": "beeverycreative",
 					"repo": "BEEweb",
-					"update_script": "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} \"{{folder}}\" {{target}}".format(update_script=update_script),
+					"update_script": update_script_callable_beeweb,
 					"restart": "octoprint",
 					"stable_branch": dict(branch="master", name="Stable"),
 					"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
@@ -158,9 +177,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 					"user": "beeverycreative",
 					"repo": "BEEwebPi",
 					"branch": configurationsReleaseBranch,
-					"update_script": "{{python}} \"{update_script}\" \"{{folder}}\" {{target}} {release_branch}".format(
-						update_script=os.path.join(self._basefolder, "scripts", "update-beewebpi.py"),
-						release_branch=configurationsReleaseBranch),
+					"update_script": update_script_callable_beewebpi,
 					"restart": "octoprint",
 					"checkout_folder": "/home/pi/beewebpi-repo" # default checkout path
 				},
@@ -666,7 +683,10 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				if restart_command is not None:
 					self._send_client_message("restarting", dict(restart_type=restart_type, results=target_results))
 					try:
-						self._perform_restart(restart_command)
+						if sys.platform == 'win32':
+							self._perform_restart_win32(restart_command)
+						else:
+							self._perform_restart(restart_command)
 					except exceptions.RestartFailed:
 						self._send_client_message("restart_failed", dict(restart_type=restart_type, results=target_results))
 				else:
@@ -749,6 +769,23 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 		try:
 			util.execute(restart_command)
 		except exceptions.ScriptError as e:
+			self._logger.exception("Error while restarting")
+			self._logger.warn("Restart stdout:\n%s" % e.stdout)
+			self._logger.warn("Restart stderr:\n%s" % e.stderr)
+			raise exceptions.RestartFailed()
+
+	def _perform_restart_win32(self, service_name):
+		"""
+		Performs a restart of the choosen service.
+		"""
+
+		self._logger.info("Restarting Win32 service...")
+		try:
+			import win32serviceutil
+			win32serviceutil.StopService(service_name)
+			win32serviceutil.StartService(service_name)
+
+		except Exception as e:
 			self._logger.exception("Error while restarting")
 			self._logger.warn("Restart stdout:\n%s" % e.stdout)
 			self._logger.warn("Restart stderr:\n%s" % e.stderr)

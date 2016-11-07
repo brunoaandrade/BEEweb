@@ -50,7 +50,7 @@ def _git(args, cwd, hide_stderr=False, verbose=False, git_executable=None):
 
 	return p.returncode, stdout
 
-def update_source(git_executable, folder, target, branch, force=False):
+def _rescue_changes(git_executable, folder):
 	print(">>> Running: git diff --shortstat")
 	returncode, stdout = _git(["diff", "--shortstat"], folder, git_executable=git_executable)
 	if returncode != 0:
@@ -70,10 +70,29 @@ def update_source(git_executable, folder, target, branch, force=False):
 		with open(patch, "wb") as f:
 			f.write(stdout)
 
+		return True
+
+	return False
+
+
+def update_source(git_executable, folder, target, force=False, branch=None):
+	if _rescue_changes(git_executable, folder):
 		print(">>> Running: git reset --hard")
 		returncode, stdout = _git(["reset", "--hard"], folder, git_executable=git_executable)
 		if returncode != 0:
 			raise RuntimeError("Could not update, \"git reset --hard\" failed with returncode %d: %s" % (returncode, stdout))
+
+	print(">>> Running: git fetch")
+	returncode, stdout = _git(["fetch"], folder, git_executable=git_executable)
+	if returncode != 0:
+		raise RuntimeError("Could not update, \"git fetch\" failed with returncode %d: %s" % (returncode, stdout))
+	print(stdout)
+
+	if branch is not None and branch.strip() != "":
+		print(">>> Running: git checkout {}".format(branch))
+		returncode, stdout = _git(["checkout", branch], folder, git_executable=git_executable)
+		if returncode != 0:
+			raise RuntimeError("Could not update, \"git checkout\" failed with returncode %d: %s" % (returncode, stdout))
 
 	print(">>> Running: git pull")
 	returncode, stdout = _git(["pull"], folder, git_executable=git_executable)
@@ -81,14 +100,8 @@ def update_source(git_executable, folder, target, branch, force=False):
 		raise RuntimeError("Could not update, \"git pull\" failed with returncode %d: %s" % (returncode, stdout))
 	print(stdout)
 
-	print(">>> Running: git checkout")
-	returncode, stdout = _git(["checkout", branch], folder, git_executable=git_executable)
-	if returncode != 0:
-		raise RuntimeError("Could not update, \"git checkout %s\" failed with returncode %d: %s" % (branch, returncode, stdout))
-	print(stdout)
-
 	if force:
-		reset_command = ["reset"]
+		reset_command = ["reset", "--hard"]
 		reset_command += [target]
 
 		print(">>> Running: git %s" % " ".join(reset_command))
@@ -97,6 +110,7 @@ def update_source(git_executable, folder, target, branch, force=False):
 			raise RuntimeError("Error while updating, \"git %s\" failed with returncode %d: %s" % (" ".join(reset_command), returncode, stdout))
 		print(stdout)
 
+## CUSTOM FUNCTIONS ##
 def install_support_files(folder, target_folder):
 	print(">>> Copying BEEweb settings files to installation directory...")
 	settings_folder_path = folder + '/src/filesystem/home/pi/.beeweb'
@@ -116,31 +130,36 @@ def install_support_files(folder, target_folder):
 	finally:
 		if files_copied:
 			print("BEEweb settings files copied!")
-	try:
-		# copies the files in the /etc directory
-		copy_tree(folder + '/src/filesystem/root/etc/default', '/etc/default')
-		copy_tree(folder + '/src/filesystem/root/etc/haproxy', '/etc/haproxy')
-		copy_tree(folder + '/src/filesystem/root/etc/init.d', '/etc/init.d')
-		copy_tree(folder + '/src/filesystem/root/etc/init.d', '/etc/hostapd')
 
-	except Exception as ex:
-		raise RuntimeError(
-			"Could not update, copying the system files to /etc directories failed with error: %s" % ex.message)
-	finally:
-		if files_copied:
-			print("BEEwebPi system files copied!")
+	if sys.platform != "win32" and sys.platform != "darwin":
+		try:
+			# copies the files in the /etc directory
+			copy_tree(folder + '/src/filesystem/root/etc/default', '/etc/default')
+			copy_tree(folder + '/src/filesystem/root/etc/haproxy', '/etc/haproxy')
+			copy_tree(folder + '/src/filesystem/root/etc/init.d', '/etc/init.d')
+			copy_tree(folder + '/src/filesystem/root/etc/init.d', '/etc/hostapd')
+
+		except Exception as ex:
+			raise RuntimeError(
+				"Could not update, copying the system files to /etc directories failed with error: %s" % ex.message)
+		finally:
+			if files_copied:
+				print("BEEwebPi system files copied!")
 
 def parse_arguments():
 	import argparse
+	boolean_trues = ["true", "yes", "1"]
+	boolean_falses = ["false", "no", "0"]
 
 	parser = argparse.ArgumentParser(prog="update-beewebpi.py")
 
 	parser.add_argument("--git", action="store", type=str, dest="git_executable",
 	                    help="Specify git executable to use")
-	parser.add_argument("--force", action="store_true", dest="force",
-	                    help="Set this to force the update to only the specified version (nothing newer)")
+	parser.add_argument("--force", action="store", type=lambda x: x in boolean_trues,
+	                    dest="force", default=False,
+	                    help="Set this to true to force the update to only the specified version (nothing newer, nothing older)")
 	parser.add_argument("folder", type=str,
-	                    help="Specify the base folder of the BEEsoft installation to update")
+	                    help="Specify the base folder of the BEEsoft configurations installation to update")
 	parser.add_argument("target", type=str,
 	                    help="Specify the commit or tag to which to update")
 	parser.add_argument("branch", type=str,
@@ -167,7 +186,7 @@ def main():
 	# folder where the installation settings files are located
 	target_folder = settings(init=True).getBaseFolder('base')
 
-	update_source(git_executable, folder, target, branch, force=args.force)
+	update_source(git_executable, folder, target, force=args.force, branch=branch)
 	install_support_files(folder, target_folder)
 
 if __name__ == "__main__":
