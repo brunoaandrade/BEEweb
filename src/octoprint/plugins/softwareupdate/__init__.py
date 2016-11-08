@@ -801,6 +801,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 		# Forcefully terminates the whole server using the "hammer"...
 		# due to the impossibility of restarting the service from within the server itself, we must kill the process
 		# and wait for the service respawn to do its job...
+		import time
+		time.sleep(3) # makes a pause to allow the user to see the message
 		os._exit(1)
 
 	def _populated_check(self, target, check):
