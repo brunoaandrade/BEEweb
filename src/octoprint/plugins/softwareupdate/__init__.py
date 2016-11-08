@@ -796,15 +796,21 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 
 	def _perform_restart_win32(self, service_name):
 		"""
-		Performs a restart of the choosen service.
+		Performs a restart of the chosen service when running in a Windows system.
 		"""
 
 		self._logger.info("Restarting Win32 service...")
 		try:
-			import win32serviceutil
-			win32serviceutil.StopService(service_name)
-			win32serviceutil.StartService(service_name)
+			from .util import execute
+			restart_script_path = os.path.join(self._basefolder, "scripts", "restart-beeweb-win32.py")
+			restart_command = "\"{{python}}\" \"{restart_script}\" {{service_name}}".format(
+				restart_script=restart_script_path,
+			 	python=sys.executable,
+			  	service_name=service_name
+			)
 
+			self._logger.info("Running servoce restart script: %s" % restart_command)
+			execute(restart_command)
 		except Exception as e:
 			self._logger.exception("Error while restarting")
 			self._logger.warn("Restart stdout:\n%s" % e.stdout)
