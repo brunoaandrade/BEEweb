@@ -1,4 +1,5 @@
 import win32serviceutil
+import time
 
 def parse_arguments():
 	import argparse
@@ -16,10 +17,19 @@ def main():
 
 	try:
 		win32serviceutil.StopService(args.service_name)
-		win32serviceutil.StartService(args.service_name)
+
 	except Exception as ex:
 		import traceback
 		traceback.print_exc()
+
+	time.sleep(3)
+	try:
+		win32serviceutil.StartService(args.service_name)
+
+	except Exception as ex:
+		import traceback
+		traceback.print_exc()
+
 
 if __name__ == "__main__":
 	main()
