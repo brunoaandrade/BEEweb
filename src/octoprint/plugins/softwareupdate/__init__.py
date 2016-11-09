@@ -802,7 +802,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 		# due to the impossibility of restarting the service from within the server itself, we must kill the process
 		# and wait for the service respawn to do its job...
 		import time
-		time.sleep(3) # makes a pause to allow the user to see the message
+		time.sleep(5) # makes a pause to allow the user to see the message
 		os._exit(1)
 
 	def _populated_check(self, target, check):
