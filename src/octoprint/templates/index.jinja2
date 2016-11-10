@@ -59,6 +59,7 @@
                                     <a id="state-header-link" class="accordion-toggle collapsed" data-toggle="collapse" data-target="#state">
                                         <img data-bind="attr:{ 'src': printerLogo }" />
                                         <strong data-bind="text: stateString, css: stateClass" class="printer-status"></strong>
+                                        <img data-bind="visible: isHeating()" src="/static/img/heating.gif" style="width: 40px;"/>
                                     </a>
                                     {% if "template_header" in data %}
                                         {% try "There was an error with the template {filename} at line number {lineno}: {exception}" %}{% include data.template_header ignore missing %}{% endtry %}

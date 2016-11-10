@@ -596,7 +596,7 @@ class BeePrinter(Printer):
          Returns a human readable string corresponding to the current communication state.
         """
         if self._comm is None:
-            return "Waiting for printer connection..."
+            return "Connecting..."
         else:
             return self._comm.getStateString()
 
