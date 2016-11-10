@@ -194,6 +194,9 @@ class BeeCom(MachineCom):
         :param kwargs:
         :return:
         """
+        if self._beeCommands is not None:
+            self._beeCommands.stopStatusMonitor()
+
         if self._beeConn is not None:
             self._beeConn.close()
             self._changeState(self.STATE_CLOSED)
@@ -355,9 +358,13 @@ class BeeCom(MachineCom):
                     except:
                         pass
 
+            filename = '' # to prevent exception throwing when for some reason the was already deselected
+            if self._currentFile is not None:
+                filename = self._currentFile.getFilename()
+
             payload = {
-                "file": self._currentFile.getFilename(),
-                "filename": os.path.basename(self._currentFile.getFilename()),
+                "file": filename,
+                "filename": os.path.basename(filename),
                 "origin": self._currentFile.getFileLocation(),
                 "firmwareError": firmware_error
             }
@@ -397,6 +404,9 @@ class BeeCom(MachineCom):
 
             # resumes printing
             self._beeCommands.resumePrint()
+
+            # restarts the progress monitor thread
+            self._beeCommands.startStatusMonitor(self._statusProgressQueueCallback)
 
             self._changeState(self.STATE_PRINTING)
 
