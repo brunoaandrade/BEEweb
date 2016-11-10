@@ -11,6 +11,7 @@ from octoprint.settings import settings
 from octoprint.server.util.connection_util import detect_bvc_printer_connection
 from octoprint.events import eventManager, Events
 from octoprint.slicing import SlicingManager
+from octoprint.filemanager import FileDestinations
 
 __author__ = "BEEVC - Electronic Systems "
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
@@ -65,9 +66,12 @@ class BeePrinter(Printer):
         self._printerProfileManager.select(printer_id)
 
         # if the printer is printing or in shutdown mode selects the last selected file for print
+        # and starts the progress monitor
         lastFile = settings().get(['lastPrintJobFile'])
         if lastFile is not None and (self.is_shutdown() or self.is_printing()):
             self.select_file(lastFile, False)
+
+            self._comm.startPrintStatusProgressMonitor()
 
         # gets current Filament profile data
         self._currentFilamentProfile = self.getSelectedFilamentProfile()
@@ -90,7 +94,28 @@ class BeePrinter(Printer):
 
 
     def select_file(self, path, sd, printAfterSelect=False, pos=None):
-        super(BeePrinter, self).select_file(path, sd, printAfterSelect, pos)
+
+        if self._comm is None:
+            self._logger.info("Cannot load file: printer not connected or currently busy")
+            return
+
+        recovery_data = self._fileManager.get_recovery_data()
+        if recovery_data:
+            # clean up recovery data if we just selected a different file than is logged in that
+            expected_origin = FileDestinations.SDCARD if sd else FileDestinations.LOCAL
+            actual_origin = recovery_data.get("origin", None)
+            actual_path = recovery_data.get("path", None)
+
+            if actual_origin is None or actual_path is None or actual_origin != expected_origin or actual_path != path:
+                self._fileManager.delete_recovery_data()
+
+        self._printAfterSelect = printAfterSelect
+        self._posAfterSelect = pos
+        self._comm.selectFile("/" + path if sd and not settings().getBoolean(["feature", "sdRelativePath"]) else path, sd)
+
+        if not self._comm.isPrinting() and not self._comm.isShutdown():
+            self._setProgressData(completion=0)
+            self._setCurrentZ(None)
 
         # saves the path to the selected file
         settings().set(['lastPrintJobFile'], path)

@@ -358,16 +358,21 @@ class BeeCom(MachineCom):
                     except:
                         pass
 
-            filename = '' # to prevent exception throwing when for some reason the was already deselected
+            # protects against any unexpected null selectedFile
             if self._currentFile is not None:
-                filename = self._currentFile.getFilename()
-
-            payload = {
-                "file": filename,
-                "filename": os.path.basename(filename),
-                "origin": self._currentFile.getFileLocation(),
-                "firmwareError": firmware_error
-            }
+                payload = {
+                    "file": self._currentFile.getFilename(),
+                    "filename": os.path.basename(self._currentFile.getFilename()),
+                    "origin": self._currentFile.getFileLocation(),
+                    "firmwareError": firmware_error
+                }
+            else:
+                payload = {
+                    "file": None,
+                    "filename": '',
+                    "origin": '',
+                    "firmwareError": firmware_error
+                }
 
             eventManager().fire(Events.PRINT_CANCELLED, payload)
 
@@ -406,7 +411,7 @@ class BeeCom(MachineCom):
             self._beeCommands.resumePrint()
 
             # restarts the progress monitor thread
-            self._beeCommands.startStatusMonitor(self._statusProgressQueueCallback)
+            self.startPrintStatusProgressMonitor()
 
             self._changeState(self.STATE_PRINTING)
 
@@ -519,6 +524,39 @@ class BeeCom(MachineCom):
         self._callback.on_comm_file_transfer_done(remote)
         eventManager().fire(Events.TRANSFER_DONE, payload)
         self.refreshSdFiles()
+
+    def startPrintStatusProgressMonitor(self):
+        """
+        Starts the monitor thread that keeps track of the print progress
+        :return:
+        """
+        if self._beeCommands is not None:
+            # starts the progress status thread
+            self._beeCommands.startStatusMonitor(self._statusProgressQueueCallback)
+
+    def selectFile(self, filename, sd):
+        """
+        Overrides the original selectFile method to allow to select files when printer is busy. For example
+        when reconnecting after connection was lost and the printer is still printing
+        :param filename:
+        :param sd:
+        :return:
+        """
+        if sd:
+            if not self.isOperational():
+                # printer is not connected, can't use SD
+                return
+            self._sdFileToSelect = filename
+            self.sendCommand("M23 %s" % filename)
+        else:
+            self._currentFile = comm.PrintingGcodeFileInformation(filename, offsets_callback=self.getOffsets,
+                                                             current_tool_callback=self.getCurrentTool)
+            eventManager().fire(Events.FILE_SELECTED, {
+                "file": self._currentFile.getFilename(),
+                "filename": os.path.basename(self._currentFile.getFilename()),
+                "origin": self._currentFile.getFileLocation()
+            })
+            self._callback.on_comm_file_selected(filename, self._currentFile.getFilesize(), False)
 
     def getPrintProgress(self):
         """
@@ -851,7 +889,7 @@ class BeeCom(MachineCom):
         self._sendUsageStatistics('start')
 
         # starts the progress status thread
-        self._beeCommands.startStatusMonitor(self._statusProgressQueueCallback)
+        self.startPrintStatusProgressMonitor()
 
         if self._heatupWaitStartTime is not None:
             self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
