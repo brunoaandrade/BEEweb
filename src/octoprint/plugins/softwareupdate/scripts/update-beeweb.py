@@ -156,7 +156,7 @@ def install_source(python_executable, folder, user=False, sudo=False):
 	settings_folder = settings(init=True).getBaseFolder('base')
 	try:
 		# copies the files in the /etc directory
-		copy_tree(folder + '/firmware', settings_folder + 'firmware')
+		copy_tree(folder + '/firmware', settings_folder + '/firmware')
 	except Exception as ex:
 		raise RuntimeError(
 			"Could not update, copying the firmware files to respective settings directory failed with error: %s" % ex.message)
