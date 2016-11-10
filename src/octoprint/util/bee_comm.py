@@ -50,8 +50,8 @@ class BeeCom(MachineCom):
         :return: True if the connection was successful
         """
         if self._beeConn is None:
-            self._changeState(self.STATE_CONNECTING)
             self._beeConn = BeePrinterConn(self._connShutdownHook)
+            self._changeState(self.STATE_CONNECTING)
             self._beeConn.connectToFirstPrinter()
 
         if self._beeConn.isConnected():
@@ -180,6 +180,10 @@ class BeeCom(MachineCom):
                     if "Error" in r:
                         self._logger.warning(r)
 
+                return True
+            else:
+                return False
+
     def close(self, is_error=False, wait=True, timeout=10.0, *args, **kwargs):
         """
         Closes the connection to the printer if it's active
@@ -230,7 +234,7 @@ class BeeCom(MachineCom):
 
     def getConnectedPrinterSN(self):
         """
-        Returns the current connected printer serial nu,ber
+        Returns the current connected printer serial number
         :return:
         """
         if self._beeConn is not None:
@@ -296,15 +300,7 @@ class BeeCom(MachineCom):
             raise ValueError("No file selected for printing")
 
         try:
-            self._currentFile.start()
-
-            payload = {
-                "file": self._currentFile.getFilename(),
-                "filename": os.path.basename(self._currentFile.getFilename()),
-                "origin": self._currentFile.getFileLocation()
-            }
-
-            eventManager().fire(Events.PRINT_STARTED, payload)
+            self._changeState(self.STATE_PREPARING_PRINT)
 
             if self.isSdFileSelected():
                 print_resp = self._beeCommands.startSDPrint(self._currentFile.getFilename())
@@ -313,10 +309,9 @@ class BeeCom(MachineCom):
                     self._sd_status_timer = RepeatedTimer(self._timeout_intervals.get("sdStatus", 1.0), self._poll_sd_status, run_first=True)
                     self._sd_status_timer.start()
             else:
-                print_resp = self._beeCommands.printFile(payload['file'])
+                print_resp = self._beeCommands.printFile(self._currentFile.getFilename())
 
             if print_resp is True:
-                self._changeState(self.STATE_PREPARING_PRINT)
                 self._heatupWaitStartTime = time.time()
                 self._heatupWaitTimeLost = 0.0
                 self._pauseWaitStartTime = 0
@@ -328,14 +323,15 @@ class BeeCom(MachineCom):
                 self._prepare_print_thread.daemon = True
                 self._prepare_print_thread.start()
             else:
-                self._logger.exception("Error while preparing the printing operation.")
+                self._errorValue = "Error while preparing the printing operation."
+                self._logger.exception(self._errorValue)
                 self._changeState(self.STATE_ERROR)
                 eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
                 return
 
         except:
-            self._logger.exception("Error while trying to start printing")
             self._errorValue = get_exception_string()
+            self._logger.exception("Error while trying to start printing: " + self.getErrorString())
             self._changeState(self.STATE_ERROR)
             eventManager().fire(Events.ERROR, {"error": self.getErrorString()})
 
@@ -370,7 +366,11 @@ class BeeCom(MachineCom):
 
             # sends usage statistics
             self._sendUsageStatistics('cancel')
+        else:
 
+            self._logger.exception("Error while canceling the print operation.")
+            eventManager().fire(Events.ERROR, {"error": "Error canceling print"})
+            return
 
     def setPause(self, pause):
         """
@@ -395,20 +395,20 @@ class BeeCom(MachineCom):
                 self._pauseWaitTimeLost = self._pauseWaitTimeLost + (time.time() - self._pauseWaitStartTime)
                 self._pauseWaitStartTime = None
 
-            self._changeState(self.STATE_PRINTING)
-
             # resumes printing
             self._beeCommands.resumePrint()
+
+            self._changeState(self.STATE_PRINTING)
 
             eventManager().fire(Events.PRINT_RESUMED, payload)
         elif pause and self.isPrinting():
             if not self._pauseWaitStartTime:
                 self._pauseWaitStartTime = time.time()
 
-            self._changeState(self.STATE_PAUSED)
-
             # pause print
             self._beeCommands.pausePrint()
+
+            self._changeState(self.STATE_PAUSED)
 
             eventManager().fire(Events.PRINT_PAUSED, payload)
 
@@ -429,10 +429,10 @@ class BeeCom(MachineCom):
             "origin": self._currentFile.getFileLocation()
         }
 
-        self._changeState(self.STATE_SHUTDOWN)
-
         # enter shutdown mode
         self._beeCommands.enterShutdown()
+
+        self._changeState(self.STATE_SHUTDOWN)
 
         eventManager().fire(Events.POWER_OFF, payload)
 
@@ -817,14 +817,25 @@ class BeeCom(MachineCom):
         """
         # waits for heating/file transfer
         while self._beeCommands.isTransferring():
-            time.sleep(2)
+            time.sleep(1)
 
         self._changeState(self.STATE_HEATING)
 
         while self._beeCommands.isHeating():
-            time.sleep(2)
+            time.sleep(1)
 
         self._changeState(self.STATE_PRINTING)
+
+        # Starts the real printing operation
+        self._currentFile.start()
+
+        payload = {
+            "file": self._currentFile.getFilename(),
+            "filename": os.path.basename(self._currentFile.getFilename()),
+            "origin": self._currentFile.getFileLocation()
+        }
+
+        eventManager().fire(Events.PRINT_STARTED, payload)
 
         # sends usage statistics
         self._sendUsageStatistics('start')
@@ -847,15 +858,16 @@ class BeeCom(MachineCom):
         biExePath = settings().getBaseFolder('bi') + '/bi_azure'
 
         if operation != 'start' and operation != 'cancel' and operation != 'stop':
-            return
+            return False
 
-        printerSN = self.getConnectedPrinterSN()
+        if os.path.exists(biExePath) and os.path.isfile(biExePath):
 
-        if printerSN is None:
-            _logger.warn("Could not get Printer Serial Number for statistics communication.")
-        else:
-            if os.path.exists(biExePath) and os.path.isfile(biExePath):
+            printerSN = self.getConnectedPrinterSN()
 
+            if printerSN is None:
+                _logger.error("Could not get Printer Serial Number for statistics communication.")
+                return False
+            else:
                 cmd = '%s %s %s' % (biExePath,str(printerSN), str(operation))
                 _logger.info(u"Running %s" % cmd)
 

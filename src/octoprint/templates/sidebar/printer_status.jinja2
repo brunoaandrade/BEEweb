@@ -32,7 +32,8 @@
 
 <div class="row-fluid print-control" style="display: none;" data-bind="visible: loginState.isUser">
     <div class="span3">
-        <button id="job_print" class="btn btn-primary span12" data-bind="click: print, visible: enablePrint() && (!isPaused() && !isShutdown()), css: {'btn-info': isPaused()}, attr: {title: titlePrintButton}" >
+        <button id="job_print" class="btn btn-primary span12"
+        data-bind="click: print, visible: enablePrint() && (!isPaused() && !isShutdown()), css: {'btn-info': isPaused()}, attr: {title: titlePrintButton}" >
             <i data-bind="css: {'icon-print': !isPaused(), 'icon-undo': isPaused()}"></i>
             <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
         </button>
