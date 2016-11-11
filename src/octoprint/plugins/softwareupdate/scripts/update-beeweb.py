@@ -163,6 +163,26 @@ def install_source(python_executable, folder, user=False, sudo=False):
 	finally:
 		print("Firmware files installed.")
 
+	if sys.platform == "win32":
+		print(">>> Removing client cache files...")
+
+		try:
+			import os
+			from glob import glob
+			from shutil import rmtree
+
+			pattern = os.path.join(os.environ["APPDATA"], "beesoft-nativefier*")
+
+			for item in glob(pattern):
+				if not os.path.isdir(item):
+					continue
+				rmtree(item)
+
+		except Exception as ex:
+			raise RuntimeError(
+				"Could not remove the cache files from client app: %s" % ex.message)
+		finally:
+			print("Cache files removed.")
 
 def parse_arguments():
 	import argparse
