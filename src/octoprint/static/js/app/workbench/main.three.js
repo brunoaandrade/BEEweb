@@ -227,7 +227,7 @@ BEEwb.main = {
             BEEwb.helpers.centerModelBasedOnBoundingBox(geometry);
 
             // Calculates any possible translation in the X axis due to the previously loaded model
-            xShift = BEEwb.helpers.calculateObjectShift( bbox );
+            var xShift = BEEwb.helpers.calculateObjectShift( bbox );
 
             var mesh = new THREE.Mesh( geometry, material );
             mesh.position.set( xShift, 0, 0 );
