@@ -151,6 +151,7 @@ def install_source(python_executable, folder, user=False, sudo=False):
 	print(stdout)
 
 
+	# Copies the firmware files to the settings directory
 	print(">>> Copying Firmware files to settings directory...")
 	# folder where the installation settings files are located
 	settings_folder = settings(init=True).getBaseFolder('base')
@@ -163,9 +164,10 @@ def install_source(python_executable, folder, user=False, sudo=False):
 	finally:
 		print("Firmware files installed.")
 
+
+	# If the update is running on Windows tries to remove cache files from the client app
 	if sys.platform == "win32":
 		print(">>> Removing client cache files...")
-
 		try:
 			import os
 			from glob import glob
