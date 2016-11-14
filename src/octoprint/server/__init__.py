@@ -583,6 +583,9 @@ class Server(object):
 			"formatters": {
 				"simple": {
 					"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+				},
+				"serial": {
+					"format": "%(asctime)s - %(message)s"
 				}
 			},
 			"handlers": {
@@ -593,18 +596,18 @@ class Server(object):
 					"stream": "ext://sys.stdout"
 				},
 				"file": {
-					"class": "logging.handlers.TimedRotatingFileHandler",
+					"class": "octoprint.logging.handlers.CleaningTimedRotatingFileHandler",
 					"level": "DEBUG",
 					"formatter": "simple",
 					"when": "D",
-					"backupCount": "1",
+					"backupCount": 6,
 					"filename": os.path.join(settings().getBaseFolder("logs"), "octoprint.log")
 				},
 				"serialFile": {
-					"class": "logging.handlers.RotatingFileHandler",
+					"class": "octoprint.logging.handlers.SerialLogHandler",
 					"level": "DEBUG",
-					"formatter": "simple",
-					"maxBytes": 2 * 1024 * 1024, # let's limit the serial log to 2MB in size
+					"formatter": "serial",
+					"backupCount": 3,
 					"filename": os.path.join(settings().getBaseFolder("logs"), "serial.log")
 				}
 			},
@@ -652,7 +655,6 @@ class Server(object):
 		if settings().getBoolean(["serial", "log"]):
 			# enable debug logging to serial.log
 			logging.getLogger("SERIAL").setLevel(logging.DEBUG)
-			logging.getLogger("SERIAL").debug("Enabling serial logging")
 
 	def _setup_app(self, app):
 		from octoprint.server.util.flask import ReverseProxiedEnvironment, OctoPrintFlaskRequest, OctoPrintFlaskResponse
@@ -1034,7 +1036,8 @@ class Server(object):
 		enable_gcodeviewer = settings().getBoolean(["gcodeViewer", "enabled"])
 		preferred_stylesheet = settings().get(["devel", "stylesheet"])
 
-		dynamic_assets = util.flask.collect_plugin_assets(
+		dynamic_core_assets = util.flask.collect_core_assets(enable_gcodeviewer=enable_gcodeviewer)
+		dynamic_plugin_assets = util.flask.collect_plugin_assets(
 			enable_gcodeviewer=enable_gcodeviewer,
 			preferred_stylesheet=preferred_stylesheet
 		)
@@ -1070,11 +1073,15 @@ class Server(object):
 			"js/lib/loglevel.min.js",
 			"js/lib/sockjs-0.3.4.min.js"
 		]
-		js_app = dynamic_assets["js"] + [
-			"js/app/dataupdater.js",
-			"js/app/helpers.js",
-			"js/app/main.js",
-		]
+		js_core = dynamic_core_assets["js"] + \
+		    dynamic_plugin_assets["bundled"]["js"] + \
+		    ["js/app/dataupdater.js",
+		     "js/app/helpers.js",
+		     "js/app/main.js"]
+		js_plugins = dynamic_plugin_assets["external"]["js"]
+		if len(js_plugins) == 0:
+			js_plugins = ["empty"]
+		js_app = js_plugins + js_core
 
 		threejs_libs = [
 			"js/lib/threejs/three.min.js",
@@ -1102,13 +1109,21 @@ class Server(object):
 			"css/pnotify.min.css",
 			"css/bee.css",
 		]
-		css_app = list(dynamic_assets["css"])
-		if len(css_app) == 0:
-			css_app = ["empty"]
+		css_core = list(dynamic_core_assets["css"]) + list(dynamic_plugin_assets["bundled"]["css"])
+		if len(css_core) == 0:
+			css_core = ["empty"]
+		css_plugins = list(dynamic_plugin_assets["external"]["css"])
+		if len(css_plugins) == 0:
+			css_plugins = ["empty"]
+		css_app = css_core + css_plugins
 
-		less_app = list(dynamic_assets["less"])
-		if len(less_app) == 0:
-			less_app = ["empty"]
+		less_core = list(dynamic_core_assets["less"]) + list(dynamic_plugin_assets["bundled"]["less"])
+		if len(less_core) == 0:
+			less_core = ["empty"]
+		less_plugins = list(dynamic_plugin_assets["external"]["less"])
+		if len(less_plugins) == 0:
+			less_plugins = ["empty"]
+		less_app = less_core + less_plugins
 
 		from webassets.filter import register_filter, Filter
 		from webassets.filter.cssrewrite.base import PatternRewriter
@@ -1129,7 +1144,7 @@ class Server(object):
 
 				return "{import_with_options}\"{import_url}\";".format(**locals())
 
-		class JsDelimiterBundle(Filter):
+		class JsDelimiterBundler(Filter):
 			name = "js_delimiter_bundler"
 			options = {}
 			def input(self, _in, out, **kwargs):
@@ -1137,27 +1152,45 @@ class Server(object):
 				out.write("\n;\n")
 
 		register_filter(LessImportRewrite)
-		register_filter(JsDelimiterBundle)
+		register_filter(JsDelimiterBundler)
 
+		# JS
 		js_libs_bundle = Bundle(*js_libs, output="webassets/packed_libs.js", filters="js_delimiter_bundler")
 		threejs_libs_bundle = Bundle(*threejs_libs, output="webassets/three_libs.js", filters="js_delimiter_bundler")
 
 		if settings().getBoolean(["devel", "webassets", "minify"]):
+			js_core_bundle = Bundle(*js_core, output="webassets/packed_core.js", filters="rjsmin, js_delimiter_bundler")
+			js_plugins_bundle = Bundle(*js_plugins, output="webassets/packed_plugins.js", filters="rjsmin, js_delimiter_bundler")
 			js_app_bundle = Bundle(*js_app, output="webassets/packed_app.js", filters="rjsmin, js_delimiter_bundler")
 		else:
+			js_core_bundle = Bundle(*js_core, output="webassets/packed_core.js", filters="js_delimiter_bundler")
+			js_plugins_bundle = Bundle(*js_plugins, output="webassets/packed_plugins.js", filters="js_delimiter_bundler")
 			js_app_bundle = Bundle(*js_app, output="webassets/packed_app.js", filters="js_delimiter_bundler")
 
+		# CSS
 		css_libs_bundle = Bundle(*css_libs, output="webassets/packed_libs.css")
+		css_core_bundle = Bundle(*css_core, output="webassets/packed_core.css", filters="cssrewrite")
+		css_plugins_bundle = Bundle(*css_plugins, output="webassets/packed_plugins.css", filters="cssrewrite")
 		css_app_bundle = Bundle(*css_app, output="webassets/packed_app.css", filters="cssrewrite")
 
-		all_less_bundle = Bundle(*less_app, output="webassets/packed_app.less", filters="cssrewrite, less_importrewrite")
+		# LESS
+		less_core_bundle = Bundle(*less_core, output="webassets/packed_core.less", filters="cssrewrite, less_importrewrite")
+		less_plugins_bundle = Bundle(*less_plugins, output="webassets/packed_plugins.less", filters="cssrewrite, less_importrewrite")
+		less_app_bundle = Bundle(*less_app, output="webassets/packed_app.less", filters="cssrewrite, less_importrewrite")
 
+		# asset registration
 		assets.register("js_libs", js_libs_bundle)
+		assets.register("js_core", js_core_bundle)
+		assets.register("js_plugins", js_plugins_bundle)
 		assets.register("threejs_libs", threejs_libs_bundle)
 		assets.register("js_app", js_app_bundle)
 		assets.register("css_libs", css_libs_bundle)
+		assets.register("css_core", css_core_bundle)
+		assets.register("css_plugins", css_plugins_bundle)
 		assets.register("css_app", css_app_bundle)
-		assets.register("less_app", all_less_bundle)
+		assets.register("less_core", less_core_bundle)
+		assets.register("less_plugins", less_plugins_bundle)
+		assets.register("less_app", less_app_bundle)
 
 	def _start_intermediary_server(self, s):
 		import BaseHTTPServer
