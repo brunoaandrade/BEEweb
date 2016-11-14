@@ -38,8 +38,7 @@ INSTALL_REQUIRES = [
 	"awesome-slugify>=1.6.5,<1.7",
 	"feedparser>=5.2.1,<5.3",
 	"beecom>=0.3.3",
-	"pyusb>=1.0.0b2",
-	"setuptools==24.0.1"
+	"pyusb>=1.0.0b2"
 ]
 
 # Additional requirements for optional install options

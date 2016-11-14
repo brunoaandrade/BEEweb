@@ -171,18 +171,17 @@ def install_source(python_executable, folder, user=False, sudo=False):
 			from glob import glob
 			from shutil import rmtree
 
-			pattern = 'C:\\Users\\*\\AppData\\Roaming\\beesoft-nativefier*'
+			pattern = 'C:\\Users\\*\\AppData\\Roaming\\beesoft-nativefier*\\Cache\\*'
 
 			for item in glob(pattern):
-				if not os.path.isdir(item):
-					continue
-				rmtree(item)
+				if os.path.exists(item):
+					try:
+						os.remove(item)
+					except Exception:
+						continue
 
 		except Exception as ex:
-			raise RuntimeError(
-				"Could not remove the cache files from client app: %s" % ex.message)
-		finally:
-			print("Client cache files removed.")
+			raise RuntimeError('Could not remove the cache files from client app: %s' % ex.strerror)
 
 def parse_arguments():
 	import argparse
