@@ -38,8 +38,9 @@
 
     <script type="text/html" id="files_template_machinecode">
         <div class="title" data-bind="css: $root.getSuccessClass($data), style: { 'font-weight': $root.listHelper.isSelected($data) ? 'bold' : 'normal' }, text: name"></div>
-        <div class="uploaded">{{ _('Uploaded') }}: <span data-bind="text: formatTimeAgo(date)"></span></div>
-        <div class="size">{{ _('Size') }}: <span data-bind="text: formatSize(size)"></span></div>
+        <!--<div class="uploaded">{{ _('Uploaded') }}: <span data-bind="text: formatTimeAgo(date)"></span></div>-->
+        <!--<div class="size">{{ _('Size') }}: <span data-bind="text: formatSize(size)"></span></div>-->
+        <br />
         <div class="additionalInfo hide" data-bind="html: $root.getAdditionalData($data)"></div>
         <div class="btn-group action-buttons">
         <br />
@@ -53,8 +54,8 @@
 
     <script type="text/html" id="files_template_model">
         <div class="title muted" data-bind="text: name"></div>
-        <div class="uploaded">{{ _('Uploaded') }}: <span data-bind="text: formatTimeAgo(date)"></span></div>
-        <div class="size">{{ _('Size') }}: <span data-bind="text: formatSize(size)"></span></div>
+        <!--<div class="uploaded">{{ _('Uploaded') }}: <span data-bind="text: formatTimeAgo(date)"></span></div>-->
+        <!--<div class="size">{{ _('Size') }}: <span data-bind="text: formatSize(size)"></span></div>-->
         <br />
         <div class="btn-group action-buttons">
             <div class="btn btn-mini"  data-bind="click: function() { $root.loadToWorkbench($data); }" title="{{ _('Load to Workbench') }}"><i class="icon-edit"></i></div>
