@@ -7,6 +7,12 @@ BEEwb.events = {};
  * OnWindowResize event function
  */
 BEEwb.events.onWindowResize = function() {
+    // Updates container bounds
+    var container = document.getElementById( 'stl_container' );
+    var bondingOffset = container.getBoundingClientRect();
+    BEEwb.main.containerWidthOffset = bondingOffset.left;
+    BEEwb.main.containerHeightOffset = bondingOffset.top;
+
     BEEwb.main.camera.aspect = BEEwb.main.container.clientWidth / BEEwb.main.container.clientHeight;
     BEEwb.main.camera.updateProjectionMatrix();
 
