@@ -92,8 +92,8 @@ function DataUpdater(allViewModels) {
                 return;
             }
 
-            showOfflineOverlay(
-                gettext("Server is offline"),
+            showRestartingOverlay(
+                undefined,
                 gettext("The server appears to be offline, at least I'm not getting any response from it. I'll try to reconnect automatically <strong>over the next couple of minutes</strong>, however you are welcome to try a manual reconnect anytime using the button below."),
                 self.reconnect
             );

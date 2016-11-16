@@ -579,6 +579,18 @@ function showOfflineOverlay(title, message, reconnectCallback) {
         $("#offline_overlay").show();
 }
 
+function showRestartingOverlay(title, message, reconnectCallback) {
+    if (title == undefined) {
+        title = gettext("Restarting");
+    }
+
+    $("#offline_overlay_title").text(title);
+    $("#offline_overlay_message").html(message);
+    $("#offline_overlay_reconnect").click(reconnectCallback);
+    if (!$("#offline_overlay").is(":visible"))
+        $("#offline_overlay").show();
+}
+
 function hideOfflineOverlay() {
     $("#offline_overlay").hide();
 }

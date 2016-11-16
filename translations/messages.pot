@@ -1059,6 +1059,10 @@ msgstr ""
 msgid "Server is offline"
 msgstr ""
 
+#: src/octoprint/static/js/app/helpers.js:584
+msgid "Restarting"
+msgstr ""
+
 #: src/octoprint/static/js/app/dataupdater.js:97
 msgid ""
 "The server appears to be offline, at least I'm not getting any response "

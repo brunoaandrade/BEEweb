@@ -1189,6 +1189,10 @@ msgstr "Interface"
 msgid "Server is offline"
 msgstr "Der Server ist offline"
 
+#: src/octoprint/static/js/app/helpers.js:584
+msgid "Restarting"
+msgstr "Neu Starten"
+
 #: src/octoprint/static/js/app/dataupdater.js:97
 msgid ""
 "The server appears to be offline, at least I'm not getting any response from "
