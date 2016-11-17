@@ -1,109 +1,134 @@
-<div class="row-fluid print-control" style="display: none;" data-bind="visible: loginState.isUser">
-    <div class="span3">
-        <button id="job_print" class="btn btn-primary span12"
-        data-bind="click: print, visible: enablePrint() && (!isPaused() && !isShutdown()), css: {'btn-info': isPaused()}, attr: {title: titlePrintButton}" >
-            <i data-bind="css: {'icon-print': !isPaused(), 'icon-undo': isPaused()}"></i>
-            <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
-        </button>
-    </div>
-    <div class="span5">
-        <div class="row-fluid text-center">
-            <div class="span12">
-                {{ _('File') }}: <strong data-bind="text: filename"></strong>&nbsp;<strong data-bind="visible: sd">(SD)</strong><br>
+
+    <div class="row-fluid print-control" style="display: none;" data-bind="visible: loginState.isUser">
+        <div class="span12">
+            <div class="row-fluid text-center">
+                <div class="span12">
+                    <strong data-bind="text: filename"></strong>&nbsp;<strong data-bind="visible: sd">(SD)</strong><br>
+                </div>
             </div>
         </div>
     </div>
-    <div id="pause_filler" class="span2">
-        <button class="btn btn-block"
-        id="job_pause" data-bind="click: function() { isPaused() ? onlyResume() : onlyPause(); },
-        visible: enablePause, css: {active: (isPaused() && isShutdown())}, attr: {title: titlePauseButton}">
-        <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>
-        <span data-bind="visible: !isPaused() && !isShutdown()">{{ _('Pause') }}</span>
-        <span data-bind="visible: isPaused() || isShutdown()">{{ _('Resume') }}</span>
-    </button>
-    </div>
-    <button class="btn span2" id="job_cancel" data-bind="click: cancel, visible: enableCancel()" title="{{ _('Cancels the print job') }}">
-        <i class="icon-stop"></i> {{ _('Cancel') }}
-    </button>
-</div>
-<br />
-<div class="progress">
-    <div class="bar" id="job_progressBar" data-bind="style: { width: progressString() + '%' }"></div>
-</div>
-<hr /><br />
-<div class="row-fluid">
-    <div class="span6">
-        {{ _('Approx. Total Print Time') }}: <strong data-bind="text: estimatedPrintTimeString"></strong><br>
-        {{ _('Approx. Time Left') }}: <strong data-bind="text: printTimeLeftString"></strong><br>
-    </div>
-    <div class="span6">
-        {{ _('Print Time') }}: <strong data-bind="text: printTimeString"></strong><br>
-        {{ _('Printed') }}: <strong data-bind="text: byteString"></strong><br>
-    </div>
-</div>
-<br />
-<div class="row-fluid">
-    <div class="span6">
-        <!-- ko foreach: filament -->
-        <span data-bind="text: 'Filament (' + name() + '): '"></span><strong data-bind="text: formatFilament(data())"></strong>
-        <!-- /ko -->
-    </div>
-    <div class="span6">
-        {{ _('Timelapse') }}: <strong data-bind="text: timelapseString"></strong>
-    </div>
-</div>
 
-<div id="pause_panel" class="row-fluid" data-bind="visible: loginState.isUser && (isPaused() || isShutdown())">
-    <hr /><br />
-    <div id="shutdown_panel" data-bind="visible: !isShutdown()">
-        <button id="job_shutdown" class="btn btn-danger span3" data-bind="click: shutdown" >
-            <i class="icon-off"></i>
-            <span >{{ _('Shutdown') }}</span>
+    <div class="row-fluid">
+        <div class="span4">
+            <button id="job_print" class="btn btn-primary span12"
+            data-bind="click: print, visible: enablePrint() && (!isPaused() && !isShutdown()), css: {'btn-info': isPaused()}, attr: {title: titlePrintButton}" >
+                <i data-bind="css: {'icon-print': !isPaused(), 'icon-undo': isPaused()}"></i>
+                <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
+            </button>
+        </div>
+        <div class="span2">
+
+        </div>
+        <div id="pause_filler" class="span3">
+            <button class="btn btn-block"
+            id="job_pause" data-bind="click: function() { isPaused() ? onlyResume() : onlyPause(); },
+            visible: enablePause, css: {active: (isPaused() && isShutdown())}, attr: {title: titlePauseButton}">
+            <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>
+            <span data-bind="visible: !isPaused() && !isShutdown()"></span>
+            <span data-bind="visible: isPaused() || isShutdown()"></span>
         </button>
-        <br /><br />
-        <span>
-            <i class="icon-warning-sign"></i>
-            {{ _('The shutdown operation saves the print state. You can power off your printer and resume printing at a later time.') }}
-        </span>
+        </div>
+        <button class="btn btn-delete span3" id="job_cancel" data-bind="click: cancel, visible: enableCancel()"
+            title="{{ _('Cancel') }}" data-toggle="tooltip">
+            <i class="icon-stop"></i>
+        </button>
     </div>
 
-    <div id="shutdown_confirmation" class="row-fluid text-center" data-bind="visible: isShutdown()">
-        <span >
-            <strong>
+    <br />
+
+    <a id="showPrintDetails" href="#">
+        <div class="progress">
+            <div class="bar" id="job_progressBar" data-bind="style: { width: progressString() + '%' }"></div>
+        </div>
+    </a>
+
+    <hr /><br />
+
+    <div id="printDetails" style="display: none;">
+        <div class="row-fluid">
+            <div class="span6">
+                {{ _('Approx. Total Print Time') }}: <strong data-bind="text: estimatedPrintTimeString"></strong><br>
+                {{ _('Approx. Time Left') }}: <strong data-bind="text: printTimeLeftString"></strong><br>
+            </div>
+            <div class="span6">
+                {{ _('Print Time') }}: <strong data-bind="text: printTimeString"></strong><br>
+                {{ _('Printed') }}: <strong data-bind="text: byteString"></strong><br>
+            </div>
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span6">
+                <!-- ko foreach: filament -->
+                <span data-bind="text: 'Filament (' + name() + '): '"></span><strong data-bind="text: formatFilament(data())"></strong>
+                <!-- /ko -->
+            </div>
+            <div class="span6">
+                {{ _('Timelapse') }}: <strong data-bind="text: timelapseString"></strong>
+            </div>
+        </div>
+    </div>
+
+    <div id="pause_panel" class="row-fluid" data-bind="visible: loginState.isUser && (isPaused() || isShutdown())">
+        <hr /><br />
+        <div id="shutdown_panel" data-bind="visible: !isShutdown()">
+            <button id="job_shutdown" class="btn btn-danger" data-bind="click: shutdown" >
+                <i class="icon-off"></i>
+                <span >{{ _('Shutdown') }}</span>
+            </button>
+            <br /><br />
+            <span>
                 <i class="icon-warning-sign"></i>
-                {{ _('You can power off your printer. Alternatively you can resume or cancel your print.') }}
-            </strong>
-        </span>
+                {{ _('The shutdown operation saves the print state. You can power off your printer and resume printing at a later time.') }}
+            </span>
+        </div>
+
+        <div id="shutdown_confirmation" class="row-fluid text-center" data-bind="visible: isShutdown()">
+            <span >
+                <strong>
+                    <i class="icon-warning-sign"></i>
+                    {{ _('You can power off your printer. Alternatively you can resume or cancel your print.') }}
+                </strong>
+            </span>
+        </div>
+
+        <br /><br />
+
+        <div id="shutdown_panel_change_filament">
+            <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn btn-primary" >
+                <i class="icon-wrench"></i>
+                {{ _('Change filament now') }}
+            </a>
+            <br /><br />
+            <span>
+                <i class="icon-warning-sign"></i>
+                {{ _('This operation is needed if you want to print with a different color or if the filament available in the spool is not enough.') }}
+            </span>
+        </div>
     </div>
 
-    <br /><br />
-
-    <div id="shutdown_panel_change_filament">
+    <div id="insufficient_filament" class="row-fluid text-center" data-bind="visible: loginState.isUser && insufficientFilament">
+        <br />
+        <span class="alert alert-warn display-block">
+            <i class="icon-warning-sign"></i>
+            {{ _('The estimated amount of filament in the spool is not enough to complete the print job!') }}
+        </span>
+        <span>
+            <i class="icon-info"></i>
+            {{ _('You can either click below to change the filament or click Print to proceed at your own risk.') }}
+        </span>
+        <br /><br />
         <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn btn-primary" >
             <i class="icon-wrench"></i>
             {{ _('Change filament now') }}
         </a>
-        <br /><br />
-        <span>
-            <i class="icon-warning-sign"></i>
-            {{ _('This operation is needed if you want to print with a different color or if the filament available in the spool is not enough.') }}
-        </span>
     </div>
-</div>
 
-<div id="insufficient_filament" class="row-fluid text-center" data-bind="visible: loginState.isUser && insufficientFilament">
-    <br />
-    <span class="alert alert-warn display-block">
-        <i class="icon-warning-sign"></i>
-        {{ _('The estimated amount of filament in the spool is not enough to complete the print job!') }}
-    </span>
-    <span>
-        <i class="icon-info"></i>
-        {{ _('You can either click below to change the filament or click Print to proceed at your own risk.') }}
-    </span>
-    <br /><br />
-    <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn btn-primary" >
-        <i class="icon-wrench"></i>
-        {{ _('Change filament now') }}
-    </a>
-</div>
+<script>
+    $( document ).ready(function () {
+        $('#showPrintDetails').click(function() {
+            event.preventDefault();
+            $('#printDetails').slideToggle();
+        })
+    });
+</script>

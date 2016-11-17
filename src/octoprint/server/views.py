@@ -185,10 +185,10 @@ def index():
 	# sidebar
 
 	templates["sidebar"]["entries"]= dict(
-		workbench_controls=(gettext("Workbench Controls"), dict(template="sidebar/workbench_controls.jinja2", _div="workbench_ctrls", styles_wrapper=["display: none"], icon="edit")),
+		#workbench_controls=(gettext("Workbench Controls"), dict(template="sidebar/workbench_controls.jinja2", _div="workbench_ctrls", styles_wrapper=["display: none"], icon="edit")),
 		#connection=(gettext("Connection"), dict(template="sidebar/connection.jinja2", _div="connection", icon="signal", styles_wrapper=["display: none"], data_bind="visible: loginState.isAdmin")),
-		#state=(gettext("State"), dict(template="sidebar/state.jinja2", _div="state", icon="info-sign")),
-		files=(gettext("Files"), dict(template="sidebar/files.jinja2", _div="files", icon="list", classes_content=["overflow_visible"], template_header="sidebar/files_header.jinja2"))
+		files=(gettext("Files"), dict(template="sidebar/files.jinja2", _div="files", icon="list", classes_content=["overflow_visible"], template_header="sidebar/files_header.jinja2")),
+		state = ("", dict(template="sidebar/printer_status.jinja2", _div="state", template_header="sidebar/printer_status_header.jinja2"))
 	)
 
 	# tabs

@@ -1,0 +1,7 @@
+<div class="text-center">
+    <a id="state-header-link" class="accordion-toggle collapsed" data-toggle="collapse" data-target="#state">
+        <img data-bind="attr:{ 'src': printerLogo }" />
+        <strong data-bind="text: stateString, css: stateClass" class="printer-status"></strong>
+        <img data-bind="visible: isHeating()" src="/static/img/heating.gif" style="width: 40px;"/>
+    </a>
+</div>

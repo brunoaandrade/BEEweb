@@ -21,7 +21,7 @@
         <div class="page-container">
             <div id="navbar" class="navbar navbar-static-top">
                 <div class="navbar-inner" data-bind="css: appearanceClasses">
-                    <div class="container">
+                    <div class="container-fluid">
                         <a class="brand" href="#">
                             <span class="brand-label-fix"><strong data-bind="text: appearance.brand">BEEsoft</strong></span>
                         </a>
@@ -46,34 +46,12 @@
                     </div>
                 </div>
             </div>
-            <div class="container octoprint-container">
-                <div class="row">
+            <div class="container-fluid octoprint-container">
+                <div class="row-fluid">
 
                     <!-- Tabs -->
                     {% if templates.tab.order %}
                     <div id="tab-container" class="tabbable {% if templates.sidebar.order %}span9{% else %}span12{% endif %}">
-
-                        <div class="row-fluid">
-                            <div id="state_wrapper" class="accordion-group">
-                                <div class="accordion-heading text-center">
-                                    <a id="state-header-link" class="accordion-toggle collapsed" data-toggle="collapse" data-target="#state">
-                                        <img data-bind="attr:{ 'src': printerLogo }" />
-                                        <strong data-bind="text: stateString, css: stateClass" class="printer-status"></strong>
-                                        <img data-bind="visible: isHeating()" src="/static/img/heating.gif" style="width: 40px;"/>
-                                    </a>
-                                    {% if "template_header" in data %}
-                                        {% try "There was an error with the template {filename} at line number {lineno}: {exception}" %}{% include data.template_header ignore missing %}{% endtry %}
-                                    {% endif %}
-                                </div>
-                                <div id="state" class="accordion-body collapse">
-                                    <div class="accordion-inner">
-                                        {% try "There was an error with the template {filename} at line number {lineno}: {exception}" %}{% include 'sidebar/printer_status.jinja2' ignore missing %}{% endtry %}
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <br />
 
                         <ul class="nav nav-tabs" id="tabs">
                             {% for key in templates.tab.order %}
@@ -181,6 +159,9 @@
             <!-- End of generic plugin template files -->
 
             {% include 'javascripts.jinja2' %}
+            <script>
+                $('[data-toggle="tooltip"]').tooltip();
+            </script>
         </div>
     </body>
 </html>
