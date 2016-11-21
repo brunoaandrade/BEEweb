@@ -21,37 +21,35 @@
         <div class="page-container">
             <div id="navbar" class="navbar navbar-static-top">
                 <div class="navbar-inner" data-bind="css: appearanceClasses">
-                    <div class="container-fluid">
-                        <a class="brand" href="#">
-                            <span class="brand-label-fix"><strong data-bind="text: appearance.brand">BEEsoft</strong></span>
-                        </a>
+                    <a class="brand" href="#">
+                        <span class="brand-label-fix"><strong data-bind="text: appearance.brand">BEEsoft</strong></span>
+                    </a>
 
-                        <div class="nav-collapse">
-                            <!-- Navbar -->
-                            <ul class="nav pull-right">
-                                {% for key in templates.navbar.order %}
-                                    {% set data = templates.navbar.entries[key] %}
-                                    {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- ko allowBindings: false -->{% endif %}
-                                    <li id="{{ data._div }}"
-                                        {% if "data_bind" in data %}data-bind="{{ data.data_bind }}"{% endif %}
-                                        {% if "classes" in data %}class="{{ data.classes|join(' ') }}"{% endif %}
-                                        {% if "styles" in data %}style="{{ data.styles|join(', ') }}"{% endif %}
-                                            >
-                                        {% try "There was an error with the template {filename} at line number {lineno}: {exception}" %}{% include data.template ignore missing %}{% endtry %}
-                                    </li>
-                                    {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- /ko -->{% endif %}
-                                {% endfor %}
-                            </ul>
-                        </div>
+                    <div class="nav-collapse">
+                        <!-- Navbar -->
+                        <ul class="nav pull-right">
+                            {% for key in templates.navbar.order %}
+                                {% set data = templates.navbar.entries[key] %}
+                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- ko allowBindings: false -->{% endif %}
+                                <li id="{{ data._div }}"
+                                    {% if "data_bind" in data %}data-bind="{{ data.data_bind }}"{% endif %}
+                                    {% if "classes" in data %}class="{{ data.classes|join(' ') }}"{% endif %}
+                                    {% if "styles" in data %}style="{{ data.styles|join(', ') }}"{% endif %}
+                                        >
+                                    {% try "There was an error with the template {filename} at line number {lineno}: {exception}" %}{% include data.template ignore missing %}{% endtry %}
+                                </li>
+                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- /ko -->{% endif %}
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </div>
-            <div class="container-fluid octoprint-container">
+            <div class="octoprint-container">
                 <div class="row-fluid">
 
                     <!-- Tabs -->
                     {% if templates.tab.order %}
-                    <div id="tab-container" class="tabbable {% if templates.sidebar.order %}span9{% else %}span12{% endif %}">
+                    <div id="tab-container" class="tabbable main-container {% if templates.sidebar.order %}span9{% else %}span12{% endif %}">
 
                         <ul class="nav nav-tabs" id="tabs">
                             {% for key in templates.tab.order %}
@@ -118,18 +116,18 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="footer">
-                    <hr />
-                    <ul class="pull-left muted">
-                        <li><large>BEEsoft &copy 2016 BEEVC - Electronic Systems : <span class="version">{{ display_version|e }}</span></large></li>
-                    </ul>
-                    <ul class="pull-right">
-                        <li>{{ _('powered by ') }}<a href="http://octoprint.org" target="_blank"><i class="icon-github"></i> Octoprint</a></li>
-                        <!--<li><a href="https://github.com/foosel/OctoPrint/"><i class="icon-github"></i> {{ _('Sourcecode') }}</a></li>-->
-                        <!--<li><a href="http://docs.octoprint.org"><i class="icon-book"></i> {{ _('Documentation') }}</a></li>-->
-                        <!--<li><a href="https://github.com/foosel/OctoPrint/issues"><i class="icon-flag"></i> {{ _('Bugs and Requests') }}</a></li>-->
-                    </ul>
-                </div>
+{#                <div class="footer">#}
+{#                    <hr />#}
+{#                    <ul class="pull-left muted">#}
+{#                        <li><large>BEEsoft &copy 2016 BEEVC - Electronic Systems : <span class="version">{{ display_version|e }}</span></large></li>#}
+{#                    </ul>#}
+{#                    <ul class="pull-right">#}
+{#                        <li>{{ _('powered by ') }}<a href="http://octoprint.org" target="_blank"><i class="icon-github"></i> Octoprint</a></li>#}
+{#                        <!--<li><a href="https://github.com/foosel/OctoPrint/"><i class="icon-github"></i> {{ _('Sourcecode') }}</a></li>-->#}
+{#                        <!--<li><a href="http://docs.octoprint.org"><i class="icon-book"></i> {{ _('Documentation') }}</a></li>-->#}
+{#                        <!--<li><a href="https://github.com/foosel/OctoPrint/issues"><i class="icon-flag"></i> {{ _('Bugs and Requests') }}</a></li>-->#}
+{#                    </ul>#}
+{#                </div>#}
             </div>
 
             <!-- Dialogs -->

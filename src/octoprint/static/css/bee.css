@@ -56,3 +56,113 @@
 .display-block {
     display: block;
 }
+
+/*-------------------------------------------------------*/
+/*-------------------- BEEsoft NEW UI -------------------*/
+
+.btn-block +.btn-block {
+    margin-top: 0 !important;
+}
+.octoprint-container{
+    margin-top: 0 !important;
+}
+
+.main-container .nav-tabs, .main-container .tab-content{
+    border: none !important;
+}
+.main-container .tab-content{
+    padding: 0 !important;
+}
+
+/*-------------------- SIDEBAR ---------------------*/
+
+#sidebar-container{
+    background: #32312b;
+    margin-left: 0;
+    float: right;
+}
+
+.accordion-inner{
+    background: #262521;
+}
+
+#workbench-controls-container{
+    position: absolute;
+    margin-top: 60px;
+    left: 25px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-width: 55px;
+}
+#workbench-controls-container button{        /* SIDEBAR BUTTONS */
+    height: 50px;
+    border: none;
+    box-shadow: none;
+    background: #f0efef;
+    font-size: 24px;
+    color: #302f30 !important;
+}
+
+/*-------------------- TABS ---------------------*/
+
+#tabs{
+    position: absolute;
+    z-index: 1;
+}
+#tabs > li {
+    padding: 20px 0 20px 15px;
+}
+#tabs > li.active > a {
+    font-weight: 600;
+    color: #000;
+
+}
+#tabs > li > a{
+    font: 200 18px "Source Sans Pro", sans-serif;
+    background: transparent !important;
+    color: #898989;
+    text-transform: uppercase;
+    border: none;
+}
+
+#gcode, #control , #temp, #term{
+    padding: 65px 25px;
+}
+
+
+/*-------------------- NAVBAR -----------------------*/
+
+.nav i{
+    padding-right: 10px;
+}
+
+.navbar-inner{
+    height: 70px;
+    border: none;
+    box-shadow: none !important;
+    background: #ffc709 !important;
+    padding: 0;
+}
+.navbar-inner a {
+    padding: 23px !important;
+}
+.navbar-inner a {
+    padding: 23px !important;
+}
+.navbar-inner .nav.pull-right a{
+    text-shadow: none !important;
+    padding: 24px !important;
+    font: 200 18px "Source Sans Pro", sans-serif;
+    text-transform: uppercase;
+    border-left: 1px solid #e2ac25;
+}
+.navbar-inner .brand{
+    margin-left: 0;
+}
+
+
+/*----------------- MODALS ----------------------*/
+
+.modal-backdrop, .modal-backdrop.fade.in{
+    background: #20201d !important;
+}

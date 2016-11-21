@@ -4,31 +4,10 @@
         <i class="icon-exchange" ></i>
         <span>{{ _('Move') }}</span>
     </button>
-    <br />
-    <div id="axis-values">
-        <div id="move-axis-form" class="row-fluid form-inline">
-            <span><strong>{{ _('Position') }}</strong></span><br /><br />
-
-            <label for="x-axis">X <small>(mm)</small></label>
-            <input type="text" class="span12 axis-input-box" id="x-axis" name="x-axis" onchange="BEEwb.transformOps.move();"/>
-            <br /><br />
-
-            <label for="y-axis">Y <small>(mm)</small></label>
-            <input type="text" class="span12 axis-input-box" id="y-axis" name="y-axis" onchange="BEEwb.transformOps.move();"/>
-            <br /><br />
-
-            <label for="z-axis">Z <small>(mm)</small></label>
-            <input type="text" class="span12 axis-input-box" id="z-axis" name="z-axis" onchange="BEEwb.transformOps.move();"/>
-            <br />
-            <hr />
-        </div>
-    </div>
-
     <button id="btn-scale" class="btn btn-default btn-block model-selection" onclick="BEEwb.transformOps.activateScale();" disabled="true">
         <i class="icon-crop" ></i>
         <span>{{ _('Scale') }}</span>
     </button>
-    <br />
     <div id="scale-values-form" style="display: none;">
         <span><strong>{{ _('Object Dimensions') }}</strong></span><br /><br />
         <div id="scale-axis-form" class="row-fluid form-inline">
