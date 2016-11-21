@@ -73,6 +73,9 @@
 .main-container .tab-content{
     padding: 0 !important;
 }
+#stl_container canvas{
+    height: calc(100vh - 70px) !important;
+}
 
 /*-------------------- SIDEBAR ---------------------*/
 
@@ -80,6 +83,7 @@
     background: #32312b;
     margin-left: 0;
     float: right;
+    height: calc(100vh - 70px);
 }
 
 .accordion-inner{
@@ -101,6 +105,59 @@
     background: #f0efef;
     font-size: 24px;
     color: #302f30 !important;
+}
+
+.accordion-inner, .accordion-group{
+    border: none;
+}
+
+
+/* ---------------- FILE MANAGER  ------------------ */
+
+#files .gcode_files .entry{
+    background: #3f3c35;
+    padding: 10px 15px !important;
+    box-shadow: 0 1px 5px #111;
+    margin-bottom: 10px;
+    border: none !important;
+    transition: all 0.2s ease;
+}
+#files .gcode_files .entry:hover{
+    background-color: #5a564c !important;
+}
+
+#files .entry .btn-group>.btn-mini{
+    font-size: 14px;
+    border: none;
+    background: transparent;
+    text-shadow: none;
+    color: #f0efef;
+}
+
+#files .gcode_files .entry .title{
+    font: 200 14px "Source Sans Pro", sans-serif;
+    text-transform: uppercase;
+}
+
+.fileinput-button{
+    font: 200 16px "Source Sans Pro", sans-serif;
+    text-transform: uppercase;
+    text-align: center;
+    background: #676356;
+    color: #fff;
+    text-shadow: none;
+    padding: 15px;
+}
+
+.input-search-box{
+    background: #111 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    padding: 0 10px !important;
+    text-align: center;
+    height: 50px;
+    width: 100%;
+    margin: 0 -15px;
 }
 
 /*-------------------- TABS ---------------------*/
@@ -146,12 +203,8 @@
 .navbar-inner a {
     padding: 23px !important;
 }
-.navbar-inner a {
-    padding: 23px !important;
-}
 .navbar-inner .nav.pull-right a{
     text-shadow: none !important;
-    padding: 24px !important;
     font: 200 18px "Source Sans Pro", sans-serif;
     text-transform: uppercase;
     border-left: 1px solid #e2ac25;
