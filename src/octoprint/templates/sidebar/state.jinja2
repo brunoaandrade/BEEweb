@@ -11,11 +11,6 @@
 <span title="{{ _('Estimated time until the print job is done. This is only an estimate and accuracy depends heavily on various factors!') }}">{{ _('Print Time Left') }}</span>: <strong data-bind="text: printTimeLeftString"></strong> <span id="state_printtimeleft_popover" style="display: none" data-bind="visible: printTimeLeftOrigin, attr: {title: printTimeLeftOriginString}, css: printTimeLeftOriginClass">&#9679;</span><br>
 <span title="{{ _('Bytes printed vs total bytes of file') }}">{{ _('Printed') }}</span>: <strong data-bind="text: byteString"></strong><br>
 
-<button class="btn btn-block btn-primary span2" id="print_scene"
-            data-bind="click: startPrint, enable: loginState.isUser() && !connection.isConnecting() && !state.enablePrint()">
-        <i class="icon-print" ></i>
-        {{ _('Start Print...') }}
-    </button>
 <div class="progress progress-text-centered">
     <span class="progress-text-back" data-bind="text: progressBarString()"></span>
     <div class="bar" id="job_progressBar" data-bind="style: {width: progressString() + '%'}">

@@ -60,6 +60,13 @@
 /*-------------------------------------------------------*/
 /*-------------------- BEEsoft NEW UI -------------------*/
 
+body {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.radio input[type="radio"], .checkbox input[type="checkbox"]{
+    margin-top: -5px;
+}
+
 .btn-block +.btn-block {
     margin-top: 0 !important;
 }
@@ -77,6 +84,64 @@
     height: calc(100vh - 70px) !important;
 }
 
+/*---------- LOGIN -----------*/
+
+#login_button{
+    background: #518359;
+    color: #fff;
+}
+
+/*--------- DEFAULT BUTTONS & INPUTS & SPANS ----------*/
+
+button.btn{
+    font: 200 16px "Source Sans Pro", sans-serif;
+    background: #ccc;
+    padding: 10px 25px;
+    box-shadow: none;
+    text-transform: uppercase;
+    text-shadow: none;
+    border: none;
+}
+button.btn.yellow{
+    color: #000;
+    background: #ffc709;
+}
+.btn.disabled, .btn[disabled]{
+    opacity: 0.4 !important;
+}
+
+input{
+    height: 31px !important;
+    border-radius: 0 !important;
+}
+input + span.add-on{
+    padding: 9px !important;
+    border-radius: 0 !important;
+}
+
+.btn-maintenance{
+    padding: 11px 25px !important;
+    font: 400 16px "Source Sans Pro", sans-serif;
+    text-transform: uppercase;
+    box-shadow: none !important;
+    border: none !important;
+    text-shadow: none !important;
+    color: #000;
+    background: #ffc709 !important;
+    display: inline-block;
+}
+
+.btn-prepareprint{
+    width: 100%;
+    font: 200 16px "Source Sans Pro", sans-serif;
+    text-transform: uppercase;
+    box-shadow: none !important;
+    border: none !important;
+    color: #fff;
+    background: #518359;
+    padding: 15px 25px;
+}
+
 /*-------------------- SIDEBAR ---------------------*/
 
 #sidebar-container{
@@ -88,6 +153,7 @@
 
 .accordion-inner{
     background: #262521;
+    padding: 9px 25px;
 }
 
 #workbench-controls-container{
@@ -101,6 +167,7 @@
 #workbench-controls-container button{        /* SIDEBAR BUTTONS */
     height: 50px;
     border: none;
+    padding: 0;
     box-shadow: none;
     background: #f0efef;
     font-size: 24px;
@@ -203,7 +270,7 @@
 .navbar-inner a {
     padding: 23px !important;
 }
-.navbar-inner .nav.pull-right a{
+.navbar-inner ul.nav.pull-right a{
     text-shadow: none !important;
     font: 200 18px "Source Sans Pro", sans-serif;
     text-transform: uppercase;
@@ -212,10 +279,110 @@
 .navbar-inner .brand{
     margin-left: 0;
 }
-
-
+.dropdown-menu{
+    border-radius: 0;
+}
+.navbar .pull-right>li>.dropdown-menu, .navbar .nav>li>.dropdown-menu.pull-right{ padding:0; }
+.dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus, .dropdown-submenu:hover>a, .dropdown-submenu:focus>a{
+    color: #000;
+    font-weight: 400;
+    background: #ffc709;
+}
+.dropdown-menu>li>a{
+    background: #000;
+    color: #fff;
+}
+.navbar .nav>li>.dropdown-menu:after{
+    border-bottom: 6px solid #000;
+}
 /*----------------- MODALS ----------------------*/
+
+.modal-header{
+    padding: 15px 25px;
+}
+.modal-header h3{
+    font-size: 16px;
+    color: #898989;
+    text-transform: uppercase;
+}
 
 .modal-backdrop, .modal-backdrop.fade.in{
     background: #20201d !important;
+}
+
+.modal{
+    background: #ebebeb;
+    border: 0;
+    border-radius: 0;
+}
+.modal-body{ padding: 15px 25px !important;}
+.full-sized-box { padding: 15px 25px !important; }
+.modal .modal-footer{
+    padding: 0;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    background-color: #32312b;
+}
+.modal .modal-footer > a:first-of-type, .modal .modal-footer > button:first-of-type{
+    background: transparent;
+    color: #777;
+    text-shadow: none;
+    text-transform: uppercase;
+    border: none;
+    box-shadow: none;
+}
+#slicing_configuration_dialog .modal-body{
+    padding: 0  !important;
+}
+#slicing_configuration_dialog .control-group{
+    margin-bottom: 2px;
+    background: #e1e2e1;
+    padding: 12px 25px;
+}
+#slicing_configuration_dialog .control-group:last-of-type{
+    margin-bottom: 0;
+    border-bottom: 1px solid #252420;
+    background-color: #32312b;
+}
+#slicing_configuration_dialog .form-horizontal{
+    margin: 0;
+}
+#slicing_configuration_dialog .form-horizontal .controls{
+    margin-left: 160px;
+}
+#slicing_configuration_dialog .form-horizontal .control-label{
+    width: unset;
+    font: 200 18px "Source Sans Pro", sans-serif;
+    text-align: left;
+    text-transform: uppercase;
+}
+#slicing_configuration_dialog .control-label small{
+    font-size: 12px;
+    display: block;
+}
+
+#slice_button, #settings_dialog .modal-footer .btn-primary, #settings_printerProfiles_editDialog .modal-footer .btn-primary, #usersettings_dialog .modal-footer .btn-primary{
+    padding: 20px 0;
+    width: 175px;
+    text-transform: uppercase;
+    color: #fff;
+    background: #518359;
+    display: inline-block;
+}
+.modal .modal-footer > a:first-of-type, .modal .modal-footer > button:first-of-type {
+    padding: 20px;
+}
+#maintenanceCloseButton, #login_dialog .modal-footer .btn, #cancelMaintenance, #aboutbee_dialog .modal-footer .btn{
+    padding: 20px;
+    background: transparent;
+    color: #898989;
+    border: none;
+    box-shadow: none;
+    border-left: 1px solid #252420;
+    text-shadow: none;
+}
+
+.slider .slider-selection{
+    background: #ffc709 !important;
 }

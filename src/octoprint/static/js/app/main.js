@@ -545,10 +545,10 @@ $(function() {
                 workbControls.css('display', 'block');
             } else {
                 tabContainer.removeClass('span9');
-                tabContainer.addClass('span8');
+                tabContainer.addClass('span9');
 
                 sidebarContainer.removeClass('span3');
-                sidebarContainer.addClass('span4');
+                sidebarContainer.addClass('span3');
 
                 workbControls.css('display', 'none');
             }
