@@ -62,6 +62,7 @@
 
 body {
     font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    letter-spacing: 0.4px;
 }
 .radio input[type="radio"], .checkbox input[type="checkbox"]{
     margin-top: -5px;
@@ -81,7 +82,11 @@ body {
     padding: 0 !important;
 }
 #stl_container canvas{
-    height: calc(100vh - 70px) !important;
+    height: calc(100vh - 75px) !important;
+}
+
+#tab-container{
+    width: 76.92%;
 }
 
 /*---------- LOGIN -----------*/
@@ -93,7 +98,7 @@ body {
 
 /*--------- DEFAULT BUTTONS & INPUTS & SPANS ----------*/
 
-button.btn{
+button.btn, a.btn{
     font: 200 16px "Source Sans Pro", sans-serif;
     background: #ccc;
     padding: 10px 25px;
@@ -101,11 +106,15 @@ button.btn{
     text-transform: uppercase;
     text-shadow: none;
     border: none;
+    transition: all 0.2s ease;
 }
-button.btn.yellow{
+button.btn.yellow, a.btn.yellow{
     color: #000;
     background: #ffc709;
 }
+button.btn:hover, a.btn:hover{  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); }
+button.btn.yellow:hover, a.btn.yellow:hover{  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); }
+
 .btn.disabled, .btn[disabled]{
     opacity: 0.4 !important;
 }
@@ -146,9 +155,10 @@ input + span.add-on{
 
 #sidebar-container{
     background: #32312b;
-    margin-left: 0;
+    margin: 0;
     float: right;
     height: calc(100vh - 70px);
+    overflow: auto;
 }
 
 .accordion-inner{
@@ -158,26 +168,96 @@ input + span.add-on{
 
 #workbench-controls-container{
     position: absolute;
-    margin-top: 60px;
+    bottom: 25px;
     left: 25px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    max-width: 55px;
+    width: 55px;
 }
+
 #workbench-controls-container button{        /* SIDEBAR BUTTONS */
     height: 50px;
+    width: 55px;
     border: none;
     padding: 0;
     box-shadow: none;
     background: #f0efef;
     font-size: 24px;
     color: #302f30 !important;
+    outline: none;
+}
+#workbench-controls-container button:hover{
+    background: #ffc709 !important;
+}
+#workbench-controls-container button:disabled{
+    pointer-events: none;
+}
+
+#workbench-controls-container button + .tooltip .tooltip-inner{
+    border-radius: 0;
+    padding: 5px 16px;
+    max-height: 50px;
+    text-transform: uppercase;
+}
+
+#workbench-controls-container > hr{
+    margin: 0;
+    width: 55px;
 }
 
 .accordion-inner, .accordion-group{
     border: none;
 }
 
+.print-container{
+    padding: 25px;
+}
+
+/*----------------- 3D CONTROLS ------------------------*/
+
+.workbench-title{
+    text-transform: uppercase;
+    font-weight: 400;
+}
+
+#btn-scale-max, #btn-rotate-cw, #btn-rotate-ccw{
+    width: unset !important;
+    padding: 5px 15px !important;
+}
+
+
+#axis-values, #rotate-values-form, #scale-values-form{
+    position: fixed;
+    z-index: 0 ;
+    bottom: 25px;
+    left: 110px;
+}
+#axis-values button, #rotate-values-form button, #scale-values-form button{
+    height: unset;
+    font-size: 14px;
+}
+
+.move-x, .move-y, .move-z,
+.scale-x, .scale-y, .scale-z,
+.rotate-x, .rotate-y, .rotate-z{
+    display: inline-block;
+    padding-right: 20px;
+}
+.move-x > input[type="text"], .move-y > input[type="text"], .move-z > input[type="text"],
+.scale-x > input[type="text"], .scale-y > input[type="text"], .scale-z > input[type="text"],
+.rotate-x > input[type="text"], .rotate-y > input[type="text"], .rotate-z > input[type="text"]{
+    width: 50px !important;
+    border: none;
+    background: #f0efef;
+}
+/*----------------- STATUS ------------------------*/
+#state_wrapper .accordion-heading > .accordion-toggle{
+    padding: 0 25px 15px !important;
+    display: block;
+}
+#state-header-link strong{
+    color: #fff;
+    font-size: 16px;
+    font-weight: 300;
+}
 
 /* ---------------- FILE MANAGER  ------------------ */
 
@@ -214,6 +294,14 @@ input + span.add-on{
     color: #fff;
     text-shadow: none;
     padding: 15px;
+    margin: 0 !important;
+}
+
+.progress{
+    height: 12px !important;
+    border-radius: 0 !important;
+    background: #111 !important;
+    margin-bottom: 10px ;
 }
 
 .input-search-box{
@@ -225,6 +313,12 @@ input + span.add-on{
     height: 50px;
     width: 100%;
     margin: 0 -15px;
+}
+
+.settings-trigger .dropdown-menu{
+    right: 0;
+    left: unset;
+
 }
 
 /*-------------------- TABS ---------------------*/
@@ -251,6 +345,14 @@ input + span.add-on{
 
 #gcode, #control , #temp, #term{
     padding: 65px 25px;
+}
+.tab-content>.tab-pane, .pill-content>.pill-pane{
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: calc(100vh - 200px);
+}
+#workbench.tab-pane{
+    height: unset;
 }
 
 
@@ -385,4 +487,59 @@ input + span.add-on{
 
 .slider .slider-selection{
     background: #ffc709 !important;
+}
+
+/*----------------- NOTIFICATIONS POPUPS -----------------------*/
+
+.ui-pnotify-container{
+    border: none;
+    border-radius: 0;
+    font: 200 14px "Source Sans Pro", sans-serif;
+    padding: 20px;
+    text-shadow: none;
+    -webkit-box-shadow: 0 2px 10px rgba(50,50,50,.15) !important;
+    -moz-box-shadow: 0 2px 10px rgba(50,50,50,.15) !important;
+    box-shadow: 0 2px 10px rgba(50, 50, 50, 0.15) !important;
+}
+.ui-pnotify-container.alert-info{
+    background-color: #f0efef;
+    color: #000;
+}
+.ui-pnotify-container.alert-info .ui-pnotify-title{
+    color: #000;
+}
+.ui-pnotify-title {
+    text-shadow: none !important;
+    text-transform: uppercase;
+    font-weight: 300 !important;
+}
+
+.ui-pnotify-container.alert-success{
+    background-color: #76a37c;
+    color: #fff;
+}
+
+
+
+
+
+/*-----------------------------------------------------------------------------------------------------*/
+/*--------------------------------------      MEDIA QUERIES      --------------------------------------*/
+
+
+@media (max-width: 1200px){
+    #tab-container {
+        width: 76.5%;
+    }
+}
+@media (max-width: 979px){
+    #tab-container {
+        width: 76.92%;
+    }
+}
+
+@media (max-width: 768px){
+    #tab-container {
+        width: 100%;
+    }
 }

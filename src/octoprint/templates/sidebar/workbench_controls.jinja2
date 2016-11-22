@@ -11,6 +11,12 @@
     <div id="scale-values-form" style="display: none;">
         <span><strong>{{ _('Object Dimensions') }}</strong></span><br /><br />
         <div id="scale-axis-form" class="row-fluid form-inline">
+            <div class="row-fluid text-center">
+                <button id="btn-scale-max" class="btn btn-sm btn-block btn-default model-selection" onclick="BEEwb.transformOps.scaleToMax();" disabled="true">
+                    <i class="icon-crop" ></i>
+                    <span>{{ _('Scale to Max') }}</span>
+                </button>
+            </div>
             <div id="size_text_fields">
 
                 <label for="scalex-axis" id="scalex-axis-label">X <small>(mm)</small></label><br />
@@ -43,13 +49,6 @@
                 <span class="span3"></span>
             </div>
             <br />
-            <div class="row-fluid text-center">
-                <button id="btn-scale-max" class="btn btn-sm btn-block btn-default model-selection" onclick="BEEwb.transformOps.scaleToMax();" disabled="true">
-                    <i class="icon-crop" ></i>
-                    <span>{{ _('Scale to Max') }}</span>
-                </button>
-            </div>
-            <hr />
         </div>
     </div>
     <button id="btn-rotate" class="btn btn-default btn-block model-selection" onclick="BEEwb.transformOps.activateRotate();" disabled="true">
@@ -96,7 +95,6 @@
                 <span class="span2"></span>
             </div>
         </div>
-        <hr />
     </div>
     <button class="btn btn-block model-selection" id="center_selection"
             data-bind="" onclick="BEEwb.transformOps.centerModel();">

@@ -29,9 +29,6 @@
             data-bind="copyWidth: ':parent :parent :parent :parent form', text: uploadProgressText"></span>
         </div>
     </div>
-    <div>
-        <small class="muted">{{ _('Hint: You can also drag and drop files on this page to upload them.') }}</small>
-    </div>
 </div>
 <div class="gcode_files" data-bind="slimScrolledForeach: listHelper.paginatedItems">
     <div class="entry" data-bind="attr: { id: $root.getEntryId($data) }, template: { name: $root.templateFor($data), data: $data }"></div>
