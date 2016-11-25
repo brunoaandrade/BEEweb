@@ -244,6 +244,8 @@ BEEwb.main = {
             BEEwb.transformOps.placeOnBed();
 
             $('#loadingDialog').modal('hide');
+
+            document.cookie="lastModel=" + modelName;
         });
     },
 
@@ -276,8 +278,6 @@ BEEwb.main = {
                 var html = _.sprintf(gettext("The scene was saved to the local filesystem."));
                 new PNotify({title: gettext("Save success"), text: html, type: "success", hide: true});
 
-                document.cookie="lastModel=" + filename;
-
             },
             error: function() {
                 var html = _.sprintf(gettext("Could not save the scene in the server filesystem. Make sure you have the right permissions and disk space."));
@@ -290,6 +290,22 @@ BEEwb.main = {
                         break;
                     }
                 }
+            }
+        });
+    },
+
+    /**
+     * Removes a saved scene with the passed filename
+     *
+     * Returns the Promise object of the Ajax call to the server
+     */
+    removeSavedScene: function ( filename ) {
+
+        return $.ajax({
+            url: API_BASEURL + "files/local/" + filename,
+            type: "DELETE",
+            success: function() {
+                console.log("Scene removed");
             }
         });
     },

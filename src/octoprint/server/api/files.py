@@ -383,7 +383,12 @@ def gcodeFileCommand(filename, target):
 		for key in override_keys:
 			overrides[key[len("profile."):]] = data[key]
 
-		def slicing_done(target, gcode_name, select_after_slicing, print_after_slicing):
+		if 'delete_model' in data and data['delete_model'] is not None:
+			model_to_remove_after_slicing = data['delete_model']
+		else:
+			model_to_remove_after_slicing = None
+
+		def slicing_done(target, gcode_name, select_after_slicing, print_after_slicing, model_to_remove_after_slicing = None):
 			if select_after_slicing or print_after_slicing:
 				sd = False
 				if target == FileDestinations.SDCARD:
@@ -393,6 +398,10 @@ def gcodeFileCommand(filename, target):
 					filenameToSelect = fileManager.path_on_disk(target, gcode_name)
 				printer.select_file(filenameToSelect, sd, print_after_slicing)
 
+			# Custom option to remove auto-generated STL from workbench after slicing
+			if model_to_remove_after_slicing is not None:
+				fileManager.remove_file(target, model_to_remove_after_slicing)
+
 		try:
 			fileManager.slice(slicer, target, filename, target, destination,
 			                  profile=profile,
@@ -400,7 +409,7 @@ def gcodeFileCommand(filename, target):
 			                  position=position,
 			                  overrides=overrides,
 			                  callback=slicing_done,
-			                  callback_args=(target, destination, select_after_slicing, print_after_slicing))
+			                  callback_args=(target, destination, select_after_slicing, print_after_slicing, model_to_remove_after_slicing))
 		except octoprint.slicing.UnknownProfile:
 			return make_response("Profile {profile} doesn't exist".format(**locals()), 400)
 

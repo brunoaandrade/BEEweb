@@ -32,6 +32,7 @@ $(function() {
         self.nozzleTypes = ko.observableArray();
         self.selNozzle = ko.observable();
         self.filamentInSpool = ko.observable();
+        self.workbenchFile = false; // Signals if the slice dialog was called upon a workbench scene
 
         self.sliceButtonControl = true;
 
@@ -120,7 +121,7 @@ $(function() {
         ];
         self.afterSlicing = ko.observable("none");
 
-        self.show = function(target, file, force) {
+        self.show = function(target, file, force, workbench) {
             if (!self.enableSlicingDialog() && !force) {
                 return;
             }
@@ -134,6 +135,9 @@ $(function() {
             self.afterSlicing("print");
 
             $("#slicing_configuration_dialog").modal("show");
+
+            // Flag to signal if the slicing window was called by the workbench
+            self.workbenchFile = workbench;
         };
 
         self.slicer.subscribe(function(newValue) {
@@ -312,17 +316,15 @@ $(function() {
             self.defaultProfile = selectedProfile;
         };
 
-        self.prepareAndSlice = function(workbenchFile) {
+        self.prepareAndSlice = function() {
             self.sliceButtonControl = false; // Disables the slice button to avoid multiple clicks
 
             // Checks if the slicing was called on a workbench scene and finally saves it
-            if (workbenchFile) {
+            if (self.workbenchFile) {
                 var saveCall = BEEwb.main.saveScene(self.file());
-
                 // waits for the save operation
                 saveCall.done( function () {
-
-                    self.slice();
+                    self.slice(self.file());
                 });
 
             } else {
@@ -331,7 +333,7 @@ $(function() {
 
         };
 
-        self.slice = function() {
+        self.slice = function(modelToRemoveAfterSlice) {
 
             // Selects the slicing profile based on the color and resolution
             if (self.selColor() != null && self.selResolution() != null) {
@@ -375,6 +377,10 @@ $(function() {
                 data["print"] = true;
             } else if (self.afterSlicing() == "select") {
                 data["select"] = true;
+            }
+
+            if (modelToRemoveAfterSlice) {
+                data["delete_model"] = modelToRemoveAfterSlice;
             }
 
             // Density support
