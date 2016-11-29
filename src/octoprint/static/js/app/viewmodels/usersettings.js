@@ -17,6 +17,7 @@ $(function() {
         self.access_repeatedPassword = ko.observable(undefined);
         self.access_apikey = ko.observable(undefined);
         self.interface_language = ko.observable(undefined);
+        self.devMode = ko.observable();
 
         self.currentUser = ko.observable(undefined);
         self.currentUser.subscribe(function(newUser) {
@@ -45,6 +46,17 @@ $(function() {
             }
 
             self.currentUser(user);
+            // loads user settings
+            $.ajax({
+                url: API_BASEURL + "users/" + user.name + "/settings",
+                type: "GET",
+                contentType: "application/json; charset=UTF-8",
+                success: function (settings) {
+                debugger;
+                    self.devMode(settings.interface.dev_mode)
+                }
+            });
+
             self.userSettingsDialog.modal("show");
         };
 
@@ -57,7 +69,8 @@ $(function() {
 
             var settings = {
                 "interface": {
-                    "language": self.interface_language()
+                    "language": self.interface_language(),
+                    "dev_mode": self.devMode()
                 }
             };
             self.updateSettings(self.currentUser().name, settings, function() {

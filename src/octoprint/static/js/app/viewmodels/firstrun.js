@@ -1,6 +1,8 @@
 $(function() {
-    function FirstRunViewModel() {
+    function FirstRunViewModel(parameters) {
         var self = this;
+
+        self.loginState = parameters[0];
 
         self.username = ko.observable(undefined);
         self.password = ko.observable(undefined);
@@ -31,7 +33,11 @@ $(function() {
                 "pass1": self.password(),
                 "pass2": self.confirmedPassword()
             };
-            self._sendData(data);
+            self._sendData(data, function () {
+                // Show the login dialog after first user was created
+                var dialog = $('#login_dialog');
+                self.loginState.showLoginDialog(dialog);
+            });
         };
 
         self.disableAccessControl = function() {
@@ -82,7 +88,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push([
         FirstRunViewModel,
-        [],
+        ["loginStateViewModel"],
         "#first_run_dialog"
     ]);
 });

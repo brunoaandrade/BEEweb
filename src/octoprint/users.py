@@ -186,6 +186,9 @@ class UserManager(object):
 	def hasBeenCustomized(self):
 		return False
 
+	def devModeEnabled(self):
+		return False
+
 ##~~ FilebasedUserManager, takes available users from users.yaml file
 
 class FilebasedUserManager(UserManager):
@@ -200,6 +203,7 @@ class FilebasedUserManager(UserManager):
 		self._dirty = False
 
 		self._customized = None
+		self._devMode = False
 		self._load()
 
 	def _load(self):
@@ -215,6 +219,9 @@ class FilebasedUserManager(UserManager):
 					settings = dict()
 					if "settings" in attributes:
 						settings = attributes["settings"]
+						if "interface" in settings and "dev_mode" in settings["interface"] \
+							and settings["interface"]["dev_mode"] == True:
+							self._devMode = True
 					self._users[name] = User(name, attributes["password"], attributes["active"], attributes["roles"], apikey=apikey, settings=settings)
 		else:
 			self._customized = False
@@ -328,7 +335,7 @@ class FilebasedUserManager(UserManager):
 		self._save()
 
 	def getAllUserSettings(self, username):
-		if not username in self._users.key():
+		if not username in self._users.keys():
 			raise UnknownUser(username)
 
 		user = self._users[username]
@@ -395,6 +402,9 @@ class FilebasedUserManager(UserManager):
 
 	def hasBeenCustomized(self):
 		return self._customized
+
+	def devModeEnabled(self):
+		return self._devMode
 
 ##~~ Exceptions
 

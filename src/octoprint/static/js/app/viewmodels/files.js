@@ -246,7 +246,7 @@ $(function() {
         self.sliceFile = function(file) {
             if (!file) return;
 
-            self.slicing.show(file.origin, file.name, true);
+            self.slicing.show(file.origin, file.name, true, false);
         };
 
         self.loadToWorkbench = function(file) {

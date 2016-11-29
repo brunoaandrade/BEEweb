@@ -76,8 +76,10 @@ $(function() {
                 });
 
                 // Shows the login dialog modal if no session is active
-                var dialog = $('#login_dialog');
-                self.showLoginDialog(dialog);
+                if (!CONFIG_FIRST_RUN) {
+                    var dialog = $('#login_dialog');
+                    self.showLoginDialog(dialog);
+                }
 
                 // Deactivates the workbench keyboard shortcuts to prevent actions being trigger when user is typing
                 BEEwb.main.deactivateWorkbenchKeys();

@@ -428,7 +428,6 @@ $(function() {
          * @returns {boolean}
          */
         self.isCancelEnabled = function() {
-            debugger;
             if (!self.loginState.isUser()) {
                 return false;
             }

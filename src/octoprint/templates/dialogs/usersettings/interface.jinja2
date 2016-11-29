@@ -1,4 +1,12 @@
 <form class="form-horizontal">
+    <div class="control-group" title="{{ _('Activates advanced options') }}">
+        <div class="controls">
+            <label class="checkbox">
+                <input type="checkbox" data-bind="checked: devMode">{{ _('Developer mode') }}</input>
+            </label>
+            <small>{{ _('NOTE: Changes will only be applied after the system is restarted.') }}</small>
+        </div>
+    </div>
     <fieldset>
         <legend>{{ _('Language') }}</legend>
         <div class="control-group">

@@ -106,7 +106,7 @@
     </div>
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</a>
-        <a id="slice_button" href="#" class="btn btn-primary" data-bind="click: function() { if ($root.enableSliceButton()) { $root.prepareAndSlice(true) } }, enable: enableSliceButton, css: {disabled: !$root.enableSliceButton()}">
+        <a id="slice_button" href="#" class="btn btn-primary" data-bind="click: function() { if ($root.enableSliceButton()) { $root.prepareAndSlice() } }, enable: enableSliceButton, css: {disabled: !$root.enableSliceButton()}">
 
             <i data-bind="css: {'icon-print': forPrint(), 'icon-magic': !forPrint()}"></i>
             <span data-bind="text: (forPrint() ? '{{ _('Print') }}' : '{{ _('Slice') }}')">{{ _('Slice') }}</span>
