@@ -82,13 +82,16 @@ BEEwb.main = {
         this.scene = new THREE.Scene();
         //scene.add( new THREE.GridHelper( 90, 30 ) );
 
-        var light1 = new THREE.PointLight( 0xffffff, 0.5 );
+        var light1 = new THREE.SpotLight( 0xffffff, 0.5 );
         light1.position.set( 200, 200, 200 );
-        var light2 = new THREE.PointLight( 0xffffff, 0.5 );
+
+        var light2 = new THREE.SpotLight( 0xffffff, 0.5 );
         light2.position.set( -200, 200, 200 );
-        var light3 = new THREE.PointLight( 0xffffff, 0.5 );
+
+        var light3 = new THREE.SpotLight( 0xffffff, 0.5 );
         light3.position.set( 200, -200, 200 );
-        var light4 = new THREE.PointLight( 0xffffff, 0.5 );
+
+        var light4 = new THREE.SpotLight( 0xffffff, 0.5 );
         light4.position.set( -200, -200, 200 );
 
         this.scene.add( light1 );
@@ -295,22 +298,6 @@ BEEwb.main = {
     },
 
     /**
-     * Removes a saved scene with the passed filename
-     *
-     * Returns the Promise object of the Ajax call to the server
-     */
-    removeSavedScene: function ( filename ) {
-
-        return $.ajax({
-            url: API_BASEURL + "files/local/" + filename,
-            type: "DELETE",
-            success: function() {
-                console.log("Scene removed");
-            }
-        });
-    },
-
-    /**
      * Downloads the current scene in STL format
      *
      */
@@ -453,16 +440,21 @@ BEEwb.main = {
         loader.load('./stl/btf_bed.stl', function ( geometry ) {
             var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 200 } );
 
-            var mesh = new THREE.Mesh( geometry, material );
-            mesh.position.set( 0, 0, -0.1 );
-            mesh.castShadow = false;
+            // Transparent shape
+            // var material = new THREE.MeshBasicMaterial(
+            //     {color: 0x8C8C8C, side: THREE.DoubleSide, opacity: 0.5, transparent: true, depthWrite: false}
+            // );
 
-            that.scene.add( mesh );
+            var printerBed = new THREE.Mesh( geometry, material );
+            printerBed.position.set( 0, 0, -0.1 );
+            printerBed.receiveShadow = true;
+
+            that.scene.add( printerBed );
 
         });
 
+        // Bed blue cover plane
         var color = 0x468AC7;
-        var extrudeSettings = { amount: 0.0, bevelEnabled: false}; //amount = thickness
 
         var rectShape = new THREE.Shape();
         rectShape.moveTo( 0,0 );
@@ -472,27 +464,42 @@ BEEwb.main = {
         rectShape.lineTo( 0, 0 );
 
         // 3D shape
-        var geometry = new THREE.ExtrudeGeometry( rectShape, extrudeSettings );
+        //var extrudeSettings = { amount: 0.0, bevelEnabled: false}; //amount = thickness
+        //var geometry = new THREE.ExtrudeGeometry( rectShape, extrudeSettings );
 
-        var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
-        mesh.position.set( -(rectWidth / 2), -(rectHeight / 2), 0 );
-        mesh.rotation.set( 0, 0, 0 );
-        mesh.scale.set( 1, 1, 1 );
-
-        // flat shape
-        /*
         var geometry = new THREE.ShapeGeometry( rectShape );
+        var bedCover = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
 
-        var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color, side: THREE.DoubleSide } ) );
-        mesh.position.set( x, y, z );
-        mesh.rotation.set( rx, ry, rz );
-        mesh.scale.set( s, s, s );
-        */
+        // Transparent shape
+        // var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial(
+        //         {color: color, side: THREE.DoubleSide, opacity: 0.5, transparent: true, depthWrite: false}
+        //     )
+        // );
+
+        bedCover.position.set( -(rectWidth / 2), -(rectHeight / 2), 0 );
+        bedCover.rotation.set( 0, 0, 0 );
+        bedCover.scale.set( 1, 1, 1 );
+        bedCover.receiveShadow = true;
 
         // Sets the global bed var
-        this.bed = mesh;
+        this.bed = bedCover;
 
         this.scene.add( this.bed );
+
+        // Grid
+        var planeW = rectWidth / 5; // pixels
+        var planeH = rectHeight / 5; // pixels
+        var numW = 5; // how many wide (50*50 = 2500 pixels wide)
+        var numH = 5; // how many tall (50*50 = 2500 pixels tall)
+        var plane = new THREE.Mesh(
+            new THREE.PlaneGeometry( planeW*numW, planeH*numH, planeW, planeH ),
+            new THREE.MeshBasicMaterial( {
+                color: 0xBDBDBD,
+                wireframe: true
+
+            } )
+        );
+        this.scene.add(plane);
     },
 
     /**
