@@ -12,7 +12,17 @@
     </label>
     <button class="btn btn-block btn-primary" id="login_button" data-bind="click: function() { loginState.login(); }">{{ _('Login') }}</button>
 </div>
-<ul id="login_dropdown_loggedin" class="hide" data-bind="css: {hide: !loginState.loggedIn(), 'dropdown-menu': loginState.loggedIn()}">
+<ul id="login_dropdown_loggedin" class="hide" data-bind="css: {hide: !loginState.loggedIn(), 'dropdown-menu multi-level': loginState.loggedIn()}">
+    <li class="dropdown-submenu">
+        <a tabindex="-1" href="#" class="dropdown-toggle" data-toggle="dropdown" >
+            <i class="icon-question-sign"></i> <span >{{ _('Help') }}</span>
+        </a>
+        <ul id="help_dropdown_menu" class="dropdown-menu" >
+            <li><a tabindex="-1" href="https://beeverycreative.com/faq/" target="_blank" id="faq_button">{{ _('FAQ') }}</a></li>
+            <li><a href="https://beeverycreative.com/troubleshooting/" target="_blank" id="troubleshooting_button">{{ _('Troubleshooting') }}</a></li>
+            <li><a href="#about_dialog" data-bind="click: function() { $root.showAboutBee(); }" id="about_button" >{{ _('About') }}</a></li>
+        </ul>
+    </li>
     <li><a href="#" id="usersettings_button" data-bind="click: function() { usersettings.show(); }">{{ _('User Settings') }}</a></li>
     <li><a href="#" id="logout_button" data-bind="click: loginState.logout">{{ _('Logout') }}</a></li>
 </ul>
