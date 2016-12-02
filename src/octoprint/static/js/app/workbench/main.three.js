@@ -318,6 +318,9 @@ BEEwb.main = {
             //sets the default color in the object
             obj.material.color = new THREE.Color(DEFAULT_COLOR) ;
         });
+        if (this.transformControls != null) {
+            this.transformControls.detach();
+        }
 
         //sets the selected color in the object
         model.material.color = new THREE.Color(SELECT_COLOR);
@@ -388,7 +391,7 @@ BEEwb.main = {
 
         this.objects.children.forEach(function( obj ) {
             //sets the default color in the object
-            obj.material.color = new THREE.Color(DEFAULT_COLOR) ;
+            obj.material.color = new THREE.Color(DEFAULT_COLOR);
         });
 
         if (this.transformControls != null) {
