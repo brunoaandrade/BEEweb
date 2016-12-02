@@ -81,3 +81,6 @@ If you want to generate the translation binary files from the .po files run the 
 
 $ msgfmt messages.po --output-file messages.mo
 
+or use the utility script in the project root: 
+
+$ compile-messages.sh
