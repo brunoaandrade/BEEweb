@@ -91,7 +91,8 @@
     </div>
 </div>
 
-<div id="insufficient_filament" class="row-fluid text-center" data-bind="visible: loginState.isUser && insufficientFilament">
+<div id="insufficient_filament" class="row-fluid text-center"
+    data-bind="visible: loginState.isUser && insufficientFilament() && !ignoredInsufficientFilament()">
     <br />
     <span class="alert alert-warn display-block">
         <i class="icon-warning-sign"></i>
