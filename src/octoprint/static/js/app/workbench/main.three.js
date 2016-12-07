@@ -80,18 +80,18 @@ BEEwb.main = {
         this.resetCamera();
 
         this.scene = new THREE.Scene();
-        //scene.add( new THREE.GridHelper( 90, 30 ) );
+        //this.scene.add( new THREE.GridHelper( 90, 30 ) );
 
-        var light1 = new THREE.SpotLight( 0xffffff, 0.5 );
+        var light1 = new THREE.PointLight( 0xffffff, 0.5 );
         light1.position.set( 200, 200, 200 );
 
-        var light2 = new THREE.SpotLight( 0xffffff, 0.5 );
+        var light2 = new THREE.PointLight( 0xffffff, 0.5 );
         light2.position.set( -200, 200, 200 );
 
-        var light3 = new THREE.SpotLight( 0xffffff, 0.5 );
+        var light3 = new THREE.PointLight( 0xffffff, 0.5 );
         light3.position.set( 200, -200, 200 );
 
-        var light4 = new THREE.SpotLight( 0xffffff, 0.5 );
+        var light4 = new THREE.PointLight( 0xffffff, 0.5 );
         light4.position.set( -200, -200, 200 );
 
         this.scene.add( light1 );
@@ -222,15 +222,11 @@ BEEwb.main = {
         loader.load(folder + modelName, function ( geometry ) {
             var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 100 } );
 
-            // Updates the bounding box for the next calculations
-            geometry.computeBoundingBox();
-            var bbox = geometry.boundingBox;
-
             // Centers the object if it's not centered
             BEEwb.helpers.centerModelBasedOnBoundingBox(geometry);
 
             // Calculates any possible translation in the X axis due to the previously loaded model
-            var xShift = BEEwb.helpers.calculateObjectShift( bbox );
+            var xShift = BEEwb.helpers.calculateObjectShift( geometry );
 
             var mesh = new THREE.Mesh( geometry, material );
             mesh.position.set( xShift, 0, 0 );
@@ -247,7 +243,6 @@ BEEwb.main = {
             BEEwb.transformOps.placeOnBed();
 
             $('#loadingDialog').modal('hide');
-
             document.cookie="lastModel=" + modelName;
         });
     },
@@ -318,6 +313,9 @@ BEEwb.main = {
             //sets the default color in the object
             obj.material.color = new THREE.Color(DEFAULT_COLOR) ;
         });
+        if (this.transformControls != null) {
+            this.transformControls.detach();
+        }
 
         //sets the selected color in the object
         model.material.color = new THREE.Color(SELECT_COLOR);
@@ -388,7 +386,7 @@ BEEwb.main = {
 
         this.objects.children.forEach(function( obj ) {
             //sets the default color in the object
-            obj.material.color = new THREE.Color(DEFAULT_COLOR) ;
+            obj.material.color = new THREE.Color(DEFAULT_COLOR);
         });
 
         if (this.transformControls != null) {
@@ -487,17 +485,16 @@ BEEwb.main = {
         this.scene.add( this.bed );
 
         // Grid
-        var planeW = rectWidth / 5; // pixels
-        var planeH = rectHeight / 5; // pixels
-        var numW = 5; // how many wide (50*50 = 2500 pixels wide)
-        var numH = 5; // how many tall (50*50 = 2500 pixels tall)
+        var planeW = rectWidth / 10; // pixels
+        var planeH = rectHeight / 10; // pixels
+        var numW = 10; // how many wide (50*50 = 2500 pixels wide)
+        var numH = 10; // how many tall (50*50 = 2500 pixels tall)
         var plane = new THREE.Mesh(
             new THREE.PlaneGeometry( planeW*numW, planeH*numH, planeW, planeH ),
-            new THREE.MeshBasicMaterial( {
+            new THREE.MeshBasicMaterial({
                 color: 0xBDBDBD,
                 wireframe: true
-
-            } )
+            })
         );
         this.scene.add(plane);
     },

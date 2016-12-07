@@ -160,12 +160,13 @@ BEEwb.helpers.convertToRadians = function( degrees ) {
 /**
  * Calculates any possible object shift to avoid overlapping of models in the scene
  *
- * param bbox: THREEJS.BufferGeometry Bounding box of new object to be loaded
+ * param geometry: THREEJS.BufferGeometry geometry new object to be loaded
  *
  * Returns float value with amount to shift the new object
  */
-BEEwb.helpers.calculateObjectShift = function( bbox ) {
+BEEwb.helpers.calculateObjectShift = function( geometry ) {
 
+    geometry.computeBoundingBox();
     var shift = 0;
     if (BEEwb.main.objects.children.length > 0) {
         var lastObj = BEEwb.main.objects.children[BEEwb.main.objects.children.length-1];
@@ -177,7 +178,7 @@ BEEwb.helpers.calculateObjectShift = function( bbox ) {
         }
 
         // Final shift calculation with the "left" side of the new object
-        shift = shift - bbox.min.x + 1; // +1 for a small padding between the objects
+        shift = shift - geometry.boundingBox.min.x + 1; // +1 for a small padding between the objects
     }
 
     return shift;
@@ -190,6 +191,7 @@ BEEwb.helpers.calculateObjectShift = function( bbox ) {
  */
 BEEwb.helpers.centerModelBasedOnBoundingBox = function(geometry) {
 
+    geometry.computeBoundingBox();
     var bbox = geometry.boundingBox;
 
     var xShift = 0;
@@ -201,27 +203,27 @@ BEEwb.helpers.centerModelBasedOnBoundingBox = function(geometry) {
     var centerZ = 0.5 * ( bbox.max.z - bbox.min.z );
 
     // Checks if the object is out of center in any axis
-    if ( bbox.min.x > 0 ) {
+    if ( bbox.min.x >= 0 ) {
         xShift = bbox.min.x + centerX;
     }
 
-    if ( bbox.min.y > 0 ) {
+    if ( bbox.min.y >= 0 ) {
         yShift = bbox.min.y + centerY;
     }
 
-    if ( bbox.min.z > 0 ) {
+    if ( bbox.min.z >= 0 ) {
         zShift = bbox.min.z + centerZ;
     }
 
-    if ( bbox.max.x < 0 ) {
+    if ( bbox.max.x <= 0 ) {
         xShift = bbox.max.x - centerX;
     }
 
-    if ( bbox.min.y < 0 ) {
+    if ( bbox.max.y <= 0 ) {
         yShift = bbox.max.y - centerY;
     }
 
-    if ( bbox.min.z < 0 ) {
+    if ( bbox.max.z <= 0 ) {
         zShift = bbox.max.z - centerZ;
     }
 

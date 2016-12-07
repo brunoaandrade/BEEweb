@@ -60,7 +60,7 @@ BEEwb.events.onMouseUp = function( e ) {
         var model = intersection.object;
 
         if (BEEwb.main.selectedObject !== model) {
-            BEEwb.main.removeAllSelections();
+            //BEEwb.main.removeAllSelections();
             BEEwb.main.selectModel(model);
         }
 

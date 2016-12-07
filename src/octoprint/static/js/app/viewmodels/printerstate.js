@@ -20,6 +20,7 @@ $(function() {
         self.isShutdown = ko.observable(undefined);
 
         self.insufficientFilament = ko.observable(false);
+        self.ignoredInsufficientFilament = ko.observable(false);
 
         self.enablePrint = ko.pureComputed(function() {
             return self.isOperational() && self.isReady() && !self.isPrinting() && !self.isHeating()
@@ -345,6 +346,11 @@ $(function() {
             } else {
                 self._jobCommand("start");
             }
+
+            // Forces the insufficient filament message to hide
+            if (self.insufficientFilament() && self.ignoredInsufficientFilament() == false) {
+                self.ignoredInsufficientFilament(true);
+            }
         };
 
         self.shutdown = function() {
@@ -383,6 +389,7 @@ $(function() {
 
             self._restoreShutdown();
             self.insufficientFilament(false);
+            self.ignoredInsufficientFilament(false);
 
             self._jobCommand("cancel", function() {
 
@@ -442,6 +449,7 @@ $(function() {
 
             return true;
         };
+
         /**
          * This function shows the maintenance panel and
          * automatically displays the change filament dialog
