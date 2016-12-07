@@ -80,18 +80,18 @@ BEEwb.main = {
         this.resetCamera();
 
         this.scene = new THREE.Scene();
-        //scene.add( new THREE.GridHelper( 90, 30 ) );
+        //this.scene.add( new THREE.GridHelper( 90, 30 ) );
 
-        var light1 = new THREE.SpotLight( 0xffffff, 0.5 );
+        var light1 = new THREE.PointLight( 0xffffff, 0.5 );
         light1.position.set( 200, 200, 200 );
 
-        var light2 = new THREE.SpotLight( 0xffffff, 0.5 );
+        var light2 = new THREE.PointLight( 0xffffff, 0.5 );
         light2.position.set( -200, 200, 200 );
 
-        var light3 = new THREE.SpotLight( 0xffffff, 0.5 );
+        var light3 = new THREE.PointLight( 0xffffff, 0.5 );
         light3.position.set( 200, -200, 200 );
 
-        var light4 = new THREE.SpotLight( 0xffffff, 0.5 );
+        var light4 = new THREE.PointLight( 0xffffff, 0.5 );
         light4.position.set( -200, -200, 200 );
 
         this.scene.add( light1 );
@@ -222,15 +222,11 @@ BEEwb.main = {
         loader.load(folder + modelName, function ( geometry ) {
             var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 100 } );
 
-            // Updates the bounding box for the next calculations
-            geometry.computeBoundingBox();
-            var bbox = geometry.boundingBox;
-
             // Centers the object if it's not centered
             BEEwb.helpers.centerModelBasedOnBoundingBox(geometry);
 
             // Calculates any possible translation in the X axis due to the previously loaded model
-            var xShift = BEEwb.helpers.calculateObjectShift( bbox );
+            var xShift = BEEwb.helpers.calculateObjectShift( geometry );
 
             var mesh = new THREE.Mesh( geometry, material );
             mesh.position.set( xShift, 0, 0 );
@@ -247,7 +243,6 @@ BEEwb.main = {
             BEEwb.transformOps.placeOnBed();
 
             $('#loadingDialog').modal('hide');
-
             document.cookie="lastModel=" + modelName;
         });
     },
