@@ -8,6 +8,7 @@ $(function() {
 
         self.file = ko.observable(undefined);
         self.target = undefined;
+        self.path = undefined;
         self.data = undefined;
 
         self.defaultSlicer = undefined;
@@ -22,6 +23,8 @@ $(function() {
         self.profile = ko.observable();
         self.profiles = ko.observableArray();
         self.printerProfile = ko.observable();
+
+        self.allViewModels = undefined;
 
         self.colors = ko.observableArray();
         self.selColor = ko.observable();
@@ -121,16 +124,23 @@ $(function() {
         ];
         self.afterSlicing = ko.observable("none");
 
-        self.show = function(target, file, force, workbench) {
+        self.show = function(target, file, force, path, workbench) {
             if (!self.enableSlicingDialog() && !force) {
                 return;
+            }
+
+            var filename = file.substr(0, file.lastIndexOf("."));
+            if (filename.lastIndexOf("/") != 0) {
+                path = path || filename.substr(0, filename.lastIndexOf("/"));
+                filename = filename.substr(filename.lastIndexOf("/") + 1);
             }
 
             self.requestData(self._nozzleFilamentUpdate);
             self.target = target;
             self.file(file);
-            self.title(_.sprintf(gettext("Slicing %(filename)s"), {filename: self.file()}));
-            self.destinationFilename(self.file().substr(0, self.file().lastIndexOf(".")));
+            self.path = path;
+            self.title(_.sprintf(gettext("Slicing %(filename)s"), {filename: filename}));
+            self.destinationFilename(filename);
             self.printerProfile(self.printerProfiles.currentProfile());
             self.afterSlicing("print");
 
@@ -167,17 +177,14 @@ $(function() {
         });
 
         self.requestData = function(callback) {
-            $.ajax({
-                url: API_BASEURL + "slicing",
-                type: "GET",
-                dataType: "json",
-                success: function(data) {
+            return OctoPrint.slicing.listAllSlicersAndProfiles()
+                .done(function(data) {
                     self.fromResponse(data);
+
                     if (callback !== undefined) {
                         callback();
                     }
-                }
-            });
+                });
         };
 
         self.destinationExtension = ko.pureComputed(function() {
@@ -268,6 +275,10 @@ $(function() {
             });
 
             self.defaultSlicer = selectedSlicer;
+
+            if (self.allViewModels) {
+                callViewModels(self.allViewModels, "onSlicingData", [data]);
+            }
         };
 
         self.profilesForSlicer = function(key) {
@@ -366,12 +377,15 @@ $(function() {
             }
 
             var data = {
-                command: "slice",
                 slicer: self.slicer(),
                 profile: self.profile(),
                 printerProfile: self.printerProfile(),
                 destination: destinationFilename
             };
+
+            if (self.path != undefined) {
+                data["path"] = self.path;
+            }
 
             if (self.afterSlicing() == "print") {
                 data["print"] = true;
@@ -423,26 +437,14 @@ $(function() {
                 data['profile.support'] = 'none';
             }
 
-            $.ajax({
-                url: API_BASEURL + "files/" + self.target + "/" + self.file(),
-                type: "POST",
-                dataType: "json",
-                contentType: "application/json; charset=UTF-8",
-                data: JSON.stringify(data),
-                success: function ( response ) {
+            OctoPrint.files.slice(self.target, self.file(), data)
+                .done(function() {
                     // Shows the status panel
                     if (data["select"] || data["print"])
                         $("#state").collapse("show");
 
                     self.sliceButtonControl = true;
-                },
-                error: function ( response ) {
-                    html = _.sprintf(gettext("Could not slice the selected file. Please make sure your printer is connected."));
-                    new PNotify({title: gettext("Slicing failed"), text: html, type: "error", hide: false});
-
-                    self.sliceButtonControl = true;
-                }
-            });
+                });
 
             $("#slicing_configuration_dialog").modal("hide");
 
@@ -461,6 +463,10 @@ $(function() {
 
         self.onEventSettingsUpdated = function(payload) {
             self.requestData();
+        };
+
+        self.onAllBound = function(allViewModels) {
+            self.allViewModels = allViewModels;
         };
     }
 

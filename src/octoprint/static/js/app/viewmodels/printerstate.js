@@ -35,6 +35,7 @@ $(function() {
         });
 
         self.filename = ko.observable(undefined);
+        self.filepath = ko.observable(undefined);
         self.progress = ko.observable(undefined);
         self.filesize = ko.observable(undefined);
         self.filepos = ko.observable(undefined);
@@ -267,10 +268,12 @@ $(function() {
         self._processJobData = function(data) {
             if (data.file) {
                 self.filename(data.file.name);
+                self.filepath(data.file.path);
                 self.filesize(data.file.size);
                 self.sd(data.file.origin == "sdcard");
             } else {
                 self.filename(undefined);
+                self.filepath(undefined);
                 self.filesize(undefined);
                 self.sd(undefined);
             }
@@ -334,17 +337,15 @@ $(function() {
         };
 
         self.print = function() {
-            var restartCommand = function() {
-                self._jobCommand("restart");
-            };
-
             if (self.isPaused()) {
-                $("#confirmation_dialog .confirmation_dialog_message").text(gettext("This will restart the print job from the beginning."));
-                $("#confirmation_dialog .confirmation_dialog_acknowledge").unbind("click");
-                $("#confirmation_dialog .confirmation_dialog_acknowledge").click(function(e) {e.preventDefault(); $("#confirmation_dialog").modal("hide"); restartCommand(); });
-                $("#confirmation_dialog").modal("show");
+                showConfirmationDialog({
+                    message: gettext("This will restart the print job from the beginning."),
+                    onproceed: function() {
+                        OctoPrint.job.restart();
+                    }
+                });
             } else {
-                self._jobCommand("start");
+                OctoPrint.job.start();
             }
 
             // Forces the insufficient filament message to hide
@@ -370,11 +371,17 @@ $(function() {
         };
 
         self.onlyPause = function() {
-            self.pause("pause");
+            OctoPrint.job.pause();
         };
 
         self.onlyResume = function() {
-            self.pause("resume");
+            OctoPrint.job.resume();
+        };
+
+        self.pause = function(action) {
+            OctoPrint.job.togglePause();
+
+            self._restoreShutdown();
         };
 
         self._restoreShutdown = function() {
@@ -391,14 +398,20 @@ $(function() {
             self.insufficientFilament(false);
             self.ignoredInsufficientFilament(false);
 
-            self._jobCommand("cancel", function() {
+            showConfirmationDialog({
+                message: gettext("This will cancel your print."),
+                onproceed: function() {
+                    OctoPrint.job.cancel({
+                        done: function () {
+                            $('#job_cancel').prop('disabled', false);
+                            $('#job_pause').prop('disabled', false);
 
-                $('#job_cancel').prop('disabled', false);
-                $('#job_pause').prop('disabled', false);
-
-                // Hides the status panel
-                if ($("#state").hasClass('in')) {
-                    $("#state").collapse("hide");
+                            // Hides the status panel
+                            if ($("#state").hasClass('in')) {
+                                $("#state").collapse("hide");
+                            }
+                        }
+                    });
                 }
             });
         };
