@@ -181,11 +181,6 @@ class Server(object):
 		# setup i18n
 		self._setup_i18n(app)
 
-		# then initialize logging
-		self._setup_logging(self._debug, self._logConf)
-		self._logger = logging.getLogger(__name__)
-		self._logger.info("Starting BEEweb %s" % DISPLAY_VERSION)
-
 		if self._settings.getBoolean(["serial", "log"]):
 			# enable debug logging to serial.log
 			logging.getLogger("SERIAL").setLevel(logging.DEBUG)
@@ -1237,7 +1232,6 @@ class Server(object):
 		js_libs_bundle = Bundle(*js_libs, output="webassets/packed_libs.js", filters="js_delimiter_bundler")
 		threejs_libs_bundle = Bundle(*threejs_libs, output="webassets/three_libs.js", filters="js_delimiter_bundler")
 
-		if settings().getBoolean(["devel", "webassets", "minify"]):
 		if minify:
 			js_client_bundle = Bundle(*js_client, output="webassets/packed_client.js", filters="rjsmin, js_delimiter_bundler")
 			js_core_bundle = Bundle(*js_core, output="webassets/packed_core.js", filters="rjsmin, js_delimiter_bundler")

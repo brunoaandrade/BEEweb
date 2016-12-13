@@ -23,7 +23,7 @@ $(function () {
 
         self.startPrint = function () {
 
-            self.slicing.show('local', BEEwb.helpers.generateSceneName(), true, true);
+            self.slicing.show('local', BEEwb.helpers.generateSceneName(), true, undefined, true);
 		};
 
 	}

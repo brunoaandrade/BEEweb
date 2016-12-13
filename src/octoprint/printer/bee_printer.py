@@ -591,14 +591,14 @@ class BeePrinter(Printer):
         return self._comm is not None and self._comm.isShutdown()
 
 
-    def get_state_string(self):
+    def get_state_string(self, state=None):
         """
          Returns a human readable string corresponding to the current communication state.
         """
         if self._comm is None:
             return "Connecting..."
         else:
-            return self._comm.getStateString()
+            return self._comm.getStateString(state)
 
 
     def getCurrentFirmware(self):

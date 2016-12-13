@@ -18,7 +18,7 @@ def run_server(basedir, configfile, host, port, debug, allow_root, logging_confi
 
 	def log_startup(recorder=None, safe_mode=None, **kwargs):
 		logger = logging.getLogger("octoprint.server")
-		logger.info("Starting OctoPrint {}".format(__display_version__))
+		logger.info("Starting BEEweb {}".format(__display_version__))
 		if safe_mode:
 			logger.info("Starting in SAFE MODE. Third party plugins will be disabled!")
 

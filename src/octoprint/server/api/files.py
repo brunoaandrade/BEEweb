@@ -597,7 +597,7 @@ def gcodeFileCommand(filename, target):
 		else:
 			model_to_remove_after_slicing = None
 
-		def slicing_done(target, path, gcode_name, select_after_slicing, print_after_slicing, model_to_remove_after_slicing = None):
+		def slicing_done(target, path, select_after_slicing, print_after_slicing, model_to_remove_after_slicing = None):
 			if select_after_slicing or print_after_slicing:
 				sd = False
 				if target == FileDestinations.SDCARD:

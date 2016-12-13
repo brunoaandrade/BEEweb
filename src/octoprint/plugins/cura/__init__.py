@@ -46,7 +46,8 @@ class CuraPlugin(octoprint.plugin.SlicerPlugin,
 		return cura_engine is not None and os.path.isfile(cura_engine) and os.access(cura_engine, os.X_OK)
 
 	def _is_profile_available(self):
-		return bool(self._slicing_manager.all_profiles("cura", require_configured=False))
+		# uses the all_profiles_list method due to performance issues when there are a lot of cura profiles
+		return bool(self._slicing_manager.all_profiles_list("cura", require_configured=False))
 
 	##~~ TemplatePlugin API
 
@@ -375,14 +376,31 @@ class CuraPlugin(octoprint.plugin.SlicerPlugin,
 								if not tool_key in analysis["filament"]:
 									analysis["filament"][tool_key] = dict()
 
-								if profile.get_float("filament_diameter") != None:
-									if profile.get("gcode_flavor") == GcodeFlavors.ULTIGCODE or profile.get("gcode_flavor") == GcodeFlavors.REPRAP_VOLUME:
-										analysis["filament"][tool_key] = _get_usage_from_volume(filament, profile.get_float("filament_diameter"))
+								if "filamentDiameter" in engine_settings and engine_settings["filamentDiameter"] != None:
+									if engine_settings["gcodeFlavor"] == GcodeFlavors.ULTIGCODE or engine_settings["gcodeFlavor"] == GcodeFlavors.REPRAP_VOLUME:
+										analysis["filament"][tool_key] = _get_usage_from_volume(filament, engine_settings["filamentDiameter"])
 									else:
-										analysis["filament"][tool_key] = _get_usage_from_length(filament, profile.get_float("filament_diameter"))
+										analysis["filament"][tool_key] = _get_usage_from_length(filament, engine_settings["filamentDiameter"])
 
-							except:
-								pass
+							except Exception as ex:
+								self._logger.error(ex)
+
+							# ORIGINAL CODE FOR FILAMENT VOLUME ESTIMATION
+							# try:
+							# 	filament = int(filament_str)
+							# 	if analysis is None:
+							# 		analysis = dict()
+							# 	if not "filament" in analysis:
+							# 		analysis["filament"] = dict()
+							# 	if not tool_key in analysis["filament"]:
+							# 		analysis["filament"][tool_key] = dict()
+							# 	analysis["filament"][tool_key]["length"] = filament
+							# 	if "filamentDiameter" in engine_settings:
+							# 		radius_in_cm = float(int(engine_settings["filamentDiameter"]) / 10000.0) / 2.0
+							# 		filament_in_cm = filament / 10.0
+							# 		analysis["filament"][tool_key]["volume"] = filament_in_cm * math.pi * radius_in_cm * radius_in_cm
+							# except:
+							# 	pass
 			finally:
 				p.close()
 

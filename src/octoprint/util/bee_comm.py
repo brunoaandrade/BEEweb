@@ -273,7 +273,7 @@ class BeeCom(MachineCom):
     def isShutdown(self):
         return self._state == self.STATE_SHUTDOWN
 
-    def getStateString(self):
+    def getStateString(self, state=None):
         """
         Returns the current printer state
         :return:
@@ -289,7 +289,7 @@ class BeeCom(MachineCom):
         elif self._state == self.STATE_OPERATIONAL:
             return "Ready"
         else:
-            return super(BeeCom, self).getStateString()
+            return super(BeeCom, self).getStateString(state)
 
     def startPrint(self, pos=None):
         """
