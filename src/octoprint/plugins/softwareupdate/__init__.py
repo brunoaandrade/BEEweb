@@ -216,6 +216,13 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 						"restart": "octoprint",
 						"checkout_folder": "/home/pi/beewebpi-repo" # default checkout path
 					},
+					"BEEpanel": {
+						"type": "github_release",
+						"user": "beeverycreative",
+						"repo": "BEEpanel2",
+						"restart": "environment",
+						"checkout_folder": "/home/pi/BEEpanel2"  # default checkout path
+					},
 				},
 				"pip_command": None,
 				"check_providers": {},
