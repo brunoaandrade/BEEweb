@@ -156,19 +156,19 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 	#~~ SettingsPlugin API
 
 	def get_settings_defaults(self):
-		configurationsReleaseBranch = "release/configurations"
-		update_script = os.path.join(self._basefolder, "scripts", "update-beeweb.py")
-		update_script_configurations = os.path.join(self._basefolder, "scripts", "update-beewebpi.py")
+		configurationsReleaseBranch = "test/configurations"
+		update_script = os.path.join(self._basefolder, "scripts", "update-octoprint.py")
 
 		# in case of windows desktop installation
 		if sys.platform == "win32":
 			git_exec = '..\\Git\\bin\\git.exe'
 			python_exec = '..\\Python27\\python.exe'
 
-			update_script_callable_beeweb = "\"{{python}}\" \"{update_script}\" --branch={{branch}} --force={{force}} --git={git_executable} --python={python_executable} {{folder}} {{target}}".format(
+			update_script_callable_beeweb = "\"{{python}}\" \"{update_script}\" --branch={{branch}} --force={{force}} --git={git_executable} --python={python_executable} --custom-install={custom_install} {{folder}} {{target}}".format(
 				update_script=update_script,
 				git_executable=git_exec,
-				python_executable=python_exec)
+				python_executable=python_exec,
+				custom_install='beeweb')
 
 			default_settings = {
 				"checks": {
@@ -189,11 +189,13 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				"cache_ttl": 24 * 60,
 			}
 		else:
-			update_script_callable_beeweb = "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} \"{{folder}}\" {{target}}".format(
-				update_script=update_script)
-			update_script_callable_beewebpi = "{{python}} \"{update_script}\" \"{{folder}}\" {{target}} {release_branch}".format(
-				update_script=update_script_configurations,
-				release_branch=configurationsReleaseBranch)
+			update_script_callable_beeweb = "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} --custom-install={custom_install} \"{{folder}}\" {{target}}".format(
+				update_script=update_script,
+				custom_install='beeweb')
+			update_script_callable_beewebpi = "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} --custom-install={custom_install} \"{{folder}}\" {{target}}".format(
+				update_script=update_script,
+				branch=configurationsReleaseBranch,
+				custom_install='beeweb-configurations')
 
 			default_settings = {
 				"checks": {

@@ -10,6 +10,9 @@ import errno
 import sys
 import traceback
 import time
+from octoprint.settings import settings
+from distutils.dir_util import copy_tree
+from distutils.file_util import copy_file
 
 def _log_call(*lines):
 	_log(lines, prefix=">", stream="call")
@@ -253,6 +256,94 @@ def install_source(python_executable, folder, user=False, sudo=False):
 	if returncode is None or returncode != 0:
 		raise RuntimeError("Could not update, \"python setup.py install\" failed with returncode {}".format(returncode))
 
+################################
+## CUSTOM BEEWEB RELATED CODE ##
+################################
+def install_source_beeweb(python_executable, folder, user=False, sudo=False):
+	print(">>> Running: python setup.py clean")
+	returncode, stdout, stderr = _python(["setup.py", "clean"], folder, python_executable)
+	if returncode is None or returncode != 0:
+		print("\"python setup.py clean\" failed with returncode {}".format(returncode))
+		print("Continuing anyways")
+
+	print(">>> Running: python setup.py install")
+	args = ["setup.py", "install"]
+	if user:
+		args.append("--user")
+	returncode, stdout, stderr = _python(args, folder, python_executable, sudo=sudo)
+	if returncode is None or returncode != 0:
+		raise RuntimeError("Could not update, \"python setup.py install\" failed with returncode {}".format(returncode))
+
+	# Copies the firmware files to the settings directory
+	print(">>> Copying Firmware files to settings directory...")
+	# folder where the installation settings files are located
+	settings_folder = settings(init=True).getBaseFolder('base')
+	try:
+		# copies the files in the /etc directory
+		copy_tree(folder + '/firmware', settings_folder + '/firmware')
+	except Exception as ex:
+		raise RuntimeError(
+			"Could not update, copying the firmware files to respective settings directory failed with error: %s" % ex.message)
+	finally:
+		print("Firmware files installed.")
+
+
+	# If the update is running on Windows tries to remove cache files from the client app
+	if sys.platform == "win32":
+		print(">>> Removing client cache files...")
+		try:
+			import os
+			from glob import glob
+			from shutil import rmtree
+
+			pattern = 'C:\\Users\\*\\AppData\\Roaming\\beesoft-nativefier*\\Cache\\*'
+
+			for item in glob(pattern):
+				if os.path.exists(item):
+					try:
+						os.remove(item)
+					except Exception:
+						continue
+
+		except Exception as ex:
+			raise RuntimeError('Could not remove the cache files from client app: %s' % ex.strerror)
+
+
+def install_support_files(folder, target_folder):
+	print(">>> Copying BEEweb settings files to installation directory...")
+	settings_folder_path = folder + '/src/filesystem/home/pi/.beeweb'
+
+	try:
+		# creates a backup of the user config.yaml file
+		copy_file(target_folder + '/config.yaml', target_folder + '/config-backup.yaml')
+
+		files_copied = copy_tree(settings_folder_path, target_folder)
+
+		# overwrites the settings file from the repository with the backup
+		copy_file(target_folder + '/config-backup.yaml', target_folder + '/config.yaml')
+
+	except Exception as ex:
+		raise RuntimeError(
+			"Could not update, copying the files to .beeweb directory failed with error: %s" % ex.message)
+	finally:
+		if files_copied:
+			print("BEEweb settings files copied!")
+
+	if sys.platform != "win32" and sys.platform != "darwin":
+		try:
+			# copies the files in the /etc directory
+			copy_tree(folder + '/src/filesystem/root/etc/default', '/etc/default')
+			copy_tree(folder + '/src/filesystem/root/etc/haproxy', '/etc/haproxy')
+			copy_tree(folder + '/src/filesystem/root/etc/init.d', '/etc/init.d')
+			copy_tree(folder + '/src/filesystem/root/etc/init.d', '/etc/hostapd')
+
+		except Exception as ex:
+			raise RuntimeError(
+				"Could not update, copying the system files to /etc directories failed with error: %s" % ex.message)
+		finally:
+			if files_copied:
+				print("BEEwebPi system files copied!")
+
 
 def parse_arguments():
 	import argparse
@@ -278,6 +369,8 @@ def parse_arguments():
 	                    help="Specify the base folder of the OctoPrint installation to update")
 	parser.add_argument("target", type=str,
 	                    help="Specify the commit or tag to which to update")
+	parser.add_argument("--custom-install", type=str, dest="custom_install",
+	                    help="Specify the custom repository or octoprint distro to update")
 
 	args = parser.parse_args()
 
@@ -307,7 +400,17 @@ def main():
 		raise RuntimeError("Could not update, base folder is not writable")
 
 	update_source(git_executable, folder, args.target, force=args.force, branch=args.branch)
-	install_source(python_executable, folder, user=args.user, sudo=args.sudo)
+
+	if args.custom_install and args.custom_install == "beeweb":
+		install_source_beeweb(python_executable, folder, user=args.user, sudo=args.sudo)
+
+	elif args.custom_install and args.custom_install == "beeweb-configurations":
+		# folder where the installation settings files are located
+		target_folder = settings(init=True).getBaseFolder('base')
+		install_support_files(folder, target_folder)
+
+	else:
+		install_source(python_executable, folder, user=args.user, sudo=args.sudo)
 
 if __name__ == "__main__":
 	main()
