@@ -131,7 +131,8 @@ class CoreWizardPlugin(octoprint.plugin.AssetPlugin,
 		system_restart_command = self._settings.global_get(["server", "commands", "systemRestartCommand"])
 		server_restart_command = self._settings.global_get(["server", "commands", "serverRestartCommand"])
 
-		return not (system_shutdown_command and system_restart_command and server_restart_command)
+		#return not (system_shutdown_command and system_restart_command and server_restart_command)
+		return False
 
 	def _get_servercommands_wizard_details(self):
 		return dict()
