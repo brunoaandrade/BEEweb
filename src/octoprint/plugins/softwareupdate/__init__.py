@@ -196,6 +196,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				update_script=update_script,
 				branch=configurationsReleaseBranch,
 				custom_install='beeweb-configurations')
+			update_script_callable_beepanel = 'python --version' # dummy installer script, because it's not needed for beepanel
 
 			default_settings = {
 				"checks": {
@@ -207,7 +208,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 						"restart": "octoprint",
 						"stable_branch": dict(branch="master", name="Stable"),
 						"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
-												dict(branch="rc/devel", name="Devel RCs")]
+												dict(branch="rc/develop", name="Devel RCs")]
 					},
 					"BEEsoft configurations": {
 						"type": "github_commit",
@@ -223,7 +224,12 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 						"user": "beeverycreative",
 						"repo": "BEEpanel2",
 						"restart": "environment",
-						"checkout_folder": "/home/pi/BEEpanel2"  # default checkout path
+						"persist_current": True, # Custom property to force persistence of current version. The octoprint default, doesn't do it for some reason in github releases...
+						"current": "unknown",
+						"update_script": update_script_callable_beepanel,
+						"stable_branch": dict(branch="master", name="Stable"),
+						"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
+												dict(branch="rc/develop", name="Devel RCs")]
 					},
 				},
 				"pip_command": None,
@@ -832,7 +838,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 			self._settings.load()
 
 			# persist the new version if necessary for check type
-			if check["type"] == "github_commit":
+			if check["type"] == "github_commit" or\
+			 (check["type"] == "github_release" and "persist_current" in check):
 				dummy_default = dict(plugins=dict())
 				dummy_default["plugins"][self._identifier] = dict(checks=dict())
 				dummy_default["plugins"][self._identifier]["checks"][target] = dict(current=None)
