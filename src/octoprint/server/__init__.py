@@ -1182,7 +1182,7 @@ class Server(object):
 		]
 
 		css_libs = [
-			"css/bootstrap.cosmo.min.css",
+			"css/bootstrap.spacelab.min.css",
 			"css/bootstrap-modal.css",
 			"css/bootstrap-slider.css",
 			"css/bootstrap-tabdrop.css",
