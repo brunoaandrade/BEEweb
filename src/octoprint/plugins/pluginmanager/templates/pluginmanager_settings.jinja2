@@ -27,7 +27,7 @@
 {{ pluginmanager_sudopip() }}
 
 <div class="pull-right">
-    <button class="btn btn-small" data-bind="click: function() { $root.showPluginSettings(); }" title="{{ _('Plugin Configuration') }}"><i class="icon-wrench"></i></button>
+    <button class="btn btn-small yellow" data-bind="click: function() { $root.showPluginSettings(); }" title="{{ _('Plugin Configuration') }}"><i class="icon-wrench"></i></button>
 </div>
 
 <h3>{{ _('Installed Plugins') }}</h3>
@@ -69,7 +69,7 @@
     </ul>
 </div>
 
-<button class="btn btn-block" data-bind="click: $root.showRepository">{{ _('Get More...') }}</button>
+<button class="btn btn-block yellow" data-bind="click: $root.showRepository">{{ _('Get More...') }}</button>
 
 <p class="muted" data-bind="visible: pipAvailable()">
     <small>Using pip at "<span data-bind="text: pipCommand"></span>" (Version <span data-bind="text: pipVersion"></span><span data-bind="visible: pipAdditionalArgs">, additional arguments: <span data-bind="text: pipAdditionalArgs"></span></span>)</small>
@@ -133,7 +133,7 @@
                             </div>
                         </div>
                         <div class="span3">
-                            <button class="btn btn-primary btn-block" data-bind="enable: $root.enableRepoInstall($data), css: {disabled: !$root.enableRepoInstall($data)}, click: function() { if ($root.enableRepoInstall($data)) { $root.installFromRepository($data); } else { return false; } }"><i class="icon-add"></i> <span data-bind="text: $root.installButtonText($data)"></span></button>
+                            <button class="btn btn-primary btn-block yellow" data-bind="enable: $root.enableRepoInstall($data), css: {disabled: !$root.enableRepoInstall($data)}, click: function() { if ($root.enableRepoInstall($data)) { $root.installFromRepository($data); } else { return false; } }"><i class="icon-add"></i> <span data-bind="text: $root.installButtonText($data)"></span></button>
                         </div>
                     </div>
                 </div>
@@ -237,7 +237,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</button>
-        <button class="btn btn-primary" data-bind="click: savePluginSettings" aria-hidden="true">{{ _('Save') }}</button>
+        <button class="btn btn-primary green" data-bind="click: savePluginSettings" aria-hidden="true">{{ _('Save') }}</button>
     </div>
 </div>
 

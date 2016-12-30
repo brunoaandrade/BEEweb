@@ -27,7 +27,7 @@
                     <div class="row-fluid">
                         <select data-bind="options: nozzleSizes, optionsText: 'name', optionsValue: 'key', value: selectedNozzle, optionsCaption: '{{ _('Select nozzle size...') }}'"></select>
 
-                        <button id="submit-nozzle" title="Save Nozzle" class="btn btn-primary pull-right"
+                        <button id="submit-nozzle" title="Save Nozzle" class="btn btn-primary pull-right yellow"
                         data-bind="click: saveNozzle, enable: printerState.isOperational() && !commandLock()
                         && printerState.isReady() && !printerState.isPrinting() && loginState.isUser() && selectedNozzle">
                             <i class="icon-arrow-right"></i> {{ _('Next')}}
@@ -84,7 +84,7 @@
         </div>
         <div class="span3">
             <div class="row-fluid">
-                <button id="load-ext-mtn" title="Load" class="btn btn-primary span12"
+                <button id="load-ext-mtn" title="Load" class="btn btn-primary span12 yellow"
                     data-bind="click: loadFilament, enable: printerState.isOperational()
                     && printerState.isReady() && !commandLock()
                     && !printerState.isPrinting() && loginState.isUser()">
@@ -93,7 +93,7 @@
             </div>
             <br />
             <div class="row-fluid">
-                <button id="unload-ext-mtn" title="Unload" class="btn btn-primary span12"
+                <button id="unload-ext-mtn" title="Unload" class="btn btn-primary span12 yellow"
                     data-bind="click: unloadFilament, enable: printerState.isOperational()
                     && printerState.isReady() && !commandLock()
                     && !printerState.isPrinting() && loginState.isUser()">

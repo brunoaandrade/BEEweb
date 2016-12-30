@@ -3,7 +3,7 @@
     <head>
         <title data-bind="text: title">BEEsoft</title>
 
-        <link rel="shortcut icon" href="{{ url_for('static', filename='img/bee.png') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/icons/BEESOFT_LOGO.svg') }}">
         <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='img/bee.png') }}">
         <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='img/bee.png') }}">
 
@@ -21,26 +21,26 @@
         <div class="page-container">
             <div id="navbar" class="navbar navbar-static-top">
                 <div class="navbar-inner" data-bind="css: appearanceClasses">
-                    <a class="brand" href="#">
-                        <span class="brand-label-fix"><strong data-bind="text: appearance.brand">BEEsoft</strong></span>
-                    </a>
-
-                    <div class="nav-collapse">
-                        <!-- Navbar -->
-                        <ul class="nav pull-right">
-                            {% for key in templates.navbar.order %}
-                                {% set data = templates.navbar.entries[key] %}
-                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- ko allowBindings: false -->{% endif %}
-                                <li id="{{ data._div }}"
-                                    {% if "data_bind" in data %}data-bind="{{ data.data_bind }}"{% endif %}
-                                    {% if "classes" in data %}class="{{ data.classes|join(' ') }}"{% endif %}
-                                    {% if "styles" in data %}style="{{ data.styles|join(', ') }}"{% endif %}
-                                        >
-                                    {% try "There was an error with the template {filename} at line number {lineno}: {exception}" %}{% include data.template ignore missing %}{% endtry %}
-                                </li>
-                                {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- /ko -->{% endif %}
-                            {% endfor %}
-                        </ul>
+                    <div class="container">
+                        <a class="brand" href="#">
+                        </a>
+                        <div class="nav-collapse">
+                            <!-- Navbar -->
+                            <ul class="nav pull-right">
+                                {% for key in templates.navbar.order %}
+                                    {% set data = templates.navbar.entries[key] %}
+                                    {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- ko allowBindings: false -->{% endif %}
+                                    <li id="{{ data._div }}"
+                                        {% if "data_bind" in data %}data-bind="{{ data.data_bind }}"{% endif %}
+                                        {% if "classes" in data %}class="{{ data.classes|join(' ') }}"{% endif %}
+                                        {% if "styles" in data %}style="{{ data.styles|join(', ') }}"{% endif %}
+                                            >
+                                        {% try "There was an error with the template {filename} at line number {lineno}: {exception}" %}{% include data.template ignore missing %}{% endtry %}
+                                    </li>
+                                    {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- /ko -->{% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,7 +84,7 @@
 
                     <!-- Sidebar -->
                     {% if templates.sidebar.order %}
-                    <div id="sidebar-container" class="accordion {% if templates.tab.order %}span3{% else %}span12{% endif %}">
+                    <div id="sidebar-container" class="accordion {% if templates.tab.order %}{% else %}span12{% endif %}">
                         {% for key in templates.sidebar.order %}
                             {% set entry, data = templates.sidebar.entries[key] %}
                             {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- ko allowBindings: false -->{% endif %}
@@ -95,7 +95,7 @@
                                     >
                                 <div class="accordion-heading">
                                     <a class="accordion-toggle" data-toggle="collapse" data-target="#{{ data._div }}">
-                                        {% if "icon" in data %}<i class="icon-{{ data.icon }}"></i> {% endif %}{{ entry }}
+                                        {{ entry }}{% if "icon" in data %}<i class="icon-{{ data.icon }}"></i> {% endif %}
                                     </a>
                                     {% if "template_header" in data %}
                                         {% include data.template_header ignore missing %}
@@ -112,28 +112,9 @@
                             </div>
                             {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- /ko -->{% endif %}
                         {% endfor %}
-                        <div class="print-container">
-                            <button class="btn-prepareprint" id="print_scene"
-                                    data-bind="click: startPrint, enable: loginState.isUser() && !connection.isConnecting() && !state.enablePrint()">
-                                <i class="icon-print" ></i>
-                                {{ _('Print...') }}
-                            </button>
-                        </div>
                     </div>
                     {% endif %}
                 </div>
-{#                <div class="footer">#}
-{#                    <hr />#}
-{#                    <ul class="pull-left muted">#}
-{#                        <li><large>BEEsoft &copy 2016 BEEVC - Electronic Systems : <span class="version">{{ display_version|e }}</span></large></li>#}
-{#                    </ul>#}
-{#                    <ul class="pull-right">#}
-{#                        <li>{{ _('powered by ') }}<a href="http://octoprint.org" target="_blank"><i class="icon-github"></i> Octoprint</a></li>#}
-{#                        <!--<li><a href="https://github.com/foosel/OctoPrint/"><i class="icon-github"></i> {{ _('Sourcecode') }}</a></li>-->#}
-{#                        <!--<li><a href="http://docs.octoprint.org"><i class="icon-book"></i> {{ _('Documentation') }}</a></li>-->#}
-{#                        <!--<li><a href="https://github.com/foosel/OctoPrint/issues"><i class="icon-flag"></i> {{ _('Bugs and Requests') }}</a></li>-->#}
-{#                    </ul>#}
-{#                </div>#}
             </div>
 
             <!-- Dialogs -->

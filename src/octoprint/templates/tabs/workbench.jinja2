@@ -7,7 +7,7 @@
             <button id="btn-move" class="btn btn-default btn-block model-selection" title="{{ _('Move') }}"
             data-toggle="tooltip" data-placement="right"
             onclick="BEEwb.transformOps.activateMove();" disabled="true">
-                <i class="icon-exchange" ></i>
+                <span class="icon move"></span>
             </button>
             <div id="axis-values">
                 <div id="move-axis-form" class="row-fluid form-inline">
@@ -30,7 +30,7 @@
             <button id="btn-scale" class="btn btn-default btn-block model-selection"
                 data-toggle="tooltip" data-placement="right"
                 title="{{ _('Scale') }}" onclick="BEEwb.transformOps.activateScale();" disabled="true">
-                <i class="icon-crop" ></i>
+                <span class="icon scale"></span>
             </button>
             <div id="scale-values-form" style="display: none;">
                 <span class="workbench-title">{{ _('Object Dimensions') }}</span>
@@ -75,7 +75,7 @@
             <button id="btn-rotate" class="btn btn-default btn-block model-selection"
                 data-toggle="tooltip" data-placement="right"
                 title="{{ _('Rotate') }}" onclick="BEEwb.transformOps.activateRotate();" disabled="true">
-                <i class="icon-refresh" ></i>
+                <span class="icon rotate"></span>
             </button>
             <hr>
             <div id="rotate-values-form" style="display: none;">
@@ -95,11 +95,11 @@
                     </div>
                     <div class="row-fluid">
                         <button id="btn-rotate-ccw" class="span6 btn btn-sm btn-default model-selection" onclick="BEEwb.transformOps.rotateCCW();" disabled="true">
-                            <i class="icon-rotate-left" ></i>
+                            <span class="m-icon rotatel"></span>
                             <span>{{ _('90° Left') }}</span>
                         </button>
                         <button id="btn-rotate-cw" class="span6 btn btn-sm btn-default model-selection" onclick="BEEwb.transformOps.rotateCW();" disabled="true">
-                            <i class="icon-rotate-right" ></i>
+                            <span class="m-icon rotater"></span>
                             <span>{{ _('90° Right') }}</span>
                         </button>
                     </div>
@@ -118,54 +118,60 @@
                     </div>
                 </div>
             </div>
-            <button class="btn btn-block model-selection" title="{{ _('Center model') }}" id="center_selection"
-                    data-toggle="tooltip" data-placement="right"
-                    data-bind="" onclick="BEEwb.transformOps.centerModel();">
-                <i class="icon-bullseye" ></i>
-            </button>
             <button class="btn btn-block model-selection" title="{{ _('Place on bed') }}" id="place_bed_selection"
                     data-toggle="tooltip" data-placement="right"
                     data-bind="" onclick="BEEwb.transformOps.placeOnBed();">
-                <i class="icon-level-down" ></i>
+                <span class="icon placein"></span>
             </button>
-            <button class="btn btn-block model-selection" title="{{ _('Reset model') }}" id="reset_selection"
+            <button class="btn btn-block model-selection" title="{{ _('Center model') }}" id="center_selection"
                     data-toggle="tooltip" data-placement="right"
-                    data-bind="" onclick="BEEwb.transformOps.resetSelectedModel();">
-                <i class="icon-reply-all" ></i>
+                    data-bind="" onclick="BEEwb.transformOps.centerModel();">
+                <span class="icon centerplat"></span>
             </button>
             <button class="btn btn-block model-selection" title="{{ _('Clone model') }}" id="clone_selection"
                     data-toggle="tooltip" data-placement="right"
                     data-bind="" onclick="BEEwb.transformOps.cloneSelected();">
-                <i class="icon-copy" ></i>
+                <span class="icon clonemod"></span>
+            </button>
+            <button class="btn btn-block model-selection" title="{{ _('Reset model') }}" id="reset_selection"
+                    data-toggle="tooltip" data-placement="right"
+                    data-bind="" onclick="BEEwb.transformOps.resetSelectedModel();">
+                <span class="icon resetmod"></span>
             </button>
             <button class="btn btn-block btn-delete model-selection" title="{{ _('Delete') }}" id="delete_selection"
                     data-toggle="tooltip" data-placement="right"
                     data-bind="" onclick="BEEwb.transformOps.removeSelected();">
-                <i class="icon-trash" ></i>
+                <span class="icon trash"></span>
             </button>
             <hr>
             <button class="btn btn-block" title="{{ _('Save Scene') }}" id="save_scene"
                 data-toggle="tooltip" data-placement="right" onclick="BEEwb.main.saveScene();">
                 <i class="icon-save" ></i>
             </button>
-            <button class="btn btn-block" title="{{ _('Clear Platform') }}" id="clean_bed"
-                data-toggle="tooltip" data-placement="right" onclick="BEEwb.main.clearBed();" >
-                <i class="icon-eraser" ></i>
-            </button>
-            <button class="btn btn-block" id="reset_camera"
+             <button class="btn btn-block" id="reset_camera"
                 data-toggle="tooltip" data-placement="right" onclick="BEEwb.main.resetCamera();"
                 title="{{ _('Reset camera position') }}">
-                <i class="icon-screenshot" ></i>
+                <span class="icon homenew"></span>
+            </button>
+            <button class="btn btn-block" title="{{ _('Clear Platform') }}" id="clean_bed"
+                data-toggle="tooltip" data-placement="right" onclick="BEEwb.main.clearBed();" >
+                <span class="icon clearplat"></span>
             </button>
         </div>
-
         <div>
-            <div id="stl_container" ></div>
-            <div id="workbench-buttons-bottom" class="row-fluid">
+            <div id="stl_container" >
+                <button class="btn-prepareprint" id="print_scene"
+                    data-bind="click: startPrint, enable: loginState.isUser() && !connection.isConnecting() && !state.enablePrint()">
+                    <i class="icon-print" ></i>
+                    {{ _('Prepare Print...') }}
+                </button>
                 <div id="out-bound-msg" class="alert alter-warning workbench-alert text-center" style="display: none;">
                     <i class="icon-warning-sign"></i>
                     {{ _('The model is out of the printing area.') }}
                 </div>
+            </div>
+            <div id="workbench-buttons-bottom" class="row-fluid">
+
             </div>
             <script>
                 BEEwb.main.init();
