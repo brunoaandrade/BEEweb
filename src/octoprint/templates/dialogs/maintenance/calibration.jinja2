@@ -17,13 +17,13 @@
             <strong>{{ _('Table Fine Tuning')}}</strong>
             <br /><br />
             <div class="row-fluid">
-                <button id="upsmallstep-btn" title="Up 0.05" class="btn btn-primary btn-block"
+                <button id="upsmallstep-btn" title="Up 0.05" class="btn btn-primary btn-block yellow"
                    data-bind="click: upSmallStep, enable: printerState.isOperational() && !commandLock()
                    && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                     <i class="icon-chevron-up"></i> {{ _('0.05 millimeters')}}
                 </button>
                 <br />
-                <button id="upbigstep-btn" title="Up 0.05" class="btn btn-primary btn-block"
+                <button id="upbigstep-btn" title="Up 0.05" class="btn btn-primary btn-block yellow"
                    data-bind="click: upBigStep, enable: printerState.isOperational() && !commandLock()
                    && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                     <i class="icon-arrow-up"></i> {{ _('0.5 millimeters')}}
@@ -31,13 +31,13 @@
 
                 <br /><br />
 
-                <button id="downbigstep-btn" title="Up 0.05" class="btn btn-primary btn-block"
+                <button id="downbigstep-btn" title="Up 0.05" class="btn btn-primary btn-block yellow"
                    data-bind="click: downBigStep, enable: printerState.isOperational() && !commandLock()
                    && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                     <i class="icon-arrow-down"></i> {{ _('0.5 millimeters')}}
                 </button>
                 <br />
-                <button id="downsmallstep-btn" title="Down 0.05" class="btn btn-primary btn-block"
+                <button id="downsmallstep-btn" title="Down 0.05" class="btn btn-primary btn-block yellow"
                    data-bind="click: downSmallStep, enable: printerState.isOperational() && !commandLock()
                    && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                     <i class="icon-chevron-down"></i> {{ _('0.05 millimeters')}}
@@ -60,7 +60,7 @@
     <br />
     <div class="row-fluid">
         <div class="span12">
-            <button id="calib-next-step-3" title="Next Step" class="btn btn-primary pull-right"
+            <button id="calib-next-step-3" title="Next Step" class="btn btn-primary pull-right yellow"
                data-bind="click: nextStepCalibration1, enable: printerState.isOperational() && !commandLock()
                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                 <i class="icon-arrow-right"></i> {{ _('Next Step')}}</button>
@@ -91,7 +91,7 @@
     <br />
     <div class="row-fluid">
         <div class="span12">
-            <button id="calib-next-step-4" title="Next Step" class="btn btn-primary pull-right"
+            <button id="calib-next-step-4" title="Next Step" class="btn btn-primary pull-right yellow"
                data-bind="click: nextStepCalibration2, enable: printerState.isOperational() && !commandLock()
                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                 <i class="icon-arrow-right"></i> {{ _('Next Step')}}</button>
@@ -122,7 +122,7 @@
     <br />
     <div class="row-fluid">
         <div class="span12">
-            <button id="calib-next-step-5" title="Next Step" class="btn btn-primary pull-right"
+            <button id="calib-next-step-5" title="Next Step" class="btn btn-primary pull-right yellow"
                data-bind="click: nextStepCalibration3, enable: printerState.isOperational() && !commandLock()
                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                 <i class="icon-arrow-right"></i> {{ _('Next Step')}}
@@ -148,7 +148,7 @@
     <div class="row-fluid">
         <div class="span4"></div>
         <div class="span4 text-center">
-            <button id="test-calibration-btn" title="Calibration Test" class="btn btn-primary"
+            <button id="test-calibration-btn" title="Calibration Test" class="btn btn-primary yellow"
                data-bind="click: calibrationTestStep1, enable: printerState.isOperational() && !commandLock()
                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                 <i class="icon-cog"></i> {{ _('Calibration test')}}</button>
@@ -222,7 +222,7 @@
         <div class="span1"></div>
         <div class="span4" style="text-align: center;">
             <img src="{{ url_for('static', filename='img/maintenance/validation1.png') }}" />
-            <button id="calib-success" title="Finish Calibration" class="btn btn-primary "
+            <button id="calib-success" title="Finish Calibration" class="btn btn-primary green"
                data-bind="click: finishOperations, enable: printerState.isOperational() && !commandLock()
                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                 <i class="icon-ok-sign"></i> {{ _('Calibration successful')}}
@@ -232,7 +232,7 @@
         <div class="span1"></div>
         <div class="span4" style="text-align: center;">
             <img src="{{ url_for('static', filename='img/maintenance/validation2.png') }}" />
-            <button id="calib-repeat" title="Repeat Calibration" class="btn btn-default"
+            <button id="calib-repeat" title="Repeat Calibration" class="btn btn-default yellow"
                data-bind="click: repeatCalibration, enable: printerState.isOperational() && !commandLock()
                && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
                 <i class="icon-refresh"></i> {{ _('Repeat calibration')}}
