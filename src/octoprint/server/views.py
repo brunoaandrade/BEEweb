@@ -361,7 +361,9 @@ def index():
 	#~~ prepare full set of template vars for rendering
 
 	now = datetime.datetime.utcnow()
-	first_run = settings().getBoolean(["server", "firstRun"]) and userManager.enabled and not userManager.hasBeenCustomized()
+ 	# Removed the hasBeenCustomized verification to allow custom user for beepanel
+	first_run = settings().getBoolean(["server", "firstRun"]) and userManager.enabled # and not userManager.hasBeenCustomized()
+
 	render_kwargs = dict(
 		webcamStream=settings().get(["webcam", "stream"]),
 		enableTemperatureGraph=settings().get(["feature", "temperatureGraph"]),

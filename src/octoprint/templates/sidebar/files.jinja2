@@ -17,7 +17,7 @@
         {% else %}
             <span class="fileinput-button span12" data-bind="css: {disabled: !$root.loginState.isUser()}" style="margin-bottom: 10px">
                 <i class="icon-upload-alt icon-white"></i>
-                <span>{{ _('Upload') }}</span>
+                <span>{{ _('Import Model') }}</span>
                 <input id="gcode_upload" accept="{{ ",".join(supportedExtensions) }}" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser()">
             </span>
         {% endif %}

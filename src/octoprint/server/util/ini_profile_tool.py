@@ -9,7 +9,8 @@ import requests
 
 def convert_ini_to_profile(input_path):
 	count = 0
-	headers = {'X-Api-Key': '466BAF4374EE4F3EB364182AF184A429'}
+	# CHANGE THE KEY BEFORE USING THE SCRIPT
+	headers = {'X-Api-Key': '2EBDBD9A3C224992A9B058DA2C9705C1'}
 
 	for filename in glob.glob(input_path + "/*.ini"):
 		ininame = os.path.basename(filename)
