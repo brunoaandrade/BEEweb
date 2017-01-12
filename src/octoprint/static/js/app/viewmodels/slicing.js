@@ -4,7 +4,6 @@ $(function() {
 
         self.loginState = parameters[0];
         self.printerProfiles = parameters[1];
-        self.printerState = parameters[2];
 
         self.file = ko.observable(undefined);
         self.target = undefined;
@@ -160,9 +159,7 @@ $(function() {
             return self.destinationFilename() != undefined
                 && self.destinationFilename().trim() != ""
                 && self.slicer() != undefined
-                && self.sliceButtonControl == true
-                && (self.printerState.isOperational() ||
-                    self.afterSlicing() == "none" && self.printerState.isErrorOrClosed() == true);
+                && self.sliceButtonControl == true;
                 //&& self.profile() != undefined;
         });
 
@@ -443,7 +440,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push([
         SlicingViewModel,
-        ["loginStateViewModel", "printerProfilesViewModel", "printerStateViewModel"],
+        ["loginStateViewModel", "printerProfilesViewModel"],
         "#slicing_configuration_dialog"
     ]);
 });

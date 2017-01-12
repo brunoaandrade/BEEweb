@@ -4,6 +4,8 @@ $(function() {
 
         self.loginState = parameters[0];
         self.printerProfiles = parameters[1];
+        self.slicing = parameters[2];
+        self.connection = parameters[3];
 
         self.stateString = ko.observable(undefined);
         self.isErrorOrClosed = ko.observable(undefined);
@@ -457,11 +459,18 @@ $(function() {
         self.showMaintenanceFilamentChange = function() {
             $('#navbar_show_maintenance').click();
         };
+
+        /**
+         * Shows the slicing dialog window for the workbench
+         */
+        self.preparePrint = function () {
+            self.slicing.show('local', BEEwb.helpers.generateSceneName(), true, true);
+		};
     }
 
     OCTOPRINT_VIEWMODELS.push([
         PrinterStateViewModel,
-        ["loginStateViewModel", "printerProfilesViewModel"],
+        ["loginStateViewModel", "printerProfilesViewModel", "slicingViewModel", "connectionViewModel"],
         ["#state_wrapper", "#drop_overlay"]
     ]);
 });

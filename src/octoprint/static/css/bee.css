@@ -387,7 +387,7 @@ a.brand{
 }
 /*----------small file controls---------*/
 .smabtn{ width: 16.666666%; }
-.bigbtn{ width: 25%; }
+.bigbtn{ width: 67%; }
 .bigbtn.printnow{
     background: #518359 !important;
     color: #fff !important;
@@ -547,10 +547,9 @@ input + span.add-on{
 }
 
 .btn-prepareprint{
-    width: 210px !important;
+    width: 100% !important;
     right: 27% !important;
     bottom: 25px !important;
-    position: absolute !important;
     font: 200 16px "din-light", sans-serif;
     text-transform: uppercase;
     box-shadow: none !important;

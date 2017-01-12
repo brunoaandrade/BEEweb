@@ -596,7 +596,7 @@ class BeePrinter(Printer):
          Returns a human readable string corresponding to the current communication state.
         """
         if self._comm is None:
-            return "Connecting..."
+            return "Disconnected"
         else:
             return self._comm.getStateString()
 
@@ -606,7 +606,7 @@ class BeePrinter(Printer):
         Gets the current printer firmware version
         :return: string
         """
-        if self._comm is not None:
+        if self._comm is not None and self._comm.getCommandsInterface() is not None:
             firmware_v = self._comm.getCommandsInterface().getFirmwareVersion()
 
             if firmware_v is not None:

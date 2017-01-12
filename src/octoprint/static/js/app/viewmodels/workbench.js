@@ -21,11 +21,12 @@ $(function () {
 			self.files.updateItems(_.filter(self.files.allItems, self.files.supportedFilters["model"]));
 		};
 
-        self.startPrint = function () {
-
+        /**
+         * Shows the slicing dialog window for the workbench
+         */
+        self.preparePrint = function () {
             self.slicing.show('local', BEEwb.helpers.generateSceneName(), true, true);
 		};
-
 	}
 
 	// This is how our plugin registers itself with the application, by adding some configuration information to
