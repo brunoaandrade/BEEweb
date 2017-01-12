@@ -357,27 +357,6 @@ class BeeCom(MachineCom):
                         self._sd_status_timer.cancel()
                     except:
                         pass
-
-            # protects against any unexpected null selectedFile
-            if self._currentFile is not None:
-                payload = {
-                    "file": self._currentFile.getFilename(),
-                    "filename": os.path.basename(self._currentFile.getFilename()),
-                    "origin": self._currentFile.getFileLocation(),
-                    "firmwareError": firmware_error
-                }
-            else:
-                payload = {
-                    "file": None,
-                    "filename": '',
-                    "origin": '',
-                    "firmwareError": firmware_error
-                }
-
-            eventManager().fire(Events.PRINT_CANCELLED, payload)
-
-            # sends usage statistics
-            self._sendUsageStatistics('cancel')
         else:
 
             self._logger.exception("Error while canceling the print operation.")
@@ -896,40 +875,4 @@ class BeeCom(MachineCom):
             self._heatupWaitStartTime = None
             self._heating = False
 
-    def _sendUsageStatistics(self, operation):
-        """
-        Calls and external executable to send usage statistics to a remote cloud server
-        :param operation: Supports 'start' (Start Print), 'cancel' (Cancel Print), 'stop' (Print finished) operations
-        :return: true in case the operation was successfull or false if not
-        """
-        _logger = logging.getLogger()
-        biExePath = settings().getBaseFolder('bi') + '/bi_azure'
 
-        if operation != 'start' and operation != 'cancel' and operation != 'stop':
-            return False
-
-        if os.path.exists(biExePath) and os.path.isfile(biExePath):
-
-            printerSN = self.getConnectedPrinterSN()
-
-            if printerSN is None:
-                _logger.error("Could not get Printer Serial Number for statistics communication.")
-                return False
-            else:
-                cmd = '%s %s %s' % (biExePath,str(printerSN), str(operation))
-                _logger.info(u"Running %s" % cmd)
-
-                import subprocess
-                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
-
-                (output, err) = p.communicate()
-
-                p_status = p.wait()
-
-                if p_status == 0 and 'IOTHUB_CLIENT_CONFIRMATION_OK' in output:
-                    _logger.info(u"Statistics sent to remote server. (Operation: %s)" % operation)
-                    return True
-                else:
-                    _logger.info(u"Failed sending statistics to remote server. (Operation: %s)" % operation)
-
-        return False

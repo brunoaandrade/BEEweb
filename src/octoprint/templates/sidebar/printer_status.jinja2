@@ -52,7 +52,7 @@
         visible: enablePause, css: {active: (isPaused() && isShutdown())}, attr: {title: titlePauseButton}">
         <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>
         <span data-bind="visible: !isPaused() && !isShutdown()"> {{ _('Pause') }}</span>
-        <span data-bind="visible: isPaused() || isShutdown()"> {{ _('Resumeb') }}</span>
+        <span data-bind="visible: isPaused() || isShutdown()"> {{ _('Resume') }}</span>
     </button>
     </div>
     <button class="btn btn-cancel" id="job_cancel" data-bind="click: cancel, visible: enableCancel()"

@@ -257,13 +257,6 @@ $(function() {
                 }
             }
 
-            // If the print job is running show the print panel (print or shutdown states)
-            // This is used when the page is reloaded and the print info must be shown
-            if (self.isPrinting() || self.isShutdown()) {
-                if (!$("#state").hasClass('in')) {
-                    $("#state").collapse("show");
-                }
-            }
         };
 
         self._processJobData = function(data) {
@@ -398,10 +391,6 @@ $(function() {
                 $('#job_cancel').prop('disabled', false);
                 $('#job_pause').prop('disabled', false);
 
-                // Hides the status panel
-                if ($("#state").hasClass('in')) {
-                    $("#state").collapse("hide");
-                }
             });
         };
 

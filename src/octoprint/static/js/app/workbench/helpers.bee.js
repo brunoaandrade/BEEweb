@@ -29,12 +29,14 @@ BEEwb.helpers.generateSTLFromScene = function( objects ) {
  */
 BEEwb.helpers.generateSceneName = function( ) {
     var now = new Date();
-    var prefix = 'bee_';
+    var prefix = 'bee';
+    var workbenchTempFileMarker = '__tmp-scn';
+
     if (BEEwb.main.lastLoadedModel != null) {
         prefix = BEEwb.main.lastLoadedModel;
     }
-    var sceneName = prefix + '__bee' + now.getDate() + (now.getMonth()+1) + now.getFullYear()
-    + '_' + now.getHours() + '-' + now.getMinutes() + '-' + now.getSeconds() + '.stl';
+    var sceneName = prefix + '_' + now.getDate() + (now.getMonth()+1) + now.getFullYear()
+    + '_' + now.getHours() + '-' + now.getMinutes() + '-' + now.getSeconds() + workbenchTempFileMarker + '.stl';
 
     return sceneName;
 };

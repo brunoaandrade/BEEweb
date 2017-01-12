@@ -225,10 +225,6 @@ $(function() {
                 data: JSON.stringify({command: "select", print: printAfterLoad})
             });
 
-            // Shows the status panel
-            if (!$("#state").hasClass('in')) {
-                $("#state").collapse("show");
-            }
         };
 
         self.removeFile = function(file) {

@@ -404,9 +404,6 @@ $(function() {
                 contentType: "application/json; charset=UTF-8",
                 data: JSON.stringify(data),
                 success: function ( response ) {
-                    // Shows the status panel
-                    if (data["select"] || data["print"])
-                        $("#state").collapse("show");
 
                     self.sliceButtonControl = true;
                 },

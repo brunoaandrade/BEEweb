@@ -3,6 +3,8 @@
 from __future__ import absolute_import
 
 import math
+import time
+import logging
 from octoprint.util.bee_comm import BeeCom
 import os
 from octoprint.printer.standard import Printer
@@ -22,6 +24,7 @@ class BeePrinter(Printer):
     BVC implementation of the :class:`PrinterInterface`. Manages the communication layer object and registers
     itself with it as a callback to react to changes on the communication layer.
     """
+    TMP_FILE_MARKER = '__tmp-scn'
 
     def __init__(self, fileManager, analysisQueue, printerProfileManager):
         super(BeePrinter, self).__init__(fileManager, analysisQueue, printerProfileManager)
@@ -37,6 +40,7 @@ class BeePrinter(Printer):
         self._slicingManager = SlicingManager(settings().getBaseFolder("slicingProfiles"), printerProfileManager)
         self._slicingManager.reload_slicers()
         self._currentFilamentProfile = None
+
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
@@ -76,8 +80,9 @@ class BeePrinter(Printer):
         # gets current Filament profile data
         self._currentFilamentProfile = self.getSelectedFilamentProfile()
 
-        # subscribes the unselect_file function with the PRINT_FAILED event
-        eventManager().subscribe(Events.PRINT_FAILED, self.on_print_cancelled)
+        # subscribes event handlers
+        eventManager().subscribe(Events.PRINT_CANCELLED, self.on_print_cancelled)
+        eventManager().subscribe(Events.PRINT_CANCELLED_DELETE_FILE, self.on_print_cancelled_delete_file)
 
 
     def disconnect(self):
@@ -121,6 +126,7 @@ class BeePrinter(Printer):
         settings().set(['lastPrintJobFile'], path)
         settings().save()
 
+
     # # # # # # # # # # # # # # # # # # # # # # #
     ############# PRINTER ACTIONS ###############
     # # # # # # # # # # # # # # # # # # # # # # #
@@ -128,13 +134,33 @@ class BeePrinter(Printer):
         """
          Cancels the current print job.
         """
-        super(BeePrinter, self).cancel_print()
+        if self._comm is None:
+            return
 
-        # waits a bit before un-selecting the file
-        import time
-        time.sleep(2)
-        self.unselect_file()
+        self._comm.cancelPrint()
 
+        # reset progress, height, print time
+        self._setCurrentZ(None)
+        self._setProgressData()
+
+        # mark print as failure
+        if self._selectedFile is not None:
+            self._fileManager.log_print(FileDestinations.SDCARD if self._selectedFile["sd"] else FileDestinations.LOCAL,
+                                        self._selectedFile["filename"], time.time(), self._comm.getPrintTime(), False,
+                                        self._printerProfileManager.get_current_or_default()["id"])
+            payload = {
+                "file": self._selectedFile["filename"],
+                "origin": FileDestinations.LOCAL
+            }
+            if self._selectedFile["sd"]:
+                payload["origin"] = FileDestinations.SDCARD
+
+            if BeePrinter.TMP_FILE_MARKER in self._selectedFile["filename"]:
+                eventManager().fire(Events.PRINT_CANCELLED_DELETE_FILE, payload)
+            else:
+                eventManager().fire(Events.PRINT_CANCELLED, payload)
+
+            eventManager().fire(Events.PRINT_FAILED, payload)
 
     def jog(self, axis, amount):
         """
@@ -596,7 +622,7 @@ class BeePrinter(Printer):
          Returns a human readable string corresponding to the current communication state.
         """
         if self._comm is None:
-            return "Disconnected"
+            return "Connecting..."
         else:
             return self._comm.getStateString()
 
@@ -678,11 +704,24 @@ class BeePrinter(Printer):
             self._printAfterSelect = False
             self.start_print(pos=self._posAfterSelect)
 
+
     def on_print_cancelled(self, event, payload):
         """
         Print cancelled callback for the EventManager.
         """
         self.unselect_file()
+
+        # sends usage statistics to remote server
+        self._sendUsageStatistics('cancel')
+
+
+    def on_print_cancelled_delete_file(self, event, payload):
+        """
+        Print cancelled callback for the EventManager.
+        """
+        self._fileManager.remove_file(payload['origin'], payload['file'])
+        self.on_print_cancelled(event, payload)
+
 
     def on_comm_state_change(self, state):
         """
@@ -809,6 +848,44 @@ class BeePrinter(Printer):
             "heating": self.is_heating(),
             "shutdown": self.is_shutdown()
         }
+
+    def _sendUsageStatistics(self, operation):
+        """
+        Calls and external executable to send usage statistics to a remote cloud server
+        :param operation: Supports 'start' (Start Print), 'cancel' (Cancel Print), 'stop' (Print finished) operations
+        :return: true in case the operation was successfull or false if not
+        """
+        _logger = logging.getLogger()
+        biExePath = settings().getBaseFolder('bi') + '/bi_azure'
+
+        if operation != 'start' and operation != 'cancel' and operation != 'stop':
+            return False
+
+        if os.path.exists(biExePath) and os.path.isfile(biExePath):
+
+            printerSN = self._comm.getConnectedPrinterSN()
+
+            if printerSN is None:
+                _logger.error("Could not get Printer Serial Number for statistics communication.")
+                return False
+            else:
+                cmd = '%s %s %s' % (biExePath,str(printerSN), str(operation))
+                _logger.info(u"Running %s" % cmd)
+
+                import subprocess
+                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+
+                (output, err) = p.communicate()
+
+                p_status = p.wait()
+
+                if p_status == 0 and 'IOTHUB_CLIENT_CONFIRMATION_OK' in output:
+                    _logger.info(u"Statistics sent to remote server. (Operation: %s)" % operation)
+                    return True
+                else:
+                    _logger.info(u"Failed sending statistics to remote server. (Operation: %s)" % operation)
+
+        return False
 
 class CalibrationGCoder:
 
