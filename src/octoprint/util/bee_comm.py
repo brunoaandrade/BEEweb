@@ -593,8 +593,6 @@ class BeeCom(MachineCom):
             except:
                 pass
 
-        # sends usage statistics
-        self._sendUsageStatistics('stop')
 
     def _monitor(self):
         """
@@ -863,9 +861,6 @@ class BeeCom(MachineCom):
         }
 
         eventManager().fire(Events.PRINT_STARTED, payload)
-
-        # sends usage statistics
-        self._sendUsageStatistics('start')
 
         # starts the progress status thread
         self.startPrintStatusProgressMonitor()

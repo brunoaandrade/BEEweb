@@ -83,6 +83,7 @@ class BeePrinter(Printer):
         # subscribes event handlers
         eventManager().subscribe(Events.PRINT_CANCELLED, self.on_print_cancelled)
         eventManager().subscribe(Events.PRINT_CANCELLED_DELETE_FILE, self.on_print_cancelled_delete_file)
+        eventManager().subscribe(Events.PRINT_DONE, self.on_print_finished)
 
 
     def disconnect(self):
@@ -130,6 +131,18 @@ class BeePrinter(Printer):
     # # # # # # # # # # # # # # # # # # # # # # #
     ############# PRINTER ACTIONS ###############
     # # # # # # # # # # # # # # # # # # # # # # #
+    def start_print(self, pos=None):
+        """
+        Starts a new print job
+        :param pos:
+        :return:
+        """
+        super(BeePrinter, self).start_print(pos)
+
+        # sends usage statistics
+        self._sendUsageStatistics('start')
+
+
     def cancel_print(self):
         """
          Cancels the current print job.
@@ -741,6 +754,17 @@ class BeePrinter(Printer):
                 self._comm = None
 
         self._setState(state)
+
+    def on_print_finished(self, event, payload):
+        """
+        Event listener to when a print job finishes
+        :return:
+        """
+        if BeePrinter.TMP_FILE_MARKER in payload["file"]:
+            self._fileManager.remove_file(payload['origin'], payload['file'])
+
+        # sends usage statistics
+        self._sendUsageStatistics('stop')
 
     # # # # # # # # # # # # # # # # # # # # # # #
     ########### AUXILIARY FUNCTIONS #############
