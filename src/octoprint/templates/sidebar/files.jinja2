@@ -1,5 +1,5 @@
 <form class="form-search" data-bind="submit: performSearch">
-    <input type="text" class="input-search-box input-block" data-bind="value: searchQuery, valueUpdate: 'input'" placeholder="{{ _('Search...') }}">
+    <input type="text" class="input-search-box input-block" data-bind="value: searchQuery, valueUpdate: 'input'" placeholder="{{ _('Search files here...') }}">
 </form>
 <div style="display: none;" data-bind="visible: loginState.isUser">
     <div class="row-fluid upload-buttons">
@@ -17,7 +17,7 @@
         {% else %}
             <span class="fileinput-button span12" data-bind="css: {disabled: !$root.loginState.isUser()}" style="margin-bottom: 10px">
                 <i class="icon-upload-alt icon-white"></i>
-                <span>{{ _('Import File') }}</span>
+                <span>{{ _('Import Model') }}</span>
                 <input id="gcode_upload" accept="{{ ",".join(supportedExtensions) }}" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser()">
             </span>
         {% endif %}
