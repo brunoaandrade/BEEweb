@@ -505,6 +505,7 @@ BEEwb.main = {
      */
     activateWorkbenchKeys: function () {
         window.addEventListener('keydown', BEEwb.events.onKeyDown);
+        window.addEventListener('keyup', BEEwb.events.onKeyUp);
     },
 
     /**
@@ -513,5 +514,6 @@ BEEwb.main = {
      */
     deactivateWorkbenchKeys: function () {
         window.removeEventListener('keydown', BEEwb.events.onKeyDown);
+        window.removeEventListener('keyup', BEEwb.events.onKeyUp);
     }
 };

@@ -665,6 +665,7 @@ input + span.add-on{
     padding: 5px 16px;
     max-height: 50px;
     text-transform: uppercase;
+    width: 100px;
 }
 
 #workbench-controls-container > hr{

@@ -272,9 +272,8 @@ BEEwb.transformOps.duplicateModel = function(modelObj) {
         var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 100 } );
 
         var geometry = modelObj.geometry.clone();
-        geometry.computeBoundingBox();
         BEEwb.helpers.centerModelBasedOnBoundingBox(geometry);
-        var xShift = BEEwb.helpers.calculateObjectShift(geometry.boundingBox);
+        var xShift = BEEwb.helpers.calculateObjectShift(geometry);
 
         var objClone = new THREE.Mesh(geometry, material);
         objClone.position.set(xShift, 0, 0);
