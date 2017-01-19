@@ -25,15 +25,25 @@ $(function() {
         self.ignoredInsufficientFilament = ko.observable(false);
 
         self.enablePrint = ko.pureComputed(function() {
-            return self.isOperational() && self.isReady() && !self.isPrinting() && !self.isHeating()
-            && self.loginState.isUser() && self.filename() != undefined;
+            return self.insufficientFilament() && self.loginState.isUser() && self.filename() != undefined;
         });
         self.enablePause = ko.pureComputed(function() {
-            return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown()) && self.loginState.isUser();
+            return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown())
+            && self.loginState.isUser();
         });
         self.enableCancel = ko.pureComputed(function() {
             return ((self.isPrinting() || self.isPaused() || self.isHeating()))
             && self.loginState.isUser() && self.filename() != undefined;
+        });
+        self.enablePreparePrint = ko.pureComputed(function() {
+            return self.loginState.isUser() && !self.connection.isConnecting() && !self.filename();
+        });
+        self.showInsufficientFilament = ko.pureComputed(function() {
+            return self.loginState.isUser && self.insufficientFilament()
+            && !self.ignoredInsufficientFilament() && self.filename() != undefined;
+        });
+        self.showPrintControlButtons = ko.pureComputed(function() {
+            return self.enablePause() || self.isHeating();
         });
 
         self.filename = ko.observable(undefined);

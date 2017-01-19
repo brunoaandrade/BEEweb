@@ -582,21 +582,30 @@ input + span.add-on{
     display: inline-block !important;
 }
 .btn-print{
-    width: 60%;
+    width: 63%;
     font: 200 18px "din-light", sans-serif;
     background: #4d955e !important;
     color: #fff !important;
 }
 .btn-pause{
-    width: 60%;
+    width: 80%;
     font: 200 18px "din-light", sans-serif;
     background: #676356 !important;
     color: #fff !important;
 }
 .btn-cancel{
-    width: 40%;
+    width: 35%;
+    padding: 10px 20px !important;
     font: 200 18px "din-light", sans-serif;
     background: #676356 !important;
+    color: #fff !important;
+}
+
+.btn-stop{
+    width: 17%;
+    padding: 10px 20px !important;
+    font: 200 18px "din-light", sans-serif;
+    background: #ea6c54 !important;
     color: #fff !important;
 }
 /*-------------------- SIDEBAR ---------------------*/

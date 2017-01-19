@@ -358,10 +358,10 @@ class BeeCom(MachineCom):
                     except:
                         pass
         else:
-
             self._logger.exception("Error while canceling the print operation.")
             eventManager().fire(Events.ERROR, {"error": "Error canceling print"})
             return
+
 
     def setPause(self, pause):
         """

@@ -20,8 +20,8 @@
         </a>
     </div>
 </div>
-<div id="insufficient_filament"
-    data-bind="visible: loginState.isUser && insufficientFilament() && !ignoredInsufficientFilament()">
+<div id="insufficientFilamentMessage"
+    data-bind="visible: showInsufficientFilament">
     <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn-ghost" >
         <span class="m-icon maintenanceiconw"></span>
         {{ _('Change filament now') }}
@@ -40,27 +40,33 @@
         <strong data-bind="visible: sd">(SD)</strong><br>
     </div>
 </div>
-<div>
-    <!--<button id="job_print" class="btn btn-primary btn-print"-->
-    <!--data-bind="click: print, visible: enablePrint() && (!isPaused() && !isShutdown()), css: {'btn-info': isPaused()}, attr: {title: titlePrintButton}" >-->
-        <!--<i data-bind="css: {'icon-print': !isPaused(), 'icon-undo': isPaused()}"></i>-->
-        <!--<span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>-->
-    <!--</button>-->
-    <div id="pause_filler" class="btn-pause">
-        <button class="btn btn-block "
-        id="job_pause" data-bind="click: function() { isPaused() ? onlyResume() : onlyPause(); },
+<br /><br />
+<div id="noFilamentAvailableButtons" data-bind="visible: showInsufficientFilament">
+    <button id="job_print" class="btn btn-primary btn-print"
+    data-bind="click: print, css: {'btn-info': isPaused()}, attr: {title: titlePrintButton},
+     visible: enablePrint() && (!isPaused() && !isShutdown())" >
+        <i data-bind="css: {'icon-print': !isPaused(), 'icon-undo': isPaused()}"></i>
+        <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
+    </button>
+
+    <button class="btn btn-cancel" id="job_cancel_insufficient_filament" data-bind="click: cancel, visible: enableCancel"
+        title="{{ _('Cancel') }}" data-toggle="tooltip">
+        {{ _('Cancel') }}
+    </button>
+</div>
+<div id="printRunningButtons" data-bind="visible: showPrintControlButtons()">
+
+    <button class="btn btn-pause" id="job_pause" data-bind="click: function() { isPaused() ? onlyResume() : onlyPause(); },
         visible: enablePause, css: {active: (isPaused() && isShutdown())}, attr: {title: titlePauseButton}">
         <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>
-        <span data-bind="visible: !isPaused() && !isShutdown()"><i class="icon-pause"></i> {{ _('Pause') }}</span>
-        <span data-bind="visible: isPaused() || isShutdown()"><i class="icon-play"></i> {{ _('Resume') }}</span>
+        <span data-bind="visible: !isPaused() && !isShutdown()"> {{ _('Pause') }}</span>
+        <span data-bind="visible: isPaused() || isShutdown()"> {{ _('Resume') }}</span>
     </button>
-    </div>
-    <div data-bind=" visible: enableCancel">
-        <button class="btn btn-cancel" id="job_cancel" data-bind="click: cancel"
-            title="{{ _('Cancel') }}" data-toggle="tooltip">
-            <i class="icon-stop"></i> {{ _('Cancel') }}
-        </button>
-    </div>
+    <button class="btn btn-stop" id="job_cancel" data-bind="click: cancel, visible: enableCancel"
+        title="{{ _('Cancel') }}" data-toggle="tooltip">
+        <i class="icon-stop"></i>
+    </button>
+
 </div>
 <div id="printDetails" style="display: none;">
     <div>
@@ -85,15 +91,16 @@
         </div>
     </div>
 </div>
+<br />
 <a id="showPrintDetails" href="#">
     <div class="progress">
         <div class="bar" id="job_progressBar" data-bind="style: { width: progressString() + '%' }"></div>
     </div>
 </a>
-<div id="preparePrint">
+<div id="preparePrint" data-bind="visible: enablePreparePrint()">
     <span>{{ _('Press PRINT... to print the object(s) on the platform') }}</span>
     <button class="btn-prepareprint" id="print_scene"
-        data-bind="click: preparePrint, enable: loginState.isUser() && !connection.isConnecting() && !enablePrint()">
+        data-bind="click: preparePrint, enable: enablePreparePrint()">
         <i class="icon-print" ></i>
         {{ _('Print...') }}
     </button>
