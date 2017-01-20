@@ -213,24 +213,24 @@ $(function() {
         self._processStateClass = function() {
             self.stateClass("text-black");
 
-            /*if (self.isOperational()) {
-                self.stateClass("text-success");
+            if (self.isOperational()) {
+                self.stateClass("ready");
             }
             if (self.isPaused()) {
-                self.stateClass("text-black");
+                self.stateClass("paused");
             }
             if (self.isHeating()) {
-                self.stateClass("text-error");
+                self.stateClass("heating");
             }
             if (self.isPrinting()) {
-                self.stateClass("text-primary");
+                self.stateClass("printing");
             }
             if (self.isShutdown()) {
-                self.stateClass("text-black");
+                self.stateClass("shutdown");
             }
             if (self.isErrorOrClosed()) {
-                self.stateClass("text-warning");
-            } */
+                self.stateClass("error");
+            }
         };
 
         self._fromData = function(data) {

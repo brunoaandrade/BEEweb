@@ -11,18 +11,18 @@
             </button>
             <div id="axis-values">
                 <div id="move-axis-form" class="row-fluid form-inline">
-                    <span class="workbench-title">{{ _('Position') }}</span>
+                    <span class="workbench-title">{{ _('Object Position (mm)') }}</span>
                     <br/><br />
                     <div class="move-x">
-                        <label for="x-axis">X <small>(mm)</small></label>
+                        <label for="x-axis">X :</label>
                         <input type="text" class="span12 axis-input-box" id="x-axis" name="x-axis" onchange="BEEwb.transformOps.move();"/>
                     </div>
                     <div class="move-y">
-                        <label for="y-axis">Y <small>(mm)</small></label>
+                        <label for="y-axis">Y :</label>
                         <input type="text" class="span12 axis-input-box" id="y-axis" name="y-axis" onchange="BEEwb.transformOps.move();"/>
                     </div>
                     <div class="move-z">
-                        <label for="z-axis">Z <small>(mm)</small></label>
+                        <label for="z-axis">Z :</label>
                         <input type="text" class="span12 axis-input-box" id="z-axis" name="z-axis" onchange="BEEwb.transformOps.move();"/>
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                 <span class="icon scale"></span>
             </button>
             <div id="scale-values-form" style="display: none;">
-                <span class="workbench-title">{{ _('Object Dimensions') }}</span>
+                <span class="workbench-title">{{ _('Object Dimensions (mm)') }}</span>
                 <br/><br/>
                 <div id="scale-axis-form" class="row-fluid form-inline">
                     <div class="row-fluid text-center">
@@ -55,17 +55,17 @@
                     </div>
                     <div id="size_text_fields">
                         <div class="scale-x">
-                            <label for="scalex-axis" id="scalex-axis-label">X <small>(mm)</small></label>
+                            <label for="scalex-axis" id="scalex-axis-label">X :</label>
                             <input type="text" class="span10 axis-input-box" id="scalex-axis" name="x-axis" onchange="BEEwb.transformOps.scale('x');"/>
                             <input type="checkbox" id="lock-x" title="{{ _('Lock X aspect ratio') }}" checked />
                         </div>
                         <div class="scale-y">
-                            <label for="scaley-axis" id="scaley-axis-label">Y <small>(mm)</small></label>
+                            <label for="scaley-axis" id="scaley-axis-label">Y :</label>
                             <input type="text" class="span10 axis-input-box" id="scaley-axis" name="y-axis" onchange="BEEwb.transformOps.scale('y');"/>
                             <input type="checkbox" id="lock-y" title="{{ _('Lock Y aspect ratio') }}" checked />
                         </div>
                         <div class="scale-z">
-                            <label for="scalez-axis" id="scalez-axis-label">Z <small>(mm)</small></label>
+                            <label for="scalez-axis" id="scalez-axis-label">Z :</label>
                             <input type="text" class="span10 axis-input-box" id="scalez-axis" name="z-axis" onchange="BEEwb.transformOps.scale('z');"/>
                             <input type="checkbox" id="lock-z" title="{{ _('Lock Z aspect ratio') }}" checked />
                         </div>
@@ -79,7 +79,7 @@
             </button>
             <hr>
             <div id="rotate-values-form" style="display: none;">
-                <span class="workbench-title">{{ _('Object Rotation') }}</span>
+                <span class="workbench-title">{{ _('Object Rotation (deg)') }}</span>
                 <br/><br/>
                 <div id="rotate-axis-form" class="row-fluid form-inline">
                     <div class="row-fluid">
@@ -105,15 +105,15 @@
                     </div>
                     <br/>
                     <div class="rotate-x">
-                        <label for="rotx-axis">X <small>(deg°)</small></label>
+                        <label for="rotx-axis">X :</label>
                         <input type="text" class="span12 axis-input-box" id="rotx-axis" name="x-axis" value="0" onchange="BEEwb.transformOps.rotate();"/>
                     </div>
                     <div class="rotate-y">
-                        <label for="roty-axis">Y <small>(deg°)</small></label>
+                        <label for="roty-axis">Y :</label>
                         <input type="text" class="span12 axis-input-box" id="roty-axis" name="y-axis" value="0" onchange="BEEwb.transformOps.rotate();"/>
                     </div>
                     <div class="rotate-z">
-                        <label for="rotz-axis">Z <small>(deg°)</small></label>
+                        <label for="rotz-axis">Z :</label>
                         <input type="text" class="span12 axis-input-box" id="rotz-axis" name="z-axis" value="0" onchange="BEEwb.transformOps.rotate();"/>
                     </div>
                 </div>

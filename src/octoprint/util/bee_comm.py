@@ -50,7 +50,7 @@ class BeeCom(MachineCom):
         :return: True if the connection was successful
         """
         if self._beeConn is None:
-            self._beeConn = BeePrinterConn(self._connShutdownHook)
+            self._beeConn = BeePrinterConn(self._connShutdownHook, True)
             self._changeState(self.STATE_CONNECTING)
             self._beeConn.connectToFirstPrinter()
 
