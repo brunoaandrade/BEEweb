@@ -3,7 +3,8 @@ $(function() {
         var self = this;
 
         self.loginState = parameters[0];
-        self.printerProfiles = parameters[1];
+        self.settings = parameters[1];
+        self.printerProfiles = parameters[2];
 
         self.stateString = ko.observable(undefined);
         self.isErrorOrClosed = ko.observable(undefined);
@@ -329,8 +330,8 @@ $(function() {
         self._processBusyFiles = function(data) {
             var busyFiles = [];
             _.each(data, function(entry) {
-                if (entry.hasOwnProperty("name") && entry.hasOwnProperty("origin")) {
-                    busyFiles.push(entry.origin + ":" + entry.name);
+                if (entry.hasOwnProperty("path") && entry.hasOwnProperty("origin")) {
+                    busyFiles.push(entry.origin + ":" + entry.path);
                 }
             });
             self.busyFiles(busyFiles);
@@ -398,22 +399,26 @@ $(function() {
             self.insufficientFilament(false);
             self.ignoredInsufficientFilament(false);
 
-            showConfirmationDialog({
-                message: gettext("This will cancel your print."),
-                onproceed: function() {
-                    OctoPrint.job.cancel({
-                        done: function () {
-                            $('#job_cancel').prop('disabled', false);
-                            $('#job_pause').prop('disabled', false);
+            if (!self.settings.feature_printCancelConfirmation()) {
+                OctoPrint.job.cancel();
+            } else {
+                showConfirmationDialog({
+                    message: gettext("This will cancel your print."),
+                    onproceed: function() {
+                        OctoPrint.job.cancel({
+                            done: function () {
+                                $('#job_cancel').prop('disabled', false);
+                                $('#job_pause').prop('disabled', false);
 
-                            // Hides the status panel
-                            if ($("#state").hasClass('in')) {
-                                $("#state").collapse("hide");
+                                // Hides the status panel
+                                if ($("#state").hasClass('in')) {
+                                    $("#state").collapse("hide");
+                                }
                             }
-                        }
-                    });
-                }
-            });
+                        });
+                    }
+                });
+            }
         };
 
         self._jobCommand = function(command, payload, callback) {
@@ -474,7 +479,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push([
         PrinterStateViewModel,
-        ["loginStateViewModel", "printerProfilesViewModel"],
+        ["loginStateViewModel", "settingsViewModel", "printerProfilesViewModel"],
         ["#state_wrapper", "#drop_overlay"]
     ]);
 });

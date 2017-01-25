@@ -125,7 +125,8 @@ def getSettings():
 			"pollWatched": s.getBoolean(["feature", "pollWatched"]),
 			"ignoreIdenticalResends": s.getBoolean(["feature", "ignoreIdenticalResends"]),
 			"modelSizeDetection": s.getBoolean(["feature", "modelSizeDetection"]),
-			"firmwareDetection": s.getBoolean(["feature", "firmwareDetection"])
+			"firmwareDetection": s.getBoolean(["feature", "firmwareDetection"]),
+			"printCancelConfirmation": s.getBoolean(["feature", "printCancelConfirmation"])
 		},
 		"usb": {
 			"autoconnect": s.getBoolean(["usb", "autoconnect"]),
@@ -312,6 +313,7 @@ def _saveSettings(data):
 		if "ignoreIdenticalResends" in data["feature"]: s.setBoolean(["feature", "ignoreIdenticalResends"], data["feature"]["ignoreIdenticalResends"])
 		if "modelSizeDetection" in data["feature"]: s.setBoolean(["feature", "modelSizeDetection"], data["feature"]["modelSizeDetection"])
 		if "firmwareDetection" in data["feature"]: s.setBoolean(["feature", "firmwareDetection"], data["feature"]["firmwareDetection"])
+		if "printCancelConfirmation" in data["feature"]: s.setBoolean(["feature", "printCancelConfirmation"], data["feature"]["printCancelConfirmation"])
 
 	if "usb" in data.keys():
 		if "autoconnect" in data["usb"].keys(): s.setBoolean(["usb", "autoconnect"], data["usb"]["autoconnect"])

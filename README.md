@@ -35,27 +35,27 @@ following usage examples assume that said `beeweb` script is on your `PATH`.
 
 You can start the server via
 
-    beeweb
+    beeweb serve
 
 By default it binds to all interfaces on port 5000 (so pointing your browser to `http://127.0.0.1:5000`
 will do the trick). If you want to change that, use the additional command line parameters `host` and `port`,
 which accept the host ip to bind to and the numeric port number respectively. If for example you want the server
 to only listen on the local interface on port 8080, the command line would be
 
-    beeweb --host=127.0.0.1 --port=8080
+    beeweb  serve--host=127.0.0.1 --port=8080
 
 Alternatively, the host and port on which to bind can be defined via the configuration.
 
 If you want to run BEEsoft.web as a daemon (only supported on Linux), use
 
-    beeweb --daemon {start|stop|restart} [--pid PIDFILE]
+    beeweb daemon {start|stop|restart} [--pid PIDFILE]
 
 If you do not supply a custom pidfile location via `--pid PIDFILE`, it will be created at `/tmp/beeweb.pid`.
 
 You can also specify the configfile or the base directory (for basing off the `uploads`, `timelapse` and `logs` folders),
 e.g.:
 
-    beeweb --config /path/to/another/config.yaml --basedir /path/to/my/basedir
+    beeweb serve --config /path/to/another/config.yaml --basedir /path/to/my/basedir
 
 See `beeweb --help` for further information.
 

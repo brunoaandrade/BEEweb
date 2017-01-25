@@ -187,7 +187,9 @@ default_settings = {
 		"sizeThreshold": 20 * 1024 * 1024, # 20MB
 	},
 	"gcodeAnalysis": {
-		"maxExtruders": 10
+		"maxExtruders": 10,
+		"throttle_normalprio": 0.01,
+		"throttle_highprio": 0.0
 	},
 	"feature": {
 		"temperatureGraph": True,
@@ -209,7 +211,8 @@ default_settings = {
 		"identicalResendsCountdown": 7,
 		"supportFAsCommand": False,
 		"modelSizeDetection": True,
-		"firmwareDetection": True
+		"firmwareDetection": True,
+		"printCancelConfirmation": True
 	},
 	"folder": {
 		"uploads": None,
@@ -304,8 +307,9 @@ default_settings = {
 		"apps": {}
 	},
 	"terminalFilters": [
-		{ "name": "Suppress M105 requests/responses", "regex": "(Send: M105)|(Recv: (B|T\d*):)" },
-		{ "name": "Suppress M27 requests/responses", "regex": "(Send: M27)|(Recv: SD printing byte)" }
+		{ "name": "Suppress temperature messages", "regex": "(Send: (N\d+\s+)?M105)|(Recv: ok (B|T\d*):)" },
+		{ "name": "Suppress SD status messages", "regex": "(Send: (N\d+\s+)?M27)|(Recv: SD printing byte)" },
+		{ "name": "Suppress wait responses", "regex": "Recv: wait"}
 	],
 	"plugins": {
 		"_disabled": ['announcements', 'virtual_printer']
@@ -1498,12 +1502,8 @@ class Settings(object):
 def _default_basedir(applicationName):
 	# taken from http://stackoverflow.com/questions/1084697/how-do-i-store-desktop-application-data-in-a-cross-platform-way-for-python
 	if sys.platform == "darwin":
-		from AppKit import NSSearchPathForDirectoriesInDomains
-		# http://developer.apple.com/DOCUMENTATION/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Functions/Reference/reference.html#//apple_ref/c/func/NSSearchPathForDirectoriesInDomains
-		# NSApplicationSupportDirectory = 14
-		# NSUserDomainMask = 1
-		# True for expanding the tilde into a fully qualified path
-		return os.path.join(NSSearchPathForDirectoriesInDomains(14, 1, True)[0], applicationName)
+		import appdirs
+		return appdirs.user_data_dir(applicationName, "")
 	elif sys.platform == "win32":
 		# Custom install path for settings in desktop installation
 		path, filename = os.path.split(os.path.abspath(os.path.realpath(__file__)))
