@@ -320,6 +320,8 @@ $(function() {
         self.loadFilament = function() {
             self.commandLock(true);
             self._showMovingMessage();
+            $('.load-gifs').show();
+            $('.unload-gifs').hide();
 
             $.ajax({
                 url: API_BASEURL + "maintenance/load",
@@ -340,6 +342,8 @@ $(function() {
         self.unloadFilament = function() {
             self.commandLock(true);
             self._showMovingMessage();
+            $('.load-gifs').hide();
+            $('.unload-gifs').show();
 
             $.ajax({
                 url: API_BASEURL + "maintenance/unload",
@@ -1021,6 +1025,44 @@ $(function() {
                             name: ntype.value
                         });
                     });
+                }
+            });
+        };
+
+        self.loadFilamentReplaceNozzle = function() {
+            self.commandLock(true);
+            self._showMovingMessage();
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/load",
+                type: "POST",
+                dataType: "json",
+                success: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
+                },
+                error: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
+                }
+            });
+        };
+
+        self.unloadFilamentReplaceNozzle = function() {
+            self.commandLock(true);
+            self._showMovingMessage();
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/unload",
+                type: "POST",
+                dataType: "json",
+                success: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
+                },
+                error: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
                 }
             });
         };
