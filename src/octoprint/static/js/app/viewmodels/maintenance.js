@@ -880,6 +880,7 @@ $(function() {
             $('#replaceNozzleStep3').addClass('hidden');
             $('#replaceNozzleStep1').removeClass('hidden');
             $('#replaceNozzleStep4').addClass('hidden');
+            $('#replaceNozzleStep5').addClass('hidden');
         };
 
         self.nextStepReplaceNozzle1 = function() {
@@ -890,6 +891,7 @@ $(function() {
             $('#replaceNozzleStep1').addClass('hidden');
             $('#replaceNozzleStep3').addClass('hidden');
             $('#replaceNozzleStep4').addClass('hidden');
+            $('#replaceNozzleStep5').addClass('hidden');
         };
 
         self.nextStepReplaceNozzle2 = function() {
@@ -901,11 +903,18 @@ $(function() {
 
         self.nextStepReplaceNozzle3 = function() {
             $('#replaceNozzleStep4').removeClass('hidden');
+            $('#replaceNozzleStep5').addClass('hidden');
             $('#replaceNozzleStep3').addClass('hidden');
             $('#replaceNozzleStep1').addClass('hidden');
             $('#replaceNozzleStep2').addClass('hidden');
+        };
 
-            $('#maintenanceCloseButton').addClass('hidden');
+        self.nextStepReplaceNozzle4 = function() {
+            $('#replaceNozzleStep5').removeClass('hidden');
+            $('#replaceNozzleStep4').addClass('hidden');
+            $('#replaceNozzleStep3').addClass('hidden');
+            $('#replaceNozzleStep1').addClass('hidden');
+            $('#replaceNozzleStep2').addClass('hidden');
         };
 
         self.saveNozzle = function() {
@@ -934,7 +943,7 @@ $(function() {
                         self.commandLock(false);
                         self.operationLock(false);
 
-                        self.finishOperations();
+                        self.nextStepReplaceNozzle4();
                     } else {
                         self.saveNozzleResponseError(true);
                         self.commandLock(false);
@@ -1063,6 +1072,45 @@ $(function() {
                 error: function() {
                     self.commandLock(false);
                     self._hideMovingMessage();
+                }
+            });
+        };
+
+        self.saveFilamentReplaceNozzle = function() {
+            self.commandLock(true);
+
+            self.filamentSelected(false);
+            self.filamentResponseError(false);
+
+            var data = {
+                command: "filament",
+                filamentStr: self.selectedFilament()
+            };
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/save_filament",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify(data),
+                success: function(data) {
+                    var response = data['response'];
+
+                    if (response.indexOf('ok') > -1) {
+                        self.filamentSelected(true);
+
+                        self.finishOperations();
+                    } else {
+                        self.filamentResponseError(true);
+                    }
+
+                    self.commandLock(false);
+                    self.operationLock(false);
+                },
+                error: function() {
+                    self.commandLock(false);
+                    self.operationLock(false);
+                    self.filamentResponseError(true);
                 }
             });
         };
