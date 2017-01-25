@@ -861,7 +861,6 @@ $(function() {
         /**************            Replace nozzle functions           **************/
         /***************************************************************************/
 
-
         self.showReplaceNozzle = function() {
             $('#maintenanceList').addClass('hidden');
             $('#cancelMaintenance').removeClass('hidden');
@@ -870,29 +869,38 @@ $(function() {
 
             $('#maintenanceCloseButton').addClass('hidden');
 
-            // Starts the heating operation
-            self.startHeatingReplaceNozzle();
         };
 
         self.replaceNozzleStep0 = function() {
             $('#replaceNozzleStep2').addClass('hidden');
             $('#replaceNozzleStep3').addClass('hidden');
             $('#replaceNozzleStep1').removeClass('hidden');
-
+            $('#replaceNozzleStep4').addClass('hidden');
         };
 
         self.nextStepReplaceNozzle1 = function() {
+            // Starts the heating operation
+            self.startHeatingReplaceNozzle();
+
             $('#replaceNozzleStep2').removeClass('hidden');
             $('#replaceNozzleStep1').addClass('hidden');
             $('#replaceNozzleStep3').addClass('hidden');
+            $('#replaceNozzleStep4').addClass('hidden');
         };
 
         self.nextStepReplaceNozzle2 = function() {
             $('#replaceNozzleStep3').removeClass('hidden');
             $('#replaceNozzleStep1').addClass('hidden');
             $('#replaceNozzleStep2').addClass('hidden');
+            $('#replaceNozzleStep4').addClass('hidden');
+        };
 
-            $('#maintenanceOkButton').removeClass('hidden');
+        self.nextStepReplaceNozzle3 = function() {
+            $('#replaceNozzleStep4').removeClass('hidden');
+            $('#replaceNozzleStep3').addClass('hidden');
+            $('#replaceNozzleStep1').addClass('hidden');
+            $('#replaceNozzleStep2').addClass('hidden');
+
             $('#maintenanceCloseButton').addClass('hidden');
         };
 
@@ -922,11 +930,7 @@ $(function() {
                         self.commandLock(false);
                         self.operationLock(false);
 
-                        if (self.heatingDone()) {
-                            self.nextStepReplaceNozzle2();
-                        } else {
-                            self.nextStepReplaceNozzle1();
-                        }
+                        self.finishOperations();
                     } else {
                         self.saveNozzleResponseError(true);
                         self.commandLock(false);
@@ -985,10 +989,8 @@ $(function() {
                         if (progress >= 100) {
                             // Heating is finished, let's move on
                             self._heatingDone();
+                            self.nextStepReplaceNozzle2();
 
-                            if (self.nozzleSelected()) {
-                                self.nextStepReplaceNozzle2();
-                            }
                         } else {
                             setTimeout(function() { self._updateTempProgressReplaceNozzle() }, 2000);
                         }

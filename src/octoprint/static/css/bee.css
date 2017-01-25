@@ -10,7 +10,9 @@
 body {
     font-family: din-light, sans-serif !important;
 }
-
+strong {
+    font-family: din-black, sans-serif !important;
+}
 .alert.alter-warning{
     background-color: #ea6c54 !important;
 }
@@ -199,6 +201,7 @@ a.brand{
 .calibrategicon  { background: url('../img/icons/calibrate_grey.svg'); }
 .extrudergicon  { background: url('../img/icons/extrusor_grey.svg'); }
 .nozzlegicon  { background: url('../img/icons/nozzle_grey.svg'); }
+.maintenancegicon  { background: url('../img/icons/maintenance_grey.svg'); }
 /*white*/
 .printwicon  { background: url('../img/icons/print_white.svg'); }
 .editwicon  { background: url('../img/icons/edit_white.svg'); }
@@ -209,6 +212,10 @@ a.brand{
 .addplatform .m-icon { float: left; margin: 4px -10px 0 10px; }
 .btn-prepareprint .m-icon,
 .fileinput-button .m-icon { float: left; }
+
+.modal-header h3 span.m-icon {
+    margin-right: 15px;
+}
 
 /*---------- LOGIN -----------*/
 
@@ -435,13 +442,13 @@ input[name=z-axis]{ border-bottom: 2px solid #0000ff !important; }
     background: #aeab9d;
 }
 .progress{
-    height: 12px !important;
+    height: 22px !important;
     border-radius: 0 !important;
     background: transparent !important;
     margin-bottom: 10px ;
 }
 .progress .bar{
-    font-size: 10px !important;
+    font-size: 12px !important;
     background: #518359 !important;
 }
 
@@ -1131,8 +1138,8 @@ input + span.add-on{
     margin: 0 0 0 -23px !important;
 }
 #maintenance_dialog .modal-body .full-sized-box {
-    padding: 0 23px !important;
-    margin: 0 -23px !important;
+    padding: 0 0px !important;
+    /*margin: 0 -23px !important;*/
 }
 /*-----------------------------------*/
 
