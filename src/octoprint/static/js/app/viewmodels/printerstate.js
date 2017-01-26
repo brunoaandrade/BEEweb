@@ -86,6 +86,14 @@ $(function() {
             return logo;
         });
 
+        self.printerName = ko.computed(function() {
+            var name = "";
+            if (self.isErrorOrClosed() !== undefined && !self.isErrorOrClosed() && !self.isError()) {
+                name = self.printerProfiles.currentProfileData().name();
+            }
+            return name;
+        });
+
         self.estimatedPrintTimeString = ko.pureComputed(function() {
             if (self.lastPrintTime())
                 return formatFuzzyPrintTime(self.lastPrintTime());

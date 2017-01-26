@@ -797,10 +797,25 @@ input + span.add-on{
 #state_wrapper .accordion-heading > .accordion-toggle:first-of-type{
     display: none;
 }
+#state-header-link  {
+    width: 125px;
+    padding: 15px 5px 15px 23px !important;
+}
+
 #state-header-link strong{
     color: #fff;
     font-size: 14px;
     font-weight: 300;
+}
+
+#printer-name-link {
+    width: 100px;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 16px;
+    font-size: 14px;
+    text-align: right;
+    word-break: break-word;
 }
 
 #showPrintDetails .progress{
