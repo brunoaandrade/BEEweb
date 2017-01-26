@@ -6,11 +6,17 @@
     <div class="modal-body">
         <div id="aboutbee_body">
             <div class="full-sized-box">
-                <h4><strong>{{ _('BEEsoft.web') }}</strong> &copy BEEVC - Electronic Systems</h4>
+                <h4><strong>{{ _('BEEsoft') }}</strong> &copy BEEVC - Electronic Systems</h4>
                 <br/><br />
                 <p><strong>{{ _('Software version:') }}</strong> <span class="version">{{ display_version|e }}</span></p>
                 <br/><br />
-                <p><strong>{{ _('Firmware version:') }}</strong> <span data-bind="text: currentFirmware"> </span></p>
+                <p><strong>{{ _('Firmware version:') }}</strong> <span data-bind="text: currentFirmware"></span></p>
+                <br/><br />
+                <span>
+                    <img src="{{ url_for('static', filename='img/octoprint.png') }}" width="40" />
+                    {{ _('Powered by ') }} <a href="http://octoprint.org" target="_blank">Octoprint</a>
+                </span>
+
             </div>
         </div>
     </div>

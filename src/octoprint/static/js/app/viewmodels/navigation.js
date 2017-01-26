@@ -75,6 +75,6 @@ $(function() {
     OCTOPRINT_VIEWMODELS.push([
         NavigationViewModel,
         ["loginStateViewModel", "appearanceViewModel", "settingsViewModel", "userSettingsViewModel"],
-        "#navbar"
+        ["#navbar", "#aboutbee_dialog"]
     ]);
 });
