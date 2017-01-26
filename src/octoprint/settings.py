@@ -233,7 +233,7 @@ default_settings = {
 		"components": {
 			"order": {
 				"navbar": ["maintenance", "settings", "systemmenu", "help", "login"],
-				"sidebar": ["files", "workbench_controls", "state", "connection"],
+				"sidebar": ["files", "state", "connection"],
 				"tab": ["workbench", "gcodeviewer", "control", "temperature", "terminal", "timelapse"],
 				"settings": [
 					"section_printer", "printerprofiles", "temperatures", "terminalfilters", "gcodescripts",

@@ -88,28 +88,28 @@ BEEwb.transformOps.rotate = function() {
 };
 
 /**
- * Rotates the selected model 90 degrees to the left (counter clockwise)
+ * Rotates the selected model 45 degrees to the left (counter clockwise)
  * in the selected axis in the radio input control
  *
  */
 BEEwb.transformOps.rotateCCW = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        this._rotateStep(-90);
+        this._rotateStep(-45);
 
         this.updateRotationInputs();
     }
 };
 
 /**
- * Rotates the selected model 90 degrees to the right (clockwise)
+ * Rotates the selected model 45 degrees to the right (clockwise)
  * in the selected axis in the radio input control
  *
  */
 BEEwb.transformOps.rotateCW = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        this._rotateStep(90);
+        this._rotateStep(45);
 
         this.updateRotationInputs();
     }
