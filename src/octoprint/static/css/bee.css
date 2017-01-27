@@ -326,6 +326,10 @@ input[name=x-axis]{ border-bottom: 2px solid #ff0000 !important; }
 input[name=y-axis]{ border-bottom: 2px solid #00ff00 !important; }
 input[name=z-axis]{ border-bottom: 2px solid #0000ff !important; }
 
+.workbench-controls-label {
+    vertical-align: sub;
+}
+
 /* ---------------- FILE MANAGER  ------------------ */
 
 #files .slimScrollDiv{
@@ -798,7 +802,7 @@ input + span.add-on{
     display: none;
 }
 #state-header-link  {
-    width: 125px;
+    width: 130px;
     padding: 15px 5px 15px 23px !important;
 }
 
