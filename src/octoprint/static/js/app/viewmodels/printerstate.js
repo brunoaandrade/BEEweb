@@ -45,6 +45,24 @@ $(function() {
         self.showPrintControlButtons = ko.pureComputed(function() {
             return self.enablePause() || self.isHeating();
         });
+        self.enablePrintFromMemory = ko.pureComputed(function() {
+            return self.loginState.isUser() && (self.isReady && !self.isPrinting()
+            && !self.isPaused() && !self.isHeating() && !self.isShutdown());
+        });
+
+        self.togglePrintFromMemory = function() {
+            if ($('#printFromMemoryDiv').hasClass('hidden')) {
+                $('#printFromMemoryDiv').removeClass('hidden');
+                $('#preparePrint').addClass('hidden');
+            } else {
+                $('#printFromMemoryDiv').addClass('hidden');
+                $('#preparePrint').removeClass('hidden');
+            }
+        };
+
+        self.printFromMemory = ko.pureComputed(function() {
+
+        });
 
         self.filename = ko.observable(undefined);
         self.progress = ko.observable(undefined);

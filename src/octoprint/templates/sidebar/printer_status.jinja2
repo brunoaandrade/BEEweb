@@ -45,7 +45,7 @@
     <button id="job_print" class="btn btn-primary btn-print"
     data-bind="click: print, css: {'btn-info': isPaused()}, attr: {title: titlePrintButton},
      visible: enablePrint() && (!isPaused() && !isShutdown())" >
-        <i data-bind="css: {'icon-print': !isPaused(), 'icon-undo': isPaused()}"></i>
+        <i data-bind="css: {'m-icon printwicon': !isPaused(), 'icon-undo': isPaused()}"></i>
         <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
     </button>
 
@@ -103,6 +103,14 @@
         data-bind="click: preparePrint, enable: enablePreparePrint()">
         <span class="m-icon printwicon" ></span>
         {{ _('Print...') }}
+    </button>
+</div>
+<div id="printFromMemoryDiv" class="hidden">
+    <span><strong>{{ _('Your printer has a file in its internal memory.') }}</strong></span>
+    <p>{{ _('It corresponds to the last file that was printed. Press the button below to print it.') }}</p>
+    <button class="btn" id="print_from_memory"
+        data-bind="click: printFromMemory, enable: enablePrintFromMemory()">
+        {{ _('Print from internal memory') }}
     </button>
 </div>
 

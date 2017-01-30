@@ -633,7 +633,7 @@ input + span.add-on{
 }
 .btn-cancel{
     width: 35%;
-    padding: 10px 20px !important;
+    padding: 10px 10px !important;
     font: 200 18px "din-light", sans-serif;
     background: #676356 !important;
     color: #fff !important;
@@ -641,7 +641,7 @@ input + span.add-on{
 
 .btn-stop{
     width: 17%;
-    padding: 10px 20px !important;
+    padding: 10px 10px !important;
     font: 200 18px "din-light", sans-serif;
     background: #ea6c54 !important;
     color: #fff !important;
