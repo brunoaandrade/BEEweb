@@ -655,6 +655,13 @@ class BeePrinter(Printer):
         else:
             return 'Not available'
 
+    def printFromMemory(self):
+        """
+        Prints the file currently in the printer memory
+        :param self:
+        :return:
+        """
+        return "ok"
 
     # # # # # # # # # # # # # # # # # # # # # # #
     ##########  CALLBACK FUNCTIONS  #############

@@ -60,9 +60,19 @@ $(function() {
             }
         };
 
-        self.printFromMemory = ko.pureComputed(function() {
+        self.printFromMemory = function() {
 
-        });
+            $.ajax({
+                url: "bee/api/print_from_memory",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                success: function(response) {
+                    $('#printFromMemoryDiv').addClass('hidden');
+                    $('#preparePrint').removeClass('hidden');
+                }
+            });
+        };
 
         self.filename = ko.observable(undefined);
         self.progress = ko.observable(undefined);
