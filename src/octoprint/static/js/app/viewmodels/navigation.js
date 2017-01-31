@@ -59,7 +59,7 @@ $(function() {
             });
 
             $.ajax({
-                url: "bee/api/firmware/current/version",
+                url: BEE_CUSTOM_API_BASEURL + "firmware/current/version",
                 type: "GET",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",

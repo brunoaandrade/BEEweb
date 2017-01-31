@@ -165,7 +165,7 @@
 
             function getCurrentHostname() {
                 $.ajax({
-                    url: "bee/api/hostname",
+                    url: BEE_CUSTOM_API_BASEURL + "hostname",
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",
@@ -180,7 +180,7 @@
                 $('#get-networks-button').button('loading');
 
                 $.ajax({
-                    url: "bee/api/wifi/list",
+                    url: BEE_CUSTOM_API_BASEURL + "wifi/list",
                     type: "GET",
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",
@@ -209,7 +209,7 @@
                 $('#alert-connect').show();
 
                 $.ajax({
-                    url: "bee/api/netconfig/save",
+                    url: BEE_CUSTOM_API_BASEURL + "netconfig/save",
                     type: "POST",
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",
@@ -230,7 +230,7 @@
                 $('#alert-hostname').show();
 
                 $.ajax({
-                    url: "bee/api/hostname/save",
+                    url: BEE_CUSTOM_API_BASEURL + "hostname/save",
                     type: "POST",
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",

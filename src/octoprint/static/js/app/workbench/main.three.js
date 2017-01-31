@@ -37,7 +37,7 @@ BEEwb.main = {
         var that = this;
         // Loads the printer profile
         $.ajax({
-            url: "bee/api/printer",
+            url: BEE_CUSTOM_API_BASEURL + "printer",
             type: 'GET',
             success: function(data) {
                 that.bedDepth = data.profile.volume.depth;

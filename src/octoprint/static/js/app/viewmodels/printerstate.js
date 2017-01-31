@@ -63,7 +63,7 @@ $(function() {
         self.printFromMemory = function() {
 
             $.ajax({
-                url: "bee/api/print_from_memory",
+                url: BEE_CUSTOM_API_BASEURL + "print_from_memory",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=UTF-8",
