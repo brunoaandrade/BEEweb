@@ -1,7 +1,7 @@
 <div id="slicing_configuration_dialog" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>
-        <h3>Print Setup</h3>
+        <h3><span class="m-icon printgicon"></span>{{ _('Print Setup') }}</h3>
     </div>
     <div class="modal-body">
         <div data-bind="visible: !enableSlicingDialog()">
@@ -23,7 +23,7 @@
                     </div>
                 </div> -->
                 <div class="control-group">
-                    <label class="control-label"><small>Select</small>{{ _('Resolution') }}</label>
+                    <label class="control-label">{{ _('Resolution') }}</label>
                     <div class="controls">
                         <label class="radio">
                             <input type="radio"  name="resolution" data-bind="checked: selResolution" value="Low"/>
@@ -44,50 +44,55 @@
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label"><small>{{ _('Select') }}</small>{{ _('Density') }}</label>
+                    <label class="control-label">{{ _('Density') }}<small>({{ _('Infill') }})</small></label>
                     <div class="controls">
                         <input type="text" style="width: 200%"
                         data-bind="slider: {value: selDensity, min:0, max: 100, step: 1, tooltip: 'show'}"/>
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label"><small>{{ _('Select') }}</small>{{ _('Base') }}</label>
-                    <label>{{ _('Raft') }}</label>
+                    <label class="control-label">{{ _('Platform Adhesion') }}</label>
                     <div class="controls">
                         <input type="checkbox" data-bind="checked: raft"/> <br />
                         <small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>
                     </div>
-                    <label>{{ _('Support') }}</label>
+                    <label class="control-label">{{ _('Support') }}</label>
                     <div class="controls">
                         <input type="checkbox" data-bind="checked: support"/> <br />
                         <small>{{ _('This option automatically creates a detachable structure beneath an overhang or highly inclined areas, so as to allow the model to be printed.') }}</small>
                     </div>
                 </div>
-                <div class="control-group">
-                    <label class="control-label"><small>{{ _('Filename') }}</small>{{ _('Output') }}</label>
-                    <div class="controls">
-                        <div class="input-append">
-                            <input type="text" data-bind="value: destinationFilename">
-                            <span class="add-on" data-bind="text: '.' + destinationExtension()"></span>
-                        </div>
-                    </div>
-                </div>
+                <!--<div class="control-group">-->
+                    <!--<label class="control-label"><small>{{ _('Filename') }}</small>{{ _('Output') }}</label>-->
+                    <!--<div class="controls">-->
+                        <!--<div class="input-append">-->
+                            <!--<input type="text" data-bind="value: destinationFilename">-->
+                            <!--<span class="add-on" data-bind="text: '.' + destinationExtension()"></span>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
                 <div class="control-group">
                     <label class="control-label">{{ _('Details') }}</label>
                     <div class="controls">
-                        <select data-bind="options: colors, value: selColor, valueAllowUnset: false, visible: !forPrint()" ></select>
-                        <span data-bind="text: selColor, visible: forPrint()"></span>
-                        <br />
-                        <small>
-                            <strong>{{ _('Remaining filament') }}</strong>
-                            : <span data-bind="text: filamentInSpool" ></span> (g)
-                        </small>
+                        <div class="row-fluid">
+                            <div class="span6 text-center">
+                                <label class="control-label">{{ _('Filament') }}:</label>
+                                <select data-bind="options: colors, value: selColor, valueAllowUnset: false, visible: !forPrint()" ></select>
+                                <span class="filament" data-bind="text: selColor, visible: forPrint()"></span>
+                                <br /><br />
+                                <span class="remaining-filament">
+                                    <small>{{ _('Remaining filament') }}:  <span data-bind="text: filamentInSpool" ></span> (g)</small>
+                                </span>
+                            </div>
+                            <div class="span2 text-center"></div>
+                            <div class="span4 text-center">
+                                <label class="control-label">{{ _('Nozzle') }}: </label>
+                                <select data-bind="options: nozzleTypes, value: selNozzle, valueAllowUnset: false, visible: !forPrint()" ></select>
+                                <span class="nozzle" data-bind="text: selNozzle, visible: forPrint()"></span>
+                            </div>
+                        </div>
                     </div>
-                    <label class="control-label">{{ _('Nozzle type') }}</label>
-                    <div class="controls">
-                        <select data-bind="options: nozzleTypes, value: selNozzle, valueAllowUnset: false, visible: !forPrint()" ></select>
-                        <span data-bind="text: selNozzle, visible: forPrint()"></span>
-                    </div>
+
                 </div>
                 <!--<div class="control-group">
                     <label class="control-label">{{ _('Printer Profile') }}</label>
@@ -95,20 +100,19 @@
                         <select data-bind="options: printerProfiles.profiles.items, optionsText: 'name', optionsValue: 'id', value: printerProfile, optionsCaption: '{{ _('Select a printer profile...') }}'"></select>
                     </div>
                 </div> -->
-                <div class="control-group">
-                    <label class="control-label">{{ _('Action') }}</label>
-                    <div class="controls">
-                        <select data-bind="options: afterSlicingOptions, optionsText: 'text', optionsValue: 'value', value: afterSlicing"></select>
-                    </div>
-                </div>
+                <!--<div class="control-group">-->
+                    <!--<label class="control-label">{{ _('Action') }}</label>-->
+                    <!--<div class="controls">-->
+                        <!--<select data-bind="options: afterSlicingOptions, optionsText: 'text', optionsValue: 'value', value: afterSlicing"></select>-->
+                    <!--</div>-->
+                <!--</div>-->
             </form>
         </div>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</a>
-        <a id="slice_button" href="#" class="btn btn-primary" data-bind="click: function() { if ($root.enableSliceButton()) { $root.prepareAndSlice() } }, enable: enableSliceButton, css: {disabled: !$root.enableSliceButton()}">
-
-            <i data-bind="css: {'icon-print': forPrint(), 'icon-magic': !forPrint()}"></i>
+        <a href="#" class="btn pull-left modal-footer-btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</a>
+        <a id="slice_button" href="#" class="btn btn-primary modal-footer-btn" data-bind="click: function() { if ($root.enableSliceButton()) { $root.prepareAndSlice() } }, enable: enableSliceButton, css: {disabled: !$root.enableSliceButton()}">
+            <span class="m-icon printwicon"></span>
             <span data-bind="text: (forPrint() ? '{{ _('Print') }}' : '{{ _('Slice') }}')">{{ _('Slice') }}</span>
         </a>
     </div>

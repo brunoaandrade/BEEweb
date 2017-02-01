@@ -202,6 +202,7 @@ a.brand{
 .extrudergicon  { background: url('../img/icons/extrusor_grey.svg'); }
 .nozzlegicon  { background: url('../img/icons/nozzle_grey.svg'); }
 .maintenancegicon  { background: url('../img/icons/maintenance_grey.svg'); }
+.printgicon  { background: url('../img/icons/print_grey.svg'); }
 /*white*/
 .printwicon  { background: url('../img/icons/print_white.svg'); }
 .editwicon  { background: url('../img/icons/edit_white.svg'); }
@@ -211,6 +212,7 @@ a.brand{
 .printnow .m-icon,
 .addplatform .m-icon { float: left; margin: 4px -10px 0 10px; }
 .btn-prepareprint .m-icon,
+.modal-footer-btn .m-icon,
 .fileinput-button .m-icon { float: left; }
 
 .modal-header h3 span.m-icon {
@@ -1210,8 +1212,8 @@ table th.settings_printerProfiles_profiles_action a:hover, table td.settings_pri
 .modal-row p{
     font: 200 11px "din-light", sans-serif;
 }
-.modal-footer .btn{
-    height: 59px;
+.modal-footer-btn {
+    padding: 15px !important;
 }
 
 /*-------------------modal tabs -------------------------*/
@@ -1267,11 +1269,6 @@ table th.settings_printerProfiles_profiles_action a:hover, table td.settings_pri
     background: #e1e2e1;
     padding: 12px 25px;
 }
-#slicing_configuration_dialog .control-group:last-of-type{
-    margin-bottom: 0;
-    border-bottom: 1px solid #252420;
-    background-color: #32312b;
-}
 #slicing_configuration_dialog .form-horizontal{
     margin: 0;
 }
@@ -1286,6 +1283,16 @@ table th.settings_printerProfiles_profiles_action a:hover, table td.settings_pri
 #slicing_configuration_dialog .control-label small{
     font-size: 12px;
     display: block;
+}
+
+#slicing_configuration_dialog .filament{
+    font-weight: bold;
+    font-family: din-black, sans-serif !important;
+    vertical-align: sub;
+}
+
+#slicing_configuration_dialog .nozzle{
+    vertical-align: sub;
 }
 
 #slice_button, #settings_dialog .modal-footer .btn-primary, #settings_printerProfiles_editDialog .modal-footer .btn-primary, #usersettings_dialog .modal-footer .btn-primary{
