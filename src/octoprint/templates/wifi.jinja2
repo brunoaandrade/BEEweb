@@ -19,9 +19,9 @@
                 <div class="navbar-inner" data-bind="css: appearanceClasses">
                     <div class="container">
                         <a class="brand" href="#">
-                            <span class="brand-label-fix"><strong data-bind="text: appearance.brand">BEEsoft</strong></span>
+
                         </a>
-                        <span id="printer-name-label" class="brand" data-bind="text: appearance.printerName"></span>
+
                         <div class="nav-collapse">
                             <!-- Navbar -->
                             <ul class="nav pull-right">
@@ -46,23 +46,20 @@
                         <div class="tab-content">
 
                             <div id="wifi-config" class="tab-pane active">
-                                {{ _('Please select the wi-fi network you wish to join.') }} <br /><br />
-
+                                <br /><br />
                                 <div class="row-fluid">
-
                                     <div class="control-group">
                                         <div class="controls">
                                             <label>{{ _('Available networks') }}: </label>
                                             <select id="networks-list" class="form-control" style="margin-bottom: 0px;"
                                                     onchange="$('#network-password').show();" >
                                                 <option value=""></option>
-
                                             </select>
-
                                             <a id="get-networks-button" class="btn btn-default" onclick="getNetworkList()"
                                             data-loading-text="<i class='icon-refresh icon-spin'></i>">
                                                 <i class="icon-refresh"></i>
                                             </a>
+                                            <p>{{ _('Please select the wi-fi network you wish to join.') }}</p>
                                         </div>
                                     </div>
 
@@ -98,7 +95,7 @@
                                         <small>{{ _('The hostname will be used to identify your device in the network.
                                         Please choose a unique name.') }}</small>
                                     </div>
-                                    <div class="alert alert-danger">
+                                    <div class="alert alert-warning">
                                         <i class="icon-info"></i>
                                         <small>{{ _('Please notice that changing the hostname will require rebooting your device!') }}</small>
                                     </div>
@@ -157,6 +154,9 @@
 
         </div>
         <script>
+            var BASEURL = "{{ url_for('index') }}";
+            var BEE_CUSTOM_API_BASEURL = BASEURL + "bee/api/";
+
             $( document ).ready(function() {
                 getNetworkList();
 
