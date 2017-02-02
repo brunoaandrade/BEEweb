@@ -485,18 +485,10 @@ BEEwb.main = {
         this.scene.add( this.bed );
 
         // Grid
-        var planeW = rectWidth / 10; // pixels
-        var planeH = rectHeight / 10; // pixels
-        var numW = 10; // how many wide (50*50 = 2500 pixels wide)
-        var numH = 10; // how many tall (50*50 = 2500 pixels tall)
-        var plane = new THREE.Mesh(
-            new THREE.PlaneGeometry( planeW*numW, planeH*numH, planeW, planeH ),
-            new THREE.MeshBasicMaterial({
-                color: 0xBDBDBD,
-                wireframe: true
-            })
-        );
-        this.scene.add(plane);
+        var gridXY = new THREE.GridHelper(this.bedDepth / 2 + 0.5, this.bedDepth / 10 +0.5);
+        gridXY.position.set(0, 0, 0);
+        gridXY.rotation.x = Math.PI/2;
+        this.scene.add(gridXY);
     },
 
     /**
