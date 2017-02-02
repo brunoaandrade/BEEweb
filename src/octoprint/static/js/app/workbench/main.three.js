@@ -485,10 +485,19 @@ BEEwb.main = {
         this.scene.add( this.bed );
 
         // Grid
-        var gridXY = new THREE.GridHelper(this.bedDepth / 2 + 0.5, this.bedDepth / 10 +0.5);
-        gridXY.position.set(0, 0, 0);
-        gridXY.rotation.x = Math.PI/2;
-        this.scene.add(gridXY);
+        // We must overlap 2 grids, in order to fill the entire bed space because,
+        // they are exact square and the bed is not
+        var normalizedBedDepth = this.bedDepth + 5; // We add 5 to round out the bedDepth to facilitate grid size calculations
+        var widthHeightDiff = this.bedWidth - normalizedBedDepth;
+        var gridXY1 = new THREE.GridHelper(normalizedBedDepth / 2, normalizedBedDepth / 10, '#666666', '#666666');
+        gridXY1.position.set(-widthHeightDiff/2, 0, 0);
+        gridXY1.rotation.x = Math.PI/2;
+        this.scene.add(gridXY1);
+
+        var gridXY2 = new THREE.GridHelper(normalizedBedDepth / 2, normalizedBedDepth / 10, '#666666', '#666666');
+        gridXY2.position.set(+widthHeightDiff/2, 0, 0);
+        gridXY2.rotation.x = Math.PI/2;
+        this.scene.add(gridXY2);
     },
 
     /**
