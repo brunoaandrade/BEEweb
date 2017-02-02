@@ -92,6 +92,12 @@ class BeePrinter(Printer):
         """
         super(BeePrinter, self).disconnect()
 
+        # Instantiates the comm object just to allow for a state to be returned. This is a workaround
+        # to allow to have the "Connecting..." string when the printer is connecting when the comm object is None...
+        # This forces the printer to be used in auto-connect mode
+        self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
+        self._comm.confirmConnection()
+
         # Starts the connection monitor thread
         import threading
         bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(self.connect, ))
