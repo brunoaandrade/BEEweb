@@ -54,87 +54,86 @@
                 <label class="control-label">{{ _('Density') }}  <span>({{ _('Infill') }})</span></label>
                     <div class="control-group">
                         <div class="controls">
-                            <input type="radio" id="density1" name="density" data-bind="" value="Low" checked/>
+                            <input type="radio" id="density1" name="density" data-bind="checked: selDensity" value="Low" checked/>
                                 <label class="radio " for="density1">
                                     <span class="icon den1icon"></span>
                                     <div>LOW</div>
                                     <p>5 %</p>
                                 </label>
-                            <input type="radio" id="density2" name="density" data-bind="" value="Medium"/>
+                            <input type="radio" id="density2" name="density" data-bind="checked: selDensity" value="Medium"/>
                                 <label class="radio " for="density2">
                                     <span class="icon den2icon"></span>
                                     <div>MEDIUM</div>
                                     <p>10 %</p>
                                 </label>
-                            <input type="radio" id="density3" name="density" data-bind="" value="High"/>
+                            <input type="radio" id="density3" name="density" data-bind="checked: selDensity" value="High"/>
                                 <label class="radio " for="density3">
                                     <span class="icon den3icon"></span>
                                     <div>HIGH</div>
                                     <p>20 %</p>
                                 </label>
-                            <input type="radio" id="density4" name="density" data-bind="" value="High+"/>
+                            <input type="radio" id="density4" name="density" data-bind="checked: selDensity" value="High+"/>
                                 <label class="radio " for="density4">
                                     <span class="icon den4icon"></span>
                                     <div>HIGH +</div>
                                     <p>40 %</p>
                                 </label>
-                            <input type="radio" id="density5" name="density" data-bind="" value="Custom"/>
+                            <input type="radio" id="density5" name="density" data-bind="checked: selDensity" value="Custom"/>
                                 <label class="radio " for="density5">
                                     <span class="icon den5icon"></span>
-                                    <input type="text" placeholder="X %">
+                                    <input type="number" min="0" max="100" placeholder="X %" data-bind="value: customDensity"/>
                                 </label>
-{#                            <input type="text" style="width: 100%" data-bind="slider: {value: selDensity, min:0, max: 100, step: 1, tooltip: 'show'}"/>#}
                         </div>
                     </div>
                 <label class="control-label">{{ _('Platform Adhesion') }}</label>
                     <div class="control-group">
                         <div class="controls">
-                            <input type="radio" name="platform" id="plat1" data-bind="" value="None" checked/>
+                            <input type="radio" name="platform" id="plat1" data-bind="checked: platformAdhesion" value="None" checked/>
                                 <label class="radio " for="plat1">
                                     <span class="icon plat1icon"></span>
-                                    <div>NONE</div>
+                                    <div>{{ _('NONE') }}</div>
                                     <p></p>
                                 </label>
 
-{#                            <input type="radio" name="platform" id="plat3" data-bind="" value="Brim"/>#}
-{#                                 <label class="radio" for="plat3">#}
-{#                                    <span class="icon plat3icon"></span>#}
-{#                                    <div>BRIM</div>#}
-{#                                    <p></p>#}
-                                    {#  <small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>#}
-{#                                </label>#}
-                              <input type="radio" name="platform" id="plat2" data-bind="checked: raft" value="Raft"/>
+                            <input type="radio" name="platform" id="plat3" data-bind="checked: platformAdhesion" value="Brim"/>
+                                 <label class="radio" for="plat3">
+                                   <span class="icon plat3icon"></span>
+                                    <div>{{ _('BRIM') }}</div>
+                                    <p></p>
+                                    <!--<small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>-->
+                                </label>
+                            <input type="radio" name="platform" id="plat2" data-bind="checked: platformAdhesion" value="Raft"/>
                                  <label class="radio" for="plat2">
                                     <span class="icon plat2icon"></span>
-                                    <div>RAFT</div>
+                                    <div>{{ _('RAFT') }}</div>
                                     <p></p>
-                                    {#  <small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>#}
+                                    <!--<small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>-->
                                 </label>
                         </div>
                     </div>
                 <label class="control-label"> {{ _('Support') }}</label>
                     <div class="control-group">
                         <div class="controls">
-                            <input type="radio" name="support" id="supp1" data-bind="" value="None" checked/>
+                            <input type="radio" name="support" id="supp1" data-bind="checked: support" value="None" checked/>
                                 <label class="radio " for="supp1">
                                     <span class="icon supp1icon"></span>
-                                    <div>NONE</div>
+                                    <div>{{ _('NONE') }}</div>
                                     <p></p>
                                 </label>
-                            <input type="radio" name="support"id="supp2" data-bind="checked: support" value="Touching Platform" />
+                            <input type="radio" name="support" id="supp2" data-bind="checked: support" value="Touching Platform" />
                                  <label class="radio" for="supp2">
                                     <span class="icon supp2icon"></span>
-                                    <div>SUPPORT</div>
+                                    <div>{{ _('TOUCHING PLATFORM') }}</div>
                                     <p></p>
-                                    {#  <small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>#}
+                                    <!--<small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>-->
                                 </label>
-{#                            <input type="radio" name="support" id="supp3" data-bind="" value="Everywhere"/>#}
-{#                                 <label class="radio" for="supp3">#}
-{#                                    <span class="icon supp3icon"></span>#}
-{#                                    <div>SUPPORT 2</div>#}
-{#                                    <p></p>#}
-                                    {#  <small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>#}
-{#                                </label>#}
+                                <input type="radio" name="support" id="supp3" data-bind="checked: support" value="Everywhere"/>
+                                <label class="radio" for="supp3">
+                                   <span class="icon supp3icon"></span>
+                                    <div>{{ _('EVERYWHERE') }}</div>
+                                    <p></p>
+                                    <!--<small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>-->
+                                </label>
                         </div>
                     </div>
                 <!--<div class="control-group">-->
