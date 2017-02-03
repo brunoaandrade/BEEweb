@@ -113,7 +113,9 @@
         {{ _('Print from internal memory') }}
     </button>
 </div>
-
+<div id="noPrinterConnected" data-bind="visible: noPrinterDetected()">
+    <span>{{ _('No printer detected. Please turn on and connect your USB printer to PRINT!') }}</span>
+</div>
 <script>
     $( document ).ready(function () {
         $('#showPrintDetails').click(function(event) {

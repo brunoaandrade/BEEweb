@@ -36,7 +36,8 @@ $(function() {
             && self.loginState.isUser() && self.filename() != undefined;
         });
         self.enablePreparePrint = ko.pureComputed(function() {
-            return self.loginState.isUser() && !self.connection.isConnecting() && !self.filename();
+            return self.loginState.isUser() && !self.connection.isConnecting()
+            && !self.connection.isErrorOrClosed() && !self.filename();
         });
         self.showInsufficientFilament = ko.pureComputed(function() {
             return self.loginState.isUser && self.insufficientFilament()
@@ -48,6 +49,9 @@ $(function() {
         self.enablePrintFromMemory = ko.pureComputed(function() {
             return self.loginState.isUser() && (self.isReady && !self.isPrinting()
             && !self.isPaused() && !self.isHeating() && !self.isShutdown());
+        });
+        self.noPrinterDetected = ko.pureComputed(function() {
+            return self.connection.isConnecting() || self.connection.isErrorOrClosed()
         });
 
         self.togglePrintFromMemory = function() {
