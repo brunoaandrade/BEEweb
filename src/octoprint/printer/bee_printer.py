@@ -667,7 +667,19 @@ class BeePrinter(Printer):
         :param self:
         :return:
         """
-        return "ok"
+        try:
+            if self._comm is None:
+                self._logger.info("Cannot print from memory: printer not connected or currently busy")
+                return
+
+            # bypasses normal octoprint workflow to print from memory "special" file
+            self._comm.selectFile('Memory File', False)
+
+            self._setProgressData(completion=0)
+            self._setCurrentZ(None)
+            return self._comm.startPrint('from_memory')
+        except Exception as ex:
+            self._logger.error(ex)
 
     # # # # # # # # # # # # # # # # # # # # # # #
     ##########  CALLBACK FUNCTIONS  #############

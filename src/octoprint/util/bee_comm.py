@@ -8,7 +8,7 @@ import logging
 
 from octoprint.settings import settings
 from octoprint.events import eventManager, Events
-from octoprint.util.comm import MachineCom, regex_sdPrintingByte, regex_sdFileOpened
+from octoprint.util.comm import MachineCom, regex_sdPrintingByte, regex_sdFileOpened, PrintingFileInformation
 from beedriver.connection import Conn as BeePrinterConn
 from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer, parsePropertiesFile
 
@@ -294,12 +294,12 @@ class BeeCom(MachineCom):
     def startPrint(self, pos=None):
         """
         Starts the printing operation
-        :param pos: unused parameter, just to keep the interface compatible with octoprint
+        :param pos: if the string 'memory' is passed the printer will print the last file in the printer's memory
         """
         if not self.isOperational() or self.isPrinting():
             return
 
-        if self._currentFile is None:
+        if self._currentFile is None and pos is None:
             raise ValueError("No file selected for printing")
 
         try:
@@ -311,6 +311,8 @@ class BeeCom(MachineCom):
                 if print_resp:
                     self._sd_status_timer = RepeatedTimer(self._timeout_intervals.get("sdStatus", 1.0), self._poll_sd_status, run_first=True)
                     self._sd_status_timer.start()
+            elif pos == 'from_memory':
+                print_resp = self._beeCommands.repeatLastPrint()
             else:
                 print_resp = self._beeCommands.printFile(self._currentFile.getFilename())
 
@@ -528,14 +530,21 @@ class BeeCom(MachineCom):
             self._sdFileToSelect = filename
             self.sendCommand("M23 %s" % filename)
         else:
-            self._currentFile = comm.PrintingGcodeFileInformation(filename, offsets_callback=self.getOffsets,
-                                                             current_tool_callback=self.getCurrentTool)
-            eventManager().fire(Events.FILE_SELECTED, {
-                "file": self._currentFile.getFilename(),
-                "filename": os.path.basename(self._currentFile.getFilename()),
-                "origin": self._currentFile.getFileLocation()
-            })
-            self._callback.on_comm_file_selected(filename, self._currentFile.getFilesize(), False)
+        	# Special case treatment for in memory file printing
+            if filename == 'Memory File':
+                self._currentFile = InMemoryFileInformation(filename, offsets_callback=self.getOffsets,
+                                                                 current_tool_callback=self.getCurrentTool)
+
+                self._callback.on_comm_file_selected(filename, 0, False)
+            else:
+                self._currentFile = comm.PrintingGcodeFileInformation(filename, offsets_callback=self.getOffsets,
+                                                                 current_tool_callback=self.getCurrentTool)
+                eventManager().fire(Events.FILE_SELECTED, {
+                    "file": self._currentFile.getFilename(),
+                    "filename": os.path.basename(self._currentFile.getFilename()),
+                    "origin": self._currentFile.getFileLocation()
+                })
+                self._callback.on_comm_file_selected(filename, self._currentFile.getFilesize(), False)
 
     def getPrintProgress(self):
         """
@@ -871,3 +880,21 @@ class BeeCom(MachineCom):
             self._heating = False
 
 
+class InMemoryFileInformation(PrintingFileInformation):
+    """
+    Dummy file information handler for printer in memory files
+    Encapsulates information regarding an ongoing direct print. Takes care of the needed file handle and ensures
+    that the file is closed in case of an error.
+    """
+
+    def __init__(self, filename, offsets_callback=None, current_tool_callback=None):
+        PrintingFileInformation.__init__(self, filename)
+
+        self._handle = None
+
+        self._offsets_callback = offsets_callback
+        self._current_tool_callback = current_tool_callback
+
+        self._size = 0
+        self._pos = 0
+        self._read_lines = 0

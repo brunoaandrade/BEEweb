@@ -47,7 +47,7 @@ $(function() {
             return self.enablePause() || self.isHeating();
         });
         self.enablePrintFromMemory = ko.pureComputed(function() {
-            return self.loginState.isUser() && (self.isReady && !self.isPrinting()
+            return self.loginState.isUser() && self.filename() == undefined && (self.isReady && !self.isPrinting()
             && !self.isPaused() && !self.isHeating() && !self.isShutdown());
         });
         self.noPrinterDetected = ko.pureComputed(function() {
@@ -55,12 +55,14 @@ $(function() {
         });
 
         self.togglePrintFromMemory = function() {
-            if ($('#printFromMemoryDiv').hasClass('hidden')) {
-                $('#printFromMemoryDiv').removeClass('hidden');
-                $('#preparePrint').addClass('hidden');
-            } else {
-                $('#printFromMemoryDiv').addClass('hidden');
-                $('#preparePrint').removeClass('hidden');
+            if (self.enablePrintFromMemory()) {
+                if ($('#printFromMemoryDiv').hasClass('hidden')) {
+                    $('#printFromMemoryDiv').removeClass('hidden');
+                    $('#preparePrint').addClass('hidden');
+                } else {
+                    $('#printFromMemoryDiv').addClass('hidden');
+                    $('#preparePrint').removeClass('hidden');
+                }
             }
         };
 
