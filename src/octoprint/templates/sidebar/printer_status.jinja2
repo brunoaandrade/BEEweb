@@ -108,7 +108,7 @@
 <div id="printFromMemoryDiv" class="hidden">
     <span><strong>{{ _('Your printer has a file in its internal memory.') }}</strong></span>
     <p>{{ _('It corresponds to the last file that was printed. Press the button below to print it.') }}</p>
-    <button class="btn" id="print_from_memory"
+    <button class="btn btn-print-from-memory" id="print_from_memory"
         data-bind="click: printFromMemory, enable: enablePrintFromMemory()">
         {{ _('Print from internal memory') }}
     </button>

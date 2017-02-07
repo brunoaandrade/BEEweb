@@ -10,8 +10,12 @@
 body {
     font-family: din-light, sans-serif !important;
 }
+p {
+    color: #999688 !important;
+}
 strong {
     font-family: din-black, sans-serif !important;
+    color: #fff !important;
 }
 .alert.alter-warning{
     background-color: #ea6c54 !important;
@@ -577,8 +581,6 @@ input[name=z-axis]{ border-bottom: 2px solid #0000ff !important; }
 /*--------- DEFAULT BUTTONS & INPUTS & SPANS ----------*/
 
 
-
-
 button.btn, a.btn{
     font: 200 16px "din-light", sans-serif;
     background: #ccc;
@@ -674,6 +676,13 @@ input + span.add-on{
     font: 200 18px "din-light", sans-serif;
     background: #ea6c54 !important;
     color: #fff !important;
+}
+
+.btn-print-from-memory {
+    background-color: #32312b !important;
+    color: #fff !important;
+    border: solid !important;;
+    border-width: 1px !important;;
 }
 /*-------------------- SIDEBAR ---------------------*/
 
