@@ -482,7 +482,14 @@ class BeePrinter(Printer):
         Starts the printer calibration test
         :return:
         """
-        test_gcode = CalibrationGCoder.get_calibration_gcode(self._printerProfileManager.get_current_or_default()['name'])
+
+        """
+        TODO: For now we will hard-code a fixed string to fetch the calibration GCODE, since it is the same for all
+        the "first version" printers. In the future this function call must use the printer name for dynamic fetch
+        of the correct GCODE, using self._printerProfileManager.get_current_or_default()['name'] to get the current
+        printer name
+        """
+        test_gcode = CalibrationGCoder.get_calibration_gcode('BVC_BEETHEFIRST_V1')
         lines = test_gcode.split(',')
 
         file_path = os.path.join(settings().getBaseFolder("uploads"), 'BEETHEFIRST_calib_test.gcode')
@@ -938,7 +945,7 @@ class BeePrinter(Printer):
 
 class CalibrationGCoder:
 
-    _calibration_gcode = { 'BEETHEFIRST' :'M29,'
+    _calibration_gcode = { 'BVC_BEETHEFIRST_V1' :'M29,'
                 'M300 ;3.X.X - 2013-12-05,'
                 'M206 X500		; SET ACCEL = 500mm/s^2,'
                 'M107			; TURN OFF FAN,'
