@@ -41,7 +41,9 @@ INSTALL_REQUIRES = [
 	"awesome-slugify>=1.6.5,<1.7",
 	"feedparser>=5.2.1,<5.3",
 	"beecom>=0.3.4",
-	"pyusb>=1.0.0b2"
+	"pyusb>=1.0.0b2",
+	"setuptools==24.0.1" # We must pin the setuptools to this version, because on the RPI platform this is affecting the
+						 # software updates version sorting for some reason....
 ]
 
 # Additional requirements for optional install options
