@@ -44,7 +44,8 @@ $(function() {
             && !self.ignoredInsufficientFilament() && self.filename() != undefined;
         });
         self.showPrintControlButtons = ko.pureComputed(function() {
-            return self.enablePause() || self.isHeating();
+            return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown() || self.isHeating())
+            && self.loginState.isUser();
         });
         self.enablePrintFromMemory = ko.pureComputed(function() {
             return self.loginState.isUser() && self.filename() == undefined && (self.isReady && !self.isPrinting()

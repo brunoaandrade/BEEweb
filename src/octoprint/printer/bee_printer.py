@@ -795,6 +795,9 @@ class BeePrinter(Printer):
         if BeePrinter.TMP_FILE_MARKER in payload["file"]:
             self._fileManager.remove_file(payload['origin'], payload['file'])
 
+        # unselects the current file
+        self.unselect_file()
+
         # sends usage statistics
         self._sendUsageStatistics('stop')
 

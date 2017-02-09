@@ -530,7 +530,7 @@ class BeeCom(MachineCom):
             self._sdFileToSelect = filename
             self.sendCommand("M23 %s" % filename)
         else:
-        	# Special case treatment for in memory file printing
+            # Special case treatment for in memory file printing
             if filename == 'Memory File':
                 self._currentFile = InMemoryFileInformation(filename, offsets_callback=self.getOffsets,
                                                                  current_tool_callback=self.getCurrentTool)
@@ -858,26 +858,30 @@ class BeeCom(MachineCom):
         while self._beeCommands.isHeating():
             time.sleep(1)
 
-        self._changeState(self.STATE_PRINTING)
-
+        if self._currentFile is not None:
         # Starts the real printing operation
-        self._currentFile.start()
+            self._currentFile.start()
 
-        payload = {
-            "file": self._currentFile.getFilename(),
-            "filename": os.path.basename(self._currentFile.getFilename()),
-            "origin": self._currentFile.getFileLocation()
-        }
+            self._changeState(self.STATE_PRINTING)
 
-        eventManager().fire(Events.PRINT_STARTED, payload)
+            payload = {
+                "file": self._currentFile.getFilename(),
+                "filename": os.path.basename(self._currentFile.getFilename()),
+                "origin": self._currentFile.getFileLocation()
+            }
 
-        # starts the progress status thread
-        self.startPrintStatusProgressMonitor()
+            eventManager().fire(Events.PRINT_STARTED, payload)
 
-        if self._heatupWaitStartTime is not None:
-            self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
-            self._heatupWaitStartTime = None
-            self._heating = False
+            # starts the progress status thread
+            self.startPrintStatusProgressMonitor()
+
+            if self._heatupWaitStartTime is not None:
+                self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
+                self._heatupWaitStartTime = None
+                self._heating = False
+        else:
+            self._changeState(self.STATE_READY)
+            self._logger.error('Error starting Print operation. No selected file found.')
 
 
 class InMemoryFileInformation(PrintingFileInformation):
