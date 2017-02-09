@@ -1,7 +1,7 @@
 <div id="pause_panel" data-bind="visible: loginState.isUser && (isPaused() || isShutdown())">
     <div id="shutdown_panel" data-bind="visible: !isShutdown()">
         <button id="job_shutdown" class="btn-ghost" data-bind="click: shutdown" >
-            <i class="icon-off"></i>
+            <span class="m-icon shutdowngicon"></span>
             <span >{{ _('Save & Shutdown') }}</span>
         </button>
     </div>
@@ -43,7 +43,7 @@
     <button id="job_print" class="btn btn-primary btn-print"
     data-bind="click: print, css: {'btn-info': isPaused()}, attr: {title: titlePrintButton},
      visible: enablePrint() && (!isPaused() && !isShutdown())" >
-        <i data-bind="css: {'m-icon printwicon': !isPaused(), 'icon-undo': isPaused()}"></i>
+        <span data-bind="css: {'m-icon printwicon': !isPaused(), 'icon-undo': isPaused()}"></span>
         <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
     </button>
 
@@ -57,7 +57,7 @@
     <button class="btn btn-pause" id="job_pause" data-bind="click: function() { isPaused() ? onlyResume() : onlyPause(); },
         visible: enablePause, css: {active: (isPaused() && isShutdown())}, attr: {title: titlePauseButton}">
         <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>
-        <span data-bind="visible: !isPaused() && !isShutdown()"> {{ _('Pause') }}</span>
+        <span data-bind="visible: isPrinting() && !isShutdown()"> {{ _('Pause') }}</span>
         <span data-bind="visible: isPaused() || isShutdown()"> {{ _('Resume') }}</span>
     </button>
     <button class="btn btn-stop" id="job_cancel" data-bind="click: cancel, visible: enableCancel"
@@ -104,9 +104,9 @@
     </button>
 </div>
 <div id="printFromMemoryDiv" class="hidden">
-    <span class="print-memory-message">{{ _('Your') }}</span><strong>
+    <span class="white-label-message">{{ _('Your') }}</span><strong>
     <span data-bind="text: printerName " /></strong>
-    <span class="print-memory-message">{{ _('has a file in its internal memory.') }}</span>
+    <span class="white-label-message">{{ _('has a file in its internal memory.') }}</span>
     <p>{{ _('It corresponds to the last file that was printed. Press the button below to print it.') }}</p>
     <button class="btn btn-print-from-memory" id="print_from_memory"
         data-bind="click: printFromMemory, enable: enablePrintFromMemory()">
