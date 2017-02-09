@@ -6,16 +6,14 @@
         </button>
     </div>
     <div id="shutdown_confirmation" class="text-center" data-bind="visible: isShutdown()">
-        <span >
-            <strong>
-                <i class="icon-warning-sign"></i>
-                {{ _('You can power off your printer. Alternatively you can resume or cancel your print.') }}
-            </strong>
+        <span class="white-label-message">
+            <i class="icon-warning-sign"></i>
+            {{ _('You can power off your printer. Alternatively you can resume or cancel your print.') }}
         </span>
     </div>
     <div id="shutdown_panel_change_filament">
         <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn-ghost" >
-            <i class="icon-wrench"></i>
+            <span class="m-icon maintenancegicon"></span>
             {{ _('Change filament now') }}
         </a>
     </div>
@@ -23,7 +21,7 @@
 <div id="insufficientFilamentMessage"
     data-bind="visible: showInsufficientFilament">
     <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn-ghost" >
-        <span class="m-icon maintenanceiconw"></span>
+        <span class="m-icon maintenancegicon"></span>
         {{ _('Change filament now') }}
     </a>
     <br />
@@ -36,7 +34,7 @@
 <div class="print-control" style="display: none;" data-bind="visible: loginState.isUser">
     <div class="span12">
         <span class="loaded-file" data-bind="visible: filename">{{ _('Loaded File') }}:</span>
-        <strong data-bind="text: filename"></strong>&nbsp;
+        <span class="white-label-message" data-bind="text: filename"></span>&nbsp;
         <strong data-bind="visible: sd">(SD)</strong><br>
     </div>
 </div>
@@ -106,7 +104,9 @@
     </button>
 </div>
 <div id="printFromMemoryDiv" class="hidden">
-    <span><strong>{{ _('Your printer has a file in its internal memory.') }}</strong></span>
+    <span class="print-memory-message">{{ _('Your') }}</span><strong>
+    <span data-bind="text: printerName " /></strong>
+    <span class="print-memory-message">{{ _('has a file in its internal memory.') }}</span>
     <p>{{ _('It corresponds to the last file that was printed. Press the button below to print it.') }}</p>
     <button class="btn btn-print-from-memory" id="print_from_memory"
         data-bind="click: printFromMemory, enable: enablePrintFromMemory()">
