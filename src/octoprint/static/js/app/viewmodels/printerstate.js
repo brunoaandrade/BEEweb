@@ -54,6 +54,9 @@ $(function() {
         self.noPrinterDetected = ko.pureComputed(function() {
             return self.connection.isConnecting() || self.connection.isErrorOrClosed()
         });
+        self.isSelectedFile = ko.pureComputed(function() {
+             return self.loginState.isUser() && self.filename() != undefined;
+        });
 
         self.togglePrintFromMemory = function() {
             if (self.enablePrintFromMemory()) {
@@ -309,7 +312,6 @@ $(function() {
                     self.titlePauseButton(self.TITLE_PAUSE_BUTTON_UNPAUSED);
                 }
             }
-
         };
 
         self._processJobData = function(data) {
@@ -355,7 +357,7 @@ $(function() {
                 self.progress(data.completion);
 
                 if (data.completion == 100) {
-                    // Empties the progress bar
+                    // If print finishes empties the progress bar
                     self.progress(0);
                 }
             } else {
