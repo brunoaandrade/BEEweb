@@ -197,7 +197,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 						"repo": "BEEwebPi",
 						"branch": configurationsReleaseBranch,
 						"update_script": update_script_callable_beewebpi,
-						"restart": "octoprint",
+						"restart": "environment",
 						"checkout_folder": "/home/pi/beewebpi-repo" # default checkout path
 					},
 					"BEEpanel": {
@@ -207,6 +207,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 						"restart": "environment",
 						"persist_current": True, # Custom property to force persistence of current version. The octoprint default, doesn't do it for some reason in github releases...
 						"current": "unknown",
+						"checkout_folder": "/home/pi/beepanel2",  # default checkout path. For some unknown reason the path configured in the config.yaml is erased during setup (or boot)... :/
 						"update_script": update_script_callable_beepanel,
 						"stable_branch": dict(branch="master", name="Stable"),
 						"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
