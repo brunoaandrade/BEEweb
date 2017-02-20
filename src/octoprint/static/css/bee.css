@@ -15,9 +15,10 @@ p {
 }
 strong {
     font-family: din-black, sans-serif !important;
-    color: #fff !important;
 }
-
+table {
+    color: #000;
+}
 /*-------------------------------------------------------*/
 /*-------------------- BEEsoft NEW UI -------------------*/
 
@@ -163,7 +164,7 @@ strong {
 .dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus, .multi-level .dropdown-submenu:hover>a, .multi-level .dropdown-submenu:focus>a{
     color: #000;
     font-weight: 400;
-    background: #ffc709;
+    background: #ffcc00;
 }
 .dropdown-menu>li>a{
     color: #fff;
@@ -370,6 +371,11 @@ a.brand{
 .calibrateicon  { background: url('../img/icons/calibrate.svg'); }
 .extrudericon  { background: url('../img/icons/extrusor.svg'); }
 .nozzleicon  { background: url('../img/icons/nozzle.svg'); }
+/* Settings */
+.checkicon { background: url('../img/icons/ok.svg'); }
+.trashicon { background: url('../img/icons/delete.svg'); }
+.editicon { background: url('../img/icons/edit.svg'); }
+.profileicon { background: url('../img/icons/profile.svg'); }
 /*grey*/
 .filamentgicon { background: url('../img/icons/filament_grey.svg'); }
 .calibrategicon  { background: url('../img/icons/calibrate_grey.svg'); }
@@ -378,12 +384,16 @@ a.brand{
 .maintenancegicon  { background: url('../img/icons/maintenance_grey.svg'); }
 .printgicon  { background: url('../img/icons/print_grey.svg'); }
 .shutdowngicon  { background: url('../img/icons/shutdown_grey.svg'); }
+.checkgicon { background: url('../img/icons/ok_grey.svg'); }
 /*white*/
 .printwicon  { background: url('../img/icons/print_white.svg'); }
 .editwicon  { background: url('../img/icons/edit_white.svg'); }
 .deletewicon  { background: url('../img/icons/delete_white.svg'); }
 .importwicon  { background: url('../img/icons/importw.svg'); }
 .shutdownwicon  { background: url('../img/icons/shutdown_white.svg'); }
+/* green */
+.checkgreenicon  { background: url('../img/icons/ok_green.svg'); }
+
 
 .printnow .m-icon,
 .addplatform .m-icon { float: left; margin: 4px -10px 0 10px; }
@@ -458,7 +468,7 @@ a.brand{
     outline: none;
 }
 #workbench-controls-container button:hover{
-    background: #ffc709 !important;
+    background: #ffcc00 !important;
 }
 #workbench-controls-container button:disabled{
     pointer-events: none;
@@ -851,6 +861,9 @@ input + span.add-on{
 #gcode, #control , #temp, #term{
     padding: 65px 25px;
 }
+#gcode.tab-pane{
+   max-height: calc(100vh - 200px);
+}
 #tab-container .tab-content>.tab-pane, #tab-container .pill-content>.pill-pane{
     overflow-y: auto;
     overflow-x: hidden;
@@ -1038,20 +1051,44 @@ input + span.add-on{
 }
 table th.settings_printerProfiles_profiles_action, table td.settings_printerProfiles_profiles_action{ width: 120px !important; }
 table th.settings_printerProfiles_profiles_action a, table td.settings_printerProfiles_profiles_action a{
-    background: #f1f0f0;
     height: 100%;
     padding: 15px 0;
-    margin: -2px !important;
     vertical-align: middle;
-    width: 43px;
     display: inline-block;
     transition: all 0.2s ease;
 }
-table th.settings_printerProfiles_profiles_action a:hover, table td.settings_printerProfiles_profiles_action a:hover{
-    background: #ffcc00 !important;
+td.settings_printerProfiles_profiles_name, td.settings_printerProfiles_profiles_model {
+    background-color: #e1e2e1;
 }
+td.settings_printerProfiles_profiles_action .m-icon {
+    width: 17px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+th.settings_printerProfiles_profiles_name, th.settings_printerProfiles_profiles_model, th.settings_printerProfiles_profiles_action {
+    color: #898989;
+}
+
 .settings_printerProfiles_profiles_action{
     padding: 0 !important;
+}
+#settings_printerProfiles_profiles .default_profile {
+    border: solid 2px #518359;
+}
+#settings_printerProfiles_profiles .default_profile .checkgreenicon{
+    margin-right: 5px;
+}
+
+td.settings_users_name, td.settings_users_active, td.settings_users_admin{
+    background-color: #e1e2e1;
+}
+#settings_users .settings_users_actions{
+   width: 129px !important;
+}
+td.settings_users_actions .m-icon {
+    width: 17px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .modal-row{
@@ -1092,6 +1129,7 @@ table th.settings_printerProfiles_profiles_action a:hover, table td.settings_pri
     padding: 7px 23px !important;
     text-transform: uppercase;
     transition: all 0.2s ease;
+    text-shadow: none;
 }
 .tabbable .nav-list>.active>a, .tabbable .nav-list>.active>a:hover, .tabbable .nav-list>.active>a:focus{
     color: #000;
@@ -1102,6 +1140,7 @@ table th.settings_printerProfiles_profiles_action a:hover, table td.settings_pri
 .tabbable .nav-list>.active>a:hover{ color: #fff !important; }
 .nav-list>li>a:hover{
     background: #999688 !important;
+    color: #fff !important;
 }
 
 /*------------------------------PILLS-----------------------------------------*/
