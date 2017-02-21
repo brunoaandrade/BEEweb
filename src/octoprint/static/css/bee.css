@@ -1131,6 +1131,13 @@ td.settings_users_actions .m-icon {
 }
 .modal-row .m-icon{ margin-right: 10px; vertical-align: text-top; }
 
+#maintenance_dialog .modal-body{
+    min-height: 475px !important;
+}
+#maintenance_dialog {
+    top: 0;
+    margin-top: 30px !important;
+}
 #maintenanceList .modal-row > .text-right{
     padding: 35px 0 0;
 }
@@ -1143,6 +1150,7 @@ td.settings_users_actions .m-icon {
 #maintenanceList .modal-row > .text-center{
     padding: 25px 0 0;
 }
+
 .modal-row h3{
     text-transform: uppercase;
     font: 200 16px "din-light", sans-serif;
