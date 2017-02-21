@@ -1050,6 +1050,11 @@ input + span.add-on{
     vertical-align: middle;
     height: 45px;
 }
+.modal.maintenance {
+    width: 800px;
+    margin-left: -487px;
+}
+
 /*---------------------SPECIFIC MODAL STRUCTURES ---------------------*/
 #settings_dialog .modal-body .full-sized-box {
     padding: 0 23px !important;
@@ -1127,10 +1132,13 @@ td.settings_users_actions .m-icon {
 .modal-row .m-icon{ margin-right: 10px; vertical-align: text-top; }
 
 #maintenanceList .modal-row > .text-right{
-    padding: 65px 0 0;
+    padding: 35px 0 0;
 }
 #maintenanceList .modal-row:first-of-type{
-    min-height: 145px;
+    min-height: 105px;
+}
+#maintenanceList .modal-row{
+    min-height: 105px;
 }
 #maintenanceList .modal-row > .text-center{
     padding: 25px 0 0;

@@ -1,11 +1,11 @@
-<div id="maintenance_dialog" class="modal hide fade large" tabindex="-1" role="dialog" aria-labelledby="maintenance_dialog_label" aria-hidden="true">
+<div id="maintenance_dialog" class="modal hide fade maintenance" tabindex="-1" role="dialog" aria-labelledby="maintenance_dialog_label" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h3 id="maintenance_dialog_label"> <span class="m-icon maintenancegicon"></span>{{ _('Maintenance') }}
             <i class="icon-spinner icon-spin" data-bind="visible: receiving"></i>
         </h3>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" id="maintenance_modal_body">
         <div class="">
             <div id="maintenance_warning_box" class="hidden text-center alert alert-warning">
                 <i class="icon-warning-sign"></i>
@@ -13,17 +13,17 @@
             </div>
 
             <div class="tabbable row-fluid">
-                <div id="maintenanceList" class="operationsList full-sized-box"">
+                <div id="maintenanceList" class="operationsList full-sized-box">
                     <div class="modal-row">
                         <div class="span1 text-center">
                             <span class="m-icon filamentgicon"></span>
                         </div>
-                        <div class="span5">
+                        <div class="span4">
                             <h3>{{ _('Change filament') }}</h3>
                             <p>{{ _('This operation is needed when you want to print with a different color or when the filament available in the spool is not enough.')}}
                             </p>
                          </div>
-                         <div class="span6 text-right">
+                         <div class="span7 text-right">
                              <a href="https://beeverycreative.com/order-here/" class="btn btn-maintenance green" target="_blank" >{{ _('Buy filament') }}</a>
                              <a href="#maintenance_changeFilament" class="btn btn-maintenance yellow" data-bind="click: showFilamentChange" >
                                  <span class="m-icon filamenticon"></span>{{ _('Change filament now') }}
@@ -34,12 +34,12 @@
                          <div class="span1 text-center">
                             <span class="m-icon calibrategicon"></span>
                          </div>
-                         <div class="span5">
+                         <div class="span4">
                              <h3>{{ _('Calibrate') }}</h3>
                              <p>{{ _('This operation is needed to ensure the quality of your 3D prints.')}}
                              </p>
                         </div>
-                        <div class="span6 text-right">
+                        <div class="span7 text-right">
                              <a href="#maintenance_calibration" class="btn btn-maintenance yellow" data-bind="click: showCalibration" >
                                 <span class="m-icon calibrateicon"></span>{{ _('Calibrate now') }}
                              </a>
@@ -50,12 +50,12 @@
                         <div class="span1 text-center">
                             <span class="m-icon extrudergicon"></span>
                         </div>
-                        <div class="span5">
+                        <div class="span4">
                             <h3>{{ _('Extruder Maintenance') }}</h3>
                             <p>{{ _('This operation enables you to unclog the nozzle using the Maintenance Kit.')}}
                             </p>
                         </div>
-                        <div class="span6 text-right">
+                        <div class="span7 text-right">
                             <a href="#maintenance_extruderMaintenance" class="btn btn-maintenance yellow" data-bind="click: showExtruderMaintenance">
                                 <span class="m-icon extrudericon"></span>{{ _('Start extruder maintenance') }}
                             </a>
@@ -66,12 +66,12 @@
                         <div class="span1 text-center">
                             <span class="m-icon nozzlegicon"></span>
                         </div>
-                         <div class="span5">
+                         <div class="span4">
                              <h3>{{ _('Switch nozzle') }}</h3>
                              <p>{{ _('It is necessary to change the nozzle when it\'s clogged or if you need to print with a nozzle of a different diameter, ex: TPU-FLEX.')}}
                              </p>
                         </div>
-                        <div class="span6 text-right">
+                        <div class="span7 text-right">
                             <a href="#maintenance_replaceNozzle" class="btn btn-maintenance yellow" data-bind="click: showReplaceNozzle">
                                 <span class="m-icon nozzleicon"></span>{{ _('Switch nozzle now') }}
                             </a>
