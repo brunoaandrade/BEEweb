@@ -859,7 +859,6 @@ input + span.add-on{
 .settings-trigger .dropdown-menu{
     right: 0;
     left: unset;
-
 }
 
 /*-------------------- TABS ---------------------*/
@@ -1056,7 +1055,8 @@ input + span.add-on{
 }
 
 /*---------------------SPECIFIC MODAL STRUCTURES ---------------------*/
-#settings_dialog .modal-body .full-sized-box {
+#settings_dialog .modal-body .full-sized-box,
+#usersettings_dialog .modal-body .full-sized-box {
     padding: 0 23px !important;
     margin: 0 0 0 -23px !important;
 }
