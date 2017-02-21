@@ -382,6 +382,8 @@ a.brand{
 .trashicon { background: url('../img/icons/delete.svg'); }
 .editicon { background: url('../img/icons/edit.svg'); }
 .profileicon { background: url('../img/icons/profile.svg'); }
+/* black */
+.refreshicon { background: url('../img/icons/refresh.svg'); }
 /*grey*/
 .filamentgicon { background: url('../img/icons/filament_grey.svg'); }
 .calibrategicon  { background: url('../img/icons/calibrate_grey.svg'); }
@@ -391,6 +393,8 @@ a.brand{
 .printgicon  { background: url('../img/icons/print_grey.svg'); }
 .shutdowngicon  { background: url('../img/icons/shutdown_grey.svg'); }
 .checkgicon { background: url('../img/icons/ok_grey.svg'); }
+.profilegicon { background: url('../img/icons/profile_grey.svg'); }
+.settingsgicon { background: url('../img/icons/settings_grey.svg'); }
 /*white*/
 .printwicon  { background: url('../img/icons/print_white.svg'); }
 .editwicon  { background: url('../img/icons/edit_white.svg'); }
@@ -1134,8 +1138,14 @@ td.settings_users_actions .m-icon {
 #maintenance_dialog .modal-body{
     min-height: 475px !important;
 }
-#maintenance_dialog {
-    top: 0;
+#usersettings_dialog .modal-body{
+   min-height: 540px;
+}
+#maintenance_dialog,
+#usersettings_dialog,
+#settings_dialog
+{
+    top: 0 !important;
     margin-top: 30px !important;
 }
 #maintenanceList .modal-row > .text-right{
@@ -1162,6 +1172,12 @@ td.settings_users_actions .m-icon {
 .modal-footer-btn {
     padding: 22px 15px !important;
 }
+#usersettings_dialog .input-append input {
+    width: 357px;
+}
+#usersettings_dialog .input-append a {
+    background-color: #f1f0f0;
+}
 
 /*-------------------modal tabs -------------------------*/
 .tabbable .scrollable.span3{
@@ -1183,6 +1199,16 @@ td.settings_users_actions .m-icon {
 .nav-list>li>a:hover{
     background: #999688 !important;
     color: #fff !important;
+}
+/*------------------------------FORMS-----------------------------------------*/
+
+.controls input {
+    background-color: #e1e2e1;
+    height: 37px !important;
+    border: 0px none;
+}
+.control-group label {
+    color: #898989;
 }
 
 /*------------------------------PILLS-----------------------------------------*/
