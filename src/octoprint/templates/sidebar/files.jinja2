@@ -32,7 +32,8 @@
     </div>
 </div>
 <div class="gcode_files" data-bind="slimScrolledForeach: listHelper.paginatedItems">
-    <div class="entry" data-bind="attr: { id: $root.getEntryId($data) }, template: { name: $root.templateFor($data), data: $data }"></div>
+    <div class="entry" data-bind="attr: { id: $root.getEntryId($data) }, template: { name: $root.templateFor($data), data: $data },
+    css: {stl: !$root.isGcode($data) }"></div>
 
     <script type="text/html" id="files_template_machinecode">
         <div class="title" data-bind="css: $root.getSuccessClass($data), style: { 'font-weight': $root.listHelper.isSelected($data) ? 'bold' : 'normal' }, text: name"></div>

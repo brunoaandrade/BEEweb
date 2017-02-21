@@ -35,6 +35,12 @@ table {
 .alert.alter-warning{
     background-color: #ea6c54 !important;
 }
+.alert {
+    border-radius: 0px;
+}
+.alert p {
+    color: #fff !important;
+}
 
 /*-------------------- NAVBAR -----------------------*/
 
@@ -1244,7 +1250,13 @@ td.settings_users_actions .m-icon {
     display: block;
 }
 
-#slice_button, #settings_dialog .modal-footer .btn-primary, #settings_printerProfiles_editDialog .modal-footer .btn-primary, #usersettings_dialog .modal-footer .btn-primary{
+#slice_button,
+#settings_dialog .modal-footer .btn-primary,
+#settings_printerProfiles_editDialog .modal-footer .btn-primary,
+#usersettings_dialog .modal-footer .btn-primary,
+#settings-usersDialogAddUser .modal-footer .btn-primary,
+#settings-usersDialogEditUser .modal-footer .btn-primary,
+#settings-usersDialogChangePassword .modal-footer .btn-primary {
     padding: 20px 0;
     width: 175px;
     text-transform: uppercase;

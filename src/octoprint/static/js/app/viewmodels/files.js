@@ -300,6 +300,12 @@ $(function() {
             return "files_template_" + data.type;
         };
 
+        self.isGcode = function(data) {
+            if(data.type == 'machinecode')
+                return true;
+            return false;
+        };
+
         self.getEntryId = function(data) {
             return "gcode_file_" + md5(data["origin"] + ":" + data["name"]);
         };
