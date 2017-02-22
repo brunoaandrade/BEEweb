@@ -1173,12 +1173,20 @@ td.settings_users_actions .m-icon {
     padding: 22px 15px !important;
 }
 #usersettings_dialog .input-append input {
-    width: 357px;
+    width: 375px;
 }
-#usersettings_dialog .input-append a {
+#settings-usersDialogChangePassword .input-append input {
+    width: 220px;
+}
+#usersettings_dialog .input-append a,
+#settings-usersDialogChangePassword .input-append a{
     background-color: #f1f0f0;
+    padding: 10px 20px;
 }
 
+.input-append .btn {
+    border-radius: 0!important;
+}
 /*-------------------modal tabs -------------------------*/
 .tabbable .scrollable.span3{
     background: #e1e1e1 !important;
