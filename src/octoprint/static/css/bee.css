@@ -384,6 +384,7 @@ a.brand{
 .profileicon { background: url('../img/icons/profile.svg'); }
 /* black */
 .refreshicon { background: url('../img/icons/refresh.svg'); }
+.scalemaxicon { background: url('../img/icons/scalemax.svg'); }
 /*grey*/
 .filamentgicon { background: url('../img/icons/filament_grey.svg'); }
 .calibrategicon  { background: url('../img/icons/calibrate_grey.svg'); }
@@ -541,6 +542,27 @@ a.brand{
     bottom: 0;
 }
 
+#preparePrint {
+    position: relative;
+    top: 145px;
+}
+#insufficientFilamentMessage {
+    position: relative;
+    top: 65px;
+}
+#selecteFileInfo {
+    position: relative;
+    top: 65px;
+}
+#noFilamentAvailableButtons {
+    position: relative;
+    top: 60px;
+}
+#printRunningButtons {
+    position: relative;
+    top: 65px;
+}
+
 /*----------------- 3D CONTROLS ------------------------*/
 
 .workbench-title{
@@ -563,6 +585,9 @@ a.brand{
 #axis-values button, #rotate-values-form button, #scale-values-form button{
     height: unset;
     font-size: 14px;
+}
+#scale-values-form {
+    width: 355px;
 }
 
 .move-x, .move-y, .move-z,
@@ -943,7 +968,7 @@ input + span.add-on{
 
 #state > .accordion-inner{
     background: #32312b !important;
-    min-height: 217px;
+    min-height: 317px;
 }
 #state_wrapper .accordion-heading > .accordion-toggle:first-of-type{
     display: none;
@@ -1420,21 +1445,21 @@ td.settings_users_actions .m-icon {
   height: 35px;
 }
 
-[type="checkbox"]:not(:checked),
-[type="checkbox"]:checked {
+#workbench-controls-container [type="checkbox"]:not(:checked),
+#workbench-controls-container [type="checkbox"]:checked {
   position: absolute;
   left: -9999px;
 }
-[type="checkbox"]:not(:checked) + label,
-[type="checkbox"]:checked + label {
+#workbench-controls-container [type="checkbox"]:not(:checked) + label,
+#workbench-controls-container [type="checkbox"]:checked + label {
   position: relative;
   padding-left: 2.95em;
   cursor: pointer;
 }
 
 /* checkbox aspect */
-[type="checkbox"]:not(:checked) + label:before,
-[type="checkbox"]:checked + label:before {
+#workbench-controls-container [type="checkbox"]:not(:checked) + label:before,
+#workbench-controls-container [type="checkbox"]:checked + label:before {
   content: '';
   position: absolute;
   left: 0; top: 0;
@@ -1444,11 +1469,11 @@ td.settings_users_actions .m-icon {
   border-radius: 0;
   box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
 }
-[type="checkbox"]:checked + label:before { background: #ffcc00 !important;}
+#workbench-controls-container [type="checkbox"]:checked + label:before { background: #ffcc00 !important;}
 
 /* checked mark aspect */
-[type="checkbox"]:not(:checked) + label:after,
-[type="checkbox"]:checked + label:after {
+#workbench-controls-container[type="checkbox"]:not(:checked) + label:after,
+#workbench-controls-container [type="checkbox"]:checked + label:after {
   content: url('../img/icons/ok.svg');
   width: 20px;
   height: 20px;
@@ -1459,30 +1484,30 @@ td.settings_users_actions .m-icon {
   transition: all .2s;
 }
 /* checked mark aspect changes */
-[type="checkbox"]:not(:checked) + label:after {
+#workbench-controls-container [type="checkbox"]:not(:checked) + label:after {
   opacity: 0;
   transform: scale(0);
 }
-[type="checkbox"]:checked + label:after {
+#workbench-controls-container [type="checkbox"]:checked + label:after {
   opacity: 1;
   transform: scale(1);
 }
 /* disabled checkbox */
-[type="checkbox"]:disabled:not(:checked) + label:before,
-[type="checkbox"]:disabled:checked + label:before {
+#workbench-controls-container [type="checkbox"]:disabled:not(:checked) + label:before,
+#workbench-controls-container [type="checkbox"]:disabled:checked + label:before {
   box-shadow: none;
   border-color: #bbb;
   background-color: #ddd;
 }
-[type="checkbox"]:disabled:checked + label:after {
+#workbench-controls-container [type="checkbox"]:disabled:checked + label:after {
   color: #999;
 }
-[type="checkbox"]:disabled + label {
+#workbench-controls-container [type="checkbox"]:disabled + label {
   color: #aaa;
 }
 /* accessibility */
-[type="checkbox"]:checked:focus + label:before,
-[type="checkbox"]:not(:checked):focus + label:before {
+#workbench-controls-container [type="checkbox"]:checked:focus + label:before,
+#workbench-controls-container [type="checkbox"]:not(:checked):focus + label:before {
   box-shadow: inset 0 0 0 1px #e2ac24;
 }
 
@@ -1495,25 +1520,25 @@ label:hover:before {
 
 /*----------------------------  Custom Radiobuttons ----------------------------------*/
 
-.radio.inline+.radio.inline{
+#workbench-controls-container .radio.inline+.radio.inline{
     margin: 0 0 10px 5px;
 }
 
-[type="radio"]:not(:checked),
-[type="radio"]:checked {
+#workbench-controls-container [type="radio"]:not(:checked),
+#workbench-controls-container [type="radio"]:checked {
   position: absolute;
   left: -9999px;
 }
-[type="radio"]:not(:checked) + label,
-[type="radio"]:checked + label {
+#workbench-controls-container [type="radio"]:not(:checked) + label,
+#workbench-controls-container [type="radio"]:checked + label {
   position: relative;
   padding-left: 2.95em;
   cursor: pointer;
 }
 
 /* radio aspect */
-[type="radio"]:not(:checked) + label:before,
-[type="radio"]:checked + label:before {
+#workbench-controls-container [type="radio"]:not(:checked) + label:before,
+#workbench-controls-container [type="radio"]:checked + label:before {
     content: '';
     position: absolute;
     width: 40px;
@@ -1525,11 +1550,11 @@ label:hover:before {
     border-radius: 0;
     box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
 }
-[type="radio"]:checked + label:before { background: #ffcc00 !important;}
+#workbench-controls-container [type="radio"]:checked + label:before { background: #ffcc00 !important;}
 
 /* checked mark aspect */
-[type="radio"]:not(:checked) + label,
-[type="radio"]:checked + label {
+#workbench-controls-container [type="radio"]:not(:checked) + label,
+#workbench-controls-container [type="radio"]:checked + label {
     position: absolute;
     line-height: 2;
     height: 30px;
@@ -1542,21 +1567,21 @@ label:hover:before {
 }
 
 /* disabled radio */
-[type="radio"]:disabled:not(:checked) + label:before,
-[type="radio"]:disabled:checked + label:before {
+#workbench-controls-container [type="radio"]:disabled:not(:checked) + label:before,
+#workbench-controls-container [type="radio"]:disabled:checked + label:before {
   box-shadow: none;
   border-color: #bbb;
   background-color: #ddd;
 }
-[type="radio"]:disabled:checked + label:after {
+#workbench-controls-container [type="radio"]:disabled:checked + label:after {
   color: #999;
 }
-[type="radio"]:disabled + label {
+#workbench-controls-container [type="radio"]:disabled + label {
   color: #aaa;
 }
 /* accessibility */
-[type="radio"]:checked:focus + label:before,
-[type="radio"]:not(:checked):focus + label:before {
+#workbench-controls-container [type="radio"]:checked:focus + label:before,
+#workbench-controls-container [type="radio"]:not(:checked):focus + label:before {
   box-shadow: inset 0 0 0 1px #e2ac24;
 }
 
@@ -1637,4 +1662,13 @@ label:hover:before {
         height: 320px;
         width: 70px;
     }
+}
+
+@media (max-width: 480px){
+
+}
+
+
+@media (max-width: 320px){
+
 }

@@ -1,5 +1,5 @@
-<div id="pause_panel" data-bind="visible: loginState.isUser && (isPaused() || isShutdown())">
-    <div id="shutdown_panel" data-bind="visible: !isShutdown()">
+<div id="pause_panel" data-bind="visible: showPrintControlButtons()">
+    <div id="shutdown_panel" data-bind="visible: !isShutdown() && loginState.isUser && isPaused()">
         <button id="job_shutdown" class="btn-ghost" data-bind="click: shutdown" >
             <span class="m-icon shutdowngicon"></span>
             <span >{{ _('Save & Shutdown') }}</span>
@@ -11,7 +11,7 @@
             {{ _('You can power off your printer. Alternatively you can resume or cancel your print.') }}
         </span>
     </div>
-    <div id="shutdown_panel_change_filament">
+    <div id="shutdown_panel_change_filament" data-bind="visible: loginState.isUser && (isPaused() || isShutdown())">
         <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn-ghost" >
             <span class="m-icon maintenancegicon"></span>
             {{ _('Change filament now') }}
@@ -30,7 +30,7 @@
         {{ _(' Change filament or proceed at your own risk.') }}
     </span>
 </div>
-<div class="print-control" data-bind="visible: isSelectedFile">
+<div id="selecteFileInfo" class="print-control" data-bind="visible: isSelectedFile">
     <div class="span12">
         <span class="loaded-file">{{ _('Loaded File') }}:</span>
         <a id="showPrintDetails" href="#"><span class="white-label-message" data-bind="text: filename"></span>&nbsp;</a>
@@ -51,6 +51,7 @@
         {{ _('Cancel') }}
     </button>
 </div>
+
 <div id="printRunningButtons" data-bind="visible: showPrintControlButtons()">
 
     <button class="btn btn-pause" id="job_pause" data-bind="click: function() { isPaused() ? onlyResume() : onlyPause(); },
