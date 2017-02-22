@@ -221,7 +221,7 @@ class PrinterProfileManager(object):
 			if not self._ensure_valid_profile(default_profile):
 				raise InvalidProfileError()
 
-			settings().set(["printerProfiles", "defaultProfile"], default_profile, defaults=dict(printerProfiles=dict(defaultProfile=self.__class__.default)))
+			settings().set(["printerProfiles", "default"], default_profile, defaults=dict(printerProfiles=dict(defaultProfile=self.__class__.default)))
 			settings().save()
 		else:
 			self._save_to_path(self._get_profile_path(identifier), profile, allow_overwrite=allow_overwrite)
