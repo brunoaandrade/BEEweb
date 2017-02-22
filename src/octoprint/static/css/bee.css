@@ -1218,7 +1218,9 @@ td.settings_users_actions .m-icon {
 .control-group label {
     color: #898989;
 }
-
+.controls .checkbox label {
+    padding-top: 5px;
+}
 /*------------------------------PILLS-----------------------------------------*/
 
 .nav-pills>li>a{ background: transparent ;}
