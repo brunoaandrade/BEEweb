@@ -44,16 +44,16 @@
                     </div>
                     <br/>
                     <div class="row-fluid">
-                        <span class="span2 text-center">
+                         <label class="radio inline span2">
                             <input type="radio" id="scaleby-size" name="scaleby" value="size"
                                    checked="checked" onchange="BEEwb.transformOps.toggleScaleType();"/>
                             <label for="scaleby-size" class="workbench-controls-label">mm</label>
-                        </span>
-                        <span class="span2 text-center">
+                        </label>
+                         <label class="radio inline span2">
                             <input type="radio" id="scaleby-per" name="scaleby" value="percentage"
                                 onchange="BEEwb.transformOps.toggleScaleType();" />
                             <label for="scaleby-per" class="workbench-controls-label">%</label>
-                        </span>
+                        </label>
                         <span class="span1"></span>
                         <span class="span6">
                             <input type="checkbox" id="keep-proportions" title="{{ _('Keep proportions') }}" checked />
@@ -88,13 +88,16 @@
                 <div id="rotate-axis-form" class="row-fluid form-inline">
                     <div class="row-fluid">
                         <label class="radio inline span2">
-                            <input type="radio" id="rot-axis-selx" name="rot-axis-sel" value="x" > X</input>
+                            <input type="radio" id="rot-axis-selx" name="rot-axis-sel" value="x" />
+                            <label for="rot-axis-selx"> X</label>
                         </label>
                         <label class="radio inline span2">
-                            <input type="radio" id="rot-axis-sely" name="rot-axis-sel" value="y" > Y</input>
+                            <input type="radio" id="rot-axis-sely" name="rot-axis-sel" value="y" />
+                            <label for="rot-axis-sely"> Y</label>
                         </label>
                         <label class="radio inline span2">
-                            <input type="radio" id="rot-axis-selz" name="rot-axis-sel" value="z" > Z</input>
+                            <input type="radio" id="rot-axis-selz" name="rot-axis-sel" value="z" />
+                            <label for="rot-axis-selz"> Z</label>
                         </label>
                     </div>
                     <div class="row-fluid">
