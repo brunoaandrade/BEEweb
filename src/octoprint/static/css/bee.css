@@ -529,38 +529,35 @@ a.brand{
     margin: 3px;
     float: right;
     position: absolute;
-    bottom: 15px;
-    right: 290px;
+    bottom: 25px;
+    right: 300px;
 }
 
 #workbench-controls-container button.btn-primary {
     background: #ccc !important;
 }
 
-#state {
-    position: absolute;
-    bottom: 0;
-}
-
 #preparePrint {
-    position: relative;
-    top: 145px;
+    position: absolute;
+    bottom: 20px;
 }
 #insufficientFilamentMessage {
-    position: relative;
-    top: 65px;
+    position: absolute;
+    bottom: 165px;
 }
 #selecteFileInfo {
-    position: relative;
-    top: 65px;
+    position: absolute;
+    bottom: 90px;
 }
 #noFilamentAvailableButtons {
-    position: relative;
-    top: 60px;
+    position: absolute;
+    bottom: 20px;
+    width: 239px;
 }
 #printRunningButtons {
-    position: relative;
-    top: 65px;
+    position: absolute;
+    bottom: -10px;
+    width: 239px;
 }
 
 /*----------------- 3D CONTROLS ------------------------*/
@@ -968,7 +965,7 @@ input + span.add-on{
 
 #state > .accordion-inner{
     background: #32312b !important;
-    min-height: 317px;
+    min-height: 359px;
 }
 #state_wrapper .accordion-heading > .accordion-toggle:first-of-type{
     display: none;

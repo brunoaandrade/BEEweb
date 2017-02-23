@@ -282,7 +282,7 @@ class BeeCom(MachineCom):
         if self._state == self.STATE_WAITING_FOR_BTF or self._state == self.STATE_CLOSED:
             return "Disconnected"
         elif self._state == self.STATE_PREPARING_PRINT:
-            return "Preparing to print..."
+            return "Preparing..."
         elif self._state == self.STATE_HEATING:
             return "Heating"
         elif self._state == self.STATE_SHUTDOWN:
