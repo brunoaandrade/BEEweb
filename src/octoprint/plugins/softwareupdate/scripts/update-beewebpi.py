@@ -7,6 +7,7 @@ from octoprint.settings import settings
 import errno
 import subprocess
 import sys
+import os
 
 def _get_git_executables():
 	GITS = ["git"]
@@ -116,13 +117,17 @@ def install_support_files(folder, target_folder):
 	settings_folder_path = folder + '/src/filesystem/home/pi/.beeweb'
 
 	try:
-		# creates a backup of the user config.yaml file
+		# creates a backup of the user config.yaml and users.yaml file
 		copy_file(target_folder + '/config.yaml', target_folder + '/config-backup.yaml')
+		if os.path.exists(target_folder + '/users.yaml'):
+			copy_file(target_folder + '/users.yaml', target_folder + '/users-backup.yaml')
 
 		files_copied = copy_tree(settings_folder_path, target_folder)
 
 		# overwrites the settings file from the repository with the backup
 		copy_file(target_folder + '/config-backup.yaml', target_folder + '/config.yaml')
+		if os.path.exists(target_folder + '/users-backup.yaml'):
+			copy_file(target_folder + '/users-backup.yaml', target_folder + '/users.yaml')
 
 	except Exception as ex:
 		raise RuntimeError(

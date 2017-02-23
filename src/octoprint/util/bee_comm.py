@@ -30,6 +30,7 @@ class BeeCom(MachineCom):
     _monitor_print_progress = True
     _connection_monitor_active = True
     _prepare_print_thread = None
+    _preparing_print = False
 
     def __init__(self, callbackObject=None, printerProfileManager=None):
         super(BeeCom, self).__init__(None, None, callbackObject, printerProfileManager)
@@ -324,6 +325,7 @@ class BeeCom(MachineCom):
 
                 self._heating = True
 
+                self._preparing_print = True
                 self._prepare_print_thread = threading.Thread(target=self._preparePrintThread, name="comm._preparePrint")
                 self._prepare_print_thread.daemon = True
                 self._prepare_print_thread.start()
@@ -349,6 +351,7 @@ class BeeCom(MachineCom):
         if not self.isOperational() or self.isStreaming():
             return
 
+        self._preparing_print = False
         if self._beeCommands.cancelPrint():
 
             self._changeState(self.STATE_OPERATIONAL)
@@ -852,11 +855,15 @@ class BeeCom(MachineCom):
         # waits for heating/file transfer
         while self._beeCommands.isTransferring():
             time.sleep(1)
+            if not self._preparing_print:  # the print (transfer) was cancelled
+                return
 
         self._changeState(self.STATE_HEATING)
 
         while self._beeCommands.isHeating():
             time.sleep(1)
+            if not self._preparing_print:  # the print (heating) was cancelled
+                return
 
         if self._currentFile is not None:
         # Starts the real printing operation
@@ -879,6 +886,7 @@ class BeeCom(MachineCom):
                 self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
                 self._heatupWaitStartTime = None
                 self._heating = False
+            self._preparing_print = False
         else:
             self._changeState(self.STATE_READY)
             self._logger.error('Error starting Print operation. No selected file found.')

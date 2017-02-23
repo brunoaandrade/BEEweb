@@ -42,8 +42,9 @@ INSTALL_REQUIRES = [
 	"feedparser>=5.2.1,<5.3",
 	"beecom>=0.3.5",
 	"pyusb>=1.0.0b2",
-	"setuptools==24.0.1" # We must pin the setuptools to this version, because on the RPI platform this is affecting the
-						 # software updates version sorting for some reason....
+	"setuptools==18.5" # We must pin a "newer" version of setuptools, because for some reason the default "old" version
+					   # installed on the oprint virtualenv (RPI Rasbian) makes wrong comparisons with the software versions
+					   # making the software update plugin not work correctly
 ]
 
 # Additional requirements for optional install options
