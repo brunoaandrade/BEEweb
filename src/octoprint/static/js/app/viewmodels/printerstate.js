@@ -315,7 +315,7 @@ $(function() {
             }
 
             // detects if a print has finished to change the ignoredInsufficientFilament flag
-            if (prevPrinting == true && self.isPrinting() != prevPrinting) {
+            if (prevPrinting == true && self.isPrinting() != prevPrinting && !self.isPaused() && !self.isShutdown()) {
                 self.ignoredInsufficientFilament(false);
             }
         };
