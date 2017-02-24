@@ -19,7 +19,7 @@ INSTALL_REQUIRES = [
  	                    # guarantee backwards compatibility for plugins and such with that
  	                    # version, hence we need to pin to a lower version for now. See #1697
 	"werkzeug>=0.8.3,<0.9",
-	"tornado>=4.0.1,<4.1",
+	"tornado==4.0.2",
 	"sockjs-tornado>=1.0.1,<1.1",
 	"PyYAML>=3.10,<3.11",
 	"Flask-Login>=0.2.2,<0.3",
@@ -41,10 +41,7 @@ INSTALL_REQUIRES = [
 	"awesome-slugify>=1.6.5,<1.7",
 	"feedparser>=5.2.1,<5.3",
 	"beecom==0.3.4",
-	"pyusb>=1.0.0b2",
-	"setuptools==34.3" # We must pin a "newer" version of setuptools, because for some reason the default "old" version
-					   # installed on the oprint virtualenv (RPI Rasbian) makes wrong comparisons with the software versions
-					   # making the software update plugin not work correctly
+	"pyusb>=1.0.0b2"
 ]
 
 # Additional requirements for optional install options
