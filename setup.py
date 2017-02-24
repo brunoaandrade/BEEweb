@@ -40,9 +40,9 @@ INSTALL_REQUIRES = [
 	"psutil>=3.2.1,<3.3",
 	"awesome-slugify>=1.6.5,<1.7",
 	"feedparser>=5.2.1,<5.3",
-	"beecom>=0.3.4",
+	"beecom==0.3.4",
 	"pyusb>=1.0.0b2",
-	"setuptools==18.5" # We must pin a "newer" version of setuptools, because for some reason the default "old" version
+	"setuptools==34.3" # We must pin a "newer" version of setuptools, because for some reason the default "old" version
 					   # installed on the oprint virtualenv (RPI Rasbian) makes wrong comparisons with the software versions
 					   # making the software update plugin not work correctly
 ]
