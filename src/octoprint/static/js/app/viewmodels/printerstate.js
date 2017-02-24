@@ -152,7 +152,7 @@ $(function() {
         });
         self.printTimeString = ko.pureComputed(function() {
             if (!self.printTime())
-                return "";
+                return "00:00";
             return formatDuration(self.printTime());
         });
         self.printTimeLeftString = ko.pureComputed(function() {

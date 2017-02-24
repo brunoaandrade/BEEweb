@@ -537,17 +537,69 @@ a.brand{
     background: #ccc !important;
 }
 
+#files_wrapper {
+    height: calc(100vh - 370px);
+}
+#files {
+    height: 100%;
+}
+#files .accordion-inner {
+    min-height: 100%;
+}
+
+/*----------------- STATUS ------------------------*/
+#state {
+    position: absolute;
+    bottom: 0px;
+    height: 245px;
+    width: 100%;
+}
+#state_wrapper {
+    position: absolute;
+    bottom: 0px;
+    height: 300px;
+    width: 100%;
+    z-index: 10;
+}
+#state > .accordion-inner{
+    background: #32312b !important;
+    min-height: 100%;
+}
+#state_wrapper .accordion-heading {
+    background: #32312b !important;
+    position: absolute;
+    bottom: 245px;
+    width: 100%;
+}
+#state_wrapper .accordion-heading > .accordion-toggle:first-of-type{
+    display: none;
+}
+#state-header-link  {
+    width: 130px;
+    padding: 15px 5px 15px 23px !important;
+}
+
+#state-header-link strong{
+    color: #fff;
+    font-size: 14px;
+    font-weight: 300;
+}
+
 #preparePrint {
+    position: absolute;
+    bottom: 20px;
+}
+#printFromMemoryDiv {
     position: absolute;
     bottom: 20px;
 }
 #insufficientFilamentMessage {
     position: absolute;
-    bottom: 165px;
+    bottom: 125px;
 }
 #selecteFileInfo {
     position: absolute;
-    bottom: 90px;
+    bottom: 70px;
 }
 #noFilamentAvailableButtons {
     position: absolute;
@@ -558,6 +610,69 @@ a.brand{
     position: absolute;
     bottom: -10px;
     width: 239px;
+}
+
+#printer-name-link {
+    width: 100px;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 16px;
+    font-size: 14px;
+    text-align: right;
+    word-break: break-word;
+}
+
+#showPrintDetails .progress{
+    width:100%;
+}
+.print-control{
+    text-transform: uppercase;
+    font: 200 16px "din-light", sans-serif;
+}
+.loaded-file{
+    color:#898989;
+    margin-right: 5px;
+}
+
+.status-ball{
+    display: inline-block;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    border: 1px solid #999688;
+    background: transparent;
+    margin-right: 8px;
+}
+.status-ball.printing{
+    border: 1px solid #518359;
+    animation: printing 0.5s infinite alternate;
+}
+.status-ball.heating{
+    border: 1px solid #ea6c54;
+    animation: heating 0.5s infinite alternate;
+}
+.status-ball.paused{
+    background: #999688;
+    border: 1px solid #999688;
+}
+.status-ball.error{
+    background: #ea6c54;
+    border: 1px solid #ea6c54;
+}
+@keyframes printing {
+  from { box-shadow: inset 0 0 0 10px #518359; }
+  to { box-shadow: inset 0 0 0 0 #518359; }
+}
+@keyframes heating {
+  from { box-shadow: inset 0 0 0 10px #ea6c54; }
+  to { box-shadow: inset 0 0 0 0 #ea6c54; }
+}
+
+
+.printer-img{
+    float: right;
+    padding: 8px 15px;
+    text-align: right;
 }
 
 /*----------------- 3D CONTROLS ------------------------*/
@@ -959,90 +1074,7 @@ input + span.add-on{
     background: #518359;
     color: #fff;
 }
-/*----------------- STATUS ------------------------*/
 
-
-
-#state > .accordion-inner{
-    background: #32312b !important;
-    min-height: 359px;
-}
-#state_wrapper .accordion-heading > .accordion-toggle:first-of-type{
-    display: none;
-}
-#state-header-link  {
-    width: 130px;
-    padding: 15px 5px 15px 23px !important;
-}
-
-#state-header-link strong{
-    color: #fff;
-    font-size: 14px;
-    font-weight: 300;
-}
-
-#printer-name-link {
-    width: 100px;
-    display: inline-block;
-    vertical-align: middle;
-    line-height: 16px;
-    font-size: 14px;
-    text-align: right;
-    word-break: break-word;
-}
-
-#showPrintDetails .progress{
-    width:100%;
-}
-.print-control{
-    text-transform: uppercase;
-    font: 200 16px "din-light", sans-serif;
-}
-.loaded-file{
-    color:#898989;
-    margin-right: 5px;
-}
-
-.status-ball{
-    display: inline-block;
-    border-radius: 50%;
-    width: 12px;
-    height: 12px;
-    border: 1px solid #999688;
-    background: transparent;
-    margin-right: 8px;
-}
-.status-ball.printing{
-    border: 1px solid #518359;
-    animation: printing 0.5s infinite alternate;
-}
-.status-ball.heating{
-    border: 1px solid #ea6c54;
-    animation: heating 0.5s infinite alternate;
-}
-.status-ball.paused{
-    background: #999688;
-    border: 1px solid #999688;
-}
-.status-ball.error{
-    background: #ea6c54;
-    border: 1px solid #ea6c54;
-}
-@keyframes printing {
-  from { box-shadow: inset 0 0 0 10px #518359; }
-  to { box-shadow: inset 0 0 0 0 #518359; }
-}
-@keyframes heating {
-  from { box-shadow: inset 0 0 0 10px #ea6c54; }
-  to { box-shadow: inset 0 0 0 0 #ea6c54; }
-}
-
-
-.printer-img{
-    float: right;
-    padding: 8px 15px;
-    text-align: right;
-}
 
 /*----------------- MODALS ----------------------*/
 
