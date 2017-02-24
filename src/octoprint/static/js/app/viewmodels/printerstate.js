@@ -291,6 +291,7 @@ $(function() {
 
         self._processStateData = function(data) {
             var prevPaused = self.isPaused();
+            var prevPrinting = self.isPrinting();
 
             self.stateString(gettext(data.text));
             self.isErrorOrClosed(data.flags.closedOrError);
@@ -311,6 +312,11 @@ $(function() {
                     self.titlePrintButton(self.TITLE_PRINT_BUTTON_UNPAUSED);
                     self.titlePauseButton(self.TITLE_PAUSE_BUTTON_UNPAUSED);
                 }
+            }
+
+            // detects if a print has finished to change the ignoredInsufficientFilament flag
+            if (prevPrinting == true && self.isPrinting() != prevPrinting) {
+                self.ignoredInsufficientFilament(false);
             }
         };
 
