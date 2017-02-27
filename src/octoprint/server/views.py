@@ -232,9 +232,9 @@ def index():
 		templates["settings"]["entries"]["features"] = (gettext("Features"), dict(template="dialogs/settings/features.jinja2", _div="settings_features", custom_bindings=False))
 		templates["settings"]["entries"]["api"] = (gettext("API"), dict(template="dialogs/settings/api.jinja2", _div="settings_api", custom_bindings=False))
 
-		templates["settings"]["entries"]["logs"] = (gettext("Logs"), dict(template="dialogs/settings/logs.jinja2", _div="settings_logs")),
+		templates["settings"]["entries"]["logs"] = (gettext("Logs"), dict(template="dialogs/settings/logs.jinja2", _div="settings_logs"))
 		templates["settings"]["entries"]["server"] = (gettext("Server"),
-			  dict(template="dialogs/settings/server.jinja2", _div="settings_server", custom_bindings=False)),
+			  dict(template="dialogs/settings/server.jinja2", _div="settings_server", custom_bindings=False))
 
 
 	# user settings dialog

@@ -18,18 +18,19 @@
     <div data-bind="foreach: temperature_profiles">
         <div class="row-fluid" style="margin-bottom: 5px">
             <div class="span4">
-                <input type="text" class="span12 text-right" data-bind="value: name">
+                <input type="text" class="custom-input span12 text-right" data-bind="value: name">
             </div>
-            <div class="input-append span3">
+            <div class="controls input-append span3">
                 <input type="number" class="input-mini text-right" data-bind="value: extruder">
                 <span class="add-on">&deg;C</span>
             </div>
-            <div class="input-append span3">
+            <div class="controls input-append span3">
                 <input type="number" class="input-mini text-right" data-bind="value: bed">
                 <span class="add-on">&deg;C</span>
             </div>
             <div class="span2">
-                <a title="Remove profile" class="btn btn-danger" data-bind="click: $parent.removeTemperatureProfile"><i class="icon-trash"></i></a>
+                <a title="Remove profile" class="btn" data-bind="click: $parent.removeTemperatureProfile">
+                <span class="m-icon trashicon"></span></a>
             </div>
         </div>
     </div>

@@ -29,7 +29,7 @@ $(function() {
         });
         self.enablePause = ko.pureComputed(function() {
             return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown())
-            && self.loginState.isUser();
+            && self.loginState.isUser() && !self.isHeating();
         });
         self.enableCancel = ko.pureComputed(function() {
             return ((self.isPrinting() || self.isPaused() || self.isHeating()))
@@ -352,7 +352,8 @@ $(function() {
 
                 self.insufficientFilament(false);
 
-                if (data.filament['tool0']['insufficient'] == true) {
+                // Signals for insufficient filament only if a print operation is not ongoing
+                if (data.filament['tool0']['insufficient'] == true && !self.isPrinting() && !self.isHeating()) {
                     self.insufficientFilament(true);
                 }
             }
@@ -401,11 +402,6 @@ $(function() {
                 $("#confirmation_dialog").modal("show");
             } else {
                 self._jobCommand("start");
-            }
-
-            // Forces the insufficient filament message to hide
-            if (self.insufficientFilament() && self.ignoredInsufficientFilament() == false) {
-                self.ignoredInsufficientFilament(true);
             }
         };
 

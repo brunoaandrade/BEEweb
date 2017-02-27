@@ -80,7 +80,7 @@
                 <li><a href="#" data-bind="click: $root.sendSelectToolCommand, text: name(), enable: $root.isOperational() && !$root.isPrinting() && !$root.isPaused() && $root.loginState.isUser()"></a></li>
             </ul>
         </div>
-        <div class="input-append control-box">
+        <div class="controls input-append control-box">
             <input type="text" class="input-mini text-right" data-bind="value: extrusionAmount, enable: isOperational() && !isPrinting() && loginState.isUser(), attr: {placeholder: settings.printer_defaultExtrusionLength}">
             <span class="add-on">mm</span>
         </div>

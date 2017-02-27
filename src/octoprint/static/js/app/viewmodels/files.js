@@ -408,7 +408,7 @@ $(function() {
             });
 
             $(".gcode_files").slimScroll({
-                height: "390px",
+                height: "395px",
                 size: "5px",
                 distance: "0",
                 railVisible: true,

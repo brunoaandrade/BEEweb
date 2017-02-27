@@ -595,7 +595,7 @@ a.brand{
 }
 #insufficientFilamentMessage {
     position: absolute;
-    bottom: 125px;
+    bottom: 130px;
 }
 #selecteFileInfo {
     position: absolute;
@@ -981,6 +981,7 @@ input + span.add-on{
 }
 .progress-time {
     color: #fff;
+    font-size: 14px;
 }
 
 .input-search-box{
@@ -1269,11 +1270,25 @@ td.settings_users_actions .m-icon {
     height: 37px !important;
     border: 0px none;
 }
+.custom-input {
+    background-color: #e1e2e1 !important;
+    height: 37px !important;
+    border: 0px none !important;
+}
 .control-group label {
     color: #898989;
 }
 .controls .checkbox label {
     padding-top: 5px;
+}
+
+.input-append span.add-on {
+    height: 25px !important;
+}
+
+.input-append>.btn-group button,
+.input-append button.btn {
+    height: 45px !important;
 }
 /*------------------------------PILLS-----------------------------------------*/
 
@@ -1612,6 +1627,12 @@ label:hover:before {
 #workbench-controls-container [type="radio"]:checked:focus + label:before,
 #workbench-controls-container [type="radio"]:not(:checked):focus + label:before {
   box-shadow: inset 0 0 0 1px #e2ac24;
+}
+
+/* ---------------------------------- Developer Mode Tabs ---------------------------------------------*/
+
+#control .control-box {
+    height: inherit !important;
 }
 
 /*-----------------------------------------------------------------------------------------------------*/
