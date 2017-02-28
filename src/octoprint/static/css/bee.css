@@ -31,6 +31,7 @@ table {
 }
 .bee-alert.success{
     color: #518359;
+    font: 200 16px "din-light", sans-serif;
 }
 .alert.alter-warning{
     background-color: #ea6c54 !important;
@@ -1404,6 +1405,12 @@ td.settings_users_actions .m-icon {
     color: #fff;
     background: #518359;
     display: inline-block;
+}
+#maintenance_dialog .modal-footer .btn-primary {
+    padding: 20px 0;
+    text-transform: uppercase;
+    color: #fff;
+    background: #518359;
 }
 #maintenanceCloseButton, #login_dialog .modal-footer .btn, #cancelMaintenance, #aboutbee_dialog .modal-footer .btn{
     padding: 20px;
