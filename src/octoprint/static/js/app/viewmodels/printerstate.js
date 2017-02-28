@@ -403,6 +403,11 @@ $(function() {
             } else {
                 self._jobCommand("start");
             }
+
+            // Forces the insufficient filament message to hide
+            if (self.insufficientFilament() && self.ignoredInsufficientFilament() == false) {
+                self.ignoredInsufficientFilament(true);
+            }
         };
 
         self.shutdown = function() {
