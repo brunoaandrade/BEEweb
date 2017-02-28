@@ -17,7 +17,7 @@ strong {
     font-family: din-black, sans-serif !important;
 }
 table {
-    color: #000;
+    color: #2d2d2d;
 }
 /*-------------------------------------------------------*/
 /*-------------------- BEEsoft NEW UI -------------------*/
@@ -1629,10 +1629,21 @@ label:hover:before {
   box-shadow: inset 0 0 0 1px #e2ac24;
 }
 
-/* ---------------------------------- Developer Mode Tabs ---------------------------------------------*/
+/*---------------------------------- Developer Mode Tabs ---------------------------------------------*/
 
 #control .control-box {
     height: inherit !important;
+}
+
+/*------------------------------------ First Run Dialog ---------------------------------------------*/
+#first_run_dialog .modal-body p{
+    color: #898989 !important;
+}
+#first_run_dialog .modal-body .control-label{
+    color: #898989 !important;
+}
+#confirmation_dialog .modal-body p{
+    color: #898989 !important;
 }
 
 /*-----------------------------------------------------------------------------------------------------*/
