@@ -123,6 +123,11 @@ def get_user_for_apikey(apikey):
 		elif octoprint.server.userManager.enabled:
 			# user key might have been used
 			return octoprint.server.userManager.findUser(apikey=apikey)
+		else:
+			# NOTE: This is a workaround to allow to special beepanel user to access the API even when the user access control is disabled
+			user = octoprint.server.userManager.findUser(apikey=apikey)
+			if user.get_id() == 'beepanel':
+				return user
 	return None
 
 
