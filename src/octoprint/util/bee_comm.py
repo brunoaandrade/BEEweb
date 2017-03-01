@@ -31,6 +31,7 @@ class BeeCom(MachineCom):
     _connection_monitor_active = True
     _prepare_print_thread = None
     _preparing_print = False
+    _resume_print_thread = None
 
     def __init__(self, callbackObject=None, printerProfileManager=None):
         super(BeeCom, self).__init__(None, None, callbackObject, printerProfileManager)
@@ -386,7 +387,7 @@ class BeeCom(MachineCom):
             "origin": self._currentFile.getFileLocation()
         }
 
-        if (not pause and self.isPaused()) or self.isShutdown():
+        if (not pause and self.isPaused()) or (not pause and self.isShutdown()):
             if self._pauseWaitStartTime:
                 self._pauseWaitTimeLost = self._pauseWaitTimeLost + (time.time() - self._pauseWaitStartTime)
                 self._pauseWaitStartTime = None
@@ -394,12 +395,11 @@ class BeeCom(MachineCom):
             # resumes printing
             self._beeCommands.resumePrint()
 
-            # restarts the progress monitor thread
-            self.startPrintStatusProgressMonitor()
+            self._heating = True
+            self._resume_print_thread = threading.Thread(target=self._resumePrintThread, name="comm._resumePrint")
+            self._resume_print_thread.daemon = True
+            self._resume_print_thread.start()
 
-            self._changeState(self.STATE_PRINTING)
-
-            eventManager().fire(Events.PRINT_RESUMED, payload)
         elif pause and self.isPrinting():
             if not self._pauseWaitStartTime:
                 self._pauseWaitStartTime = time.time()
@@ -878,6 +878,44 @@ class BeeCom(MachineCom):
             }
 
             eventManager().fire(Events.PRINT_STARTED, payload)
+
+            # starts the progress status thread
+            self.startPrintStatusProgressMonitor()
+
+            if self._heatupWaitStartTime is not None:
+                self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
+                self._heatupWaitStartTime = None
+                self._heating = False
+            self._preparing_print = False
+        else:
+            self._changeState(self.STATE_READY)
+            self._logger.error('Error starting Print operation. No selected file found.')
+
+
+    def _resumePrintThread(self):
+        """
+        Thread code that runs while the print job is being resumed after pause/shutdown
+        :return:
+        """
+        self._changeState(self.STATE_HEATING)
+
+        while self._beeCommands.isHeating():
+            time.sleep(1)
+            if not self._preparing_print:  # the print (heating) was cancelled
+                return
+
+        if self._currentFile is not None:
+        # Starts the real printing operation
+
+            self._changeState(self.STATE_PRINTING)
+
+            payload = {
+                "file": self._currentFile.getFilename(),
+                "filename": os.path.basename(self._currentFile.getFilename()),
+                "origin": self._currentFile.getFileLocation()
+            }
+
+            eventManager().fire(Events.PRINT_RESUMED, payload)
 
             # starts the progress status thread
             self.startPrintStatusProgressMonitor()

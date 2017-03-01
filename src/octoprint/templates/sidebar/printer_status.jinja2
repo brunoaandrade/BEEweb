@@ -54,13 +54,13 @@
 
 <div id="printRunningButtons" data-bind="visible: showPrintControlButtons()">
 
-    <button class="btn btn-pause" id="job_pause" data-bind="click: function() { isPaused() ? onlyResume() : onlyPause(); },
+    <button class="btn btn-pause" id="job_pause" data-bind="click: function() { isPaused() || isShutdown() ? onlyResume() : onlyPause(); },
         visible: enablePause, enable: enablePause, css: {active: (isPaused() && isShutdown())}, attr: {title: titlePauseButton}">
         <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>
         <span data-bind="visible: isPrinting() && !isShutdown()"> {{ _('Pause') }}</span>
         <span data-bind="visible: isPaused() || isShutdown()"> {{ _('Resume') }}</span>
     </button>
-    <button class="btn btn-stop" id="job_cancel" data-bind="click: cancel, visible: enableCancel"
+    <button class="btn btn-stop" id="job_cancel" data-bind="click: cancel, enable: enableCancel"
         title="{{ _('Cancel') }}" data-toggle="tooltip">
         <i class="icon-stop"></i>
     </button>

@@ -52,7 +52,7 @@ $(function() {
             && !self.isPaused() && !self.isHeating() && !self.isShutdown());
         });
         self.noPrinterDetected = ko.pureComputed(function() {
-            return self.connection.isConnecting() || self.connection.isErrorOrClosed()
+            return self.connection.isErrorOrClosed()
         });
         self.isSelectedFile = ko.pureComputed(function() {
              return self.loginState.isUser() && self.filename() != undefined;
