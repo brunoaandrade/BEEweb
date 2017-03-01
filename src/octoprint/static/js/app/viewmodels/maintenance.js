@@ -760,6 +760,7 @@ $(function() {
             self.startHeatingExtMaint();
 
             $('#maintenanceCloseButton').addClass('hidden');
+            $('#ext-mtn-4').addClass('hidden');
         };
 
 

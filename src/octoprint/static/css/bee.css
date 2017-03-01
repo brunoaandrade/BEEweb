@@ -984,6 +984,9 @@ input + span.add-on{
     color: #fff;
     font-size: 14px;
 }
+#maintenance_dialog .progress {
+    margin: 10px -23px -20px -0px !important;
+}
 
 .input-search-box{
     background: #111 !important;
