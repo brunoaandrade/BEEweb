@@ -65,11 +65,6 @@
 
 <div id="replaceNozzleStep2" class="hidden">
     <div class="row-fluid">
-        <div class="span12 text-center">
-            <strong> {{ _('Heating...') }}</strong>
-        </div>
-    </div>
-    <div class="row-fluid">
         <div class="span4"></div>
         <div class="span4 text-center">
             <img src="{{ url_for('static', filename='img/maintenance/bico_extrusao.png') }}" />
@@ -78,22 +73,33 @@
     </div>
     <br />
     <div id="progress-bar-replace-nozzle" class="row-fluid hidden">
+        <div class="row-fluid">
+            <div class="span12 text-center">
+                <strong> {{ _('Heating...') }}</strong>
+            </div>
+        </div>
         <div id="temperature-progress-replace-nozzle" class="progress" style="width: 100%;">
             <div class="bar" style="width: 0%"></div>
         </div>
+        <br /><br />
+        <div class="row-fluid">
+            <p>{{ _('The extruder is currently heating, please wait.') }}</p>
+            <p>{{ _('When the extruder has reached the ideal temperature, the progress bar will be full.' ) }}
+            </p>
+        </div>
     </div>
     <br /><br />
-    <div class="row-fluid">
-        <p>{{ _('The extruder is currently heating, please wait.') }}</p>
-        <p>{{ _('When the extruder has reached the ideal temperature, the progress bar will be full.' ) }}
-        </p>
-    </div>
-    <br /><br /><br />
     <div class="row-fluid text-center">
         <span class="span12"><i class="icon-exclamation-sign"></i>
             <strong>{{ _('WARNING: BE CAREFUL NOT TO TOUCH THE NOZZLE WITH YOUR SKIN DURING THIS PROCESS.') }}</strong>
         </span>
     </div>
+    <br />
+    <button id="replace-nozzle-heating-done" title="{{ _('Next')}}" class="btn btn-primary pull-right yellow hidden"
+        data-bind="click: nextStepReplaceNozzle2, enable: printerState.isOperational() && !commandLock()
+        && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
+            <i class="icon-arrow-right"></i> {{ _('Next')}}
+    </button>
 </div>
 
 <div id="replaceNozzleStep3" class="hidden">

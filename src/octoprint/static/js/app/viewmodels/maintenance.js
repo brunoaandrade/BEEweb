@@ -183,6 +183,7 @@ $(function() {
 
             $('#start-heating-btn').removeClass('hidden');
             $('#progress-bar-div').addClass('hidden');
+            $('#change-filament-heating-done').addClass('hidden');
 
             self.operationLock(false);
 
@@ -202,6 +203,9 @@ $(function() {
         };
 
         self.nextStep3 = function() {
+            // Heating is finished, let's move on
+            self._heatingDone();
+
             $('#step3').removeClass('hidden');
             $('#step4').addClass('hidden');
             $('#step2').addClass('hidden');
@@ -296,14 +300,8 @@ $(function() {
                         tempProgressBar.text(progressStr);
 
                         if (progress >= 100) {
-                            // Heating is finished, let's move on
-                            self._heatingDone();
-
-                            if (self.filamentSelected()) {
-                                $('#step3').removeClass('hidden');
-                                $('#step2').addClass('hidden');
-                                $('#step1').addClass('hidden');
-                            }
+                            $('#change-filament-heating-done').removeClass('hidden');
+                            $('#progress-bar-div').addClass('hidden');
                         } else {
                             setTimeout(function() { self._updateTempProgress() }, 2000);
                         }
@@ -787,6 +785,9 @@ $(function() {
         };
 
         self.nextStepExtMaint3 = function() {
+            // Heating is finished, let's move on
+            self._heatingDone();
+
             $('#extMaintStep4').removeClass('hidden');
             $('#extMaintStep3').addClass('hidden');
             $('#extMaintStep2').addClass('hidden');
@@ -839,8 +840,6 @@ $(function() {
                         tempProgressBar.text(progressStr);
 
                         if (progress >= 100) {
-                            // Heating is finished, let's move on
-                            self._heatingDone();
 
                             $('#ext-mtn-4').removeClass('hidden');
                             $('#progress-bar-ext-mtn').addClass('hidden');
@@ -896,6 +895,9 @@ $(function() {
         };
 
         self.nextStepReplaceNozzle2 = function() {
+            // Heating is finished, let's move on
+            self._heatingDone();
+
             $('#replaceNozzleStep3').removeClass('hidden');
             $('#replaceNozzleStep1').addClass('hidden');
             $('#replaceNozzleStep2').addClass('hidden');
@@ -1001,9 +1003,8 @@ $(function() {
                         tempProgressBar.text(progressStr);
 
                         if (progress >= 100) {
-                            // Heating is finished, let's move on
-                            self._heatingDone();
-                            self.nextStepReplaceNozzle2();
+                            $('#replace-nozzle-heating-done').removeClass('hidden');
+                            $('#progress-bar-replace-nozzle').addClass('hidden');
 
                         } else {
                             setTimeout(function() { self._updateTempProgressReplaceNozzle() }, 2000);
