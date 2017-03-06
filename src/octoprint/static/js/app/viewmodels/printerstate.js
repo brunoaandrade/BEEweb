@@ -63,9 +63,11 @@ $(function() {
                 if ($('#printFromMemoryDiv').hasClass('hidden')) {
                     $('#printFromMemoryDiv').removeClass('hidden');
                     $('#preparePrint').addClass('hidden');
+                    $('#state_wrapper .accordion-heading').addClass('selected');
                 } else {
                     $('#printFromMemoryDiv').addClass('hidden');
                     $('#preparePrint').removeClass('hidden');
+                    $('#state_wrapper .accordion-heading').removeClass('selected');
                 }
             }
         };
