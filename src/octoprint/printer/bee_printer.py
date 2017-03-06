@@ -726,6 +726,8 @@ class BeePrinter(Printer):
                 # Runs the print finish communications callback
                 self._comm.triggerPrintFinished()
 
+                self._setProgressData()
+
                 self._comm.getCommandsInterface().stopStatusMonitor()
                 self._runningCalibrationTest = False
 
@@ -881,6 +883,8 @@ class BeePrinter(Printer):
         self._progress = completion
         self._printTime = printTime
         self._printTimeLeft = totalPrintTime - printTimeLeft if (totalPrintTime is not None and printTimeLeft is not None) else None
+        if printTime is None:
+            self._elapsedTime = 0
 
         self._stateMonitor.set_progress({
             "completion": self._progress * 100 if self._progress is not None else None,
