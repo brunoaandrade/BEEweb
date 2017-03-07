@@ -52,7 +52,6 @@ $(function() {
                 type: "GET",
                 contentType: "application/json; charset=UTF-8",
                 success: function (settings) {
-                debugger;
                     self.devMode(settings.interface.dev_mode)
                 }
             });

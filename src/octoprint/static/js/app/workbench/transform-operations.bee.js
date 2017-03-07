@@ -88,28 +88,28 @@ BEEwb.transformOps.rotate = function() {
 };
 
 /**
- * Rotates the selected model 90 degrees to the left (counter clockwise)
+ * Rotates the selected model 45 degrees to the left (counter clockwise)
  * in the selected axis in the radio input control
  *
  */
 BEEwb.transformOps.rotateCCW = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        this._rotateStep(-90);
+        this._rotateStep(-45);
 
         this.updateRotationInputs();
     }
 };
 
 /**
- * Rotates the selected model 90 degrees to the right (clockwise)
+ * Rotates the selected model 45 degrees to the right (clockwise)
  * in the selected axis in the radio input control
  *
  */
 BEEwb.transformOps.rotateCW = function() {
 
     if (BEEwb.main.selectedObject !== null) {
-        this._rotateStep(90);
+        this._rotateStep(45);
 
         this.updateRotationInputs();
     }
@@ -272,9 +272,8 @@ BEEwb.transformOps.duplicateModel = function(modelObj) {
         var material = new THREE.MeshPhongMaterial( { color: 0x8C8C8C, specular: 0x111111, shininess: 100 } );
 
         var geometry = modelObj.geometry.clone();
-        geometry.computeBoundingBox();
         BEEwb.helpers.centerModelBasedOnBoundingBox(geometry);
-        var xShift = BEEwb.helpers.calculateObjectShift(geometry.boundingBox);
+        var xShift = BEEwb.helpers.calculateObjectShift(geometry);
 
         var objClone = new THREE.Mesh(geometry, material);
         objClone.position.set(xShift, 0, 0);
@@ -496,30 +495,21 @@ BEEwb.transformOps.scaleByPercentage = function(x, y, z, changedAxis) {
         // Checks which axis was changed
         if (changedAxis == 'x') {
 
-            if ($('#lock-y').is(':checked')) {
+            if ($('#keep-proportions').is(':checked')) {
                 yScale = xScale;
-            }
-
-            if ($('#lock-z').is(':checked')) {
                 zScale = xScale;
             }
         } else if (changedAxis == 'y') {
 
-            if ($('#lock-x').is(':checked')) {
+            if ($('#keep-proportions').is(':checked')) {
                 xScale = yScale;
-            }
-
-            if ($('#lock-z').is(':checked')) {
                 zScale = yScale;
             }
         } else if (changedAxis == 'z') {
 
-            if ($('#lock-y').is(':checked')) {
-                yScale = zScale;
-            }
-
-            if ($('#lock-x').is(':checked')) {
+            if ($('#keep-proportions').is(':checked')) {
                 xScale = zScale;
+                yScale = zScale;
             }
         }
 

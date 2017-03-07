@@ -175,8 +175,7 @@ def index():
 
 	templates["navbar"]["entries"] = dict(
 		settings=dict(template="navbar/settings.jinja2", _div="navbar_settings", styles=["display: none"], data_bind="visible: loginState.isAdmin"),
-		maintenance=dict(template="navbar/maintenance.jinja2", _div="navbar_maintenance"),
-		help=dict(template="navbar/help.jinja2", _div="navbar_help", classes=["dropdown"])
+		maintenance=dict(template="navbar/maintenance.jinja2", _div="navbar_maintenance")
 	)
 	if enable_accesscontrol:
 		templates["navbar"]["entries"]["login"] = dict(template="navbar/login.jinja2", _div="navbar_login", classes=["dropdown"], custom_bindings=False)
@@ -186,10 +185,9 @@ def index():
 	# sidebar
 
 	templates["sidebar"]["entries"]= dict(
-		workbench_controls=(gettext("Workbench Controls"), dict(template="sidebar/workbench_controls.jinja2", _div="workbench_ctrls", styles_wrapper=["display: none"], icon="edit")),
 		#connection=(gettext("Connection"), dict(template="sidebar/connection.jinja2", _div="connection", icon="signal", styles_wrapper=["display: none"], data_bind="visible: loginState.isAdmin")),
-		#state=(gettext("State"), dict(template="sidebar/state.jinja2", _div="state", icon="info-sign")),
-		files=(gettext("Files"), dict(template="sidebar/files.jinja2", _div="files", icon="list", classes_content=["overflow_visible"], template_header="sidebar/files_header.jinja2"))
+		files=(gettext("Files"), dict(template="sidebar/files.jinja2", _div="files", classes_content=["overflow_visible"], template_header="sidebar/files_header.jinja2")),
+		state = ("", dict(template="sidebar/printer_status.jinja2", _div="state", template_header="sidebar/printer_status_header.jinja2"))
 	)
 
 	# tabs
@@ -217,8 +215,6 @@ def index():
 
 		section_features=(gettext("General Settings"), None),
 
-		logs=(gettext("Logs"), dict(template="dialogs/settings/logs.jinja2", _div="settings_logs")),
-		server=(gettext("Server"), dict(template="dialogs/settings/server.jinja2", _div="settings_server", custom_bindings=False)),
 		webcam=(gettext("Webcam"),
 				dict(template="dialogs/settings/webcam.jinja2", _div="settings_webcam", custom_bindings=False)),
 
@@ -235,6 +231,10 @@ def index():
 		templates["settings"]["entries"]["gcodescripts"] = (gettext("GCODE Scripts"), dict(template="dialogs/settings/gcodescripts.jinja2", _div="settings_gcodeScripts", custom_bindings=False))
 		templates["settings"]["entries"]["features"] = (gettext("Features"), dict(template="dialogs/settings/features.jinja2", _div="settings_features", custom_bindings=False))
 		templates["settings"]["entries"]["api"] = (gettext("API"), dict(template="dialogs/settings/api.jinja2", _div="settings_api", custom_bindings=False))
+
+		templates["settings"]["entries"]["logs"] = (gettext("Logs"), dict(template="dialogs/settings/logs.jinja2", _div="settings_logs"))
+		templates["settings"]["entries"]["server"] = (gettext("Server"),
+			  dict(template="dialogs/settings/server.jinja2", _div="settings_server", custom_bindings=False))
 
 
 	# user settings dialog

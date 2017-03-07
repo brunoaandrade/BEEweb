@@ -6,7 +6,7 @@
 
     <div class="row-fluid">
         <div class="span6">
-            <strong>{{ _('Step 1')}}: {{ _('Extruder heating for filament removal') }}</strong>
+            <strong>{{ _('Extruder heating for filament removal') }}</strong>
         </div>
     </div>
     <div class="row-fluid">
@@ -30,7 +30,7 @@
     </div>
     <br />
     <div class="row-fluid">
-        <button id="ext-mtn-2" title="Next Step" class="btn btn-primary pull-right"
+        <button id="ext-mtn-2" title="Next Step" class="btn btn-primary pull-right yellow"
             data-bind="click: nextStepExtMaint1, enable: printerState.isOperational() && !commandLock()
             && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
             <i class="icon-arrow-right"></i> {{ _('Next Step')}}
@@ -46,7 +46,6 @@
     </div>
     <div class="row-fluid">
         <div class="span6">
-            <strong>{{ _('Step 2')}}</strong>
         </div>
     </div>
     <div class="row-fluid">
@@ -65,7 +64,7 @@
         <div class="span4"></div>
     </div>
     <br />
-    <button id="ext-mtn-3" title="Next Step" class="btn btn-primary pull-right"
+    <button id="ext-mtn-3" title="Next Step" class="btn btn-primary pull-right yellow"
         data-bind="click: nextStepExtMaint2, enable: printerState.isOperational() && !commandLock()
         && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
         <i class="icon-arrow-right"></i> {{ _('Next Step')}}
@@ -74,7 +73,6 @@
 <div id="extMaintStep3" class="hidden">
     <div class="row-fluid">
         <div class="span6">
-            <strong>{{ _('Step 3')}}</strong>
         </div>
     </div>
     <div class="row-fluid">
@@ -102,7 +100,7 @@
         </div>
     </div>
     <br />
-    <button id="ext-mtn-4" title="Next Step" class="btn btn-primary pull-right hidden"
+    <button id="ext-mtn-4" title="Next Step" class="btn btn-primary pull-right hidden yellow"
         data-bind="click: nextStepExtMaint3, enable: printerState.isOperational() && !commandLock()
         && printerState.isReady() && !printerState.isPrinting() && loginState.isUser()">
         <i class="icon-arrow-right"></i> {{ _('Next Step')}}
@@ -119,7 +117,7 @@
         </div>
         <div class="span2">
             <div class="row-fluid">
-                <button id="load-ext-mtn" title="Load" class="btn btn-primary span12"
+                <button id="load-ext-mtn" title="Load" class="btn btn-primary span12 yellow"
                     data-bind="click: loadFilament, enable: printerState.isOperational()
                     && printerState.isReady() && !commandLock()
                     && !printerState.isPrinting() && loginState.isUser()">
@@ -128,7 +126,7 @@
             </div>
             <br />
             <div class="row-fluid">
-                <button id="unload-ext-mtn" title="Unload" class="btn btn-primary span12"
+                <button id="unload-ext-mtn" title="Unload" class="btn btn-primary span12 yellow"
                     data-bind="click: unloadFilament, enable: printerState.isOperational()
                     && printerState.isReady() && !commandLock()
                     && !printerState.isPrinting() && loginState.isUser()">
@@ -140,7 +138,6 @@
     <br />
     <div class="row-fluid">
         <div class="span6">
-            <strong>{{ _('Step 4')}}</strong>
         </div>
     </div>
     <div class="row-fluid">

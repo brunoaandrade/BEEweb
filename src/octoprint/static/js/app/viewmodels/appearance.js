@@ -9,7 +9,7 @@ $(function() {
         self.connection = parameters[2];
 
         self.brand = ko.pureComputed(function() {
-            var brandText = gettext("BEEsoft");
+            var brandText = gettext("BEESOFT");
             if (self.name())
                 brandText = brandText + self.name();
 
@@ -18,9 +18,9 @@ $(function() {
 
         self.title = ko.pureComputed(function() {
             if (self.name())
-                return "[" + gettext("BEEsoft") + "]" + self.name();
+                return "[" + gettext("BEESOFT") + "]" + self.name();
             else
-                return gettext("BEEsoft");
+                return gettext("BEESOFT");
         });
     }
 

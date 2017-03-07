@@ -12,6 +12,7 @@ from flask import Blueprint, jsonify, request, make_response, url_for
 from octoprint.settings import settings
 from os import listdir
 from os.path import isfile, join
+from octoprint.server.util.flask import restricted_access
 
 #~~ BVC custom API
 api = Blueprint("beeapi", __name__)
@@ -146,4 +147,12 @@ def getFirmwareFileLink(printer_name, version):
 
 	return NO_CONTENT
 
+@api.route("/print_from_memory", methods=["POST"])
+@restricted_access
+def printMemoryFile():
+	if not printer.is_operational():
+		return make_response("Printer is not operational", 409)
 
+	printer.printFromMemory()
+
+	return NO_CONTENT

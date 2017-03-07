@@ -1,6 +1,6 @@
 <form class="form-horizontal">
     <fieldset>
-        <legend>{{ _('Password') }}</legend>
+        <h4>{{ _('Password') }}</h4>
         <p>
             {{ _('If you do not wish to change your password, just leave the following fields empty.') }}
         </p>
@@ -19,14 +19,14 @@
         </div>
     </fieldset>
     <fieldset>
-        <legend>{{ _('API Key') }}</legend>
+        <h4>{{ _('API Key') }}</h4>
         <div class="control-group">
             <label class="control-label" for="userSettings-access_apikey">{{ _('Current API Key') }}</label>
             <div class="controls">
                 <div class="input-append">
                     <input type="text" class="input-block-level uneditable-input" id="userSettings-access_apikey" data-bind="value: access_apikey, valueUpdate: 'input', attr: {placeholder: '{{ _('N/A') }}'}">
-                    <a class="btn" title="Generate new Apikey" data-bind="click: generateApikey"><i class="icon-refresh"></i></a>
-                    <a class="btn btn-danger" title="Delete Apikey" data-bind="click: deleteApikey"><i class="icon-trash"></i></a>
+                    <a class="btn" title="Generate new Apikey" data-bind="click: generateApikey"><span class="m-icon refreshicon"></span></a>
+                    <a class="btn btn-danger" title="Delete Apikey" data-bind="click: deleteApikey"><span class="m-icon trashicon"></span></a>
                 </div>
 
             </div>

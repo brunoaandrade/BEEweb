@@ -1,7 +1,7 @@
 <div id="slicing_configuration_dialog" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>
-        <h3 data-bind="text: title"></h3>
+        <h3><span class="m-icon printgicon"></span>{{ _('Print Setup') }}</h3>
     </div>
     <div class="modal-body">
         <div data-bind="visible: !enableSlicingDialog()">
@@ -22,96 +22,166 @@
                         <select data-bind="options: profiles, optionsText: 'name', optionsValue: 'key', optionsCaption: '{{ _('Select a slicing profile...') }}', value: profile, valueAllowUnset: true"></select>
                     </div>
                 </div> -->
+                <label class="control-label">{{ _('Resolution') }}</label>
                 <div class="control-group">
-                    <label class="control-label">{{ _('Resolution') }}</label>
                     <div class="controls">
-                        <label class="radio">
-                            <input type="radio"  name="resolution" data-bind="checked: selResolution" value="Low"/>
-                            LOW (0.3mm)
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="resolution" data-bind="checked: selResolution" value="Medium"/>
-                            MEDIUM (0.2mm)
-                        </label>
-                        <label class="radio">
-                            <input type="radio"  name="resolution" data-bind="checked: selResolution" value="High"/>
-                            HIGH (0.1mm)
-                        </label>
-                        <label class="radio">
-                            <input type="radio"  name="resolution" data-bind="checked: selResolution" value="Highplus"/>
-                            HIGH+ (0.05mm)
-                        </label>
+                        <input type="radio" id="resolution1" name="resolution" data-bind="checked: selResolution" value="Low"/>
+                            <label class="radio " for="resolution1">
+                               <span class="icon res1icon"></span>
+                                <div>LOW</div>
+                                <p>0.3mm</p>
+                            </label>
+                        <input type="radio" id="resolution2" name="resolution" data-bind="checked: selResolution" value="Medium" checked/>
+                            <label class="radio " for="resolution2">
+                                <span class="icon res2icon"></span>
+                                <div>MEDIUM</div>
+                                <p>0.2mm</p>
+                            </label>
+                        <input type="radio" id="resolution3" name="resolution" data-bind="checked: selResolution" value="High"/>
+                            <label class="radio " for="resolution3">
+                                <span class="icon res3icon"></span>
+                                <div>HIGH</div>
+                                <p>0.1mm</p>
+                            </label>
+                        <input type="radio" id="resolution4" name="resolution" data-bind="checked: selResolution" value="Highplus"/>
+                            <label class="radio " for="resolution4">
+                                <span class="icon res4icon"></span>
+                                <div>HIGH +</div>
+                                <p>0.05mm</p>
+                            </label>
                     </div>
                 </div>
-                <div class="control-group">
-                    <label class="control-label">{{ _('Density') }} (%)</label>
-                    <div class="controls">
-                        <input type="text" style="width: 200%"
-                        data-bind="slider: {value: selDensity, min:0, max: 100, step: 1, tooltip: 'show'}"/>
+                <label class="control-label">{{ _('Density') }}  <span>({{ _('Infill') }})</span></label>
+                    <div class="control-group">
+                        <div class="controls">
+                            <input type="radio" id="density1" name="density" data-bind="checked: selDensity" value="Low" checked/>
+                                <label class="radio " for="density1">
+                                    <span class="icon den1icon"></span>
+                                    <div>LOW</div>
+                                    <p>5 %</p>
+                                </label>
+                            <input type="radio" id="density2" name="density" data-bind="checked: selDensity" value="Medium"/>
+                                <label class="radio " for="density2">
+                                    <span class="icon den2icon"></span>
+                                    <div>MEDIUM</div>
+                                    <p>10 %</p>
+                                </label>
+                            <input type="radio" id="density3" name="density" data-bind="checked: selDensity" value="High"/>
+                                <label class="radio " for="density3">
+                                    <span class="icon den3icon"></span>
+                                    <div>HIGH</div>
+                                    <p>20 %</p>
+                                </label>
+                            <input type="radio" id="density4" name="density" data-bind="checked: selDensity" value="High+"/>
+                                <label class="radio " for="density4">
+                                    <span class="icon den4icon"></span>
+                                    <div>HIGH +</div>
+                                    <p>40 %</p>
+                                </label>
+                            <input type="radio" id="density5" name="density" data-bind="checked: selDensity" value="Custom"/>
+                                <label class="radio " for="density5">
+                                    <span class="icon den5icon"></span>
+                                    <input type="number" min="0" max="100" placeholder="X %" data-bind="value: customDensity"/>
+                                </label>
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">{{ _('Raft') }}</label>
-                    <div class="controls">
-                        <input type="checkbox" data-bind="checked: raft"/> <br />
-                        <small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>
+                <label class="control-label">{{ _('Platform Adhesion') }}</label>
+                    <div class="control-group">
+                        <div class="controls">
+                            <input type="radio" name="platform" id="plat1" data-bind="checked: platformAdhesion" value="None" checked/>
+                                <label class="radio " for="plat1">
+                                    <span class="icon plat1icon"></span>
+                                    <div>{{ _('NONE') }}</div>
+                                    <p></p>
+                                </label>
+
+                            <input type="radio" name="platform" id="plat3" data-bind="checked: platformAdhesion" value="Brim"/>
+                                 <label class="radio" for="plat3">
+                                   <span class="icon plat3icon"></span>
+                                    <div>{{ _('BRIM') }}</div>
+                                    <p></p>
+                                    <!--<small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>-->
+                                </label>
+                            <input type="radio" name="platform" id="plat2" data-bind="checked: platformAdhesion" value="Raft"/>
+                                 <label class="radio" for="plat2">
+                                    <span class="icon plat2icon"></span>
+                                    <div>{{ _('RAFT') }}</div>
+                                    <p></p>
+                                    <!--<small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>-->
+                                </label>
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">{{ _('Support') }}</label>
-                    <div class="controls">
-                        <input type="checkbox" data-bind="checked: support"/> <br />
-                        <small>{{ _('This option automatically creates a detachable structure beneath an overhang or highly inclined areas, so as to allow the model to be printed.') }}</small>
+                <label class="control-label"> {{ _('Support') }}</label>
+                    <div class="control-group">
+                        <div class="controls">
+                            <input type="radio" name="support" id="supp1" data-bind="checked: support" value="None" checked/>
+                                <label class="radio " for="supp1">
+                                    <span class="icon supp1icon"></span>
+                                    <div>{{ _('NONE') }}</div>
+                                    <p></p>
+                                </label>
+                            <input type="radio" name="support" id="supp2" data-bind="checked: support" value="Touching Platform" />
+                                 <label class="radio" for="supp2">
+                                    <span class="icon supp2icon"></span>
+                                    <div>{{ _('TOUCHING PLATFORM') }}</div>
+                                    <p></p>
+                                    <!--<small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>-->
+                                </label>
+                                <input type="radio" name="support" id="supp3" data-bind="checked: support" value="Everywhere"/>
+                                <label class="radio" for="supp3">
+                                   <span class="icon supp3icon"></span>
+                                    <div>{{ _('EVERYWHERE') }}</div>
+                                    <p></p>
+                                    <!--<small>{{ _('This option creates a base that will allow the model to adhere to the table and help avoid warping. The raft may be hard to remove from the model, so only use when needed.') }}</small>-->
+                                </label>
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">{{ _('Filament Color') }}</label>
-                    <div class="controls">
-                        <select data-bind="options: colors, value: selColor, valueAllowUnset: false, visible: !forPrint()" ></select>
-                        <span data-bind="text: selColor, visible: forPrint()"></span>
-                        <br />
-                        <small>
-                            <strong>{{ _('Remaining filament') }}</strong>
-                            : <span data-bind="text: filamentInSpool" ></span> (g)
-                        </small>
+                <!--<div class="control-group">-->
+                    <!--<label class="control-label"><small>{{ _('Filename') }}</small>{{ _('Output') }}</label>-->
+                    <!--<div class="controls">-->
+                        <!--<div class="input-append">-->
+                            <!--<input type="text" data-bind="value: destinationFilename">-->
+                            <!--<span class="add-on" data-bind="text: '.' + destinationExtension()"></span>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <label class="control-label">{{ _('Details') }}</label>
+                    <div class="control-group">
+                        <div class="controls">
+                            <div class="filament-div">
+                                <span class="small-label">{{ _('FILAMENT') }}:</span>
+                                <span class="filament" data-bind="text: selColor, visible: forPrint()"></span>
+                                <select data-bind="options: colors, value: selColor, valueAllowUnset: false, visible: !forPrint()" ></select>
+                                <span class="remaining-filament">
+                                    <div>{{ _('Remaining filament') }}:  <span data-bind="text: filamentInSpool" ></span> (g)</div>
+                                </span>
+                            </div>
+                            <div class="nozzle-div">
+                                <span class="small-label">{{ _('NOZZLE') }}: </span>
+                                <span class="nozzle" data-bind="text: selNozzle, visible: forPrint()"></span>
+                                <select data-bind="options: nozzleTypes, value: selNozzle, valueAllowUnset: false, visible: !forPrint()" ></select>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">{{ _('Nozzle type') }}</label>
-                    <div class="controls">
-                        <select data-bind="options: nozzleTypes, value: selNozzle, valueAllowUnset: false, visible: !forPrint()" ></select>
-                        <span data-bind="text: selNozzle, visible: forPrint()"></span>
-                    </div>
-                </div>
                 <!--<div class="control-group">
                     <label class="control-label">{{ _('Printer Profile') }}</label>
                     <div class="controls">
                         <select data-bind="options: printerProfiles.profiles.items, optionsText: 'name', optionsValue: 'id', value: printerProfile, optionsCaption: '{{ _('Select a printer profile...') }}'"></select>
                     </div>
                 </div> -->
-                <div class="control-group">
-                    <label class="control-label">{{ _('Output Filename') }}</label>
-                    <div class="controls">
-                        <div class="input-append">
-                            <input type="text" data-bind="value: destinationFilename">
-                            <span class="add-on" data-bind="text: '.' + destinationExtension()"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">{{ _('After slicing...') }}</label>
-                    <div class="controls">
-                        <select data-bind="options: afterSlicingOptions, optionsText: 'text', optionsValue: 'value', value: afterSlicing"></select>
-                    </div>
-                </div>
+                <!--<div class="control-group">-->
+                    <!--<label class="control-label">{{ _('Action') }}</label>-->
+                    <!--<div class="controls">-->
+                        <!--<select data-bind="options: afterSlicingOptions, optionsText: 'text', optionsValue: 'value', value: afterSlicing"></select>-->
+                    <!--</div>-->
+                <!--</div>-->
             </form>
         </div>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</a>
-        <a id="slice_button" href="#" class="btn btn-primary" data-bind="click: function() { if ($root.enableSliceButton()) { $root.prepareAndSlice() } }, enable: enableSliceButton, css: {disabled: !$root.enableSliceButton()}">
-
-            <i data-bind="css: {'icon-print': forPrint(), 'icon-magic': !forPrint()}"></i>
+        <a href="#" class="btn pull-left modal-footer-btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</a>
+        <a id="slice_button" href="#" class="btn btn-primary modal-footer-btn" data-bind="click: function() { if ($root.enableSliceButton()) { $root.prepareAndSlice() } }, enable: enableSliceButton, css: {disabled: !$root.enableSliceButton()}">
+            <span class="m-icon printwicon"></span>
             <span data-bind="text: (forPrint() ? '{{ _('Print') }}' : '{{ _('Slice') }}')">{{ _('Slice') }}</span>
         </a>
     </div>

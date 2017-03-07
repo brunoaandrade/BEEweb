@@ -55,6 +55,8 @@ class Events(object):
 	PRINT_CANCELLED = "PrintCancelled"
 	PRINT_PAUSED = "PrintPaused"
 	PRINT_RESUMED = "PrintResumed"
+	PRINT_CANCELLED_DELETE_FILE = "PrintCancelledDeleteFile"
+	PRINT_FINISHED_DELETE_FILE = "PrintFinishedDeleteFile"
 	ERROR = "Error"
 
 	# print/gcode events

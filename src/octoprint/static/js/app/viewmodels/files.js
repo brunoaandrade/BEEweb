@@ -225,10 +225,6 @@ $(function() {
                 data: JSON.stringify({command: "select", print: printAfterLoad})
             });
 
-            // Shows the status panel
-            if (!$("#state").hasClass('in')) {
-                $("#state").collapse("show");
-            }
         };
 
         self.removeFile = function(file) {
@@ -302,6 +298,12 @@ $(function() {
 
         self.templateFor = function(data) {
             return "files_template_" + data.type;
+        };
+
+        self.isGcode = function(data) {
+            if(data.type == 'machinecode')
+                return true;
+            return false;
         };
 
         self.getEntryId = function(data) {
@@ -406,7 +408,7 @@ $(function() {
             });
 
             $(".gcode_files").slimScroll({
-                height: "306px",
+                height: "395px",
                 size: "5px",
                 distance: "0",
                 railVisible: true,

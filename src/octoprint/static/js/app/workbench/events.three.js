@@ -93,28 +93,42 @@ BEEwb.events.onMouseUp = function( e ) {
 /**
  * OnKeyDown event function
  */
+BEEwb.events.keyMap = {};
 BEEwb.events.onKeyDown = function( event ) {
+    BEEwb.events.keyMap[event.keyCode] = (event.type == 'keydown');
 
-    switch ( event.keyCode ) {
+    if (BEEwb.events.keyMap[17] == true) { // Ctrl pressed
+        switch ( event.keyCode ) {
 
-        case 46: // Delete model
+            case 77: // M - Move
+                BEEwb.transformOps.activateMove();
+                break;
+
+            case 82: // R - Rotate
+                BEEwb.transformOps.activateRotate();
+                break;
+
+            case 83: // S - Scale
+                BEEwb.transformOps.activateScale();
+                break;
+
+            case 67: // C - Clone model
+                BEEwb.transformOps.cloneSelected();
+                break;
+        }
+    } else {
+        if (event.keyCode == 46){
+            // Delete model
             BEEwb.transformOps.removeSelected();
-            break;
-
-        case 77: // M - Move
-            BEEwb.transformOps.activateMove();
-            break;
-
-        case 82: // R - Rotate
-            BEEwb.transformOps.activateRotate();
-            break;
-
-        case 83: // S - Scale
-            BEEwb.transformOps.activateScale();
-            break;
-
-        case 67: // C - Clone model
-            BEEwb.transformOps.cloneSelected();
-            break;
+        }
     }
+};
+
+/**
+ * OnKeyUp event function
+ *
+ * @param event
+ */
+BEEwb.events.onKeyUp = function( event ) {
+    BEEwb.events.keyMap[event.keyCode] = (event.type == 'keydown');
 };

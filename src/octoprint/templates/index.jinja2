@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title data-bind="text: title">BEEsoft</title>
+        <title data-bind="text: title">BEESOFT</title>
 
-        <link rel="shortcut icon" href="{{ url_for('static', filename='img/bee.png') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/icons/BEESOFT_LOGO.svg') }}">
         <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='img/bee.png') }}">
         <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='img/bee.png') }}">
 
@@ -23,9 +23,7 @@
                 <div class="navbar-inner" data-bind="css: appearanceClasses">
                     <div class="container">
                         <a class="brand" href="#">
-                            <span class="brand-label-fix"><strong data-bind="text: appearance.brand">BEEsoft</strong></span>
                         </a>
-
                         <div class="nav-collapse">
                             <!-- Navbar -->
                             <ul class="nav pull-right">
@@ -46,35 +44,12 @@
                     </div>
                 </div>
             </div>
-            <div class="container octoprint-container">
-                <div class="row">
+            <div class="octoprint-container">
+                <div class="row-fluid">
 
                     <!-- Tabs -->
                     {% if templates.tab.order %}
-                    <div id="tab-container" class="tabbable {% if templates.sidebar.order %}span9{% else %}span12{% endif %}">
-
-                        <div class="row-fluid">
-                            <div id="state_wrapper" class="accordion-group">
-                                <div class="accordion-heading text-center">
-                                    <a id="state-header-link" class="accordion-toggle collapsed" data-toggle="collapse" data-target="#state">
-                                        <img data-bind="attr:{ 'src': printerLogo }" />
-                                        <strong data-bind="text: stateString, css: stateClass" class="printer-status"></strong>
-                                        <img data-bind="visible: isHeating()" src="/static/img/heating.gif" style="width: 40px;"/>
-                                    </a>
-                                    {% if "template_header" in data %}
-                                        {% try "There was an error with the template {filename} at line number {lineno}: {exception}" %}{% include data.template_header ignore missing %}{% endtry %}
-                                    {% endif %}
-                                </div>
-                                <div id="state" class="accordion-body collapse">
-                                    <div class="accordion-inner">
-                                        {% try "There was an error with the template {filename} at line number {lineno}: {exception}" %}{% include 'sidebar/printer_status.jinja2' ignore missing %}{% endtry %}
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <br />
-
+                    <div id="tab-container" class="tabbable main-container {% if templates.sidebar.order %}span9{% else %}span12{% endif %}">
                         <ul class="nav nav-tabs" id="tabs">
                             {% for key in templates.tab.order %}
                                 {% set entry, data = templates.tab.entries[key] %}
@@ -109,7 +84,7 @@
 
                     <!-- Sidebar -->
                     {% if templates.sidebar.order %}
-                    <div id="sidebar-container" class="accordion {% if templates.tab.order %}span3{% else %}span12{% endif %}">
+                    <div id="sidebar-container" class="accordion {% if templates.tab.order %}{% else %}span12{% endif %}">
                         {% for key in templates.sidebar.order %}
                             {% set entry, data = templates.sidebar.entries[key] %}
                             {% if "custom_bindings" not in data or data["custom_bindings"] %}<!-- ko allowBindings: false -->{% endif %}
@@ -120,7 +95,7 @@
                                     >
                                 <div class="accordion-heading">
                                     <a class="accordion-toggle" data-toggle="collapse" data-target="#{{ data._div }}">
-                                        {% if "icon" in data %}<i class="icon-{{ data.icon }}"></i> {% endif %}{{ entry }}
+                                        {{ entry }}{% if "icon" in data %}<i class="icon-{{ data.icon }}"></i> {% endif %}
                                     </a>
                                     {% if "template_header" in data %}
                                         {% include data.template_header ignore missing %}
@@ -139,18 +114,6 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                </div>
-                <div class="footer">
-                    <hr />
-                    <ul class="pull-left muted">
-                        <li><large>BEEsoft &copy 2017 BEEVC - Electronic Systems : <span class="version">{{ display_version|e }}</span></large></li>
-                    </ul>
-                    <ul class="pull-right">
-                        <li>{{ _('powered by ') }}<a href="http://octoprint.org" target="_blank"><i class="icon-github"></i> Octoprint</a></li>
-                        <!--<li><a href="https://github.com/foosel/OctoPrint/"><i class="icon-github"></i> {{ _('Sourcecode') }}</a></li>-->
-                        <!--<li><a href="http://docs.octoprint.org"><i class="icon-book"></i> {{ _('Documentation') }}</a></li>-->
-                        <!--<li><a href="https://github.com/foosel/OctoPrint/issues"><i class="icon-flag"></i> {{ _('Bugs and Requests') }}</a></li>-->
-                    </ul>
                 </div>
             </div>
 
@@ -181,6 +144,9 @@
             <!-- End of generic plugin template files -->
 
             {% include 'javascripts.jinja2' %}
+            <script>
+                $('[data-toggle="tooltip"]').tooltip();
+            </script>
         </div>
     </body>
 </html>

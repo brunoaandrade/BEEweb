@@ -2,7 +2,8 @@
     <div class="control-group" title="{{ _('Activates advanced options') }}">
         <div class="controls">
             <label class="checkbox">
-                <input type="checkbox" data-bind="checked: devMode">{{ _('Developer mode') }}</input>
+                <input id="devmode" type="checkbox" data-bind="checked: devMode"></input>
+                <label for="devmode">Developer mode</label>
             </label>
             <small>{{ _('NOTE: Changes will only be applied after the system is restarted.') }}</small>
         </div>

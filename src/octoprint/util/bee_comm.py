@@ -8,7 +8,7 @@ import logging
 
 from octoprint.settings import settings
 from octoprint.events import eventManager, Events
-from octoprint.util.comm import MachineCom, regex_sdPrintingByte, regex_sdFileOpened
+from octoprint.util.comm import MachineCom, regex_sdPrintingByte, regex_sdFileOpened, PrintingFileInformation
 from beedriver.connection import Conn as BeePrinterConn
 from octoprint.util import comm, get_exception_string, sanitize_ascii, RepeatedTimer, parsePropertiesFile
 
@@ -31,6 +31,7 @@ class BeeCom(MachineCom):
     _connection_monitor_active = True
     _prepare_print_thread = None
     _preparing_print = False
+    _resume_print_thread = None
 
     def __init__(self, callbackObject=None, printerProfileManager=None):
         super(BeeCom, self).__init__(None, None, callbackObject, printerProfileManager)
@@ -122,7 +123,7 @@ class BeeCom(MachineCom):
                     curr_version_parts = curr_firmware_parts[2].split('.')
                     file_version_parts = fname_parts[2].split('.')
 
-                    if len(curr_version_parts) == 4 and len(file_version_parts) == 4:
+                    if len(curr_version_parts) >= 3 and len(file_version_parts) >=3:
                         for i in xrange(3):
                             if int(file_version_parts[i]) != int(curr_version_parts[i]):
                                 # version update found
@@ -280,9 +281,9 @@ class BeeCom(MachineCom):
         :return:
         """
         if self._state == self.STATE_WAITING_FOR_BTF or self._state == self.STATE_CLOSED:
-            return "No printer detected. Please connect your printer"
+            return "Disconnected"
         elif self._state == self.STATE_PREPARING_PRINT:
-            return "Preparing to print, please wait"
+            return "Preparing..."
         elif self._state == self.STATE_HEATING:
             return "Heating"
         elif self._state == self.STATE_SHUTDOWN:
@@ -295,12 +296,12 @@ class BeeCom(MachineCom):
     def startPrint(self, pos=None):
         """
         Starts the printing operation
-        :param pos: unused parameter, just to keep the interface compatible with octoprint
+        :param pos: if the string 'memory' is passed the printer will print the last file in the printer's memory
         """
         if not self.isOperational() or self.isPrinting():
             return
 
-        if self._currentFile is None:
+        if self._currentFile is None and pos is None:
             raise ValueError("No file selected for printing")
 
         try:
@@ -312,6 +313,8 @@ class BeeCom(MachineCom):
                 if print_resp:
                     self._sd_status_timer = RepeatedTimer(self._timeout_intervals.get("sdStatus", 1.0), self._poll_sd_status, run_first=True)
                     self._sd_status_timer.start()
+            elif pos == 'from_memory':
+                print_resp = self._beeCommands.repeatLastPrint()
             else:
                 print_resp = self._beeCommands.printFile(self._currentFile.getFilename())
 
@@ -360,32 +363,11 @@ class BeeCom(MachineCom):
                         self._sd_status_timer.cancel()
                     except:
                         pass
-
-            # protects against any unexpected null selectedFile
-            if self._currentFile is not None:
-                payload = {
-                    "file": self._currentFile.getFilename(),
-                    "filename": os.path.basename(self._currentFile.getFilename()),
-                    "origin": self._currentFile.getFileLocation(),
-                    "firmwareError": firmware_error
-                }
-            else:
-                payload = {
-                    "file": None,
-                    "filename": '',
-                    "origin": '',
-                    "firmwareError": firmware_error
-                }
-
-            eventManager().fire(Events.PRINT_CANCELLED, payload)
-
-            # sends usage statistics
-            self._sendUsageStatistics('cancel')
         else:
-
             self._logger.exception("Error while canceling the print operation.")
             eventManager().fire(Events.ERROR, {"error": "Error canceling print"})
             return
+
 
     def setPause(self, pause):
         """
@@ -405,7 +387,7 @@ class BeeCom(MachineCom):
             "origin": self._currentFile.getFileLocation()
         }
 
-        if (not pause and self.isPaused()) or self.isShutdown():
+        if (not pause and self.isPaused()) or (not pause and self.isShutdown()):
             if self._pauseWaitStartTime:
                 self._pauseWaitTimeLost = self._pauseWaitTimeLost + (time.time() - self._pauseWaitStartTime)
                 self._pauseWaitStartTime = None
@@ -413,12 +395,11 @@ class BeeCom(MachineCom):
             # resumes printing
             self._beeCommands.resumePrint()
 
-            # restarts the progress monitor thread
-            self.startPrintStatusProgressMonitor()
+            self._heating = True
+            self._resume_print_thread = threading.Thread(target=self._resumePrintThread, name="comm._resumePrint")
+            self._resume_print_thread.daemon = True
+            self._resume_print_thread.start()
 
-            self._changeState(self.STATE_PRINTING)
-
-            eventManager().fire(Events.PRINT_RESUMED, payload)
         elif pause and self.isPrinting():
             if not self._pauseWaitStartTime:
                 self._pauseWaitStartTime = time.time()
@@ -552,14 +533,21 @@ class BeeCom(MachineCom):
             self._sdFileToSelect = filename
             self.sendCommand("M23 %s" % filename)
         else:
-            self._currentFile = comm.PrintingGcodeFileInformation(filename, offsets_callback=self.getOffsets,
-                                                             current_tool_callback=self.getCurrentTool)
-            eventManager().fire(Events.FILE_SELECTED, {
-                "file": self._currentFile.getFilename(),
-                "filename": os.path.basename(self._currentFile.getFilename()),
-                "origin": self._currentFile.getFileLocation()
-            })
-            self._callback.on_comm_file_selected(filename, self._currentFile.getFilesize(), False)
+            # Special case treatment for in memory file printing
+            if filename == 'Memory File':
+                self._currentFile = InMemoryFileInformation(filename, offsets_callback=self.getOffsets,
+                                                                 current_tool_callback=self.getCurrentTool)
+
+                self._callback.on_comm_file_selected(filename, 0, False)
+            else:
+                self._currentFile = comm.PrintingGcodeFileInformation(filename, offsets_callback=self.getOffsets,
+                                                                 current_tool_callback=self.getCurrentTool)
+                eventManager().fire(Events.FILE_SELECTED, {
+                    "file": self._currentFile.getFilename(),
+                    "filename": os.path.basename(self._currentFile.getFilename()),
+                    "origin": self._currentFile.getFileLocation()
+                })
+                self._callback.on_comm_file_selected(filename, self._currentFile.getFilesize(), False)
 
     def getPrintProgress(self):
         """
@@ -617,8 +605,6 @@ class BeeCom(MachineCom):
             except:
                 pass
 
-        # sends usage statistics
-        self._sendUsageStatistics('stop')
 
     def _monitor(self):
         """
@@ -879,66 +865,86 @@ class BeeCom(MachineCom):
             if not self._preparing_print:  # the print (heating) was cancelled
                 return
 
-        self._changeState(self.STATE_PRINTING)
-
+        if self._currentFile is not None:
         # Starts the real printing operation
-        self._currentFile.start()
+            self._currentFile.start()
 
-        payload = {
-            "file": self._currentFile.getFilename(),
-            "filename": os.path.basename(self._currentFile.getFilename()),
-            "origin": self._currentFile.getFileLocation()
-        }
+            self._changeState(self.STATE_PRINTING)
 
-        eventManager().fire(Events.PRINT_STARTED, payload)
+            payload = {
+                "file": self._currentFile.getFilename(),
+                "filename": os.path.basename(self._currentFile.getFilename()),
+                "origin": self._currentFile.getFileLocation()
+            }
 
-        # starts the progress status thread
-        self.startPrintStatusProgressMonitor()
+            eventManager().fire(Events.PRINT_STARTED, payload)
 
-        if self._heatupWaitStartTime is not None:
-            self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
-            self._heatupWaitStartTime = None
-            self._heating = False
+            # starts the progress status thread
+            self.startPrintStatusProgressMonitor()
 
-        self._preparing_print = False
+            if self._heatupWaitStartTime is not None:
+                self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
+                self._heatupWaitStartTime = None
+                self._heating = False
+            self._preparing_print = False
+        else:
+            self._changeState(self.STATE_READY)
+            self._logger.error('Error starting Print operation. No selected file found.')
 
-        # sends usage statistics
-        self._sendUsageStatistics('start')
 
-    def _sendUsageStatistics(self, operation):
+    def _resumePrintThread(self):
         """
-        Calls and external executable to send usage statistics to a remote cloud server
-        :param operation: Supports 'start' (Start Print), 'cancel' (Cancel Print), 'stop' (Print finished) operations
-        :return: true in case the operation was successfull or false if not
+        Thread code that runs while the print job is being resumed after pause/shutdown
+        :return:
         """
-        _logger = logging.getLogger()
-        biExePath = settings().getBaseFolder('bi') + '/bi_azure'
+        self._changeState(self.STATE_HEATING)
 
-        if operation != 'start' and operation != 'cancel' and operation != 'stop':
-            return False
+        while self._beeCommands.isHeating():
+            time.sleep(1)
+            if not self._preparing_print:  # the print (heating) was cancelled
+                return
 
-        if os.path.exists(biExePath) and os.path.isfile(biExePath):
+        if self._currentFile is not None:
+        # Starts the real printing operation
 
-            printerSN = self.getConnectedPrinterSN()
+            self._changeState(self.STATE_PRINTING)
 
-            if printerSN is None:
-                _logger.error("Could not get Printer Serial Number for statistics communication.")
-                return False
-            else:
-                cmd = '%s %s %s' % (biExePath,str(printerSN), str(operation))
-                _logger.info(u"Running %s" % cmd)
+            payload = {
+                "file": self._currentFile.getFilename(),
+                "filename": os.path.basename(self._currentFile.getFilename()),
+                "origin": self._currentFile.getFileLocation()
+            }
 
-                import subprocess
-                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+            eventManager().fire(Events.PRINT_RESUMED, payload)
 
-                (output, err) = p.communicate()
+            # starts the progress status thread
+            self.startPrintStatusProgressMonitor()
 
-                p_status = p.wait()
+            if self._heatupWaitStartTime is not None:
+                self._heatupWaitTimeLost = self._heatupWaitTimeLost + (time.time() - self._heatupWaitStartTime)
+                self._heatupWaitStartTime = None
+                self._heating = False
+            self._preparing_print = False
+        else:
+            self._changeState(self.STATE_READY)
+            self._logger.error('Error starting Print operation. No selected file found.')
 
-                if p_status == 0 and 'IOTHUB_CLIENT_CONFIRMATION_OK' in output:
-                    _logger.info(u"Statistics sent to remote server. (Operation: %s)" % operation)
-                    return True
-                else:
-                    _logger.info(u"Failed sending statistics to remote server. (Operation: %s)" % operation)
 
-        return False
+class InMemoryFileInformation(PrintingFileInformation):
+    """
+    Dummy file information handler for printer in memory files
+    Encapsulates information regarding an ongoing direct print. Takes care of the needed file handle and ensures
+    that the file is closed in case of an error.
+    """
+
+    def __init__(self, filename, offsets_callback=None, current_tool_callback=None):
+        PrintingFileInformation.__init__(self, filename)
+
+        self._handle = None
+
+        self._offsets_callback = offsets_callback
+        self._current_tool_callback = current_tool_callback
+
+        self._size = 0
+        self._pos = 0
+        self._read_lines = 0

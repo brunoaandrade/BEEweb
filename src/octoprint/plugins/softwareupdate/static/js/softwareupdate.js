@@ -214,6 +214,7 @@ $(function() {
                         confirm: true,
                         buttons: [{
                             text: gettext("Ignore"),
+                            addClass: "btn-software-update",
                             click: function() {
                                 self._markNotificationAsSeen(data.information);
                                 self._showPopup({
@@ -222,7 +223,7 @@ $(function() {
                             }
                         }, {
                             text: gettext("Update now"),
-                            addClass: "btn-primary",
+                            addClass: "btn-primary btn-software-update",
                             click: self.update
                         }]
                     };

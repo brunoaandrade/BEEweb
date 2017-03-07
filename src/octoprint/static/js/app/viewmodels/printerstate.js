@@ -4,6 +4,8 @@ $(function() {
 
         self.loginState = parameters[0];
         self.printerProfiles = parameters[1];
+        self.slicing = parameters[2];
+        self.connection = parameters[3];
 
         self.stateString = ko.observable(undefined);
         self.isErrorOrClosed = ko.observable(undefined);
@@ -23,16 +25,66 @@ $(function() {
         self.ignoredInsufficientFilament = ko.observable(false);
 
         self.enablePrint = ko.pureComputed(function() {
-            return self.isOperational() && self.isReady() && !self.isPrinting() && !self.isHeating()
-            && self.loginState.isUser() && self.filename() != undefined;
+            return self.insufficientFilament() && self.loginState.isUser() && self.filename() != undefined;
         });
         self.enablePause = ko.pureComputed(function() {
-            return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown()) && self.loginState.isUser();
+            return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown())
+            && self.loginState.isUser() && !self.isHeating();
         });
         self.enableCancel = ko.pureComputed(function() {
-            return (self.isOperational() || (self.isPrinting() || self.isPaused()))
+            return ((self.isPrinting() || self.isPaused() || self.isHeating()))
             && self.loginState.isUser() && self.filename() != undefined;
         });
+        self.enablePreparePrint = ko.pureComputed(function() {
+            return self.loginState.isUser() && !self.connection.isConnecting()
+            && !self.connection.isErrorOrClosed() && !self.filename();
+        });
+        self.showInsufficientFilament = ko.pureComputed(function() {
+            return self.loginState.isUser && self.insufficientFilament()
+            && !self.ignoredInsufficientFilament() && self.filename() != undefined;
+        });
+        self.showPrintControlButtons = ko.pureComputed(function() {
+            return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown() || self.isHeating())
+            && self.loginState.isUser();
+        });
+        self.enablePrintFromMemory = ko.pureComputed(function() {
+            return self.loginState.isUser() && self.filename() == undefined && (self.isReady && !self.isPrinting()
+            && !self.isPaused() && !self.isHeating() && !self.isShutdown());
+        });
+        self.noPrinterDetected = ko.pureComputed(function() {
+            return self.connection.isErrorOrClosed()
+        });
+        self.isSelectedFile = ko.pureComputed(function() {
+             return self.loginState.isUser() && self.filename() != undefined;
+        });
+
+        self.togglePrintFromMemory = function() {
+            if (self.enablePrintFromMemory()) {
+                if ($('#printFromMemoryDiv').hasClass('hidden')) {
+                    $('#printFromMemoryDiv').removeClass('hidden');
+                    $('#preparePrint').addClass('hidden');
+                    $('#state_wrapper .accordion-heading').addClass('selected');
+                } else {
+                    $('#printFromMemoryDiv').addClass('hidden');
+                    $('#preparePrint').removeClass('hidden');
+                    $('#state_wrapper .accordion-heading').removeClass('selected');
+                }
+            }
+        };
+
+        self.printFromMemory = function() {
+
+            $.ajax({
+                url: BEE_CUSTOM_API_BASEURL + "print_from_memory",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                success: function(response) {
+                    $('#printFromMemoryDiv').addClass('hidden');
+                    $('#preparePrint').removeClass('hidden');
+                }
+            });
+        };
 
         self.filename = ko.observable(undefined);
         self.progress = ko.observable(undefined);
@@ -74,6 +126,14 @@ $(function() {
             return logo;
         });
 
+        self.printerName = ko.computed(function() {
+            var name = "";
+            if (self.isErrorOrClosed() !== undefined && !self.isErrorOrClosed() && !self.isError()) {
+                name = self.printerProfiles.currentProfileData().name();
+            }
+            return name;
+        });
+
         self.estimatedPrintTimeString = ko.pureComputed(function() {
             if (self.lastPrintTime())
                 return formatFuzzyPrintTime(self.lastPrintTime());
@@ -94,7 +154,7 @@ $(function() {
         });
         self.printTimeString = ko.pureComputed(function() {
             if (!self.printTime())
-                return "-";
+                return "00:00";
             return formatDuration(self.printTime());
         });
         self.printTimeLeftString = ko.pureComputed(function() {
@@ -201,24 +261,24 @@ $(function() {
         self._processStateClass = function() {
             self.stateClass("text-black");
 
-            /*if (self.isOperational()) {
-                self.stateClass("text-success");
+            if (self.isOperational()) {
+                self.stateClass("ready");
             }
             if (self.isPaused()) {
-                self.stateClass("text-black");
+                self.stateClass("paused");
             }
             if (self.isHeating()) {
-                self.stateClass("text-error");
+                self.stateClass("heating");
             }
             if (self.isPrinting()) {
-                self.stateClass("text-primary");
+                self.stateClass("printing");
             }
             if (self.isShutdown()) {
-                self.stateClass("text-black");
+                self.stateClass("shutdown");
             }
             if (self.isErrorOrClosed()) {
-                self.stateClass("text-warning");
-            } */
+                self.stateClass("error");
+            }
         };
 
         self._fromData = function(data) {
@@ -233,6 +293,7 @@ $(function() {
 
         self._processStateData = function(data) {
             var prevPaused = self.isPaused();
+            var prevPrinting = self.isPrinting();
 
             self.stateString(gettext(data.text));
             self.isErrorOrClosed(data.flags.closedOrError);
@@ -255,12 +316,9 @@ $(function() {
                 }
             }
 
-            // If the print job is running show the print panel (print or shutdown states)
-            // This is used when the page is reloaded and the print info must be shown
-            if (self.isPrinting() || self.isShutdown()) {
-                if (!$("#state").hasClass('in')) {
-                    $("#state").collapse("show");
-                }
+            // detects if a print has finished to change the ignoredInsufficientFilament flag
+            if (prevPrinting == true && self.isPrinting() != prevPrinting && !self.isPaused() && !self.isShutdown()) {
+                self.ignoredInsufficientFilament(false);
             }
         };
 
@@ -296,7 +354,8 @@ $(function() {
 
                 self.insufficientFilament(false);
 
-                if (data.filament['tool0']['insufficient'] == true) {
+                // Signals for insufficient filament only if a print operation is not ongoing
+                if (data.filament['tool0']['insufficient'] == true && !self.isPrinting() && !self.isHeating()) {
                     self.insufficientFilament(true);
                 }
             }
@@ -307,7 +366,7 @@ $(function() {
                 self.progress(data.completion);
 
                 if (data.completion == 100) {
-                    // Empties the progress bar
+                    // If print finishes empties the progress bar
                     self.progress(0);
                 }
             } else {
@@ -396,10 +455,6 @@ $(function() {
                 $('#job_cancel').prop('disabled', false);
                 $('#job_pause').prop('disabled', false);
 
-                // Hides the status panel
-                if ($("#state").hasClass('in')) {
-                    $("#state").collapse("hide");
-                }
             });
         };
 
@@ -457,11 +512,18 @@ $(function() {
         self.showMaintenanceFilamentChange = function() {
             $('#navbar_show_maintenance').click();
         };
+
+        /**
+         * Shows the slicing dialog window for the workbench
+         */
+        self.preparePrint = function () {
+            self.slicing.show('local', BEEwb.helpers.generateSceneName(), true, true);
+		};
     }
 
     OCTOPRINT_VIEWMODELS.push([
         PrinterStateViewModel,
-        ["loginStateViewModel", "printerProfilesViewModel"],
+        ["loginStateViewModel", "printerProfilesViewModel", "slicingViewModel", "connectionViewModel"],
         ["#state_wrapper", "#drop_overlay"]
     ]);
 });

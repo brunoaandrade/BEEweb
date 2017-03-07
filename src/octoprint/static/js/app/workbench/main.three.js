@@ -37,7 +37,7 @@ BEEwb.main = {
         var that = this;
         // Loads the printer profile
         $.ajax({
-            url: "bee/api/printer",
+            url: BEE_CUSTOM_API_BASEURL + "printer",
             type: 'GET',
             success: function(data) {
                 that.bedDepth = data.profile.volume.depth;
@@ -485,18 +485,19 @@ BEEwb.main = {
         this.scene.add( this.bed );
 
         // Grid
-        var planeW = rectWidth / 10; // pixels
-        var planeH = rectHeight / 10; // pixels
-        var numW = 10; // how many wide (50*50 = 2500 pixels wide)
-        var numH = 10; // how many tall (50*50 = 2500 pixels tall)
-        var plane = new THREE.Mesh(
-            new THREE.PlaneGeometry( planeW*numW, planeH*numH, planeW, planeH ),
-            new THREE.MeshBasicMaterial({
-                color: 0xBDBDBD,
-                wireframe: true
-            })
-        );
-        this.scene.add(plane);
+        // We must overlap 2 grids, in order to fill the entire bed space because,
+        // they are exact square and the bed is not
+        var normalizedBedDepth = this.bedDepth + 5; // We add 5 to round out the bedDepth to facilitate grid size calculations
+        var widthHeightDiff = this.bedWidth - normalizedBedDepth;
+        var gridXY1 = new THREE.GridHelper(normalizedBedDepth / 2, normalizedBedDepth / 10, '#666666', '#666666');
+        gridXY1.position.set(-widthHeightDiff/2, 0, 0);
+        gridXY1.rotation.x = Math.PI/2;
+        this.scene.add(gridXY1);
+
+        var gridXY2 = new THREE.GridHelper(normalizedBedDepth / 2, normalizedBedDepth / 10, '#666666', '#666666');
+        gridXY2.position.set(+widthHeightDiff/2, 0, 0);
+        gridXY2.rotation.x = Math.PI/2;
+        this.scene.add(gridXY2);
     },
 
     /**
@@ -505,6 +506,7 @@ BEEwb.main = {
      */
     activateWorkbenchKeys: function () {
         window.addEventListener('keydown', BEEwb.events.onKeyDown);
+        window.addEventListener('keyup', BEEwb.events.onKeyUp);
     },
 
     /**
@@ -513,5 +515,6 @@ BEEwb.main = {
      */
     deactivateWorkbenchKeys: function () {
         window.removeEventListener('keydown', BEEwb.events.onKeyDown);
+        window.removeEventListener('keyup', BEEwb.events.onKeyUp);
     }
 };

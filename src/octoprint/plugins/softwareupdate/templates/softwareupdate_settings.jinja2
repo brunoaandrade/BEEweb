@@ -17,7 +17,7 @@
 {% endtrans %}</div>
 
 <div class="pull-right">
-    <button class="btn btn-small" data-bind="click: function() { $root.showPluginSettings(); }" title="{{ _('Plugin Configuration') }}"><i class="icon-wrench"></i></button>
+    <button class="btn btn-small yellow" data-bind="click: function() { $root.showPluginSettings(); }" title="{{ _('Plugin Configuration') }}"><i class="icon-wrench"></i></button>
 </div>
 
 <h3>{{ _('Current versions') }}</h3>
@@ -57,7 +57,7 @@
     </ul>
 </div>
 
-<button class="btn btn-primary btn-block" data-bind="click: function() { $root.performCheck(true, false, true); }">{{ _('Check for update now') }}</button>
+<button class="btn btn-primary btn-block yellow" data-bind="click: function() { $root.performCheck(true, false, true); }">{{ _('Check for update now') }}</button>
 
 <div>
     <div><small><a href="#" class="muted" onclick="$(this).children().toggleClass('icon-caret-right icon-caret-down').parent().parent().parent().next().slideToggle('fast')"><i class="icon-caret-right"></i> {{ _('Advanced options') }}</a></small></div>
@@ -106,7 +106,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</button>
-        <button class="btn btn-primary" data-bind="click: savePluginSettings" aria-hidden="true">{{ _('Save') }}</button>
+        <button class="btn btn-primary green" data-bind="click: savePluginSettings" aria-hidden="true">{{ _('Save') }}</button>
     </div>
 </div>
 

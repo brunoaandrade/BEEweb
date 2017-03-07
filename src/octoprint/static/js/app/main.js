@@ -545,10 +545,10 @@ $(function() {
                 workbControls.css('display', 'block');
             } else {
                 tabContainer.removeClass('span9');
-                tabContainer.addClass('span8');
+                tabContainer.addClass('span9');
 
                 sidebarContainer.removeClass('span3');
-                sidebarContainer.addClass('span4');
+                sidebarContainer.addClass('span3');
 
                 workbControls.css('display', 'none');
             }
@@ -703,6 +703,10 @@ $(function() {
             // Resets the offset to adjust the 3D canvas
             BEEwb.main.topPanelVerticalOffset = 0;
         });
+
+        $('#slicing_configuration_dialog .form-horizontal .control-label').on('click', function(){
+            $(this).toggleClass('closed');
+        })
     }
 );
 

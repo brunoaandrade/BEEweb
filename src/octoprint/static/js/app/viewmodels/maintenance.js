@@ -183,6 +183,7 @@ $(function() {
 
             $('#start-heating-btn').removeClass('hidden');
             $('#progress-bar-div').addClass('hidden');
+            $('#change-filament-heating-done').addClass('hidden');
 
             self.operationLock(false);
 
@@ -202,6 +203,9 @@ $(function() {
         };
 
         self.nextStep3 = function() {
+            // Heating is finished, let's move on
+            self._heatingDone();
+
             $('#step3').removeClass('hidden');
             $('#step4').addClass('hidden');
             $('#step2').addClass('hidden');
@@ -296,14 +300,8 @@ $(function() {
                         tempProgressBar.text(progressStr);
 
                         if (progress >= 100) {
-                            // Heating is finished, let's move on
-                            self._heatingDone();
-
-                            if (self.filamentSelected()) {
-                                $('#step3').removeClass('hidden');
-                                $('#step2').addClass('hidden');
-                                $('#step1').addClass('hidden');
-                            }
+                            $('#change-filament-heating-done').removeClass('hidden');
+                            $('#progress-bar-div').addClass('hidden');
                         } else {
                             setTimeout(function() { self._updateTempProgress() }, 2000);
                         }
@@ -320,6 +318,8 @@ $(function() {
         self.loadFilament = function() {
             self.commandLock(true);
             self._showMovingMessage();
+            $('.load-gifs').show();
+            $('.unload-gifs').hide();
 
             $.ajax({
                 url: API_BASEURL + "maintenance/load",
@@ -340,6 +340,8 @@ $(function() {
         self.unloadFilament = function() {
             self.commandLock(true);
             self._showMovingMessage();
+            $('.load-gifs').hide();
+            $('.unload-gifs').show();
 
             $.ajax({
                 url: API_BASEURL + "maintenance/unload",
@@ -756,6 +758,7 @@ $(function() {
             self.startHeatingExtMaint();
 
             $('#maintenanceCloseButton').addClass('hidden');
+            $('#ext-mtn-4').addClass('hidden');
         };
 
 
@@ -782,6 +785,9 @@ $(function() {
         };
 
         self.nextStepExtMaint3 = function() {
+            // Heating is finished, let's move on
+            self._heatingDone();
+
             $('#extMaintStep4').removeClass('hidden');
             $('#extMaintStep3').addClass('hidden');
             $('#extMaintStep2').addClass('hidden');
@@ -834,8 +840,6 @@ $(function() {
                         tempProgressBar.text(progressStr);
 
                         if (progress >= 100) {
-                            // Heating is finished, let's move on
-                            self._heatingDone();
 
                             $('#ext-mtn-4').removeClass('hidden');
                             $('#progress-bar-ext-mtn').addClass('hidden');
@@ -861,7 +865,6 @@ $(function() {
         /**************            Replace nozzle functions           **************/
         /***************************************************************************/
 
-
         self.showReplaceNozzle = function() {
             $('#maintenanceList').addClass('hidden');
             $('#cancelMaintenance').removeClass('hidden');
@@ -870,30 +873,51 @@ $(function() {
 
             $('#maintenanceCloseButton').addClass('hidden');
 
-            // Starts the heating operation
-            self.startHeatingReplaceNozzle();
         };
 
         self.replaceNozzleStep0 = function() {
             $('#replaceNozzleStep2').addClass('hidden');
             $('#replaceNozzleStep3').addClass('hidden');
             $('#replaceNozzleStep1').removeClass('hidden');
-
+            $('#replaceNozzleStep4').addClass('hidden');
+            $('#replaceNozzleStep5').addClass('hidden');
         };
 
         self.nextStepReplaceNozzle1 = function() {
+            // Starts the heating operation
+            self.startHeatingReplaceNozzle();
+
             $('#replaceNozzleStep2').removeClass('hidden');
             $('#replaceNozzleStep1').addClass('hidden');
             $('#replaceNozzleStep3').addClass('hidden');
+            $('#replaceNozzleStep4').addClass('hidden');
+            $('#replaceNozzleStep5').addClass('hidden');
         };
 
         self.nextStepReplaceNozzle2 = function() {
+            // Heating is finished, let's move on
+            self._heatingDone();
+
             $('#replaceNozzleStep3').removeClass('hidden');
             $('#replaceNozzleStep1').addClass('hidden');
             $('#replaceNozzleStep2').addClass('hidden');
+            $('#replaceNozzleStep4').addClass('hidden');
+        };
 
-            $('#maintenanceOkButton').removeClass('hidden');
-            $('#maintenanceCloseButton').addClass('hidden');
+        self.nextStepReplaceNozzle3 = function() {
+            $('#replaceNozzleStep4').removeClass('hidden');
+            $('#replaceNozzleStep5').addClass('hidden');
+            $('#replaceNozzleStep3').addClass('hidden');
+            $('#replaceNozzleStep1').addClass('hidden');
+            $('#replaceNozzleStep2').addClass('hidden');
+        };
+
+        self.nextStepReplaceNozzle4 = function() {
+            $('#replaceNozzleStep5').removeClass('hidden');
+            $('#replaceNozzleStep4').addClass('hidden');
+            $('#replaceNozzleStep3').addClass('hidden');
+            $('#replaceNozzleStep1').addClass('hidden');
+            $('#replaceNozzleStep2').addClass('hidden');
         };
 
         self.saveNozzle = function() {
@@ -922,11 +946,7 @@ $(function() {
                         self.commandLock(false);
                         self.operationLock(false);
 
-                        if (self.heatingDone()) {
-                            self.nextStepReplaceNozzle2();
-                        } else {
-                            self.nextStepReplaceNozzle1();
-                        }
+                        self.nextStepReplaceNozzle4();
                     } else {
                         self.saveNozzleResponseError(true);
                         self.commandLock(false);
@@ -983,12 +1003,9 @@ $(function() {
                         tempProgressBar.text(progressStr);
 
                         if (progress >= 100) {
-                            // Heating is finished, let's move on
-                            self._heatingDone();
+                            $('#replace-nozzle-heating-done').removeClass('hidden');
+                            $('#progress-bar-replace-nozzle').addClass('hidden');
 
-                            if (self.nozzleSelected()) {
-                                self.nextStepReplaceNozzle2();
-                            }
                         } else {
                             setTimeout(function() { self._updateTempProgressReplaceNozzle() }, 2000);
                         }
@@ -1019,6 +1036,83 @@ $(function() {
                             name: ntype.value
                         });
                     });
+                }
+            });
+        };
+
+        self.loadFilamentReplaceNozzle = function() {
+            self.commandLock(true);
+            self._showMovingMessage();
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/load",
+                type: "POST",
+                dataType: "json",
+                success: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
+                },
+                error: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
+                }
+            });
+        };
+
+        self.unloadFilamentReplaceNozzle = function() {
+            self.commandLock(true);
+            self._showMovingMessage();
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/unload",
+                type: "POST",
+                dataType: "json",
+                success: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
+                },
+                error: function() {
+                    self.commandLock(false);
+                    self._hideMovingMessage();
+                }
+            });
+        };
+
+        self.saveFilamentReplaceNozzle = function() {
+            self.commandLock(true);
+
+            self.filamentSelected(false);
+            self.filamentResponseError(false);
+
+            var data = {
+                command: "filament",
+                filamentStr: self.selectedFilament()
+            };
+
+            $.ajax({
+                url: API_BASEURL + "maintenance/save_filament",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify(data),
+                success: function(data) {
+                    var response = data['response'];
+
+                    if (response.indexOf('ok') > -1) {
+                        self.filamentSelected(true);
+
+                        self.finishOperations();
+                    } else {
+                        self.filamentResponseError(true);
+                    }
+
+                    self.commandLock(false);
+                    self.operationLock(false);
+                },
+                error: function() {
+                    self.commandLock(false);
+                    self.operationLock(false);
+                    self.filamentResponseError(true);
                 }
             });
         };

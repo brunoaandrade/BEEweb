@@ -4,7 +4,6 @@ $(function() {
 
         self.loginState = parameters[0];
         self.printerProfiles = parameters[1];
-        self.printerState = parameters[2];
 
         self.file = ko.observable(undefined);
         self.target = undefined;
@@ -25,10 +24,11 @@ $(function() {
 
         self.colors = ko.observableArray();
         self.selColor = ko.observable();
-        self.selDensity = ko.observable(5);
+        self.selDensity = ko.observable("Low");
+        self.customDensity = ko.observable();
         self.selResolution = ko.observable("Medium");
-        self.raft = ko.observable(false);
-        self.support = ko.observable(false);
+        self.platformAdhesion = ko.observable("None");
+        self.support = ko.observable("None");
         self.nozzleTypes = ko.observableArray();
         self.selNozzle = ko.observable();
         self.filamentInSpool = ko.observable();
@@ -160,9 +160,7 @@ $(function() {
             return self.destinationFilename() != undefined
                 && self.destinationFilename().trim() != ""
                 && self.slicer() != undefined
-                && self.sliceButtonControl == true
-                && (self.printerState.isOperational() ||
-                    self.afterSlicing() == "none" && self.printerState.isErrorOrClosed() == true);
+                && self.sliceButtonControl == true;
                 //&& self.profile() != undefined;
         });
 
@@ -384,18 +382,37 @@ $(function() {
             }
 
             // Density support
-            data['profile.fill_density'] = self.selDensity();
+            if (self.selDensity() == "Low") {
+                data['profile.fill_density'] = 5;
+            } else if (self.selDensity() == "Medium") {
+                data['profile.fill_density'] = 10;
+            } else if (self.selDensity() == "High") {
+                data['profile.fill_density'] = 20;
+            } else if (self.selDensity() == "High+") {
+                data['profile.fill_density'] = 40;
+            } else if (self.selDensity() == "Custom") {
+                if (self.customDensity() > 100)
+                    self.customDensity(100);
+                if (self.customDensity() < 0)
+                    self.customDensity(0);
+
+                data['profile.fill_density'] = self.customDensity();
+            }
 
             // BVC Raft Support
-            if (self.raft() == true) {
+            if (self.platformAdhesion() == 'Raft') {
                 data['profile.platform_adhesion'] = 'raft';
+            } else if (self.platformAdhesion() == 'Brim') {
+                data['profile.platform_adhesion'] = 'brim';
             } else {
                 data['profile.platform_adhesion'] = 'none';
             }
 
             // BVC Support
-            if (self.support() == true) {
+            if (self.support() == 'Everywhere') {
                 data['profile.support'] = 'everywhere';
+            } else if (self.platformAdhesion() == 'Touching Platform') {
+                data['profile.support'] = 'buildplate';
             } else {
                 data['profile.support'] = 'none';
             }
@@ -407,9 +424,6 @@ $(function() {
                 contentType: "application/json; charset=UTF-8",
                 data: JSON.stringify(data),
                 success: function ( response ) {
-                    // Shows the status panel
-                    if (data["select"] || data["print"])
-                        $("#state").collapse("show");
 
                     self.sliceButtonControl = true;
                 },
@@ -443,7 +457,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push([
         SlicingViewModel,
-        ["loginStateViewModel", "printerProfilesViewModel", "printerStateViewModel"],
+        ["loginStateViewModel", "printerProfilesViewModel"],
         "#slicing_configuration_dialog"
     ]);
 });

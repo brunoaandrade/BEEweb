@@ -44,11 +44,37 @@ $(function() {
                 callback();
             }
         }
+
+        self.aboutDialog = $('#aboutbee_dialog');
+        self.currentFirmware = ko.observable('Undefined');
+
+        self.showAboutBee = function() {
+
+            // show settings, ensure centered position
+            self.aboutDialog.modal({
+                minHeight: function() { return Math.max($.fn.modal.defaults.maxHeight() - 500, 250); }
+            }).css({
+                width: 'auto',
+                'margin-left': function() { return -($(this).width() /2); }
+            });
+
+            $.ajax({
+                url: BEE_CUSTOM_API_BASEURL + "firmware/current/version",
+                type: "GET",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                success: function(data) {
+                    self.currentFirmware(data.version);
+                }
+            });
+
+            return false;
+        };
     }
 
     OCTOPRINT_VIEWMODELS.push([
         NavigationViewModel,
         ["loginStateViewModel", "appearanceViewModel", "settingsViewModel", "userSettingsViewModel"],
-        "#navbar"
+        ["#navbar", "#aboutbee_dialog"]
     ]);
 });

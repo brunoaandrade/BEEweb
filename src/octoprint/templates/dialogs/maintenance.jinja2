@@ -1,61 +1,81 @@
-<div id="maintenance_dialog" class="modal hide fade large" tabindex="-1" role="dialog" aria-labelledby="maintenance_dialog_label" aria-hidden="true">
+<div id="maintenance_dialog" class="modal hide fade maintenance" tabindex="-1" role="dialog" aria-labelledby="maintenance_dialog_label" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 id="maintenance_dialog_label">{{ _('Maintenance') }}
+        <h3 id="maintenance_dialog_label"> <span class="m-icon maintenancegicon"></span>{{ _('Maintenance') }}
             <i class="icon-spinner icon-spin" data-bind="visible: receiving"></i>
         </h3>
     </div>
-    <div class="modal-body">
-        <div class="full-sized-box">
+    <div class="modal-body" id="maintenance_modal_body">
+        <div class="">
             <div id="maintenance_warning_box" class="hidden text-center alert alert-warning">
                 <i class="icon-warning-sign"></i>
                 <span id="maintenance_warning_text">{{ _('Moving...please wait') }}</span>
             </div>
 
             <div class="tabbable row-fluid">
-                <div id="maintenanceList" class="operationsList">
-                    <div class="row-fluid">
-                        <h3>{{ _('Filament change') }}</h3>
-                        <span>{{ _('This operation is needed when you want to print with a differente color orwhen the filament available in the spool is not enough.')}}
-                        </span>
-                        <br /><br />
-                        <a href="#maintenance_changeFilament" class="btn btn-primary" data-bind="click: showFilamentChange" >
-                            {{ _('Change filament now') }}
-                        </a>
-                        <br /><br />
+                <div id="maintenanceList" class="operationsList full-sized-box">
+                    <div class="modal-row">
+                        <div class="span1 text-center">
+                            <span class="m-icon filamentgicon"></span>
+                        </div>
+                        <div class="span4">
+                            <h3>{{ _('Change filament') }}</h3>
+                            <p>{{ _('This operation is needed when you want to print with a different color or when the filament available in the spool is not enough.')}}
+                            </p>
+                         </div>
+                         <div class="span7 text-right">
+                             <a href="https://beeverycreative.com/order-here/" class="btn btn-maintenance green" target="_blank" >{{ _('Buy filament') }}</a>
+                             <a href="#maintenance_changeFilament" class="btn btn-maintenance yellow" data-bind="click: showFilamentChange" >
+                                 <span class="m-icon filamenticon"></span>{{ _('Change filament now') }}
+                             </a>
+                         </div>
+                    </div>
+                    <div class="modal-row">
+                         <div class="span1 text-center">
+                            <span class="m-icon calibrategicon"></span>
+                         </div>
+                         <div class="span4">
+                             <h3>{{ _('Calibrate') }}</h3>
+                             <p>{{ _('This operation is needed to ensure the quality of your 3D prints.')}}
+                             </p>
+                        </div>
+                        <div class="span7 text-right">
+                             <a href="#maintenance_calibration" class="btn btn-maintenance yellow" data-bind="click: showCalibration" >
+                                <span class="m-icon calibrateicon"></span>{{ _('Calibrate now') }}
+                             </a>
+                        </div>
                     </div>
 
-                    <div class="row-fluid">
-                        <h3>{{ _('Calibrate') }}</h3>
-                        <span>{{ _('This operation is needed to ensure the quality of your 3D prints.')}}
-                        </span>
-                        <br /><br />
-                        <a href="#maintenance_calibration" class="btn btn-primary" data-bind="click: showCalibration" >
-                            {{ _('Calibrate now') }}
-                        </a>
-                        <br /><br />
+                    <div class="modal-row">
+                        <div class="span1 text-center">
+                            <span class="m-icon extrudergicon"></span>
+                        </div>
+                        <div class="span4">
+                            <h3>{{ _('Extruder Maintenance') }}</h3>
+                            <p>{{ _('This operation enables you to unclog the nozzle using the Maintenance Kit.')}}
+                            </p>
+                        </div>
+                        <div class="span7 text-right">
+                            <a href="#maintenance_extruderMaintenance" class="btn btn-maintenance yellow" data-bind="click: showExtruderMaintenance">
+                                <span class="m-icon extrudericon"></span>{{ _('Start extruder maintenance') }}
+                            </a>
+                        </div>
                     </div>
 
-                    <div class="row-fluid">
-                        <h3>{{ _('Extruder Maintenance') }}</h3>
-                        <span>{{ _('This operation enables you to unclog the nozzle using the Maintenance Kit.')}}
-                        </span>
-                        <br /><br />
-                        <a href="#maintenance_extruderMaintenance" class="btn btn-primary" data-bind="click: showExtruderMaintenance">
-                            {{ _('Start extruder maintenance') }}
-                        </a>
-                        <br /><br />
-                    </div>
-
-                    <div class="row-fluid">
-                        <h3>{{ _('Replace nozzle') }}</h3>
-                        <span>{{ _('This operation is for replacing the extruder nozzle with a spare from your Maintenance Kit.')}}
-                        </span>
-                        <br /><br />
-                        <a href="#maintenance_replaceNozzle" class="btn btn-primary" data-bind="click: showReplaceNozzle">
-                            {{ _('Replace nozzle now') }}
-                        </a>
-                        <br /><br />
+                    <div class="modal-row">
+                        <div class="span1 text-center">
+                            <span class="m-icon nozzlegicon"></span>
+                        </div>
+                         <div class="span4">
+                             <h3>{{ _('Switch nozzle') }}</h3>
+                             <p>{{ _('It is necessary to change the nozzle when it\'s clogged or if you need to print with a nozzle of a different diameter, ex: TPU-FLEX.')}}
+                             </p>
+                        </div>
+                        <div class="span7 text-right">
+                            <a href="#maintenance_replaceNozzle" class="btn btn-maintenance yellow" data-bind="click: showReplaceNozzle">
+                                <span class="m-icon nozzleicon"></span>{{ _('Switch nozzle now') }}
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -80,7 +100,7 @@
         <div class="row-fluid">
             <div class="span2">
                 <button id="cancelMaintenance" class="btn btn-block hidden" data-bind="click: cancelOperations">
-                    <i class="icon-ban-circle"></i> {{ _('Cancel') }}
+                    {{ _('Cancel') }}
                 </button>
             </div>
             <div class="span8"></div>
@@ -88,9 +108,9 @@
                 <button id="maintenanceCloseButton" class="btn btn-block" data-dismiss="modal" aria-hidden="true" data-bind="click: cancelOperations">
                     <i class="icon-remove"></i> {{ _('Close') }}
                 </button>
-                <button id="maintenanceOkButton" class="btn btn-block btn-primary pull-right hidden" data-dismiss="modal"
+                <button id="maintenanceOkButton" class="btn btn-block btn-primary    hidden" data-dismiss="modal"
                         aria-hidden="true" data-bind="click: finishOperations">
-                    <i class="icon-ok-sign"></i> {{ _('OK') }}
+                        {{ _('OK') }}
                 </button>
             </div>
 

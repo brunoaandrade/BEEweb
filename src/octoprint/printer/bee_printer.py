@@ -3,6 +3,8 @@
 from __future__ import absolute_import
 
 import math
+import time
+import logging
 from octoprint.util.bee_comm import BeeCom
 import os
 from octoprint.printer.standard import Printer
@@ -22,6 +24,7 @@ class BeePrinter(Printer):
     BVC implementation of the :class:`PrinterInterface`. Manages the communication layer object and registers
     itself with it as a callback to react to changes on the communication layer.
     """
+    TMP_FILE_MARKER = '__tmp-scn'
 
     def __init__(self, fileManager, analysisQueue, printerProfileManager):
         super(BeePrinter, self).__init__(fileManager, analysisQueue, printerProfileManager)
@@ -37,6 +40,7 @@ class BeePrinter(Printer):
         self._slicingManager = SlicingManager(settings().getBaseFolder("slicingProfiles"), printerProfileManager)
         self._slicingManager.reload_slicers()
         self._currentFilamentProfile = None
+
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
@@ -76,8 +80,10 @@ class BeePrinter(Printer):
         # gets current Filament profile data
         self._currentFilamentProfile = self.getSelectedFilamentProfile()
 
-        # subscribes the unselect_file function with the PRINT_FAILED event
-        eventManager().subscribe(Events.PRINT_FAILED, self.on_print_cancelled)
+        # subscribes event handlers
+        eventManager().subscribe(Events.PRINT_CANCELLED, self.on_print_cancelled)
+        eventManager().subscribe(Events.PRINT_CANCELLED_DELETE_FILE, self.on_print_cancelled_delete_file)
+        eventManager().subscribe(Events.PRINT_DONE, self.on_print_finished)
 
 
     def disconnect(self):
@@ -85,6 +91,12 @@ class BeePrinter(Printer):
         Closes the connection to the printer.
         """
         super(BeePrinter, self).disconnect()
+
+        # Instantiates the comm object just to allow for a state to be returned. This is a workaround
+        # to allow to have the "Connecting..." string when the printer is connecting when the comm object is None...
+        # This forces the printer to be used in auto-connect mode
+        self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
+        self._comm.confirmConnection()
 
         # Starts the connection monitor thread
         import threading
@@ -121,20 +133,53 @@ class BeePrinter(Printer):
         settings().set(['lastPrintJobFile'], path)
         settings().save()
 
+
     # # # # # # # # # # # # # # # # # # # # # # #
     ############# PRINTER ACTIONS ###############
     # # # # # # # # # # # # # # # # # # # # # # #
+    def start_print(self, pos=None):
+        """
+        Starts a new print job
+        :param pos:
+        :return:
+        """
+        super(BeePrinter, self).start_print(pos)
+
+        # sends usage statistics
+        self._sendUsageStatistics('start')
+
+
     def cancel_print(self):
         """
          Cancels the current print job.
         """
-        super(BeePrinter, self).cancel_print()
+        if self._comm is None:
+            return
 
-        # waits a bit before un-selecting the file
-        import time
-        time.sleep(2)
-        self.unselect_file()
+        self._comm.cancelPrint()
 
+        # reset progress, height, print time
+        self._setCurrentZ(None)
+        self._setProgressData()
+
+        # mark print as failure
+        if self._selectedFile is not None:
+            self._fileManager.log_print(FileDestinations.SDCARD if self._selectedFile["sd"] else FileDestinations.LOCAL,
+                                        self._selectedFile["filename"], time.time(), self._comm.getPrintTime(), False,
+                                        self._printerProfileManager.get_current_or_default()["id"])
+            payload = {
+                "file": self._selectedFile["filename"],
+                "origin": FileDestinations.LOCAL
+            }
+            if self._selectedFile["sd"]:
+                payload["origin"] = FileDestinations.SDCARD
+
+            if BeePrinter.TMP_FILE_MARKER in self._selectedFile["filename"]:
+                eventManager().fire(Events.PRINT_CANCELLED_DELETE_FILE, payload)
+            else:
+                eventManager().fire(Events.PRINT_CANCELLED, payload)
+
+            eventManager().fire(Events.PRINT_FAILED, payload)
 
     def jog(self, axis, amount):
         """
@@ -613,7 +658,7 @@ class BeePrinter(Printer):
         Gets the current printer firmware version
         :return: string
         """
-        if self._comm is not None:
+        if self._comm is not None and self._comm.getCommandsInterface() is not None:
             firmware_v = self._comm.getCommandsInterface().getFirmwareVersion()
 
             if firmware_v is not None:
@@ -623,6 +668,25 @@ class BeePrinter(Printer):
         else:
             return 'Not available'
 
+    def printFromMemory(self):
+        """
+        Prints the file currently in the printer memory
+        :param self:
+        :return:
+        """
+        try:
+            if self._comm is None:
+                self._logger.info("Cannot print from memory: printer not connected or currently busy")
+                return
+
+            # bypasses normal octoprint workflow to print from memory "special" file
+            self._comm.selectFile('Memory File', False)
+
+            self._setProgressData(completion=0)
+            self._setCurrentZ(None)
+            return self._comm.startPrint('from_memory')
+        except Exception as ex:
+            self._logger.error(ex)
 
     # # # # # # # # # # # # # # # # # # # # # # #
     ##########  CALLBACK FUNCTIONS  #############
@@ -662,6 +726,8 @@ class BeePrinter(Printer):
                 # Runs the print finish communications callback
                 self._comm.triggerPrintFinished()
 
+                self._setProgressData()
+
                 self._comm.getCommandsInterface().stopStatusMonitor()
                 self._runningCalibrationTest = False
 
@@ -685,11 +751,24 @@ class BeePrinter(Printer):
             self._printAfterSelect = False
             self.start_print(pos=self._posAfterSelect)
 
+
     def on_print_cancelled(self, event, payload):
         """
         Print cancelled callback for the EventManager.
         """
         self.unselect_file()
+
+        # sends usage statistics to remote server
+        self._sendUsageStatistics('cancel')
+
+
+    def on_print_cancelled_delete_file(self, event, payload):
+        """
+        Print cancelled callback for the EventManager.
+        """
+        self._fileManager.remove_file(payload['origin'], payload['file'])
+        self.on_print_cancelled(event, payload)
+
 
     def on_comm_state_change(self, state):
         """
@@ -709,6 +788,20 @@ class BeePrinter(Printer):
                 self._comm = None
 
         self._setState(state)
+
+    def on_print_finished(self, event, payload):
+        """
+        Event listener to when a print job finishes
+        :return:
+        """
+        if BeePrinter.TMP_FILE_MARKER in payload["file"]:
+            self._fileManager.remove_file(payload['origin'], payload['file'])
+
+        # unselects the current file
+        self.unselect_file()
+
+        # sends usage statistics
+        self._sendUsageStatistics('stop')
 
     # # # # # # # # # # # # # # # # # # # # # # #
     ########### AUXILIARY FUNCTIONS #############
@@ -790,6 +883,8 @@ class BeePrinter(Printer):
         self._progress = completion
         self._printTime = printTime
         self._printTimeLeft = totalPrintTime - printTimeLeft if (totalPrintTime is not None and printTimeLeft is not None) else None
+        if printTime is None:
+            self._elapsedTime = 0
 
         self._stateMonitor.set_progress({
             "completion": self._progress * 100 if self._progress is not None else None,
@@ -816,6 +911,44 @@ class BeePrinter(Printer):
             "heating": self.is_heating(),
             "shutdown": self.is_shutdown()
         }
+
+    def _sendUsageStatistics(self, operation):
+        """
+        Calls and external executable to send usage statistics to a remote cloud server
+        :param operation: Supports 'start' (Start Print), 'cancel' (Cancel Print), 'stop' (Print finished) operations
+        :return: true in case the operation was successfull or false if not
+        """
+        _logger = logging.getLogger()
+        biExePath = settings().getBaseFolder('bi') + '/bi_azure'
+
+        if operation != 'start' and operation != 'cancel' and operation != 'stop':
+            return False
+
+        if os.path.exists(biExePath) and os.path.isfile(biExePath):
+
+            printerSN = self._comm.getConnectedPrinterSN()
+
+            if printerSN is None:
+                _logger.error("Could not get Printer Serial Number for statistics communication.")
+                return False
+            else:
+                cmd = '%s %s %s' % (biExePath,str(printerSN), str(operation))
+                _logger.info(u"Running %s" % cmd)
+
+                import subprocess
+                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+
+                (output, err) = p.communicate()
+
+                p_status = p.wait()
+
+                if p_status == 0 and 'IOTHUB_CLIENT_CONFIRMATION_OK' in output:
+                    _logger.info(u"Statistics sent to remote server. (Operation: %s)" % operation)
+                    return True
+                else:
+                    _logger.info(u"Failed sending statistics to remote server. (Operation: %s)" % operation)
+
+        return False
 
 class CalibrationGCoder:
 

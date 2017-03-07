@@ -581,7 +581,7 @@ function showOfflineOverlay(title, message, reconnectCallback) {
 
 function showRestartingOverlay(title, message, reconnectCallback) {
     if (title == undefined) {
-        title = gettext("Restarting");
+        title = gettext("Restarting") + "...";
     }
 
     $("#offline_overlay_title").text(title);
