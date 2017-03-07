@@ -107,9 +107,13 @@ class BeeCom(MachineCom):
 
             _logger.info("Checking for firmware updates...")
 
-            firmware_path = settings().getBaseFolder('firmware')
-            firmware_properties = parsePropertiesFile(join(firmware_path, 'firmware.properties'))
-            firmware_file_name = firmware_properties['firmware.'+printer_id]
+            try:
+                firmware_path = settings().getBaseFolder('firmware')
+                firmware_properties = parsePropertiesFile(join(firmware_path, 'firmware.properties'))
+                firmware_file_name = firmware_properties['firmware.' + printer_id]
+            except KeyError as e:
+                _logger.error("Problem with printer_id %s. Firmware properties not found for this printer model." % printer_id)
+                return
 
             if firmware_file_name is not None and isfile(join(firmware_path, firmware_file_name)):
 
