@@ -294,7 +294,11 @@ table {
     color: #b9b9b9;
     font: 200 14px "din-light", sans-serif;
 }
-
+#login_dialog label.checkbox,
+#login_dropdown_loggedout label.checkbox {
+    margin-left: 20px;
+    margin-top: 5px;
+}
 /*--------------------------------------------------------------------------------*/
 /*---------------------ICONS -----------------------------------------------------*/
 a.brand{
