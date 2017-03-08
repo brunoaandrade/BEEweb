@@ -226,6 +226,8 @@ class BeeCom(MachineCom):
                 self._changeState(self.STATE_PRINTING)
             elif self._beeCommands.isShutdown():
                 self._changeState(self.STATE_SHUTDOWN)
+            elif self._beeCommands.isPaused():
+                self._changeState(self.STATE_PAUSED)
             else:
                 self._changeState(self.STATE_OPERATIONAL)
         else:

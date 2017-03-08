@@ -155,7 +155,7 @@ $(function() {
         self.printTimeString = ko.pureComputed(function() {
             if (!self.printTime())
                 return "00:00";
-            return formatDuration(self.printTime());
+            return formatDurationHoursMinutes(self.printTime());
         });
         self.printTimeLeftString = ko.pureComputed(function() {
             if (self.printTimeLeft() == undefined) {
@@ -422,8 +422,14 @@ $(function() {
         };
 
         self.pause = function(action) {
+            $('#job_pause').prop('disabled', true);
+            $('#job_cancel').prop('disabled', true);
+
             action = action || "toggle";
-            self._jobCommand("pause", {"action": action});
+            self._jobCommand("pause", {"action": action}, function() {
+                $('#job_pause').prop('disabled', false);
+                $('#job_cancel').prop('disabled', false);
+            });
 
             self._restoreShutdown();
         };

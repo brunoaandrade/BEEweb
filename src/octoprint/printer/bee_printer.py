@@ -75,7 +75,7 @@ class BeePrinter(Printer):
         # if the printer is printing or in shutdown mode selects the last selected file for print
         # and starts the progress monitor
         lastFile = settings().get(['lastPrintJobFile'])
-        if lastFile is not None and (self.is_shutdown() or self.is_printing()):
+        if lastFile is not None and (self.is_shutdown() or self.is_printing() or self.is_paused()):
             # Calls the select_file with the real previous PrintFileInformation object to recover the print status
             self.select_file(self._currentPrintJobFile, False)
             self._comm.startPrintStatusProgressMonitor()
