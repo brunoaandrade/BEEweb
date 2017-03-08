@@ -562,6 +562,13 @@ class BeeCom(MachineCom):
             return None
         return self._currentFile.getProgress()
 
+    def getCurrentFile(self):
+    	"""
+    	Gets the current PrintFileInformation object
+    	:return:
+    	"""
+    	return self._currentFile
+
     def _getResponse(self):
         """
         Auxiliar method to read the command response queue

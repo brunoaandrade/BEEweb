@@ -14,6 +14,7 @@ from octoprint.server.util.connection_util import detect_bvc_printer_connection
 from octoprint.events import eventManager, Events
 from octoprint.slicing import SlicingManager
 from octoprint.filemanager import FileDestinations
+from octoprint.util.comm import PrintingFileInformation
 
 __author__ = "BEEVC - Electronic Systems "
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
@@ -41,13 +42,15 @@ class BeePrinter(Printer):
         self._slicingManager.reload_slicers()
         self._currentFilamentProfile = None
 
+        # We must keep a copy of the _currentFile variable (from the comm layer) to allow the situation of
+        # disconnecting the printer and maintaining any selected file information after a reconnect is done
+        self._currentPrintJobFile = None
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
          Connects to a BVC printer. Ignores port, baudrate parameters.
          They are kept just for interface compatibility
         """
-
         if self._comm is not None:
             self._comm.close()
 
@@ -73,8 +76,8 @@ class BeePrinter(Printer):
         # and starts the progress monitor
         lastFile = settings().get(['lastPrintJobFile'])
         if lastFile is not None and (self.is_shutdown() or self.is_printing()):
-            self.select_file(lastFile, False)
-
+            # Calls the select_file with the real previous PrintFileInformation object to recover the print status
+            self.select_file(self._currentPrintJobFile, False)
             self._comm.startPrintStatusProgressMonitor()
 
         # gets current Filament profile data
@@ -111,6 +114,11 @@ class BeePrinter(Printer):
             self._logger.info("Cannot load file: printer not connected or currently busy")
             return
 
+        # special case where we want to recover the file information after a disconnect/connect during a print job
+        if isinstance(path, PrintingFileInformation):
+            self._comm._currentFile = path
+            return
+
         recovery_data = self._fileManager.get_recovery_data()
         if recovery_data:
             # clean up recovery data if we just selected a different file than is logged in that
@@ -145,6 +153,9 @@ class BeePrinter(Printer):
         """
         super(BeePrinter, self).start_print(pos)
 
+        # saves the current PrintFileInformation object
+        self._currentPrintJobFile = self._comm.getCurrentFile()
+
         # sends usage statistics
         self._sendUsageStatistics('start')
 
@@ -161,6 +172,7 @@ class BeePrinter(Printer):
         # reset progress, height, print time
         self._setCurrentZ(None)
         self._setProgressData()
+        self._currentPrintJobFile = None
 
         # mark print as failure
         if self._selectedFile is not None:
