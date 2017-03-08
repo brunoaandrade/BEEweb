@@ -97,7 +97,7 @@ BEEwb.events.keyMap = {};
 BEEwb.events.onKeyDown = function( event ) {
     BEEwb.events.keyMap[event.keyCode] = (event.type == 'keydown');
 
-    if (BEEwb.events.keyMap[17] == true) { // Ctrl pressed
+    if (BEEwb.events.keyMap[18] == true) { // Alt pressed
         switch ( event.keyCode ) {
 
             case 77: // M - Move

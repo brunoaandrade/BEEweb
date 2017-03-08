@@ -494,7 +494,6 @@ a.brand{
     border-radius: 0;
     vertical-align: middle;
     height: 50px;
-
     text-align: left;
     background: #000;
     line-height: 1.2;
@@ -507,7 +506,7 @@ a.brand{
     font-size: 14px;
     padding: 10px 16px;
     background: transparent;
-    width: 125px;
+    width: 110px;
     text-align: left;
 }
 #workbench-controls-container button + .tooltip .tooltip-arrow{

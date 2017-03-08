@@ -4,7 +4,7 @@
 <div>
     <div class="row-fluid">
         <div id="workbench-controls-container" class="span2" >
-            <button id="btn-move" class="btn btn-default btn-block model-selection" title="{{ _('Move Object') }} (Ctrl + M)"
+            <button id="btn-move" class="btn btn-default btn-block model-selection" title=" {{ _('Move Object') }} (Alt + M)"
             data-toggle="tooltip" data-placement="right"
             onclick="BEEwb.transformOps.activateMove();" disabled="true">
                 <span class="icon move"></span>
@@ -29,7 +29,7 @@
             </div>
             <button id="btn-scale" class="btn btn-default btn-block model-selection"
                 data-toggle="tooltip" data-placement="right"
-                title="{{ _('Scale Object') }} (Ctrl + S)" onclick="BEEwb.transformOps.activateScale();" disabled="true">
+                title="{{ _('Scale Object') }} (Alt + S)" onclick="BEEwb.transformOps.activateScale();" disabled="true">
                 <span class="icon scale"></span>
             </button>
             <div id="scale-values-form" style="display: none;">
@@ -78,7 +78,7 @@
             </div>
             <button id="btn-rotate" class="btn btn-default btn-block model-selection"
                 data-toggle="tooltip" data-placement="right"
-                title="{{ _('Rotate Object') }} (Ctrl + R)" onclick="BEEwb.transformOps.activateRotate();" disabled="true">
+                title="{{ _('Rotate Object') }} (Alt + R)" onclick="BEEwb.transformOps.activateRotate();" disabled="true">
                 <span class="icon rotate"></span>
             </button>
             <hr>
@@ -135,7 +135,7 @@
                     data-bind="" onclick="BEEwb.transformOps.centerModel();">
                 <span class="icon centerplat"></span>
             </button>
-            <button class="btn btn-block model-selection" title="{{ _('Clone object') }} (Ctrl + C)" id="clone_selection"
+            <button class="btn btn-block model-selection" title="{{ _('Clone object') }} (Alt + C)" id="clone_selection"
                     data-toggle="tooltip" data-placement="right"
                     data-bind="" onclick="BEEwb.transformOps.cloneSelected();">
                 <span class="icon clonemod"></span>
