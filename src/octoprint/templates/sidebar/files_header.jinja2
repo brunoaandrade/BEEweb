@@ -1,6 +1,6 @@
 <div class="settings-trigger accordion-heading-button btn-group">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#" title="{{ _('File list settings') }}">
-        <span class="icon-wrench"></span>
+        <span class="m-icon filterwicon"></span>
     </a>
     <ul class="dropdown-menu">
         <li><a href="#" data-bind="click: function() { $root.listHelper.changeSorting('name'); }"><i class="icon-ok" data-bind="style: {visibility: listHelper.currentSorting() == 'name' ? 'visible' : 'hidden'}"></i> {{ _('Sort by name') }} ({{ _('ascending') }})</a></li>
@@ -21,7 +21,7 @@
 
 <div class="refresh-trigger accordion-heading-button btn-group">
     <a href="#" data-bind="click: function() { $root.requestData(); }" title="{{ _('Refresh file list') }}">
-        <span class="icon-refresh"></span>
+        <span class="m-icon refreshwicon"></span>
     </a>
 </div>
 

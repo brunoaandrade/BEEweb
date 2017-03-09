@@ -357,7 +357,7 @@ a.brand{
 .abouticon  { background: url('../img/icons/aboutgrey.svg'); }
 .helpicon  { background: url('../img/icons/helpgrey.svg'); }
 .logouticon  { background: url('../img/icons/logoutgrey.svg'); }
-
+.shutdownicon { background: url('../img/icons/shutdown.svg'); }
 /* Resolution*/
 .res1icon  { background: url('../img/icons/lowres.svg'); }
 .res2icon  { background: url('../img/icons/medres.svg'); }
@@ -407,6 +407,8 @@ a.brand{
 .deletewicon  { background: url('../img/icons/delete_white.svg'); }
 .importwicon  { background: url('../img/icons/importw.svg'); }
 .shutdownwicon  { background: url('../img/icons/shutdown_white.svg'); }
+.filterwicon { background: url('../img/icons/filter_white.svg'); }
+.refreshwicon { background: url('../img/icons/refresh_white.svg'); }
 /* green */
 .checkgreenicon  { background: url('../img/icons/ok_green.svg'); }
 
@@ -1072,7 +1074,16 @@ input + span.add-on{
     height: unset;
 }
 
-
+#timelapse-config-container {
+    margin-top: 70px;
+    margin-left: 30px;
+}
+#finished-timelapses-container {
+    margin-left: 30px;
+}
+#timelapse-config-container label.checkbox {
+    margin-left: 20px;
+}
 /*-------------------------------------------------------*/
 /*-------------------- BEEsoft NEW UI -------------------*/
 
@@ -1314,14 +1325,24 @@ td.settings_users_actions .m-icon {
 .controls .checkbox label {
     padding-top: 5px;
 }
-
+.controls label.checkbox {
+    margin-left: 20px;
+}
+.controls input.checkbox {
+    margin-left: 10px;
+    margin-top: -3px;
+}
 .input-append span.add-on {
     height: 25px !important;
 }
-
 .input-append>.btn-group button,
 .input-append button.btn {
     height: 45px !important;
+}
+#timelapse-config-container input {
+    background-color: #e1e2e1 !important;
+    height: 37px !important;
+    border: 0px none !important;
 }
 /*------------------------------PILLS-----------------------------------------*/
 
