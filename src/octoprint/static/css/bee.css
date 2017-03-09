@@ -43,6 +43,31 @@ table {
     color: #fff !important;
 }
 
+.radio input[type="radio"], .checkbox input[type="checkbox"]{
+    margin-top: -10px;
+}
+
+.btn-block +.btn-block {
+    margin-top: 0 !important;
+}
+.octoprint-container{
+    margin-top: 0 !important;
+}
+
+.main-container .nav-tabs, .main-container .tab-content{
+    border: none !important;
+}
+.main-container .tab-content{
+    padding: 0 !important;
+}
+#stl_container canvas{
+    height: calc(100vh - 76px) !important;
+    width: calc(100vw - 285px) !important;
+}
+
+#tab-container{
+    width: calc(100% - 285px) !important;;
+}
 /*-------------------- NAVBAR -----------------------*/
 
 .btn.btn-navbar{
@@ -358,6 +383,7 @@ a.brand{
 .helpicon  { background: url('../img/icons/helpgrey.svg'); }
 .logouticon  { background: url('../img/icons/logoutgrey.svg'); }
 .shutdownicon { background: url('../img/icons/shutdown.svg'); }
+.addicon { background: url('../img/icons/add.svg'); }
 /* Resolution*/
 .res1icon  { background: url('../img/icons/lowres.svg'); }
 .res2icon  { background: url('../img/icons/medres.svg'); }
@@ -1084,34 +1110,7 @@ input + span.add-on{
 #timelapse-config-container label.checkbox {
     margin-left: 20px;
 }
-/*-------------------------------------------------------*/
-/*-------------------- BEEsoft NEW UI -------------------*/
 
-.radio input[type="radio"], .checkbox input[type="checkbox"]{
-    margin-top: -5px;
-}
-
-.btn-block +.btn-block {
-    margin-top: 0 !important;
-}
-.octoprint-container{
-    margin-top: 0 !important;
-}
-
-.main-container .nav-tabs, .main-container .tab-content{
-    border: none !important;
-}
-.main-container .tab-content{
-    padding: 0 !important;
-}
-#stl_container canvas{
-    height: calc(100vh - 76px) !important;
-    width: calc(100vw - 285px) !important;
-}
-
-#tab-container{
-    width: calc(100% - 285px) !important;;
-}
 
 /*---------- LOGIN -----------*/
 
