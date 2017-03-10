@@ -141,6 +141,7 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 	def get_settings_defaults(self):
 		configurationsReleaseBranch = "release/configurations"
 		update_script = os.path.join(self._basefolder, "scripts", "update-beeweb.py")
+		update_script_beepanel = os.path.join(self._basefolder, "scripts", "update-beepanel.py")
 		update_script_configurations = os.path.join(self._basefolder, "scripts", "update-beewebpi.py")
 
 		# in case of windows desktop installation
@@ -177,7 +178,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 			update_script_callable_beewebpi = "{{python}} \"{update_script}\" \"{{folder}}\" {{target}} {release_branch}".format(
 				update_script=update_script_configurations,
 				release_branch=configurationsReleaseBranch)
-			update_script_callable_beepanel = 'python --version' # dummy installer script, because it's not needed for beepanel
+			update_script_callable_beepanel = "{{python}} \"{update_script}\" --branch={{branch}} --force={{force}} \"{{folder}}\" {{target}}".format(
+				update_script=update_script_beepanel)
 
 			default_settings = {
 				"checks": {
