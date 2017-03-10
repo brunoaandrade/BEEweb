@@ -197,8 +197,7 @@ def index():
 	)
 	if enable_gcodeviewer:
 		templates["tab"]["entries"]["gcodeviewer"] = (gettext("GCode Viewer"), dict(template="tabs/gcodeviewer.jinja2", _div="gcode"))
-	if enable_timelapse:
-		templates["tab"]["entries"]["timelapse"] = (gettext("Timelapse"), dict(template="tabs/timelapse.jinja2", _div="timelapse"))
+
 
 	# Tabs for developer mode
 	if enable_devMode:
@@ -206,17 +205,17 @@ def index():
 		templates["tab"]["entries"]["control"] = (gettext("Control"), dict(template="tabs/control.jinja2", _div="control"))
 		templates["tab"]["entries"]["terminal"] = (gettext("Terminal"), dict(template="tabs/terminal.jinja2", _div="term"))
 
-	# settings dialog
+		if enable_timelapse:
+			templates["tab"]["entries"]["timelapse"] = (gettext("Timelapse"), dict(template="tabs/timelapse.jinja2", _div="timelapse"))
 
+
+	# settings dialog
 	templates["settings"]["entries"] = dict(
 		section_printer=(gettext("Printer"), None),
 		#serial=(gettext("Serial Connection"), dict(template="dialogs/settings/serialconnection.jinja2", _div="settings_serialConnection", custom_bindings=False)),
 		printerprofiles=(gettext("Printer Profiles"), dict(template="dialogs/settings/printerprofiles.jinja2", _div="settings_printerProfiles", custom_bindings=False)),
 
 		section_features=(gettext("General Settings"), None),
-
-		webcam=(gettext("Webcam"),
-				dict(template="dialogs/settings/webcam.jinja2", _div="settings_webcam", custom_bindings=False)),
 
 	)
 	if enable_accesscontrol:
@@ -235,10 +234,10 @@ def index():
 		templates["settings"]["entries"]["logs"] = (gettext("Logs"), dict(template="dialogs/settings/logs.jinja2", _div="settings_logs"))
 		templates["settings"]["entries"]["server"] = (gettext("Server"),
 			  dict(template="dialogs/settings/server.jinja2", _div="settings_server", custom_bindings=False))
-
+		templates["settings"]["entries"]["webcam"] = (gettext("Webcam"),
+			  dict(template="dialogs/settings/webcam.jinja2", _div="settings_webcam", custom_bindings=False))
 
 	# user settings dialog
-
 	if enable_accesscontrol:
 		templates["usersettings"]["entries"] = dict(
 			access=(gettext("Access"), dict(template="dialogs/usersettings/access.jinja2", _div="usersettings_access", custom_bindings=False)),
