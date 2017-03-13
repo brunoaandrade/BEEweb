@@ -435,6 +435,7 @@ a.brand{
 .shutdownwicon  { background: url('../img/icons/shutdown_white.svg'); }
 .filterwicon { background: url('../img/icons/filter_white.svg'); }
 .refreshwicon { background: url('../img/icons/refresh_white.svg'); }
+.cubewicon { background: url('../img/icons/cube_white.svg'); }
 /* green */
 .checkgreenicon  { background: url('../img/icons/ok_green.svg'); }
 
@@ -578,7 +579,9 @@ a.brand{
 #files .accordion-inner {
     min-height: 100%;
 }
-
+#sidebar-mobile-toggle {
+    display: none;
+}
 /*----------------- STATUS ------------------------*/
 #state {
     position: absolute;
@@ -1742,10 +1745,10 @@ label:hover:before {
         width: 100% !important;
     }
     #workbench-controls-container{
-        bottom: 0;
+        top: 115px;
         left: 0;
         overflow-y: auto;
-        height: 320px;
+        height: 100%;
         width: 70px;
     }
     .btn-prepareprint {
@@ -1765,21 +1768,42 @@ label:hover:before {
     #sidebar-container{
         position: fixed;
         top: 69px !important;
-        left: 100% !important;
+        left: 98% !important;
     }
     #axis-values, #rotate-values-form, #scale-values-form{
         bottom: 25px !important;
         left: 85px;
+    }
+
+    /* sidebar mobile tweaks */
+    #sidebar-mobile-toggle {
+        display: block;
+        position: fixed;
+        padding: 7px 7px;
+        background-color: #32312b;
+        top: 69px;
+        right: 0px;
+    }
+    #sidebar-container.sidebar-visible {
+        left: auto !important;
+        z-index: 100 !important;
+    }
+    #sidebar-mobile-toggle.sidebar-visible {
+        display: block;
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
+        border-left: solid 1px #000;
     }
 }
 
 
 @media (max-height: 768px) {
     #workbench-controls-container {
-        bottom: 0;
+        top: 115px;
         left: 0;
         overflow-y: auto;
-        height: 320px;
+        height: 100%;
         width: 70px;
     }
 }

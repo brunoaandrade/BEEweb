@@ -729,6 +729,16 @@ $(function() {
                 if (dropZoneSd) dropZoneSdBackground.removeClass("hover");
                 if (dropZone) dropZoneBackground.removeClass("hover");
             }, 100);
+        };
+
+        self.toggleSidebarMobile = function() {
+            if ($('#sidebar-container').hasClass('sidebar-visible')) {
+                $('#sidebar-container').removeClass('sidebar-visible');
+                $('#sidebar-mobile-toggle').removeClass('sidebar-visible');
+            } else {
+                $('#sidebar-container').addClass('sidebar-visible');
+                $('#sidebar-mobile-toggle').addClass('sidebar-visible');
+            }
         }
     }
 
