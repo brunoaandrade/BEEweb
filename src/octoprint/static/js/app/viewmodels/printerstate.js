@@ -33,11 +33,12 @@ $(function() {
         });
         self.enableCancel = ko.pureComputed(function() {
             return ((self.isPrinting() || self.isPaused() || self.isHeating()))
-            && self.loginState.isUser() && self.filename() != undefined;
+            && self.loginState.isUser();
         });
         self.enablePreparePrint = ko.pureComputed(function() {
             return self.loginState.isUser() && !self.connection.isConnecting()
-            && !self.connection.isErrorOrClosed() && !self.filename();
+            && !self.connection.isErrorOrClosed() && !self.filename()
+            && !self.isPrinting() && !self.isPaused() && !self.isShutdown() && !self.isHeating();
         });
         self.showInsufficientFilament = ko.pureComputed(function() {
             return self.loginState.isUser && self.insufficientFilament()

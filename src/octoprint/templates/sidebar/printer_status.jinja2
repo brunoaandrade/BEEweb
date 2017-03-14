@@ -30,6 +30,7 @@
         {{ _(' Change filament or proceed at your own risk.') }}
     </span>
 </div>
+
 <div id="selecteFileInfo" class="print-control" data-bind="visible: isSelectedFile">
     <div class="span12">
         <span class="loaded-file">{{ _('Loaded File') }}:</span>
@@ -37,23 +38,8 @@
         <strong data-bind="visible: sd">(SD)</strong><br />
     </div>
 </div>
-<br /><br />
-<div id="noFilamentAvailableButtons" data-bind="visible: showInsufficientFilament">
-    <button id="job_print" class="btn btn-primary btn-print"
-    data-bind="click: print, css: {'btn-info': isPaused()}, attr: {title: titlePrintButton},
-     visible: enablePrint() && (!isPaused() && !isShutdown())" >
-        <span data-bind="css: {'m-icon printwicon': !isPaused(), 'icon-undo': isPaused()}"></span>
-        <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
-    </button>
-
-    <button class="btn btn-cancel" id="job_cancel_insufficient_filament" data-bind="click: cancel, visible: enableCancel"
-        title="{{ _('Cancel') }}" data-toggle="tooltip">
-        {{ _('Cancel') }}
-    </button>
-</div>
 
 <div id="printRunningButtons" data-bind="visible: showPrintControlButtons()">
-
     <button class="btn btn-pause" id="job_pause" data-bind="click: function() { isPaused() || isShutdown() ? onlyResume() : onlyPause(); },
         visible: enablePause, enable: enablePause, css: {active: (isPaused() && isShutdown())}, attr: {title: titlePauseButton}">
         <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>
@@ -70,6 +56,19 @@
     <div class="text-center"><span class="progress-time" data-bind="text: printTimeString"></span></div>
 </div>
 
+<div id="noFilamentAvailableButtons" data-bind="visible: showInsufficientFilament">
+    <button id="job_print" class="btn btn-primary btn-print"
+    data-bind="click: print, css: {'btn-info': isPaused()}, attr: {title: titlePrintButton},
+     visible: enablePrint() && (!isPaused() && !isShutdown())" >
+        <span data-bind="css: {'m-icon printwicon': !isPaused(), 'icon-undo': isPaused()}"></span>
+        <span data-bind="text: (isPaused() ? '{{ _('Restart') }}' : '{{ _('Print') }}')">{{ _('Print') }}</span>
+    </button>
+
+    <button class="btn btn-cancel" id="job_cancel_insufficient_filament" data-bind="click: cancel, visible: enableCancel"
+        title="{{ _('Cancel') }}" data-toggle="tooltip">
+        {{ _('Cancel') }}
+    </button>
+</div>
 
 <div id="preparePrint" data-bind="visible: enablePreparePrint()">
     <span>{{ _('Press PRINT... to print the object(s) on the platform') }}</span>
@@ -79,6 +78,7 @@
         {{ _('Print...') }}
     </button>
 </div>
+
 <div id="printFromMemoryDiv" class="hidden">
     <span class="white-label-message">{{ _('Your') }}</span><strong>
     <span class="white-label-message" data-bind="text: printerName " /></strong>
