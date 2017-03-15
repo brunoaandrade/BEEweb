@@ -328,7 +328,6 @@ table {
 /*---------------------ICONS -----------------------------------------------------*/
 a.brand{
     background-size: 100% 100% !important;
-    width: 82px;
     width: 42px;
     margin: 8px 25px !important;
     display: inline-block;
@@ -571,7 +570,7 @@ a.brand{
 }
 
 #files_wrapper {
-    height: calc(100vh - 370px);
+    height: calc(100vh - 270px);
 }
 #files {
     height: 100%;
@@ -586,15 +585,21 @@ a.brand{
 #state {
     position: absolute;
     bottom: 0px;
-    height: 245px;
+    height: 145px;
     width: 100%;
+}
+#state.expanded {
+    height: 245px !important;
 }
 #state_wrapper {
     position: absolute;
     bottom: 0px;
-    height: 300px;
+    height: 150px;
     width: 100%;
     z-index: 10;
+}
+#state_wrapper.expanded {
+    height: 300px !important;
 }
 #state > .accordion-inner{
     background: #32312b !important;
@@ -603,8 +608,11 @@ a.brand{
 #state_wrapper .accordion-heading {
     background: #32312b !important;
     position: absolute;
-    bottom: 245px;
+    bottom: 145px;
     width: 100%;
+}
+#state_wrapper.expanded .accordion-heading {
+    bottom: 245px;
 }
 #state_wrapper .accordion-heading > .accordion-toggle:first-of-type{
     display: none;
@@ -621,11 +629,11 @@ a.brand{
 }
 #preparePrint {
     position: absolute;
-    bottom: 20px;
+    bottom: 10px;
 }
 #printFromMemoryDiv {
     position: absolute;
-    bottom: 20px;
+    bottom: 10px;
 }
 
 #state_wrapper .accordion-heading.selected {
@@ -1745,10 +1753,11 @@ label:hover:before {
         width: 100% !important;
     }
     #workbench-controls-container{
-        top: 115px;
+        top: 120px;
         left: 0;
         overflow-y: auto;
-        height: 100%;
+        overflow-x: hidden;
+        height: 80%;
         width: 70px;
     }
     .btn-prepareprint {
@@ -1786,7 +1795,7 @@ label:hover:before {
     }
     #sidebar-container.sidebar-visible {
         left: auto !important;
-        z-index: 100 !important;
+        z-index: 1 !important;
     }
     #sidebar-mobile-toggle.sidebar-visible {
         display: block;
@@ -1800,10 +1809,11 @@ label:hover:before {
 
 @media (max-height: 768px) {
     #workbench-controls-container {
-        top: 115px;
+        top: 120px;
         left: 0;
         overflow-y: auto;
-        height: 100%;
+        overflow-x: hidden;
+        height: 80%;
         width: 70px;
     }
 }

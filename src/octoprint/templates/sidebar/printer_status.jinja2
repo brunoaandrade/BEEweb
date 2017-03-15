@@ -1,5 +1,5 @@
 <div id="pause_panel" data-bind="visible: showPrintControlButtons()">
-    <div id="shutdown_panel" data-bind="visible: !isShutdown() && loginState.isUser && isPaused()">
+    <div id="shutdown_panel" data-bind="visible: showShutdownAndChangeFilament()">
         <button id="job_shutdown" class="btn-ghost" data-bind="click: shutdown" >
             <span class="m-icon shutdowngicon"></span>
             <span >{{ _('Save & Shutdown') }}</span>
@@ -72,6 +72,7 @@
 
 <div id="preparePrint" data-bind="visible: enablePreparePrint()">
     <span>{{ _('Press PRINT... to print the object(s) on the platform') }}</span>
+    <br /><br />
     <button class="btn-prepareprint" id="print_scene"
         data-bind="click: preparePrint, enable: enablePreparePrint()">
         <span class="m-icon printwicon" ></span>

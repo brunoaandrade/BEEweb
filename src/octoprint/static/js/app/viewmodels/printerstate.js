@@ -37,12 +37,12 @@ $(function() {
         });
         self.enablePreparePrint = ko.pureComputed(function() {
             return self.loginState.isUser() && !self.connection.isConnecting()
-            && !self.connection.isErrorOrClosed() && !self.filename()
-            && !self.isPrinting() && !self.isPaused() && !self.isShutdown() && !self.isHeating();
+                && !self.connection.isErrorOrClosed() && !self.filename()
+                && !self.isPrinting() && !self.isPaused() && !self.isShutdown() && !self.isHeating();
         });
         self.showInsufficientFilament = ko.pureComputed(function() {
             return self.loginState.isUser && self.insufficientFilament()
-            && !self.ignoredInsufficientFilament() && self.filename() != undefined;
+            && !self.ignoredInsufficientFilament() && self.filename() != undefined && !self.isPaused();
         });
         self.showPrintControlButtons = ko.pureComputed(function() {
             return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown() || self.isHeating())
@@ -58,6 +58,33 @@ $(function() {
         self.isSelectedFile = ko.pureComputed(function() {
              return self.loginState.isUser() && self.filename() != undefined;
         });
+        self.showShutdownAndChangeFilament = ko.pureComputed(function() {
+            return !self.isShutdown() && self.loginState.isUser() && self.isPaused();
+        });
+
+        /**
+         * Expands the status/print buttons panel to a larger size
+         */
+        self.expandStatusPanel = function() {
+            $('#state').addClass('expanded');
+            $('#state_wrapper').addClass('expanded');
+
+            var h = $('#files').height() - 289;
+            $(".gcode_files").height(h);
+            $('.slimScrollDiv').height(h);
+        };
+
+       /**
+         * Retracts the status/print buttons panel to the default size
+         */
+        self.retractStatusPanel = function() {
+            $('#state').removeClass('expanded');
+            $('#state_wrapper').removeClass('expanded');
+
+            var h = $('#files').height() - 189;
+            $(".gcode_files").height(h);
+            $('.slimScrollDiv').height(h);
+        };
 
         self.togglePrintFromMemory = function() {
             if (self.enablePrintFromMemory()) {
@@ -65,10 +92,14 @@ $(function() {
                     $('#printFromMemoryDiv').removeClass('hidden');
                     $('#preparePrint').addClass('hidden');
                     $('#state_wrapper .accordion-heading').addClass('selected');
+
+                    self.expandStatusPanel();
                 } else {
                     $('#printFromMemoryDiv').addClass('hidden');
                     $('#preparePrint').removeClass('hidden');
                     $('#state_wrapper .accordion-heading').removeClass('selected');
+
+                    self.retractStatusPanel();
                 }
             }
         };
@@ -358,6 +389,8 @@ $(function() {
                 // Signals for insufficient filament only if a print operation is not ongoing
                 if (data.filament['tool0']['insufficient'] == true && !self.isPrinting() && !self.isHeating()) {
                     self.insufficientFilament(true);
+                    // Expands the panel
+                    self.expandStatusPanel();
                 }
             }
         };
@@ -433,14 +466,19 @@ $(function() {
             });
 
             self._restoreShutdown();
+
         };
 
         self.onlyPause = function() {
             self.pause("pause");
+
+            self.expandStatusPanel();
         };
 
         self.onlyResume = function() {
             self.pause("resume");
+
+            self.retractStatusPanel();
         };
 
         self._restoreShutdown = function() {
@@ -461,7 +499,7 @@ $(function() {
 
                 $('#job_cancel').prop('disabled', false);
                 $('#job_pause').prop('disabled', false);
-
+                self.retractStatusPanel();
             });
         };
 
