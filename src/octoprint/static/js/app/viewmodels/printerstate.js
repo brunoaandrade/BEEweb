@@ -443,6 +443,8 @@ $(function() {
             // Forces the insufficient filament message to hide
             if (self.insufficientFilament() && self.ignoredInsufficientFilament() == false) {
                 self.ignoredInsufficientFilament(true);
+                // forces the print to start, so it can retract the status panel
+                self.retractStatusPanel();
             }
         };
 
