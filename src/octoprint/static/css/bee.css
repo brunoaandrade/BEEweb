@@ -1816,6 +1816,10 @@ label:hover:before {
         height: 80%;
         width: 70px;
     }
+
+    #slicing_configuration_dialog {
+        position: absolute !important;
+    }
 }
 
 @media (max-width: 480px){
