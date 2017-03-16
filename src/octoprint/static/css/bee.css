@@ -691,6 +691,13 @@ a.brand{
 #showPrintDetails .progress{
     width:100%;
 }
+#loadedFilename {
+    display: block;
+    width: 240px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 .print-control{
     text-transform: uppercase;
     font: 200 16px "din-light", sans-serif;
