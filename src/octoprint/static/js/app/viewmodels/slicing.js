@@ -34,7 +34,7 @@ $(function() {
         self.filamentInSpool = ko.observable();
         self.workbenchFile = false; // Signals if the slice dialog was called upon a workbench scene
 
-        self.sliceButtonControl = true;
+        self.sliceButtonControl = ko.observable(true);
 
         self.slicersForFile = function(file) {
             if (file === undefined) {
@@ -160,7 +160,7 @@ $(function() {
             return self.destinationFilename() != undefined
                 && self.destinationFilename().trim() != ""
                 && self.slicer() != undefined
-                && self.sliceButtonControl == true;
+                && self.sliceButtonControl();
                 //&& self.profile() != undefined;
         });
 
@@ -294,7 +294,7 @@ $(function() {
                 self.profiles.push({
                     key: profile.key,
                     name: name
-                })
+                });
 
                 // Parses the list and filters for BVC colors
                 // Assumes the '_' nomenclature separation for the profile names
@@ -315,20 +315,24 @@ $(function() {
         };
 
         self.prepareAndSlice = function() {
-            self.sliceButtonControl = false; // Disables the slice button to avoid multiple clicks
+            self.sliceButtonControl(false);
 
             // Checks if the slicing was called on a workbench scene and finally saves it
             if (self.workbenchFile) {
-                var saveCall = BEEwb.main.saveScene(self.file());
-                // waits for the save operation
-                saveCall.done( function () {
-                    self.slice(self.file());
-                });
+
+                // NOTE: setTimeout is a workaround to allow the saveScene function to run
+                // separately and release this "thread" so the button is disabled
+                setTimeout(function() {
+                    var saveCall = BEEwb.main.saveScene(self.file());
+                    // waits for the save operation
+                    saveCall.done( function () {
+                        self.slice(self.file());
+                    });
+                }, 10);
 
             } else {
                 self.slice();
             }
-
         };
 
         self.slice = function(modelToRemoveAfterSlice) {
@@ -425,13 +429,13 @@ $(function() {
                 data: JSON.stringify(data),
                 success: function ( response ) {
 
-                    self.sliceButtonControl = true;
+                    self.sliceButtonControl(true);
                 },
                 error: function ( response ) {
                     html = _.sprintf(gettext("Could not slice the selected file. Please make sure your printer is connected."));
                     new PNotify({title: gettext("Slicing failed"), text: html, type: "error", hide: false});
 
-                    self.sliceButtonControl = true;
+                    self.sliceButtonControl(true);
                 }
             });
 

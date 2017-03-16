@@ -179,10 +179,12 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn pull-left modal-footer-btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</a>
-        <a id="slice_button" href="#" class="btn btn-primary modal-footer-btn" data-bind="click: function() { if ($root.enableSliceButton()) { $root.prepareAndSlice() } }, enable: enableSliceButton, css: {disabled: !$root.enableSliceButton()}">
+        <a href="#" class="btn modal-footer-btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</a>
+        <a id="slice_button" href="#" class="btn btn-primary modal-footer-btn"
+            data-bind="click: function() { if ($root.enableSliceButton()) {  $root.prepareAndSlice(); } }, enable: enableSliceButton, css: {disabled: !$root.enableSliceButton()}">
             <span class="m-icon printwicon"></span>
-            <span data-bind="text: (forPrint() ? '{{ _('Print') }}' : '{{ _('Slice') }}')">{{ _('Slice') }}</span>
+            <span data-bind="text: (forPrint() ? '{{ _('Print') }}' : '{{ _('Slice') }}')">{{ _('Slice') }} </span>
+            <i id="slice_button_loader" class="icon-spinner icon-spin" data-bind="visible: !sliceButtonControl()" ></i>
         </a>
     </div>
 </div>

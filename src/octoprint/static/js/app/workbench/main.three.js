@@ -250,7 +250,8 @@ BEEwb.main = {
     /**
      * Saves the current scene
      *
-     * Returns the Promise object of the Ajax call to the server
+     * @param filename
+     * @returns Promise object of the Ajax call to the server
      */
     saveScene: function ( filename ) {
         var scope = this;
