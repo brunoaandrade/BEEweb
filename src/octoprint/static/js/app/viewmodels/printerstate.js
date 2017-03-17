@@ -352,6 +352,10 @@ $(function() {
             if (prevPrinting == true && self.isPrinting() != prevPrinting && !self.isPaused() && !self.isShutdown()) {
                 self.ignoredInsufficientFilament(false);
             }
+
+            if (self.isShutdown()) {
+                self.expandStatusPanel();
+            }
         };
 
         self._processJobData = function(data) {

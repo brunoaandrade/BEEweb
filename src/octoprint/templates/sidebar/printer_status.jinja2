@@ -11,7 +11,7 @@
             {{ _('You can power off your printer. Alternatively you can resume or cancel your print.') }}
         </span>
     </div>
-    <div id="shutdown_panel_change_filament" data-bind="visible: loginState.isUser && (isPaused() || isShutdown())">
+    <div id="shutdown_panel_change_filament" data-bind="visible: loginState.isUser && isPaused()">
         <a href="#maintenance_dialog" data-bind="click: showMaintenanceFilamentChange" class="btn-ghost" >
             <span class="m-icon maintenancegicon"></span>
             {{ _('Change filament now') }}

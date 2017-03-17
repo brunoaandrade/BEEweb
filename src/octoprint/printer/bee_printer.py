@@ -77,8 +77,14 @@ class BeePrinter(Printer):
         lastFile = settings().get(['lastPrintJobFile'])
         if lastFile is not None and (self.is_shutdown() or self.is_printing() or self.is_paused()):
             # Calls the select_file with the real previous PrintFileInformation object to recover the print status
-            self.select_file(self._currentPrintJobFile, False)
-            self._comm.startPrintStatusProgressMonitor()
+            if self._currentPrintJobFile is not None:
+                self.select_file(self._currentPrintJobFile, False)
+            else:
+                self.select_file(lastFile, False)
+
+            # starts the progress monitor if a print is on going
+            if self.is_printing():
+                self._comm.startPrintStatusProgressMonitor()
 
         # gets current Filament profile data
         self._currentFilamentProfile = self.getSelectedFilamentProfile()
@@ -116,7 +122,9 @@ class BeePrinter(Printer):
 
         # special case where we want to recover the file information after a disconnect/connect during a print job
         if path is None:
+            self._comm._currentFile = PrintingFileInformation('shutdown_recover_file')
             return # In case the server was restarted during connection break-up and path variable is passed empty from the connect method
+
         if isinstance(path, PrintingFileInformation):
             self._comm._currentFile = path
             return
