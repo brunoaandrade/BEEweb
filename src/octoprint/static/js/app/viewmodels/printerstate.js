@@ -61,6 +61,9 @@ $(function() {
         self.showShutdownAndChangeFilament = ko.pureComputed(function() {
             return !self.isShutdown() && self.loginState.isUser() && self.isPaused();
         });
+        self.showFilename = ko.pureComputed(function() {
+            return self.isSelectedFile() && !self.connection.isErrorOrClosed();
+        });
 
         /**
          * Expands the status/print buttons panel to a larger size
