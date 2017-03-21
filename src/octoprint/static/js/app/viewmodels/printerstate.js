@@ -32,7 +32,7 @@ $(function() {
             && self.loginState.isUser() && !self.isHeating();
         });
         self.enableCancel = ko.pureComputed(function() {
-            return ((self.isPrinting() || self.isPaused() || self.isHeating()))
+            return ((self.isPrinting() || self.isPaused() || self.isHeating() || self.isShutdown()))
             && self.loginState.isUser();
         });
         self.enablePreparePrint = ko.pureComputed(function() {
