@@ -182,6 +182,7 @@ class BeePrinter(Printer):
         # reset progress, height, print time
         self._setCurrentZ(None)
         self._setProgressData()
+        self._resetPrintProgress()
         self._currentPrintJobFile = None
 
         # mark print as failure
@@ -749,6 +750,7 @@ class BeePrinter(Printer):
                 self._comm.triggerPrintFinished()
 
                 self._setProgressData()
+                self._resetPrintProgress()
 
                 self._comm.getCommandsInterface().stopStatusMonitor()
                 self._runningCalibrationTest = False
@@ -920,6 +922,17 @@ class BeePrinter(Printer):
             if self._lastProgressReport != progress_int:
                 self._lastProgressReport = progress_int
                 self._reportPrintProgressToPlugins(progress_int)
+
+    def _resetPrintProgress(self):
+        """
+        Resets the progress variables responsible for storing the information that comes
+        from the printer during the print progress updates
+        :return:
+        """
+        self._elapsedTime = 0
+        self._estimatedTime = 0
+        self._executedLines = 0
+        self._numberLines = 0
 
     def _getStateFlags(self):
         return {
