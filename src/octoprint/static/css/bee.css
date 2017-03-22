@@ -627,6 +627,10 @@ a.brand{
     font-size: 14px;
     font-weight: 300;
 }
+#state-header-link:hover {
+    text-decoration: none;
+    cursor: default;
+}
 #preparePrint {
     position: absolute;
     bottom: 10px;
