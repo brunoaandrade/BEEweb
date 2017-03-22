@@ -248,7 +248,7 @@ $(function() {
             }
         });
         self.progressString = ko.pureComputed(function() {
-            if (!self.progress())
+            if (!self.progress() || self.progress() < 0)
                 return 0;
             return self.progress();
         });
@@ -256,7 +256,7 @@ $(function() {
             if (!self.progress()) {
                 return "";
             }
-            return _.sprintf("%d%%", self.progress());
+            return _.sprintf("%d%%", self.progressString());
         });
         self.pauseString = ko.pureComputed(function() {
             if (self.isPaused())
@@ -568,11 +568,18 @@ $(function() {
         };
 
         /**
-         * Shows the slicing dialog window for the workbench
+         * Callback that is called after model startup
          */
-        self.preparePrint = function () {
-            self.slicing.show('local', BEEwb.helpers.generateSceneName(), true, true);
-		};
+		self.onStartupComplete = function () {
+
+            // Workaround to prevent showing the clutter of information in the status panel during startup
+            $('#pause_panel').removeClass('hidden');
+            $('#insufficientFilamentMessage').removeClass('hidden');
+            $('#printRunningButtons').removeClass('hidden');
+            $('#noFilamentAvailableButtons').removeClass('hidden');
+            $('#preparePrint').removeClass('hidden');
+            $('#noPrinterConnected').removeClass('hidden');
+        };
     }
 
     OCTOPRINT_VIEWMODELS.push([
