@@ -568,6 +568,13 @@ $(function() {
         };
 
         /**
+         * Shows the slicing dialog window for the workbench
+         */
+        self.preparePrint = function () {
+            self.slicing.show('local', BEEwb.helpers.generateSceneName(), true, true);
+		};
+
+        /**
          * Callback that is called after model startup
          */
 		self.onStartupComplete = function () {

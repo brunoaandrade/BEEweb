@@ -70,11 +70,11 @@
     </button>
 </div>
 
-<div id="preparePrint" data-bind="visible: enablePreparePrint()" class="hidden">
+<div id="preparePrint" data-bind="visible: enablePreparePrint" class="hidden">
     <span>{{ _('Press PRINT... to print the object(s) on the platform') }}</span>
     <br /><br />
     <button class="btn-prepareprint" id="print_scene"
-        data-bind="click: preparePrint, enable: enablePreparePrint()">
+        data-bind="click: preparePrint, enable: enablePreparePrint">
         <span class="m-icon printwicon" ></span>
         {{ _('Print...') }}
     </button>
