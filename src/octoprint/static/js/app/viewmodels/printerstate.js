@@ -586,6 +586,7 @@ $(function() {
             $('#noFilamentAvailableButtons').removeClass('hidden');
             $('#preparePrint').removeClass('hidden');
             $('#noPrinterConnected').removeClass('hidden');
+            $('#selecteFileInfo').removeClass('hidden');
         };
     }
 

@@ -417,6 +417,15 @@ class BeeCom(MachineCom):
 
             eventManager().fire(Events.PRINT_PAUSED, payload)
 
+
+    def setShutdownState(self):
+        """
+        Setter method to change the current state to SHUTDOWN
+        :return:
+        """
+        self._changeState(self.STATE_SHUTDOWN)
+
+
     def enterShutdownMode(self):
         """
         Enters the printer shutdown mode
@@ -436,8 +445,7 @@ class BeeCom(MachineCom):
 
         # enter shutdown mode
         self._beeCommands.enterShutdown()
-
-        self._changeState(self.STATE_SHUTDOWN)
+        self.setShutdownState()
 
         eventManager().fire(Events.POWER_OFF, payload)
 
@@ -565,11 +573,11 @@ class BeeCom(MachineCom):
         return self._currentFile.getProgress()
 
     def getCurrentFile(self):
-    	"""
-    	Gets the current PrintFileInformation object
-    	:return:
-    	"""
-    	return self._currentFile
+        """
+        Gets the current PrintFileInformation object
+        :return:
+        """
+        return self._currentFile
 
     def _getResponse(self):
         """

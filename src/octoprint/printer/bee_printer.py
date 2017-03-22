@@ -11,6 +11,7 @@ from octoprint.printer.standard import Printer
 from octoprint.printer import PrinterInterface
 from octoprint.settings import settings
 from octoprint.server.util.connection_util import detect_bvc_printer_connection
+from octoprint.server.util.printer_status_detection_util import bvc_printer_status_detection
 from octoprint.events import eventManager, Events
 from octoprint.slicing import SlicingManager
 from octoprint.filemanager import FileDestinations
@@ -94,6 +95,11 @@ class BeePrinter(Printer):
         eventManager().subscribe(Events.PRINT_CANCELLED_DELETE_FILE, self.on_print_cancelled_delete_file)
         eventManager().subscribe(Events.PRINT_DONE, self.on_print_finished)
 
+        # Starts the printer status monitor thread
+        import threading
+        bvc_status_thread = threading.Thread(target=bvc_printer_status_detection, args=(self._comm, ))
+        bvc_status_thread.daemon = True
+        bvc_status_thread.start()
 
     def disconnect(self):
         """
