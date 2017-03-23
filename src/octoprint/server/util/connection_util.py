@@ -22,6 +22,6 @@ def detect_bvc_printer_connection(connection_callback):
 		if len(printers) > 0: # printer found
 			_logger.info("BVC Printer detected. Starting connection...")
 			connection_callback()
-			break
+			return
 
 		sleep (USB_POLL_INTERVAL)

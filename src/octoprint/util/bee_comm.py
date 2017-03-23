@@ -52,7 +52,7 @@ class BeeCom(MachineCom):
         :return: True if the connection was successful
         """
         if self._beeConn is None:
-            self._beeConn = BeePrinterConn(self._connShutdownHook)
+            self._beeConn = BeePrinterConn(self._connDisconnectHook)
             self._changeState(self.STATE_CONNECTING)
             self._beeConn.connectToFirstPrinter()
 
@@ -860,7 +860,7 @@ class BeeCom(MachineCom):
         return self._beeCommands
 
 
-    def _connShutdownHook(self):
+    def _connDisconnectHook(self):
         """
         Function to be called by the BVC driver to shutdown the connection
         :return:
