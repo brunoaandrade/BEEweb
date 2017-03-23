@@ -78,8 +78,8 @@ $(function() {
         };
 
        /**
-         * Retracts the status/print buttons panel to the default size
-         */
+        * Retracts the status/print buttons panel to the default size
+        */
         self.retractStatusPanel = function() {
             $('#state').removeClass('expanded');
             $('#state_wrapper').removeClass('expanded');
@@ -574,6 +574,12 @@ $(function() {
             self.slicing.show('local', BEEwb.helpers.generateSceneName(), true, true);
 		};
 
+		self.resizeSidebar = function () {
+		    var h = $('#files').height() - $('#state').height() - 55; // 55px for the accordion heading
+            $(".gcode_files").height(h);
+            $('.slimScrollDiv').height(h);
+        };
+
         /**
          * Callback that is called after model startup
          */
@@ -587,6 +593,8 @@ $(function() {
             $('#preparePrint').removeClass('hidden');
             $('#noPrinterConnected').removeClass('hidden');
             $('#selecteFileInfo').removeClass('hidden');
+
+            window.addEventListener('resize', self.resizeSidebar, false );
         };
     }
 
