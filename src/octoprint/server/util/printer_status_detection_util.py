@@ -26,6 +26,8 @@ def bvc_printer_status_detection(bee_comm):
 			continue
 
 		# At the moment we only want to detect possible abrupt changes to shutdown
-		if bee_comm.getCommandsInterface().isShutdown():
+		# We must also verify if the print is not resuming, because during the resume from shutdown
+		# the state is still in Shutdown (in the printer)
+		if bee_comm.getCommandsInterface().isShutdown() and not bee_comm.getCommandsInterface().isResuming():
 			_logger.info("BVC Printer Shutdown detected.")
 			bee_comm.setShutdownState()

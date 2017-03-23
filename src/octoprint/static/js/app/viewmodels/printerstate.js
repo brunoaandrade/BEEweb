@@ -20,6 +20,7 @@ $(function() {
 
         self.stateClass = ko.observable(undefined);
         self.isShutdown = ko.observable(undefined);
+        self.isResuming = ko.observable(undefined);
 
         self.insufficientFilament = ko.observable(false);
         self.ignoredInsufficientFilament = ko.observable(false);
@@ -32,7 +33,7 @@ $(function() {
             && self.loginState.isUser() && !self.isHeating();
         });
         self.enableCancel = ko.pureComputed(function() {
-            return ((self.isPrinting() || self.isPaused() || self.isHeating() || self.isShutdown()))
+            return ((self.isPrinting() || self.isPaused() || self.isHeating() || self.isShutdown() || self.isResuming()))
             && self.loginState.isUser();
         });
         self.enablePreparePrint = ko.pureComputed(function() {
@@ -45,7 +46,7 @@ $(function() {
             && !self.ignoredInsufficientFilament() && self.filename() != undefined && !self.isPaused();
         });
         self.showPrintControlButtons = ko.pureComputed(function() {
-            return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown() || self.isHeating())
+            return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown() || self.isHeating() || self.isResuming())
             && self.loginState.isUser();
         });
         self.enablePrintFromMemory = ko.pureComputed(function() {
@@ -305,6 +306,9 @@ $(function() {
             if (self.isHeating()) {
                 self.stateClass("heating");
             }
+            if (self.isResuming()) {
+                self.stateClass("heating");
+            }
             if (self.isPrinting()) {
                 self.stateClass("printing");
             }
@@ -340,6 +344,7 @@ $(function() {
             self.isSdReady(data.flags.sdReady);
             self.isHeating(data.flags.heating);
             self.isShutdown(data.flags.shutdown);
+            self.isResuming(data.flags.resuming);
 
             if (self.isPaused() != prevPaused) {
                 if (self.isPaused()) {

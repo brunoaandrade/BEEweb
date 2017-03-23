@@ -672,6 +672,10 @@ class BeePrinter(Printer):
         return self._comm is not None and self._comm.isShutdown()
 
 
+    def is_resuming(self):
+        return self._comm is not None and self._comm.isResuming()
+
+
     def get_state_string(self):
         """
          Returns a human readable string corresponding to the current communication state.
@@ -950,7 +954,8 @@ class BeePrinter(Printer):
             "ready": self.is_ready(),
             "sdReady": self.is_sd_ready(),
             "heating": self.is_heating(),
-            "shutdown": self.is_shutdown()
+            "shutdown": self.is_shutdown(),
+			"resuming": self.is_resuming(),
         }
 
     def _sendUsageStatistics(self, operation):

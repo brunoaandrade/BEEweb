@@ -39,7 +39,7 @@
     </div>
 </div>
 
-<div id="printRunningButtons" data-bind="visible: showPrintControlButtons()" class="hidden">
+<div id="printRunningButtons" data-bind="visible: showPrintControlButtons" class="hidden">
     <button class="btn btn-pause" id="job_pause" data-bind="click: function() { isPaused() || isShutdown() ? onlyResume() : onlyPause(); },
         visible: enablePause, enable: enablePause, css: {active: (isPaused() && isShutdown())}, attr: {title: titlePauseButton}">
         <i data-bind="css: {'icon-pause': (!isPaused() && !isShutdown()), 'icon-play': (isPaused() || isShutdown())}"></i>

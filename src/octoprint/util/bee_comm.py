@@ -20,6 +20,7 @@ class BeeCom(MachineCom):
     STATE_PREPARING_PRINT = 22
     STATE_HEATING = 23
     STATE_SHUTDOWN = 24
+    STATE_RESUMING = 25
 
     _beeConn = None
     _beeCommands = None
@@ -37,6 +38,7 @@ class BeeCom(MachineCom):
         super(BeeCom, self).__init__(None, None, callbackObject, printerProfileManager)
 
         self._openConnection()
+        self._heating = False
 
         # monitoring thread
         self._monitoring_active = True
@@ -260,7 +262,8 @@ class BeeCom(MachineCom):
                or self._state == self.STATE_SHUTDOWN \
                or self._state == self.STATE_TRANSFERING_FILE \
                or self._state == self.STATE_PREPARING_PRINT \
-               or self._state == self.STATE_HEATING
+               or self._state == self.STATE_HEATING \
+               or self._state == self.STATE_RESUMING
 
     def isClosedOrError(self):
         return self._state == self.STATE_ERROR or self._state == self.STATE_CLOSED_WITH_ERROR \
@@ -281,6 +284,9 @@ class BeeCom(MachineCom):
     def isShutdown(self):
         return self._state == self.STATE_SHUTDOWN
 
+    def isResuming(self):
+        return self._state == self.STATE_RESUMING
+
     def getStateString(self):
         """
         Returns the current printer state
@@ -296,6 +302,8 @@ class BeeCom(MachineCom):
             return "Shutdown"
         elif self._state == self.STATE_OPERATIONAL:
             return "Ready"
+        elif self._state == self.STATE_RESUMING:
+            return "Resuming"
         else:
             return super(BeeCom, self).getStateString()
 
@@ -399,6 +407,7 @@ class BeeCom(MachineCom):
                 self._pauseWaitStartTime = None
 
             # resumes printing
+            self._preparing_print = True
             self._beeCommands.resumePrint()
 
             self._heating = True
@@ -918,16 +927,15 @@ class BeeCom(MachineCom):
         Thread code that runs while the print job is being resumed after pause/shutdown
         :return:
         """
-        self._changeState(self.STATE_HEATING)
+        self._changeState(self.STATE_RESUMING)
 
-        while self._beeCommands.isHeating():
+        while self._beeCommands.isResuming():
             time.sleep(1)
             if not self._preparing_print:  # the print (heating) was cancelled
                 return
 
         if self._currentFile is not None:
-        # Starts the real printing operation
-
+            # Starts the real printing operation
             self._changeState(self.STATE_PRINTING)
 
             payload = {
