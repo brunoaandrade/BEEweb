@@ -56,7 +56,7 @@
     <div class="text-center"><span class="progress-time" data-bind="text: progressBarString"></span></div>
 </div>
 
-<div id="noFilamentAvailableButtons" data-bind="visible: showInsufficientFilament" class="hidden">
+<div id="noFilamentAvailableButtons" data-bind="visible: showInsufficientFilament() || showPrintControlAfterFilamentChange()" class="hidden">
     <button id="job_print" class="btn btn-primary btn-print"
     data-bind="click: print, css: {'btn-info': isPaused()}, attr: {title: titlePrintButton},
      visible: enablePrint() && (!isPaused() && !isShutdown())" >

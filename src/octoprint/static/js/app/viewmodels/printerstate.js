@@ -25,6 +25,9 @@ $(function() {
         self.insufficientFilament = ko.observable(false);
         self.ignoredInsufficientFilament = ko.observable(false);
 
+        self.filamentChangedByUser = ko.observable(false); // Flag to detect if the user called the change filament operation,
+                                                          // so we can show the print control buttons after enough filament is available
+
         self.enablePrint = ko.pureComputed(function() {
             return self.insufficientFilament() && self.loginState.isUser() && self.filename() != undefined;
         });
@@ -44,6 +47,10 @@ $(function() {
         self.showInsufficientFilament = ko.pureComputed(function() {
             return self.loginState.isUser && self.insufficientFilament()
             && !self.ignoredInsufficientFilament() && self.filename() != undefined && !self.isPaused();
+        });
+        self.showPrintControlAfterFilamentChange = ko.pureComputed(function() {
+            return self.loginState.isUser && !self.insufficientFilament()
+            && self.filamentChangedByUser() && self.filename() != undefined;
         });
         self.showPrintControlButtons = ko.pureComputed(function() {
             return self.isOperational() && (self.isPrinting() || self.isPaused() || self.isShutdown() || self.isHeating() || self.isResuming())
@@ -367,6 +374,7 @@ $(function() {
         };
 
         self._processJobData = function(data) {
+            var prevInsufficientFilamentFlag = self.insufficientFilament();
             if (data.file) {
                 self.filename(data.file.name);
                 self.filesize(data.file.size);
@@ -403,6 +411,12 @@ $(function() {
                     self.insufficientFilament(true);
                     // Expands the panel
                     self.expandStatusPanel();
+                }
+
+                // This means that the user changed the filament so we can change the flag to true (only if a print operation is not ongoing)
+                if (prevInsufficientFilamentFlag == true && self.insufficientFilament() == false && !self.isPrinting() && !self.isHeating()) {
+                    self.filamentChangedByUser(true);
+                    self.retractStatusPanel();
                 }
             }
         };
