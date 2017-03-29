@@ -45,11 +45,13 @@ $(function() {
                 && !self.isPrinting() && !self.isPaused() && !self.isShutdown() && !self.isHeating();
         });
         self.showInsufficientFilament = ko.pureComputed(function() {
-            return self.loginState.isUser && self.insufficientFilament() && !self.connection.isErrorOrClosed()
+            return self.loginState.isUser && self.insufficientFilament()
+            && self.isReady() && !(self.isHeating() || self.isPrinting() || self.isPaused() || self.isShutdown())
             && !self.ignoredInsufficientFilament() && self.filename() != undefined && !self.isPaused();
         });
         self.showPrintControlAfterFilamentChange = ko.pureComputed(function() {
-            return self.loginState.isUser && !self.insufficientFilament() && !self.connection.isErrorOrClosed()
+            return self.loginState.isUser && !self.insufficientFilament()
+            && self.isReady() && !(self.isHeating() || self.isPrinting() || self.isPaused() || self.isShutdown())
             && self.filamentChangedByUser() && self.filename() != undefined;
         });
         self.showPrintControlButtons = ko.pureComputed(function() {
