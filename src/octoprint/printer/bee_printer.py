@@ -28,6 +28,7 @@ class BeePrinter(Printer):
     """
     TMP_FILE_MARKER = '__tmp-scn'
 
+
     def __init__(self, fileManager, analysisQueue, printerProfileManager):
         super(BeePrinter, self).__init__(fileManager, analysisQueue, printerProfileManager)
         self._estimatedTime = None
@@ -46,6 +47,7 @@ class BeePrinter(Printer):
         # We must keep a copy of the _currentFile variable (from the comm layer) to allow the situation of
         # disconnecting the printer and maintaining any selected file information after a reconnect is done
         self._currentPrintJobFile = None
+
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
@@ -100,6 +102,7 @@ class BeePrinter(Printer):
         bvc_status_thread = threading.Thread(target=bvc_printer_status_detection, args=(self._comm, ))
         bvc_status_thread.daemon = True
         bvc_status_thread.start()
+
 
     def disconnect(self):
         """
@@ -169,7 +172,7 @@ class BeePrinter(Printer):
         """
         super(BeePrinter, self).start_print(pos)
 
-        # saves the current PrintFileInformation object
+        # saves the current PrintFileInformation object so we can later recover it if the printer is disconnected
         self._currentPrintJobFile = self._comm.getCurrentFile()
 
         # sends usage statistics
@@ -209,6 +212,7 @@ class BeePrinter(Printer):
                 eventManager().fire(Events.PRINT_CANCELLED, payload)
 
             eventManager().fire(Events.PRINT_FAILED, payload)
+
 
     def jog(self, axis, amount):
         """
@@ -414,7 +418,7 @@ class BeePrinter(Printer):
         try:
             filament_mm = self._comm.getCommandsInterface().getFilamentInSpool()
 
-            if filament_mm > 0:
+            if filament_mm >= 0:
                 filament_cm = filament_mm / 10.0
 
                 filament_diameter, filament_density = self._getFilamentSettings()
@@ -427,7 +431,7 @@ class BeePrinter(Printer):
             else:
                 # In case the value returned from the printer is not valid returns a high value to prevent false
                 # positives of not enough filament available
-                return 1000.0
+                return 350.0
         except Exception as ex:
             self._logger.error(ex)
 
@@ -570,6 +574,7 @@ class BeePrinter(Printer):
 
         self._comm.setPause(False)
 
+
     # # # # # # # # # # # # # # # # # # # # # # #
     ########  GETTER/SETTER FUNCTIONS  ##########
     # # # # # # # # # # # # # # # # # # # # # # #
@@ -701,6 +706,7 @@ class BeePrinter(Printer):
         else:
             return 'Not available'
 
+
     def printFromMemory(self):
         """
         Prints the file currently in the printer memory
@@ -720,6 +726,7 @@ class BeePrinter(Printer):
             return self._comm.startPrint('from_memory')
         except Exception as ex:
             self._logger.error(ex)
+
 
     # # # # # # # # # # # # # # # # # # # # # # #
     ##########  CALLBACK FUNCTIONS  #############
@@ -823,6 +830,7 @@ class BeePrinter(Printer):
 
         self._setState(state)
 
+
     def on_print_finished(self, event, payload):
         """
         Event listener to when a print job finishes
@@ -864,6 +872,7 @@ class BeePrinter(Printer):
 
         return filament_diameter, filament_density
 
+
     def _checkSufficientFilamentForPrint(self):
         """
         Checks if the current print job has enough filament to complete. By updating the
@@ -873,20 +882,23 @@ class BeePrinter(Printer):
         # Gets the current print job data
         state_data = self._stateMonitor.get_current_data()
 
-        if state_data and state_data['job'] and state_data['job']['filament']:
-            # gets the filament information for the filament weight to be used in the print job
-            filament = state_data['job']['filament']
+        if not self.is_printing():
             # gets the current amount of filament left in printer
             current_filament_length = self.getFilamentInSpool()
 
-            # Signals that there is not enough filament
-            if "tool0" in filament:
-                if filament["tool0"]['length'] > current_filament_length:
-                    filament["tool0"]['insufficient'] = True
-                    self._insufficientFilamentForCurrent = True
-                else:
-                    filament["tool0"]['insufficient'] = False
-                    self._insufficientFilamentForCurrent = False
+            try:
+                if state_data['job']['filament'] is not None:
+                    # gets the filament information for the filament weight to be used in the print job
+                    filament_extruder = state_data['job']['filament']["tool0"]
+                    if filament_extruder['length'] > current_filament_length:
+                        filament_extruder['insufficient'] = True
+                        self._insufficientFilamentForCurrent = True
+                    else:
+                        filament_extruder['insufficient'] = False
+                        self._insufficientFilamentForCurrent = False
+            except Exception as ex:
+                self._logger.error(ex)
+
 
     def _setProgressData(self, completion=None, filepos=None, printTime=None, printTimeLeft=None):
         """
@@ -933,6 +945,7 @@ class BeePrinter(Printer):
                 self._lastProgressReport = progress_int
                 self._reportPrintProgressToPlugins(progress_int)
 
+
     def _resetPrintProgress(self):
         """
         Resets the progress variables responsible for storing the information that comes
@@ -943,6 +956,7 @@ class BeePrinter(Printer):
         self._estimatedTime = 0
         self._executedLines = 0
         self._numberLines = 0
+
 
     def _getStateFlags(self):
         return {
@@ -955,8 +969,9 @@ class BeePrinter(Printer):
             "sdReady": self.is_sd_ready(),
             "heating": self.is_heating(),
             "shutdown": self.is_shutdown(),
-			"resuming": self.is_resuming(),
+            "resuming": self.is_resuming(),
         }
+
 
     def _sendUsageStatistics(self, operation):
         """
@@ -995,6 +1010,7 @@ class BeePrinter(Printer):
                     _logger.info(u"Failed sending statistics to remote server. (Operation: %s)" % operation)
 
         return False
+
 
 class CalibrationGCoder:
 

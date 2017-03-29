@@ -45,11 +45,11 @@ $(function() {
                 && !self.isPrinting() && !self.isPaused() && !self.isShutdown() && !self.isHeating();
         });
         self.showInsufficientFilament = ko.pureComputed(function() {
-            return self.loginState.isUser && self.insufficientFilament()
+            return self.loginState.isUser && self.insufficientFilament() && !self.connection.isErrorOrClosed()
             && !self.ignoredInsufficientFilament() && self.filename() != undefined && !self.isPaused();
         });
         self.showPrintControlAfterFilamentChange = ko.pureComputed(function() {
-            return self.loginState.isUser && !self.insufficientFilament()
+            return self.loginState.isUser && !self.insufficientFilament() && !self.connection.isErrorOrClosed()
             && self.filamentChangedByUser() && self.filename() != undefined;
         });
         self.showPrintControlButtons = ko.pureComputed(function() {
@@ -77,24 +77,28 @@ $(function() {
          * Expands the status/print buttons panel to a larger size
          */
         self.expandStatusPanel = function() {
-            $('#state').addClass('expanded');
-            $('#state_wrapper').addClass('expanded');
+            if (!$('#state').hasClass('expanded')) {
+                $('#state').addClass('expanded');
+                $('#state_wrapper').addClass('expanded');
 
-            var h = $('#files').height() - 289;
-            $(".gcode_files").height(h);
-            $('.slimScrollDiv').height(h);
+                var h = $('#files').height() - 289;
+                $(".gcode_files").height(h);
+                $('.slimScrollDiv').height(h);
+            }
         };
 
        /**
         * Retracts the status/print buttons panel to the default size
         */
         self.retractStatusPanel = function() {
-            $('#state').removeClass('expanded');
-            $('#state_wrapper').removeClass('expanded');
+            if ($('#state').hasClass('expanded')) {
+                $('#state').removeClass('expanded');
+                $('#state_wrapper').removeClass('expanded');
 
-            var h = $('#files').height() - 189;
-            $(".gcode_files").height(h);
-            $('.slimScrollDiv').height(h);
+                var h = $('#files').height() - 189;
+                $(".gcode_files").height(h);
+                $('.slimScrollDiv').height(h);
+            }
         };
 
         self.togglePrintFromMemory = function() {
@@ -402,7 +406,7 @@ $(function() {
             self.filament(result);
 
             // Signals that there is no filament available in the spool
-            if (data.filament && data.filament['tool0']) {
+            if (!self.isErrorOrClosed() && data.filament && data.filament['tool0']) {
 
                 self.insufficientFilament(false);
 

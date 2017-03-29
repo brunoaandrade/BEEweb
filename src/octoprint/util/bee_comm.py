@@ -167,6 +167,7 @@ class BeeCom(MachineCom):
             if not cmd:
                 return
 
+        # The following lines would prevent sending custom commands to the printer during a print job
         #if self.isPrinting() and not self.isSdFileSelected():
         #    self._commandQueue.put((cmd, cmd_type))
 
