@@ -487,6 +487,25 @@ class BeePrinter(Printer):
             self._logger.error(ex)
 
 
+    def getNozzleTypeString(self):
+        """
+        Gets the current selected nozzle type string to use for filament filtering
+        If not printer is connected returns 'nz400'
+        :return: string
+        """
+        try:
+            nozzle_type_prefix = 'nz'
+            default_nozzle_size = 400
+            if self._comm and self._comm.getCommandsInterface():
+                current_nozzle = self._comm.getCommandsInterface().getNozzleSize()
+
+                if current_nozzle is not None:
+                    return nozzle_type_prefix + str(current_nozzle)
+
+            return nozzle_type_prefix + str(default_nozzle_size)
+        except Exception as ex:
+            self._logger.error(ex)
+
     def startCalibration(self, repeat=False):
         """
         Starts the calibration procedure

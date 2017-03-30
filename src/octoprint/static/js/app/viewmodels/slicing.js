@@ -125,19 +125,20 @@ $(function() {
             if (!self.enableSlicingDialog() && !force) {
                 return;
             }
+            self.requestData(function() {
+                self._nozzleFilamentUpdate();
+                self.target = target;
+                self.file(file);
+                self.title(_.sprintf(gettext("Slicing %(filename)s"), {filename: self.file()}));
+                self.destinationFilename(self.file().substr(0, self.file().lastIndexOf(".")));
+                self.printerProfile(self.printerProfiles.currentProfile());
+                self.afterSlicing("print");
 
-            self.requestData(self._nozzleFilamentUpdate);
-            self.target = target;
-            self.file(file);
-            self.title(_.sprintf(gettext("Slicing %(filename)s"), {filename: self.file()}));
-            self.destinationFilename(self.file().substr(0, self.file().lastIndexOf(".")));
-            self.printerProfile(self.printerProfiles.currentProfile());
-            self.afterSlicing("print");
+                $("#slicing_configuration_dialog").modal("show");
 
-            $("#slicing_configuration_dialog").modal("show");
-
-            // Flag to signal if the slicing window was called by the workbench
-            self.workbenchFile = workbench;
+                // Flag to signal if the slicing window was called by the workbench
+                self.workbenchFile = workbench;
+            });
         };
 
         self.slicer.subscribe(function(newValue) {
@@ -448,10 +449,6 @@ $(function() {
 
         self._sanitize = function(name) {
             return name.replace(/[^a-zA-Z0-9\-_\.\(\) ]/g, "").replace(/ /g, "_");
-        };
-
-        self.onStartup = function() {
-            self.requestData();
         };
 
         self.onEventSettingsUpdated = function(payload) {

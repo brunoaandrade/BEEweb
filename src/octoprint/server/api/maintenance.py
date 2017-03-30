@@ -149,9 +149,7 @@ def filamentProfiles():
 	"""
 	default_slicer = s().get(["slicing", "defaultSlicer"])
 
-	profiles = getSlicingProfilesData(default_slicer)
-
-	return jsonify(profiles)
+	return jsonify(getSlicingProfilesData(default_slicer))
 
 @api.route("/maintenance/nozzle_sizes", methods=["GET"])
 @restricted_access

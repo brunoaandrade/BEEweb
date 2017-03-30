@@ -19,6 +19,37 @@ $(function() {
 
         self.maintenanceDialog = $('#maintenance_dialog');
         self.filamentProfiles = ko.observableArray();
+        // Helper to store the filament profiles and order them alphabetically
+        self.profiles = new ItemListHelper(
+            "plugin_cura_profiles",
+            {
+                "id": function(a, b) {
+                    if (a["key"].toLocaleLowerCase() < b["key"].toLocaleLowerCase()) return -1;
+                    if (a["key"].toLocaleLowerCase() > b["key"].toLocaleLowerCase()) return 1;
+                    return 0;
+                },
+                "name": function(a, b) {
+                    // sorts ascending
+                    var aName = a.name();
+                    if (aName === undefined) {
+                        aName = "";
+                    }
+                    var bName = b.name();
+                    if (bName === undefined) {
+                        bName = "";
+                    }
+
+                    if (aName.toLocaleLowerCase() < bName.toLocaleLowerCase()) return -1;
+                    if (aName.toLocaleLowerCase() > bName.toLocaleLowerCase()) return 1;
+                    return 0;
+                }
+            },
+            {},
+            "id",
+            [],
+            [],
+            5
+        );
 
         self.selectedFilament = ko.observable();
         self.filamentSelected = ko.observable(false);
@@ -451,14 +482,23 @@ $(function() {
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
-                    var profiles = data;
+                    // Stores the API call result in a ItemListHelper so the values are sorted alphabetically by key
+                    var profiles = [];
+                    _.each(_.keys(data), function(key) {
+                        profiles.push({
+                            key: key,
+                            name: ko.observable(data[key].displayName),
+                        });
+                    });
+                    self.profiles.updateItems(profiles);
+
                     self.filamentProfiles.removeAll();
 
                     _.each(profiles, function(profile) {
 
                         // Parses the list and filters for BVC colors
                         // Assumes the '_' nomenclature separation for the profile names
-                        var profile_parts = profile.displayName.split('_');
+                        var profile_parts = profile.name().split('_');
                         if (profile_parts[0] != null) {
                             var color = profile_parts[0];
                             if (!_.findWhere(self.filamentProfiles(), color)) {

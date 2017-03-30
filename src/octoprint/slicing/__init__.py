@@ -469,7 +469,7 @@ class SlicingManager(object):
 		else:
 			octoprint.events.eventManager().fire(octoprint.events.Events.SLICING_PROFILE_DELETED, dict(slicer=slicer, profile=name))
 
-	def all_profiles(self, slicer, require_configured=False, from_current_printer=False):
+	def all_profiles(self, slicer, require_configured=False):
 		"""
 		Retrieves all profiles for slicer ``slicer``.
 
@@ -481,7 +481,6 @@ class SlicingManager(object):
 		    require_configured (boolean): Whether to require the slicer ``slicer`` to be already configured (True)
 		        or not (False, default). If False and the slicer is not yet configured, a :class:`~octoprint.slicing.exceptions.SlicerNotConfigured`
 		        exception will be raised.
-			from_current_printer (boolean): Whether to select only profiles from the current or default printer
 		Returns:
 		    list of SlicingProfile: A list of all :class:`SlicingProfile` instances available for the slicer ``slicer``.
 

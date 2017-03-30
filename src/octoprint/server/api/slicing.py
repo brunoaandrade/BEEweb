@@ -8,7 +8,7 @@ __copyright__ = "Copyright (C) 2014 The OctoPrint Project - Released under terms
 from flask import request, jsonify, make_response, url_for
 from werkzeug.exceptions import BadRequest
 
-from octoprint.server import slicingManager
+from octoprint.server import slicingManager, printer
 from octoprint.server.util.flask import restricted_access
 from octoprint.server.api import api, NO_CONTENT
 
@@ -167,9 +167,13 @@ def _getSlicingProfilesData(slicer, require_configured=False):
 	profiles = slicingManager.all_profiles_list(slicer,
 												require_configured=require_configured,
 												from_current_printer=True)
+	# gets the nozzle size to filter the slicing profiles by nozzle type
+	nozzle = printer.getNozzleTypeString()
 
 	result = dict()
 	for name, profile in profiles.items():
+		if nozzle is not None and not nozzle in name:
+			continue
 		result[name] = _getSlicingProfileData(slicer, name, profile)
 	return result
 
