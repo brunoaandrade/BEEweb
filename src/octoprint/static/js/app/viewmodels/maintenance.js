@@ -475,7 +475,7 @@ $(function() {
             });
         };
 
-        self._getFilamentProfiles = function() {
+        self._getFilamentProfiles = function(postCallback) {
 
             $.ajax({
                 url: API_BASEURL + "maintenance/filament_profiles",
@@ -506,6 +506,10 @@ $(function() {
                             }
                         }
                     });
+
+                    if (postCallback !== undefined) {
+                        postCallback();
+                    }
                 }
             });
         };
@@ -986,7 +990,8 @@ $(function() {
                         self.commandLock(false);
                         self.operationLock(false);
 
-                        self.nextStepReplaceNozzle4();
+                        // Gets the available filament list
+                        self._getFilamentProfiles(self.nextStepReplaceNozzle4);
                     } else {
                         self.saveNozzleResponseError(true);
                         self.commandLock(false);
