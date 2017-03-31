@@ -206,6 +206,7 @@ class BeePrinter(Printer):
             if self._selectedFile["sd"]:
                 payload["origin"] = FileDestinations.SDCARD
 
+            # deletes the file if it was created with the temporary file name marker
             if BeePrinter.TMP_FILE_MARKER in self._selectedFile["filename"]:
                 eventManager().fire(Events.PRINT_CANCELLED_DELETE_FILE, payload)
             else:
@@ -775,11 +776,12 @@ class BeePrinter(Printer):
          Triggers storage of new values for printTime, printTimeLeft and the current progress.
         """
         if self._comm is not None:
-            self._setProgressData(self.getPrintProgress(), self.getPrintFilepos(),
+            progress = self.getPrintProgress()
+            self._setProgressData(progress, self.getPrintFilepos(),
                                   self._comm.getPrintTime(), self._comm.getCleanedPrintTime())
 
             # If the status from the printer is no longer printing runs the post-print trigger
-            if self.getPrintProgress() >= 1 \
+            if progress >= 1 \
                     and self._comm.getCommandsInterface().isPreparingOrPrinting() is False:
 
                 # Runs the print finish communications callback
