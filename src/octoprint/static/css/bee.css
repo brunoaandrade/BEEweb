@@ -43,7 +43,8 @@ table {
     color: #fff !important;
 }
 
-.radio input[type="radio"], .checkbox input[type="checkbox"]{
+.radio input[type="radio"],
+.checkbox input[type="checkbox"]{
     margin-top: -10px;
 }
 
@@ -323,6 +324,11 @@ table {
 #login_dropdown_loggedout label.checkbox {
     margin-left: 20px;
     margin-top: 5px;
+}
+
+#login_dialog .checkbox input[type="checkbox"],
+#login_dropdown_loggedout .checkbox input[type="checkbox"]{
+    margin-top: -5px !important;
 }
 /*--------------------------------------------------------------------------------*/
 /*---------------------ICONS -----------------------------------------------------*/
@@ -775,9 +781,6 @@ a.brand{
     height: unset;
     font-size: 14px;
 }
-#scale-values-form {
-    width: 355px;
-}
 
 .move-x, .move-y, .move-z,
 .scale-x, .scale-y, .scale-z,
@@ -785,6 +788,22 @@ a.brand{
     display: inline-block;
     padding-right: 20px;
 }
+
+#workbench-controls-container #scale-axis-form label.radio {
+    padding-right: 35px;
+}
+#workbench-controls-container #scale-axis-form #keep-proportions-container {
+    padding-left: 35px;
+}
+
+#workbench-controls-container #rotate-axis-form label.radio {
+    padding-right: 35px;
+    padding-left: 5px;
+}
+#workbench-controls-container #rotate-axis-form #rotate-buttons button {
+    display: inline-block;
+}
+
 .move-x > input[type="text"], .move-y > input[type="text"], .move-z > input[type="text"],
 .scale-x > input[type="text"], .scale-y > input[type="text"], .scale-z > input[type="text"],
 .rotate-x > input[type="text"], .rotate-y > input[type="text"], .rotate-z > input[type="text"]{
@@ -1647,7 +1666,7 @@ label:hover:before {
 /*----------------------------  Custom Radiobuttons ----------------------------------*/
 
 #workbench-controls-container .radio.inline+.radio.inline{
-    margin: 0 0 10px 5px;
+    /*margin: 0 0 10px 5px;*/
 }
 
 #workbench-controls-container [type="radio"]:not(:checked),
@@ -1830,6 +1849,10 @@ label:hover:before {
         top: auto !important;
         right: auto !important;
         border-left: solid 1px #000;
+    }
+
+    .scale-x, .scale-y, .scale-z {
+        display: block;
     }
 }
 /* workaround for navbar collapse in screen with resolution width below 900px */

@@ -44,22 +44,23 @@
                     </div>
                     <br/>
                     <div class="row-fluid">
-                         <label class="radio inline span2">
+                         <label class="radio inline">
                             <input type="radio" id="scaleby-size" name="scaleby" value="size"
                                    checked="checked" onchange="BEEwb.transformOps.toggleScaleType();"/>
                             <label for="scaleby-size" class="workbench-controls-label">mm</label>
                         </label>
-                         <label class="radio inline span2">
+                         <label class="radio inline">
                             <input type="radio" id="scaleby-per" name="scaleby" value="percentage"
                                 onchange="BEEwb.transformOps.toggleScaleType();" />
                             <label for="scaleby-per" class="workbench-controls-label">%</label>
                         </label>
-                        <span class="span1"></span>
-                        <span class="span6">
+
+                        <span id="keep-proportions-container">
                             <input type="checkbox" id="keep-proportions" title="{{ _('Keep proportions') }}" checked />
                             <label for="keep-proportions" class="workbench-controls-label">{{ _('Keep proportions') }}</label>
                         </span>
                     </div>
+                    <br/>
                     <div id="size_text_fields" class="row-fluid">
                         <div class="scale-x">
                             <label for="scalex-axis" id="scalex-axis-label">X :</label>
@@ -84,32 +85,34 @@
             <hr>
             <div id="rotate-values-form" style="display: none;">
                 <span class="workbench-title">{{ _('Object Rotation (deg)') }}</span>
-                <br/><br/>
+                <br />
                 <div id="rotate-axis-form" class="row-fluid form-inline">
                     <div class="row-fluid">
-                        <label class="radio inline span2">
+                        <label class="radio inline">
                             <input type="radio" id="rot-axis-selx" name="rot-axis-sel" value="x" />
                             <label for="rot-axis-selx"> X</label>
                         </label>
-                        <label class="radio inline span2">
+                        <label class="radio inline">
                             <input type="radio" id="rot-axis-sely" name="rot-axis-sel" value="y" />
                             <label for="rot-axis-sely"> Y</label>
                         </label>
-                        <label class="radio inline span2">
+                        <label class="radio inline">
                             <input type="radio" id="rot-axis-selz" name="rot-axis-sel" value="z" />
                             <label for="rot-axis-selz"> Z</label>
                         </label>
                     </div>
-                    <div class="row-fluid">
-                        <button id="btn-rotate-ccw" class="span6 btn btn-sm btn-default model-selection" onclick="BEEwb.transformOps.rotateCCW();" disabled="true">
+                    <br />
+                    <div id="rotate-buttons" class="row-fluid">
+                        <button id="btn-rotate-ccw" class="btn btn-sm btn-default model-selection" onclick="BEEwb.transformOps.rotateCCW();" disabled="true">
                             <span class="m-icon rotatel"></span>
                             <span>{{ _('45° Left') }}</span>
                         </button>
-                        <button id="btn-rotate-cw" class="span6 btn btn-sm btn-default model-selection" onclick="BEEwb.transformOps.rotateCW();" disabled="true">
+                        <button id="btn-rotate-cw" class="btn btn-sm btn-default model-selection" onclick="BEEwb.transformOps.rotateCW();" disabled="true">
                             <span class="m-icon rotater"></span>
                             <span>{{ _('45° Right') }}</span>
                         </button>
                     </div>
+
                     <br/>
                     <div class="rotate-x">
                         <label for="rotx-axis">X :</label>
