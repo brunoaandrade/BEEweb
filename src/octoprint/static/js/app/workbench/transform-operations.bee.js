@@ -536,31 +536,19 @@ BEEwb.transformOps.scaleBySize = function(x, y, z, changedAxis) {
 
         // Checks which axis was changed
         if (changedAxis == 'x') {
-
-            if ($('#lock-y').is(':checked')) {
+            if ($('#keep-proportions').is(':checked')) {
                 yScale = xScale;
-            }
-
-            if ($('#lock-z').is(':checked')) {
                 zScale = xScale;
             }
         } else if (changedAxis == 'y') {
-
-            if ($('#lock-x').is(':checked')) {
+            if ($('#keep-proportions').is(':checked')) {
                 xScale = yScale;
-            }
-
-            if ($('#lock-z').is(':checked')) {
                 zScale = yScale;
             }
         } else if (changedAxis == 'z') {
-
-            if ($('#lock-y').is(':checked')) {
-                yScale = zScale;
-            }
-
-            if ($('#lock-x').is(':checked')) {
+            if ($('#keep-proportions').is(':checked')) {
                 xScale = zScale;
+                yScale = zScale;
             }
         }
 
