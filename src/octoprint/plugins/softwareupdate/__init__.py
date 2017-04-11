@@ -719,8 +719,10 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				if restart_command is not None:
 					self._send_client_message("restarting", dict(restart_type=restart_type, results=target_results))
 					try:
-						if sys.platform == 'win32':
-							self._perform_restart_win32(restart_command)
+						# Since in Windows and OS X there isn't a command that restarts a service from one atomic system call
+						# we must unfortunately kill the process and wait for the automatic respawn to do it's job
+						if sys.platform == 'win32' or sys.platform == 'darwin':
+							self._force_restart()
 						else:
 							self._perform_restart(restart_command)
 					except exceptions.RestartFailed:
@@ -811,9 +813,9 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 			self._logger.warn("Restart stderr:\n%s" % e.stderr)
 			raise exceptions.RestartFailed()
 
-	def _perform_restart_win32(self, service_name):
+	def _force_restart(self):
 		"""
-		Performs a restart of the chosen service when running in a Windows system.
+		Performs a restart of the chosen service when running in a Windows or OS X system.
 		"""
 		# Forcefully terminates the whole server using the "hammer"...
 		# due to the impossibility of restarting the service from within the server itself, we must kill the process
