@@ -225,6 +225,7 @@ class FilebasedUserManager(UserManager):
 					self._users[name] = User(name, attributes["password"], attributes["active"], attributes["roles"], apikey=apikey, settings=settings)
 		else:
 			self._customized = False
+			self._devMode = False
 
 	def _save(self, force=False):
 		if not self._dirty and not force:
