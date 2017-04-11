@@ -2,7 +2,7 @@
     <input type="text" class="input-search-box input-block" data-bind="value: searchQuery, valueUpdate: 'input'"
     placeholder="{{ _('Search files here...') }}">
 </form>
-<div class="import-file" style="display: none;" data-bind="visible: loginState.isUser">
+<div class="import-file"  >
     <div class="row-fluid upload-buttons">
         {% if enableSdSupport %}
             <span class="fileinput-button span6" data-bind="css: {disabled: !$root.loginState.isUser()}" style="margin-bottom: 10px">
