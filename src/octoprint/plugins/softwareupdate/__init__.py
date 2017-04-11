@@ -169,7 +169,33 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 				},
 				"pip_command": None,
 				"check_providers": {},
+				"cache_ttl": 24 * 60,
+			}
+		# in case of OS X desktop installation
+		elif sys.platform == "darwin":
+			git_exec = 'git'
+			python_exec = './python'
 
+			update_script_callable_beeweb = "\"{{python}}\" \"{update_script}\" --branch={{branch}} --force={{force}} --git={git_executable} --python={python_executable} {{folder}} {{target}}".format(
+				update_script=update_script,
+				git_executable=git_exec,
+				python_executable=python_exec)
+
+			default_settings = {
+				"checks": {
+					"octoprint": {
+						"type": "github_release",
+						"user": "beeverycreative",
+						"repo": "BEEweb",
+						"update_script": update_script_callable_beeweb,
+						"restart": "octoprint",
+						"stable_branch": dict(branch="master", name="Stable"),
+						"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
+												dict(branch="rc/devel", name="Devel RCs")]
+					}
+				},
+				"pip_command": None,
+				"check_providers": {},
 				"cache_ttl": 24 * 60,
 			}
 		else:
