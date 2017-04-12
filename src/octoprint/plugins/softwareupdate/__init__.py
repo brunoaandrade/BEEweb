@@ -174,12 +174,11 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 		# in case of OS X desktop installation
 		elif sys.platform == "darwin":
 			git_exec = 'git'
-			python_exec = './python'
 
-			update_script_callable_beeweb = "\"{{python}}\" \"{update_script}\" --branch={{branch}} --force={{force}} --git={git_executable} --python={python_executable} {{folder}} {{target}}".format(
+			update_script_callable_beeweb = "\"{{python}}\" \"{update_script}\" --branch={{branch}} --force={{force}} --git={git_executable} {{folder}} {{target}}".format(
 				update_script=update_script,
-				git_executable=git_exec,
-				python_executable=python_exec)
+				git_executable=git_exec
+			)
 
 			default_settings = {
 				"checks": {
