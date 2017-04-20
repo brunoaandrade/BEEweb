@@ -14,14 +14,18 @@ def detect_bvc_printer_connection(connection_callback):
 	printerConnIntf = BeePrinterConn()
 
 	_logger = logging.getLogger()
+	_printer_detected_msg_logged = False
 
 	_logger.info("Starting BVC Printer connection monitor...")
 	while True:
 		printers = printerConnIntf.getPrinterList()
 
 		if len(printers) > 0: # printer found
-			_logger.info("BVC Printer detected. Starting connection...")
-			connection_callback()
-			return
+			if not _printer_detected_msg_logged:
+				_logger.info("BVC Printer detected. Waiting for client connection...")
+				_printer_detected_msg_logged = True
+				
+			if connection_callback():
+				return
 
 		sleep (USB_POLL_INTERVAL)

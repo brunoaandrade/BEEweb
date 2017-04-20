@@ -30,7 +30,6 @@ class BeePrinter(Printer):
 
 
     def __init__(self, fileManager, analysisQueue, printerProfileManager):
-        super(BeePrinter, self).__init__(fileManager, analysisQueue, printerProfileManager)
         self._estimatedTime = None
         self._elapsedTime = None
         self._numberLines = None
@@ -38,6 +37,7 @@ class BeePrinter(Printer):
         self._currentFeedRate = None
         self._runningCalibrationTest = False
         self._insufficientFilamentForCurrent = False
+        self._isConnecting = False
 
         # Initializes the slicing manager for filament profile information
         self._slicingManager = SlicingManager(settings().getBaseFolder("slicingProfiles"), printerProfileManager)
@@ -48,77 +48,103 @@ class BeePrinter(Printer):
         # disconnecting the printer and maintaining any selected file information after a reconnect is done
         self._currentPrintJobFile = None
 
+        # This list contains the addresses of the clients connected to the server
+        self._connectedClients = []
+
+        # Subscribes to the CLIENT_OPENED and CLIENT_CLOSED events to handle each time a client (browser)
+        # connects or disconnects
+        eventManager().subscribe(Events.CLIENT_OPENED, self.on_client_connected)
+        eventManager().subscribe(Events.CLIENT_CLOSED, self.on_client_disconnected)
+
+        super(BeePrinter, self).__init__(fileManager, analysisQueue, printerProfileManager)
+
+    def connect_on_client_connection(self):
+        """
+        This method is responsible for connecting to 
+        :param self: 
+        :return: True if the connection was established or False if not
+        """
+        self._isConnecting = True
+        if len(self._connectedClients) == 0:
+            return False
+
+        return self.connect()
+
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
-         Connects to a BVC printer. Ignores port, baudrate parameters.
+         Tries to connect to a BVC printer. Ignores port, baudrate parameters.
          They are kept just for interface compatibility
         """
-        if self._comm is not None:
-            self._comm.close()
+        try:
+            if self._comm is not None:
+                self._comm.close()
 
-        self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
-        self._comm.confirmConnection()
+            self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
+            self._comm.confirmConnection()
 
-        bee_commands = self._comm.getCommandsInterface()
+            bee_commands = self._comm.getCommandsInterface()
 
-        # homes all axis
-        if bee_commands is not None and bee_commands.isPrinting() is False:
-            bee_commands.home()
+            # homes all axis
+            if bee_commands is not None and bee_commands.isPrinting() is False:
+                bee_commands.home()
 
-        # selects the printer profile based on the connected printer name
-        printer_name = self.get_printer_name()
+            # selects the printer profile based on the connected printer name
+            printer_name = self.get_printer_name()
 
-        # converts the name to the id
-        printer_id = None
-        if printer_name is not None:
-            printer_id = printer_name.lower().replace(' ', '')
-        self._printerProfileManager.select(printer_id)
+            # converts the name to the id
+            printer_id = None
+            if printer_name is not None:
+                printer_id = printer_name.lower().replace(' ', '')
+            self._printerProfileManager.select(printer_id)
 
-        # if the printer is printing or in shutdown mode selects the last selected file for print
-        # and starts the progress monitor
-        lastFile = settings().get(['lastPrintJobFile'])
-        if lastFile is not None and (self.is_shutdown() or self.is_printing() or self.is_paused()):
-            # Calls the select_file with the real previous PrintFileInformation object to recover the print status
-            if self._currentPrintJobFile is not None:
-                self.select_file(self._currentPrintJobFile, False)
-            else:
-                self.select_file(lastFile, False)
+            # if the printer is printing or in shutdown mode selects the last selected file for print
+            # and starts the progress monitor
+            lastFile = settings().get(['lastPrintJobFile'])
+            if lastFile is not None and (self.is_shutdown() or self.is_printing() or self.is_paused()):
+                # Calls the select_file with the real previous PrintFileInformation object to recover the print status
+                if self._currentPrintJobFile is not None:
+                    self.select_file(self._currentPrintJobFile, False)
+                else:
+                    self.select_file(lastFile, False)
 
-            # starts the progress monitor if a print is on going
-            if self.is_printing():
-                self._comm.startPrintStatusProgressMonitor()
+                # starts the progress monitor if a print is on going
+                if self.is_printing():
+                    self._comm.startPrintStatusProgressMonitor()
 
-        # gets current Filament profile data
-        self._currentFilamentProfile = self.getSelectedFilamentProfile()
+            # gets current Filament profile data
+            self._currentFilamentProfile = self.getSelectedFilamentProfile()
 
-        # subscribes event handlers
-        eventManager().subscribe(Events.PRINT_CANCELLED, self.on_print_cancelled)
-        eventManager().subscribe(Events.PRINT_CANCELLED_DELETE_FILE, self.on_print_cancelled_delete_file)
-        eventManager().subscribe(Events.PRINT_DONE, self.on_print_finished)
+            # subscribes event handlers
+            eventManager().subscribe(Events.PRINT_CANCELLED, self.on_print_cancelled)
+            eventManager().subscribe(Events.PRINT_CANCELLED_DELETE_FILE, self.on_print_cancelled_delete_file)
+            eventManager().subscribe(Events.PRINT_DONE, self.on_print_finished)
 
-        # Starts the printer status monitor thread
-        import threading
-        bvc_status_thread = threading.Thread(target=bvc_printer_status_detection, args=(self._comm, ))
-        bvc_status_thread.daemon = True
-        bvc_status_thread.start()
+            # Starts the printer status monitor thread
+            import threading
+            bvc_status_thread = threading.Thread(target=bvc_printer_status_detection, args=(self._comm, ))
+            bvc_status_thread.daemon = True
+            bvc_status_thread.start()
 
+            self._isConnecting = False
+
+            if self._comm.isOperational():
+                return True
+        except Exception:
+            self._logger.exception("Error connecting to BVC printer")
+
+        return False
 
     def disconnect(self):
         """
         Closes the connection to the printer.
         """
+        self._logger.info("Closing USB printer connection.")
         super(BeePrinter, self).disconnect()
-
-        # Instantiates the comm object just to allow for a state to be returned. This is a workaround
-        # to allow to have the "Connecting..." string when the printer is connecting when the comm object is None...
-        # This forces the printer to be used in auto-connect mode
-        self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
-        self._comm.confirmConnection()
 
         # Starts the connection monitor thread
         import threading
-        bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(self.connect, ))
+        bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(self.connect_on_client_connection, ))
         bvc_conn_thread.daemon = True
         bvc_conn_thread.start()
 
@@ -700,13 +726,18 @@ class BeePrinter(Printer):
     def is_resuming(self):
         return self._comm is not None and self._comm.isResuming()
 
+    def is_connecting(self):
+        return self._isConnecting
 
     def get_state_string(self):
         """
          Returns a human readable string corresponding to the current communication state.
         """
         if self._comm is None:
-            return "Connecting..."
+            if self.is_connecting():
+                return "Connecting..."
+            else:
+                return "Disconnected"
         else:
             return self._comm.getStateString()
 
@@ -865,6 +896,35 @@ class BeePrinter(Printer):
 
         # sends usage statistics
         self._sendUsageStatistics('stop')
+
+    def on_client_connected(self, event, payload):
+        """
+        Event listener to execute when a client (browser) connects to the server
+        :param event: 
+        :param payload: 
+        :return: 
+        """
+        # Only appends the client address to the list. The connection monitor thread will automatically handle
+        # the connection itself
+        self._connectedClients.append(payload['remoteAddress'])
+
+
+    def on_client_disconnected(self, event, payload):
+        """
+        Event listener to execute when a client (browser) disconnects from the server
+        :param event: 
+        :param payload: 
+        :return: 
+        """
+        self._connectedClients.remove(payload['remoteAddress'])
+
+        # Disconnects the printer connection if the connection is active
+        if self._comm is not None:
+            # calls only the disconnect function on the parent class instead of the complete bee_printer.disconnect
+            # which also handles the connection monitor thread. This thread will be handled automatically when
+            # the disconnect function is called by the beecom driver disconnect hook
+            super(BeePrinter, self).disconnect()
+
 
     # # # # # # # # # # # # # # # # # # # # # # #
     ########### AUXILIARY FUNCTIONS #############

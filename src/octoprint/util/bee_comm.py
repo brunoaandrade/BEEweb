@@ -16,7 +16,6 @@ __author__ = "BEEVC - Electronic Systems"
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
 
 class BeeCom(MachineCom):
-    STATE_WAITING_FOR_BTF = 21
     STATE_PREPARING_PRINT = 22
     STATE_HEATING = 23
     STATE_SHUTDOWN = 24
@@ -234,7 +233,7 @@ class BeeCom(MachineCom):
             else:
                 self._changeState(self.STATE_OPERATIONAL)
         else:
-            self._changeState(self.STATE_WAITING_FOR_BTF)
+            self._changeState(self.STATE_CLOSED)
 
     def getConnectedPrinterName(self):
         """
@@ -268,10 +267,10 @@ class BeeCom(MachineCom):
 
     def isClosedOrError(self):
         return self._state == self.STATE_ERROR or self._state == self.STATE_CLOSED_WITH_ERROR \
-               or self._state == self.STATE_CLOSED or self._state == self.STATE_WAITING_FOR_BTF
+               or self._state == self.STATE_CLOSED
 
     def isBusy(self):
-        return self.isPrinting() or self.isPaused() or self.isPreparingPrint()
+        return self.isPrinting() or self.isPaused() or self.isPreparingPrint() or self.isResuming()
 
     def isPreparingPrint(self):
         return self._state == self.STATE_PREPARING_PRINT or self._state == self.STATE_HEATING
@@ -293,7 +292,7 @@ class BeeCom(MachineCom):
         Returns the current printer state
         :return:
         """
-        if self._state == self.STATE_WAITING_FOR_BTF or self._state == self.STATE_CLOSED:
+        if self._state == self.STATE_CLOSED:
             return "Disconnected"
         elif self._state == self.STATE_PREPARING_PRINT:
             return "Preparing..."
