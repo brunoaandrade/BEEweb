@@ -383,7 +383,7 @@ a.brand{
 .maintenanceicon  { background: url('../img/icons/maintenance.svg'); }
 .settingsicon  { background: url('../img/icons/settings.svg'); }
 .usericon  { background: url('../img/icons/profile.svg'); }
-.usersettingsicon  { background: url('../img/icons/usergrey.svg'); }
+.usersettingsicon  { background: url('../img/icons/profile_grey.svg'); }
 .abouticon  { background: url('../img/icons/aboutgrey.svg'); }
 .helpicon  { background: url('../img/icons/helpgrey.svg'); }
 .logouticon  { background: url('../img/icons/logoutgrey.svg'); }
@@ -443,7 +443,11 @@ a.brand{
 .cubewicon { background: url('../img/icons/cube_white.svg'); }
 /* green */
 .checkgreenicon  { background: url('../img/icons/ok_green.svg'); }
-
+/* dynamic icons - change with media queries */
+.maintenanceicon-xs  { background: url('../img/icons/maintenance.svg'); }
+.settingsicon-xs  { background: url('../img/icons/settings.svg'); }
+.shutdownicon-xs  { background: url('../img/icons/shutdown.svg'); }
+.usericon-xs  { background: url('../img/icons/profile.svg'); }
 
 .printnow .m-icon,
 .addplatform .m-icon { float: left; margin: 4px -10px 0 10px; }
@@ -1854,6 +1858,17 @@ label:hover:before {
     .scale-x, .scale-y, .scale-z {
         display: block;
     }
+
+    #out-bound-msg {
+        top: 60px;
+        bottom: inherit;
+        left: 20px;
+    }
+
+    .maintenanceicon-xs  { background: url('../img/icons/maintenance_white.svg'); }
+    .settingsicon-xs  { background: url('../img/icons/settings_white.svg'); }
+    .shutdownicon-xs  { background: url('../img/icons/shutdown_white.svg'); }
+    .usericon-xs  { background: url('../img/icons/profile_white.svg'); }
 }
 /* workaround for navbar collapse in screen with resolution width below 900px */
 @media (min-width: 768px) and (max-width: 900px) {
