@@ -1699,7 +1699,7 @@ msgstr "Der Server ist offline"
 
 #: src/octoprint/static/js/app/helpers.js:584
 msgid "Restarting"
-msgstr "Neu Starten"
+msgstr "Neustart findet statt"
 
 #: src/octoprint/static/js/app/dataupdater.js:80
 msgid ""

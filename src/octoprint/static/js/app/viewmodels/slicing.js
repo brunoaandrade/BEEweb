@@ -187,7 +187,7 @@ var filename = file.substr(0, file.lastIndexOf("."));
             return self.destinationFilename() != undefined
                 && self.destinationFilename().trim() != ""
                 && self.slicer() != undefined
-                && self.sliceButtonControl();
+                && self.sliceButtonControl()
                 //&& self.profile() != undefined
                 && (!(self.printerState.isPrinting() || self.printerState.isPaused()) || !self.slicerSameDevice());
         });
@@ -475,10 +475,6 @@ var filename = file.substr(0, file.lastIndexOf("."));
 
             $("#slicing_configuration_dialog").modal("hide");
 
-                    self.destinationFilename(undefined);
-                    self.slicer(self.defaultSlicer);
-                    self.profile(self.defaultProfile);
-                });
         };
 
         self._sanitize = function(name) {
