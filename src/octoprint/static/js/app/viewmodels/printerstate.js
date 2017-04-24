@@ -6,6 +6,7 @@ $(function() {
         self.printerProfiles = parameters[1];
         self.slicing = parameters[2];
         self.connection = parameters[3];
+        self.settings = parameters[4];
 
         self.stateString = ko.observable(undefined);
         self.isErrorOrClosed = ko.observable(undefined);
@@ -136,6 +137,7 @@ $(function() {
         };
 
         self.filename = ko.observable(undefined);
+        self.filepath = ko.observable(undefined);
         self.progress = ko.observable(undefined);
         self.filesize = ko.observable(undefined);
         self.filepos = ko.observable(undefined);
@@ -383,10 +385,12 @@ $(function() {
             var prevInsufficientFilamentFlag = self.insufficientFilament();
             if (data.file) {
                 self.filename(data.file.name);
+                self.filepath(data.file.path);
                 self.filesize(data.file.size);
                 self.sd(data.file.origin == "sdcard");
             } else {
                 self.filename(undefined);
+                self.filepath(undefined);
                 self.filesize(undefined);
                 self.sd(undefined);
             }
@@ -451,25 +455,23 @@ $(function() {
         self._processBusyFiles = function(data) {
             var busyFiles = [];
             _.each(data, function(entry) {
-                if (entry.hasOwnProperty("name") && entry.hasOwnProperty("origin")) {
-                    busyFiles.push(entry.origin + ":" + entry.name);
+                if (entry.hasOwnProperty("path") && entry.hasOwnProperty("origin")) {
+                    busyFiles.push(entry.origin + ":" + entry.path);
                 }
             });
             self.busyFiles(busyFiles);
         };
 
         self.print = function() {
-            var restartCommand = function() {
-                self._jobCommand("restart");
-            };
-
             if (self.isPaused()) {
-                $("#confirmation_dialog .confirmation_dialog_message").text(gettext("This will restart the print job from the beginning."));
-                $("#confirmation_dialog .confirmation_dialog_acknowledge").unbind("click");
-                $("#confirmation_dialog .confirmation_dialog_acknowledge").click(function(e) {e.preventDefault(); $("#confirmation_dialog").modal("hide"); restartCommand(); });
-                $("#confirmation_dialog").modal("show");
+                showConfirmationDialog({
+                    message: gettext("This will restart the print job from the beginning."),
+                    onproceed: function() {
+                        OctoPrint.job.restart();
+                    }
+                });
             } else {
-                self._jobCommand("start");
+                OctoPrint.job.start();
             }
 
             // Forces the insufficient filament message to hide
@@ -489,36 +491,32 @@ $(function() {
             });
         };
 
-        self.pause = function(action) {
-            $('#job_pause').prop('disabled', true);
-            $('#job_cancel').prop('disabled', true);
-
-            action = action || "toggle";
-            self._jobCommand("pause", {"action": action}, function() {
-                $('#job_pause').prop('disabled', false);
-                $('#job_cancel').prop('disabled', false);
-            });
-
-            self._restoreShutdown();
-
-        };
-
-        self.onlyPause = function() {
-            self.pause("pause");
-
-            self.expandStatusPanel();
-        };
-
-        self.onlyResume = function() {
-            self.pause("resume");
-
-            self.retractStatusPanel();
-        };
-
         self._restoreShutdown = function() {
             $('#job_shutdown').prop('disabled', false);
             $('#shutdown_confirmation').addClass('hidden');
             $('#shutdown_panel').removeClass('hidden');
+        };
+
+        self.onlyPause = function() {
+            OctoPrint.job.pause();
+
+            self.retractStatusPanel();
+        };
+
+        self.onlyResume = function() {
+            OctoPrint.job.resume();
+
+            self.expandStatusPanel();
+        };
+
+        self.pause = function(action) {
+            $('#job_pause').prop('disabled', true);
+            $('#job_cancel').prop('disabled', true);
+
+            OctoPrint.job.togglePause(function() {
+                $('#job_pause').prop('disabled', false);
+                $('#job_cancel').prop('disabled', false);
+            });
         };
 
         self.cancel = function() {
@@ -529,12 +527,26 @@ $(function() {
             self.insufficientFilament(false);
             self.ignoredInsufficientFilament(false);
 
-            self._jobCommand("cancel", function() {
-
-                $('#job_cancel').prop('disabled', false);
-                $('#job_pause').prop('disabled', false);
-                self.retractStatusPanel();
-            });
+            if (!self.settings.feature_printCancelConfirmation()) {
+                OctoPrint.job.cancel(function() {
+                    $('#job_cancel').prop('disabled', false);
+                    $('#job_pause').prop('disabled', false);
+                    self.retractStatusPanel();
+                });
+            } else {
+                showConfirmationDialog({
+                    message: gettext("This will cancel your print."),
+                    cancel: gettext("No"),
+                    proceed: gettext("Yes"),
+                    onproceed: function() {
+                        OctoPrint.job.cancel(function() {
+                            $('#job_cancel').prop('disabled', false);
+                            $('#job_pause').prop('disabled', false);
+                            self.retractStatusPanel();
+                        });
+                    }
+                });
+            }
         };
 
         self._jobCommand = function(command, payload, callback) {
@@ -563,7 +575,7 @@ $(function() {
             });
         };
 
-        /**
+       /**
          * Returns true if a the Cancel button should be enabled
          *
          * @returns {boolean}
@@ -621,11 +633,11 @@ $(function() {
 
             window.addEventListener('resize', self.resizeSidebar, false );
         };
-    }
+    };
 
     OCTOPRINT_VIEWMODELS.push([
         PrinterStateViewModel,
-        ["loginStateViewModel", "printerProfilesViewModel", "slicingViewModel", "connectionViewModel"],
+        ["loginStateViewModel", "printerProfilesViewModel", "slicingViewModel", "connectionViewModel", "settingsViewModel"],
         ["#state_wrapper", "#drop_overlay"]
     ]);
 });

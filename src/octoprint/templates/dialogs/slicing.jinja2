@@ -16,7 +16,14 @@
                         <select data-bind="options: matchingSlicers, optionsText: 'name', optionsValue: 'key', optionsCaption: '{{ _('Select a slicer...') }}', value: slicer, valueAllowUnset: true"></select>
                     </div>
                 </div>
-                 <div class="control-group">
+                <div class="control-group">
+                    <label class="control-label">{{ _('Runs locally') }}</label>
+                    <div class="controls">
+                        <strong data-bind="text: slicerSameDevice() ? gettext('Yes') : gettext('No')"></strong>
+                        <span class="help-block"><small>{{ _('For performance reasons locally run slicers are disabled while printing') }}</small></span>
+                    </div>
+                </div>
+                <div class="control-group">
                     <label class="control-label">{{ _('Slicing Profile') }}</label>
                     <div class="controls">
                         <select data-bind="options: profiles, optionsText: 'name', optionsValue: 'key', optionsCaption: '{{ _('Select a slicing profile...') }}', value: profile, valueAllowUnset: true"></select>

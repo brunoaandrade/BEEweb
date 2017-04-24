@@ -21,6 +21,11 @@
                 <span>{{ _('Import Model') }}</span>
                 <input id="gcode_upload" accept="{{ ",".join(supportedExtensions) }}" type="file" name="file" class="fileinput-button" data-bind="enable: loginState.isUser()">
             </span>
+            <div class="row-fluid folder-button">
+                <span class="btn addfolder-button span12" data-bind="click: function() { if ($root.loginState.isUser()) { $root.showAddFolderDialog(); } }, css: {disabled: !$root.loginState.isUser()}">
+                    <i class="icon-folder-close"></i> {{ _('Create folder...') }}
+                </span>
+            </div>
         {% endif %}
     </div>
     <div id="gcode_upload_progress" class="progress progress-text-centered">
