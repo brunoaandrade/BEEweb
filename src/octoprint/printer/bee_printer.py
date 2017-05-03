@@ -925,6 +925,19 @@ class BeePrinter(Printer):
             # the disconnect function is called by the beecom driver disconnect hook
             super(BeePrinter, self).disconnect()
 
+    def on_flash_firmware_started(self, event, payload):
+        for callback in self._callbacks:
+            try:
+                callback.sendFlashingFirmware(payload['version'])
+            except:
+                self._logger.exception("Exception while notifying client of firmware update operation start")
+
+    def on_flash_firmware_finished(self, event, payload):
+        for callback in self._callbacks:
+            try:
+                callback.sendFinishedFlashingFirmware(payload['result'])
+            except:
+                self._logger.exception("Exception while notifying client of firmware update operation finished")
 
     # # # # # # # # # # # # # # # # # # # # # # #
     ########### AUXILIARY FUNCTIONS #############

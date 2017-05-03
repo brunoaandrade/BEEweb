@@ -591,7 +591,21 @@ function showRestartingOverlay(title, message, reconnectCallback) {
         $("#offline_overlay").show();
 }
 
+function showFlashingFirmwareOverlay(title, message) {
+    if (title == undefined) {
+        title = gettext("Updating firmware") + "...";
+    }
+
+    $("#offline_overlay_title").text(title);
+    $("#offline_overlay_message").html(message);
+    $("#offline_overlay_reconnect").hide();
+    if (!$("#offline_overlay").is(":visible"))
+        $("#offline_overlay").show();
+}
+
 function hideOfflineOverlay() {
+    // re-displays the reconnect button in case it was hidden
+    $("#offline_overlay_reconnect").show();
     $("#offline_overlay").hide();
 }
 

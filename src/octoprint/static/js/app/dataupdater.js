@@ -278,6 +278,29 @@ function DataUpdater(allViewModels) {
                         }
                     })
                 }
+                case "flashing": {
+                    showFlashingFirmwareOverlay(gettext("Firmware update error"), gettext("Please wait while the printer's firmware is being updated to the latest version."), null)
+                }
+                case "flashingFinished": {
+                    // hides the overlay message
+                    hideOfflineOverlay();
+
+                    if (payload.result === false) {
+                        new PNotify({
+                            title: gettext("Firmware update error"),
+                            text: gettext("There was an unhandled error while flashing the printer firmware. Please disconnect the printer and restart the software."),
+                            type: "error",
+                            hide: false
+                        });
+                    } else {
+                        new PNotify({
+                            title: gettext("Firmware update success"),
+                            text: gettext("The firmware was updated to the latest version."),
+                            type: "success",
+                            hide: true
+                        });
+                    }
+                }
             }
 
             var end = new Date().getTime();

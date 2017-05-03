@@ -163,8 +163,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 						"update_script": update_script_callable_beeweb,
 						"restart": "octoprint",
 						"stable_branch": dict(branch="master", name="Stable"),
-						"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
-												dict(branch="rc/devel", name="Devel RCs")]
+						"prerelease_branches": [dict(branch="develop", name="Maintenance RCs"),
+												dict(branch="develop", name="Devel RCs")]
 					}
 				},
 				"pip_command": None,
@@ -189,8 +189,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 						"update_script": update_script_callable_beeweb,
 						"restart": "octoprint",
 						"stable_branch": dict(branch="master", name="Stable"),
-						"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
-												dict(branch="rc/devel", name="Devel RCs")]
+						"prerelease_branches": [dict(branch="develop", name="Maintenance RCs"),
+												dict(branch="develop", name="Devel RCs")]
 					}
 				},
 				"pip_command": None,
@@ -215,8 +215,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 						"update_script": update_script_callable_beeweb,
 						"restart": "octoprint",
 						"stable_branch": dict(branch="master", name="Stable"),
-						"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
-												dict(branch="rc/develop", name="Devel RCs")]
+						"prerelease_branches": [dict(branch="develop", name="Maintenance RCs"),
+												dict(branch="develop", name="Devel RCs")]
 					},
 					"BEEsoft configurations": {
 						"type": "github_commit",
@@ -237,8 +237,8 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 						"checkout_folder": "/home/pi/beepanel2",  # default checkout path. For some unknown reason the path configured in the config.yaml is erased during setup (or boot)... :/
 						"update_script": update_script_callable_beepanel,
 						"stable_branch": dict(branch="master", name="Stable"),
-						"prerelease_branches": [dict(branch="rc/maintenance", name="Maintenance RCs"),
-												dict(branch="rc/develop", name="Devel RCs")]
+						"prerelease_branches": [dict(branch="develop", name="Maintenance RCs"),
+												dict(branch="develop", name="Devel RCs")]
 					},
 				},
 				"pip_command": None,
