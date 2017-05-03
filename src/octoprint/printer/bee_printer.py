@@ -63,30 +63,30 @@ class BeePrinter(Printer):
 
         super(BeePrinter, self).__init__(fileManager, analysisQueue, printerProfileManager)
 
-    def connect_on_client_connection(self):
-        """
-        This method is responsible for connecting to 
-        :param self: 
-        :return: True if the connection was established or False if not
-        """
-        self._isConnecting = True
-        if len(self._connectedClients) == 0:
-            return False
-
-        return self.connect()
-
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
-         Tries to connect to a BVC printer. Ignores port, baudrate parameters.
-         They are kept just for interface compatibility
+         This method is responsible for establishing the connection to the printer when there are
+         any connected clients (browser or beepanel) to the server. 
+         
+         Ignores port, baudrate parameters. They are kept just for interface compatibility
         """
         try:
+            self._isConnecting = True
+            # if there are no connected clients returns
+            if len(self._connectedClients) == 0:
+                self._isConnecting = False
+                return False
+
             if self._comm is not None:
                 self._comm.close()
 
             self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
             self._comm.confirmConnection()
+
+            # returns in case the connection with the printer was not established
+            if self._comm is None:
+                return False
 
             bee_commands = self._comm.getCommandsInterface()
 
@@ -149,7 +149,7 @@ class BeePrinter(Printer):
 
         # Starts the connection monitor thread
         import threading
-        bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(self.connect_on_client_connection, ))
+        bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(self.connect, ))
         bvc_conn_thread.daemon = True
         bvc_conn_thread.start()
 

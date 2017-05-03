@@ -7,12 +7,13 @@ __copyright__ = "Copyright (C) 2014 The OctoPrint Project - Released under terms
 
 from octoprint.server.util.wifi_util import get_ssid_list, switch_wifi_client_mode
 from octoprint.server.util.hostname_util import is_valid_hostname, update_hostname, get_hostname
-from octoprint.server import printer, NO_CONTENT
+from octoprint.server import printer, eventManager, NO_CONTENT
 from flask import Blueprint, jsonify, request, make_response, url_for
 from octoprint.settings import settings
 from os import listdir
 from os.path import isfile, join
 from octoprint.server.util.flask import restricted_access
+from octoprint.events import Events
 
 #~~ BVC custom API
 api = Blueprint("beeapi", __name__)
@@ -32,6 +33,19 @@ def getConnectedPrinter():
 		"profile": profile
 	})
 
+@api.route("/beepanel/connect", methods=["POST"])
+def connectBeePanelClient():
+	"""
+	This method is responsible for signaling when a beepanel client connects to the server
+	in order to open the connection to the printer
+	:return: 
+	"""
+	if eventManager is not None:
+		eventManager.fire(Events.CLIENT_OPENED, {"remoteAddress": 'beeconnect'})
+
+		return jsonify({"result": "SUCCESS"})
+	else:
+		return jsonify({"result": "Error: could not signal beepanel connection"})
 
 @api.route("/wifi/list", methods=["GET"])
 def getAvailableHotspots():
