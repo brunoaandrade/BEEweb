@@ -56,6 +56,11 @@ class BeePrinter(Printer):
         eventManager().subscribe(Events.CLIENT_OPENED, self.on_client_connected)
         eventManager().subscribe(Events.CLIENT_CLOSED, self.on_client_disconnected)
 
+        # subscribes to FIRMWARE_UPDATE_STARTED and FIRMWARE_UPDATE_FINISHED events in order to signal to the
+        # user when either of these operations are triggered
+        eventManager().subscribe(Events.FIRMWARE_UPDATE_STARTED, self.on_flash_firmware_started)
+        eventManager().subscribe(Events.FIRMWARE_UPDATE_FINISHED, self.on_flash_firmware_finished)
+
         super(BeePrinter, self).__init__(fileManager, analysisQueue, printerProfileManager)
 
     def connect_on_client_connection(self):

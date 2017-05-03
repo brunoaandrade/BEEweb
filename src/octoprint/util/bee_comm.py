@@ -121,7 +121,8 @@ class BeeCom(MachineCom):
                 fname_parts = firmware_file_name.split('-')
 
                 # gets the current firmware version
-                curr_firmware = self.current_firmware()
+                #curr_firmware = self.current_firmware()
+                curr_firmware = 'BEEVC-BEETHEFIRST-10.5.26.BIN'
                 curr_firmware_parts = curr_firmware.split('-')
 
                 if len(curr_firmware_parts) == 3 and curr_firmware is not "Not available":
@@ -132,11 +133,20 @@ class BeeCom(MachineCom):
                         for i in xrange(3):
                             if int(file_version_parts[i]) != int(curr_version_parts[i]):
                                 # version update found
-                                _logger.info("Updating printer firmware...")
-                                self.getCommandsInterface().flashFirmware(join(firmware_path, firmware_file_name),
-                                                                          firmware_file_name)
+                                try:
+                                    _logger.info("Updating printer firmware...")
+                                    eventManager().fire(Events.FIRMWARE_UPDATE_STARTED, {"version": firmware_file_name})
 
-                                _logger.info("Firmware updated to %s" % fname_parts[2])
+                                    self.getCommandsInterface().flashFirmware(join(firmware_path, firmware_file_name),
+                                                                              firmware_file_name)
+
+                                    _logger.info("Firmware updated to %s" % fname_parts[2])
+
+                                    eventManager().fire(Events.FIRMWARE_UPDATE_FINISHED, {"result": True})
+                                except Exception as ex:
+                                    _logger.exception(ex)
+                                    eventManager().fire(Events.FIRMWARE_UPDATE_FINISHED, {"result": False})
+
                                 return
                 elif curr_firmware == '0.0.0':
                     # If curr_firmware is 0.0.0 it means something went wrong with a previous firmware update
