@@ -121,8 +121,7 @@ class BeeCom(MachineCom):
                 fname_parts = firmware_file_name.split('-')
 
                 # gets the current firmware version
-                #curr_firmware = self.current_firmware()
-                curr_firmware = 'BEEVC-BEETHEFIRST-10.5.26.BIN'
+                curr_firmware = self.current_firmware()
                 curr_firmware_parts = curr_firmware.split('-')
 
                 if len(curr_firmware_parts) == 3 and curr_firmware is not "Not available":
@@ -138,7 +137,7 @@ class BeeCom(MachineCom):
                                     eventManager().fire(Events.FIRMWARE_UPDATE_STARTED, {"version": firmware_file_name})
 
                                     self.getCommandsInterface().flashFirmware(join(firmware_path, firmware_file_name),
-                                                                              firmware_file_name)
+                                                                             firmware_file_name)
 
                                     _logger.info("Firmware updated to %s" % fname_parts[2])
 

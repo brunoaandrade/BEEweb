@@ -277,15 +277,17 @@ function DataUpdater(allViewModels) {
                             viewModel.onDataUpdaterPluginMessage(data.plugin, data.data);
                         }
                     })
+                    break;
                 }
                 case "flashing": {
-                    showFlashingFirmwareOverlay(gettext("Firmware update error"), gettext("Please wait while the printer's firmware is being updated to the latest version."), null)
+                    showFlashingFirmwareOverlay(gettext("Updating firmware") + '...', gettext("Please wait while the printer's firmware is being updated to the latest version."), null)
+                    break;
                 }
                 case "flashingFinished": {
                     // hides the overlay message
                     hideOfflineOverlay();
 
-                    if (payload.result === false) {
+                    if (data.result === false) {
                         new PNotify({
                             title: gettext("Firmware update error"),
                             text: gettext("There was an unhandled error while flashing the printer firmware. Please disconnect the printer and restart the software."),
@@ -300,6 +302,7 @@ function DataUpdater(allViewModels) {
                             hide: true
                         });
                     }
+                    break;
                 }
             }
 
