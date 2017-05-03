@@ -79,13 +79,19 @@ class BeePrinter(Printer):
                 return False
 
             if self._comm is not None:
-                self._comm.close()
+                if not self._comm.isBusy():
+                    self._comm.close()
+                else:
+                    # if the connection is active and the printer is busy aborts a new connection
+                    self._isConnecting = False
+                    return False
 
             self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
             self._comm.confirmConnection()
 
             # returns in case the connection with the printer was not established
             if self._comm is None:
+                self._isConnecting = False
                 return False
 
             bee_commands = self._comm.getCommandsInterface()
