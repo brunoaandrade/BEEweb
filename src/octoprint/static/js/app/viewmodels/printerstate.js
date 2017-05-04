@@ -21,6 +21,7 @@ $(function() {
         self.stateClass = ko.observable(undefined);
         self.isShutdown = ko.observable(undefined);
         self.isResuming = ko.observable(undefined);
+        self.isConnecting = ko.observable(undefined);
 
         self.insufficientFilament = ko.observable(false);
         self.ignoredInsufficientFilament = ko.observable(false);
@@ -63,7 +64,7 @@ $(function() {
             && !self.isPaused() && !self.isHeating() && !self.isShutdown());
         });
         self.noPrinterDetected = ko.pureComputed(function() {
-            return self.connection.isErrorOrClosed()
+            return self.connection.isErrorOrClosed() && !self.isConnecting()
         });
         self.isSelectedFile = ko.pureComputed(function() {
              return self.loginState.isUser() && self.filename() != undefined;
@@ -358,6 +359,14 @@ $(function() {
             self.isHeating(data.flags.heating);
             self.isShutdown(data.flags.shutdown);
             self.isResuming(data.flags.resuming);
+
+            // Workaround to detect the Connecting printer state, because it is signaled from the backend as being
+            // in closedOrError state
+            if (data.text.toLowerCase().indexOf('connecting') !== -1) {
+                self.isConnecting(true);
+            } else {
+                self.isConnecting(false);
+            }
 
             if (self.isPaused() != prevPaused) {
                 if (self.isPaused()) {
