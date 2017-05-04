@@ -10,7 +10,7 @@ import os
 from octoprint.printer.standard import Printer
 from octoprint.printer import PrinterInterface
 from octoprint.settings import settings
-from octoprint.server.util.connection_util import detect_bvc_printer_connection
+from octoprint.server.util.connection_util import ConnectionMonitorThread
 from octoprint.server.util.printer_status_detection_util import bvc_printer_status_detection
 from octoprint.events import eventManager, Events
 from octoprint.slicing import SlicingManager
@@ -38,6 +38,7 @@ class BeePrinter(Printer):
         self._runningCalibrationTest = False
         self._insufficientFilamentForCurrent = False
         self._isConnecting = False
+        self._bvc_conn_thread = None
 
         # Initializes the slicing manager for filament profile information
         self._slicingManager = SlicingManager(settings().getBaseFolder("slicingProfiles"), printerProfileManager)
@@ -139,6 +140,11 @@ class BeePrinter(Printer):
 
             self._isConnecting = False
 
+            # make sure the connection monitor thread is null so we are able to instantiate a new thread later on
+            if self._bvc_conn_thread is not None:
+                self._bvc_conn_thread.stop_connection_monitor()
+                self._bvc_conn_thread = None
+
             if self._comm.isOperational():
                 return True
         except Exception:
@@ -153,11 +159,11 @@ class BeePrinter(Printer):
         self._logger.info("Closing USB printer connection.")
         super(BeePrinter, self).disconnect()
 
-        # Starts the connection monitor thread
-        import threading
-        bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(self.connect, ))
-        bvc_conn_thread.daemon = True
-        bvc_conn_thread.start()
+        # Starts the connection monitor thread only if there are any connected clients
+        if len(self._connectedClients) > 0 and self._bvc_conn_thread is None:
+            import threading
+            self._bvc_conn_thread = ConnectionMonitorThread(self.connect)
+            self._bvc_conn_thread.start()
 
 
     def select_file(self, path, sd, printAfterSelect=False, pos=None):
@@ -919,6 +925,12 @@ class BeePrinter(Printer):
         # the connection itself
         self._connectedClients.append(payload['remoteAddress'])
 
+        # Starts the connection monitor thread
+        if self._bvc_conn_thread is None:
+            import threading
+            self._bvc_conn_thread = ConnectionMonitorThread(self.connect)
+            self._bvc_conn_thread.start()
+
 
     def on_client_disconnected(self, event, payload):
         """
@@ -928,6 +940,11 @@ class BeePrinter(Printer):
         :return: 
         """
         self._connectedClients.remove(payload['remoteAddress'])
+
+        # if there are no more connected clients stops the connection monitor thread to release the USB connection
+        if len(self._connectedClients) == 0 and self._bvc_conn_thread is not None:
+            self._bvc_conn_thread.stop_connection_monitor()
+            self._bvc_conn_thread = None
 
         # Disconnects the printer connection if the connection is active
         if self._comm is not None:

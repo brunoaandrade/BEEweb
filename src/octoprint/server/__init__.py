@@ -505,13 +505,6 @@ class Server(object):
 			import threading
 			threading.Thread(target=work).start()
 
-			# Thread that handles the auto detection of usb BVC printers
-			from octoprint.server.util.connection_util import detect_bvc_printer_connection
-			if printer.is_closed_or_error():
-				bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(printer.connect, ))
-				bvc_conn_thread.daemon = True
-				bvc_conn_thread.start()
-
 
 		ioloop.add_callback(on_after_startup)
 
