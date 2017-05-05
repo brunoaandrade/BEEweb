@@ -923,13 +923,14 @@ class BeePrinter(Printer):
         """
         # Only appends the client address to the list. The connection monitor thread will automatically handle
         # the connection itself
-        self._connectedClients.append(payload['remoteAddress'])
+        if payload['remoteAddress'] not in self._connectedClients:
+            self._connectedClients.append(payload['remoteAddress'])
 
-        # Starts the connection monitor thread
-        if self._bvc_conn_thread is None:
-            import threading
-            self._bvc_conn_thread = ConnectionMonitorThread(self.connect)
-            self._bvc_conn_thread.start()
+            # Starts the connection monitor thread
+            if self._bvc_conn_thread is None and (self._comm is None or (self._comm is not None and not self._comm.isOperational())):
+                import threading
+                self._bvc_conn_thread = ConnectionMonitorThread(self.connect)
+                self._bvc_conn_thread.start()
 
 
     def on_client_disconnected(self, event, payload):
@@ -939,7 +940,8 @@ class BeePrinter(Printer):
         :param payload: 
         :return: 
         """
-        self._connectedClients.remove(payload['remoteAddress'])
+        if payload['remoteAddress'] in self._connectedClients:
+            self._connectedClients.remove(payload['remoteAddress'])
 
         # if there are no more connected clients stops the connection monitor thread to release the USB connection
         if len(self._connectedClients) == 0 and self._bvc_conn_thread is not None:
@@ -947,7 +949,7 @@ class BeePrinter(Printer):
             self._bvc_conn_thread = None
 
         # Disconnects the printer connection if the connection is active
-        if self._comm is not None:
+        if len(self._connectedClients) == 0 and self._comm is not None:
             # calls only the disconnect function on the parent class instead of the complete bee_printer.disconnect
             # which also handles the connection monitor thread. This thread will be handled automatically when
             # the disconnect function is called by the beecom driver disconnect hook
