@@ -412,7 +412,7 @@ class BeePrinter(Printer):
             if not filamentStr:
                 return None
 
-            filamentNormalizedName = filamentStr.lower().replace(' ', '_') + '_' + self.getPrinterName().lower()
+            filamentNormalizedName = filamentStr.lower().replace(' ', '_') + '_' + self.getPrinterNameNormalized()
             profiles = self._slicingManager.all_profiles_list(self._slicingManager.default_slicer)
 
             if len(profiles) > 0:
@@ -685,6 +685,17 @@ class BeePrinter(Printer):
         else:
             return None
 
+    def getPrinterNameNormalized(self):
+        """
+        Returns the name of the connected printer with lower case and without spaces
+        the same way it's used in the filament profile names
+        :return:
+        """
+        printer_name = self.getPrinterName()
+        if printer_name:
+            return self.getPrinterName().replace(' ', '').lower()
+
+        return None
 
     def feed_rate(self, factor):
         """

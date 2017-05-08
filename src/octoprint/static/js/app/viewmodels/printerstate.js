@@ -162,20 +162,6 @@ $(function() {
         self.titlePrintButton = ko.observable(self.TITLE_PRINT_BUTTON_UNPAUSED);
         self.titlePauseButton = ko.observable(self.TITLE_PAUSE_BUTTON_UNPAUSED);
 
-        self.printerLogo = ko.computed(function() {
-            var logo = "";
-
-            if (self.isErrorOrClosed() !== undefined && !self.isErrorOrClosed() && !self.isError()) {
-                var profile = self.printerProfiles.currentProfileData().id();
-                if (profile == "_default") {
-                    profile = "beethefirst";
-                }
-                logo = "/static/img/logo_" + profile + ".png";
-            }
-
-            return logo;
-        });
-
         self.printerName = ko.computed(function() {
             var name = "";
             if (self.isErrorOrClosed() !== undefined && !self.isErrorOrClosed() && !self.isError()) {
