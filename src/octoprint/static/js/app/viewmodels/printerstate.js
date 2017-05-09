@@ -333,6 +333,7 @@ $(function() {
         self._processStateData = function(data) {
             var prevPaused = self.isPaused();
             var prevPrinting = self.isPrinting();
+            var prevClosed = self.isErrorOrClosed();
 
             self.stateString(gettext(data.text));
             self.isErrorOrClosed(data.flags.closedOrError);
@@ -371,6 +372,13 @@ $(function() {
 
             if (self.isShutdown()) {
                 self.expandStatusPanel();
+            }
+
+            // detects if the state changed from closed to ready (upon printer connection) in order to update
+            // the currently selected printer profile, instead of calling the API when the application is loaded
+            // in the PrinterProfilesViewModel which would cause the printer label to always show the default printer
+            if (prevClosed === true && self.isErrorOrClosed() === false && self.isReady() === true) {
+                self.printerProfiles.requestData();
             }
         };
 
