@@ -1496,7 +1496,8 @@ td.settings_users_actions .m-icon {
 #usersettings_dialog .modal-footer .btn-primary,
 #settings-usersDialogAddUser .modal-footer .btn-primary,
 #settings-usersDialogEditUser .modal-footer .btn-primary,
-#settings-usersDialogChangePassword .modal-footer .btn-primary {
+#settings-usersDialogChangePassword .modal-footer .btn-primary,
+#settings_plugin_softwareupdate_configurationdialog .modal-footer .btn-primary{
     padding: 20px 0;
     width: 175px;
     text-transform: uppercase;
