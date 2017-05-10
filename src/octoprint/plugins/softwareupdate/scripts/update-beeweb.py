@@ -182,7 +182,7 @@ def install_source(python_executable, folder, user=False, sudo=False):
             # NSUserDomainMask = 1
             # True for expanding the tilde into a fully qualified path
             app_data_folder = NSSearchPathForDirectoriesInDomains(14, 1, True)[0]
-            pattern = app_data_folder + '/beesoft-nativefier*/Cache/*'
+            pattern = app_data_folder + '/beesoft-*/Cache/*'
         else:
             pattern = os.path.expanduser(os.path.join("~", "." + '/beesoft-nativefier*/Cache/*'))
 
