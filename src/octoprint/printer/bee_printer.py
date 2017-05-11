@@ -888,10 +888,11 @@ class BeePrinter(Printer):
         Print cancelled callback for the EventManager.
         """
         try:
+            self.on_print_cancelled(event, payload)
+
             self._fileManager.remove_file(payload['origin'], payload['file'])
         except RuntimeError:
             self._logger.exception('Error deleting temporary GCode file.')
-        self.on_print_cancelled(event, payload)
 
 
     def on_comm_state_change(self, state):

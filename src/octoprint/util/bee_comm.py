@@ -887,9 +887,7 @@ class BeeCom(MachineCom):
                 return
 
         if self._currentFile is not None:
-        # Starts the real printing operation
-            self._currentFile.start()
-
+            # Starts the real printing operation
             self._changeState(self.STATE_PRINTING)
 
             payload = {
