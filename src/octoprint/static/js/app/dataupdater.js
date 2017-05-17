@@ -244,6 +244,31 @@ function DataUpdater(allViewModels) {
         OctoPrint.socket.decreaseRate();
     };
 
+    self._onFlashing = function(event) {
+        showFlashingFirmwareOverlay(gettext("Updating firmware") + '...', gettext("Please wait while the printer's firmware is being updated to the latest version."), null)
+    };
+
+    self._onFlashingFinished = function(event) {
+        // hides the overlay message
+        hideOfflineOverlay();
+
+        if (event.data.result === false) {
+            new PNotify({
+                title: gettext("Firmware update error"),
+                text: gettext("There was an unhandled error while flashing the printer firmware. Please disconnect the printer and restart the software."),
+                type: "error",
+                hide: false
+            });
+        } else {
+            new PNotify({
+                title: gettext("Firmware update success"),
+                text: gettext("The firmware was updated to the latest version."),
+                type: "success",
+                hide: true
+            });
+        }
+    };
+
     OctoPrint.socket.onReconnectAttempt = self._onReconnectAttempt;
     OctoPrint.socket.onReconnectFailed = self._onReconnectFailed;
     OctoPrint.socket.onRateTooHigh = self._onDecreaseRate;
@@ -255,31 +280,7 @@ function DataUpdater(allViewModels) {
         .onMessage("slicingProgress", self._onSlicingProgress)
         .onMessage("event", self._onEvent)
         .onMessage("timelapse", self._onTimelapse)
-        .onMessage("plugin", self._onPluginMessage);
-
-                case "flashing": {
-                    showFlashingFirmwareOverlay(gettext("Updating firmware") + '...', gettext("Please wait while the printer's firmware is being updated to the latest version."), null)
-                    break;
-                }
-                case "flashingFinished": {
-                    // hides the overlay message
-                    hideOfflineOverlay();
-
-                    if (data.result === false) {
-                        new PNotify({
-                            title: gettext("Firmware update error"),
-                            text: gettext("There was an unhandled error while flashing the printer firmware. Please disconnect the printer and restart the software."),
-                            type: "error",
-                            hide: false
-                        });
-                    } else {
-                        new PNotify({
-                            title: gettext("Firmware update success"),
-                            text: gettext("The firmware was updated to the latest version."),
-                            type: "success",
-                            hide: true
-                        });
-                    }
-                    break;
-                }
+        .onMessage("plugin", self._onPluginMessage)
+        .onMessage("flashing", self._onFlashing)
+        .onMessage("flashingFinished", self._onFlashingFinished);
 }
