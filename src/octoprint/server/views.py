@@ -440,6 +440,10 @@ def _get_render_kwargs(templates, plugin_names, plugin_vars, now):
 
 
 def _process_templates():
+	enable_gcodeviewer = settings().getBoolean(["gcodeViewer", "enabled"])
+	enable_timelapse = bool(settings().get(["webcam", "snapshot"]) and settings().get(["webcam", "ffmpeg"]))
+	enable_devMode = userManager.devModeEnabled()
+
 	first_run = settings().getBoolean(["server", "firstRun"])
 
 	##~~ prepare templates
