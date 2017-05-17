@@ -4,18 +4,18 @@
 
 <div id="calibrationStep1">
     <div class="row-fluid">
-        <div class="span6">
+        <div class="span8">
             <strong>{{ _('Step 1')}}: {{ _('Calibration - Table Height') }}</strong>
+        </div>
+        <div class="span4">
+            <strong>{{ _('Table Fine Tuning')}}</strong>
         </div>
     </div>
     <div class="row-fluid">
-        <div class="span3"></div>
-        <div class="span6 text-center">
-            <img src="{{ url_for('static', filename='img/maintenance/calibracao.png') }}" />
+        <div class="span8 text-center">
+            <img src="{{ url_for('static', filename='img/maintenance/calibracao.png') }}" style="padding-top: 60px;" />
         </div>
-        <div class="span3">
-            <strong>{{ _('Table Fine Tuning')}}</strong>
-            <br /><br />
+        <div class="span4">
             <div class="row-fluid">
                 <button id="upsmallstep-btn" title="Up 0.05" class="btn btn-primary btn-block yellow"
                    data-bind="click: upSmallStep, enable: printerState.isOperational() && !commandLock()
@@ -51,7 +51,7 @@
         <p>{{ _('Put a piece of paper on the table beneath the nozzle. Fine tune the table up or down.' ) }}</p>
         <p>{{ _('You have correctly calibrated the table once the paper is neither stuck nor completely loose.' ) }}</p>
     </div>
-    <br /><br />
+    <br />
     <div class="row-fluid">
         <span class="span12"><i class="icon-exclamation-sign"></i>
             <strong>{{ _('WARNING: If you have moved the table up too far against the nozzle, click "Cancel" and restart the operation.') }}</strong>

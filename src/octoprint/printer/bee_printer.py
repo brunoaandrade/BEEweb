@@ -10,7 +10,7 @@ import os
 from octoprint.printer.standard import Printer
 from octoprint.printer import PrinterInterface
 from octoprint.settings import settings
-from octoprint.server.util.connection_util import detect_bvc_printer_connection
+from octoprint.server.util.connection_util import ConnectionMonitorThread
 from octoprint.server.util.printer_status_detection_util import bvc_printer_status_detection
 from octoprint.events import eventManager, Events
 from octoprint.slicing import SlicingManager
@@ -38,6 +38,7 @@ class BeePrinter(Printer):
         self._runningCalibrationTest = False
         self._insufficientFilamentForCurrent = False
         self._isConnecting = False
+        self._bvc_conn_thread = None
 
         # Initializes the slicing manager for filament profile information
         self._slicingManager = SlicingManager(settings().getBaseFolder("slicingProfiles"), printerProfileManager)
@@ -56,32 +57,43 @@ class BeePrinter(Printer):
         eventManager().subscribe(Events.CLIENT_OPENED, self.on_client_connected)
         eventManager().subscribe(Events.CLIENT_CLOSED, self.on_client_disconnected)
 
+        # subscribes to FIRMWARE_UPDATE_STARTED and FIRMWARE_UPDATE_FINISHED events in order to signal to the
+        # user when either of these operations are triggered
+        eventManager().subscribe(Events.FIRMWARE_UPDATE_STARTED, self.on_flash_firmware_started)
+        eventManager().subscribe(Events.FIRMWARE_UPDATE_FINISHED, self.on_flash_firmware_finished)
+
         super(BeePrinter, self).__init__(fileManager, analysisQueue, printerProfileManager)
-
-    def connect_on_client_connection(self):
-        """
-        This method is responsible for connecting to 
-        :param self: 
-        :return: True if the connection was established or False if not
-        """
-        self._isConnecting = True
-        if len(self._connectedClients) == 0:
-            return False
-
-        return self.connect()
 
 
     def connect(self, port=None, baudrate=None, profile=None):
         """
-         Tries to connect to a BVC printer. Ignores port, baudrate parameters.
-         They are kept just for interface compatibility
+         This method is responsible for establishing the connection to the printer when there are
+         any connected clients (browser or beepanel) to the server. 
+         
+         Ignores port, baudrate parameters. They are kept just for interface compatibility
         """
         try:
+            self._isConnecting = True
+            # if there are no connected clients returns
+            if len(self._connectedClients) == 0:
+                self._isConnecting = False
+                return False
+
             if self._comm is not None:
-                self._comm.close()
+                if not self._comm.isBusy():
+                    self._comm.close()
+                else:
+                    # if the connection is active and the printer is busy aborts a new connection
+                    self._isConnecting = False
+                    return False
 
             self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
             self._comm.confirmConnection()
+
+            # returns in case the connection with the printer was not established
+            if self._comm is None:
+                self._isConnecting = False
+                return False
 
             bee_commands = self._comm.getCommandsInterface()
 
@@ -128,6 +140,11 @@ class BeePrinter(Printer):
 
             self._isConnecting = False
 
+            # make sure the connection monitor thread is null so we are able to instantiate a new thread later on
+            if self._bvc_conn_thread is not None:
+                self._bvc_conn_thread.stop_connection_monitor()
+                self._bvc_conn_thread = None
+
             if self._comm.isOperational():
                 return True
         except Exception:
@@ -142,11 +159,11 @@ class BeePrinter(Printer):
         self._logger.info("Closing USB printer connection.")
         super(BeePrinter, self).disconnect()
 
-        # Starts the connection monitor thread
-        import threading
-        bvc_conn_thread = threading.Thread(target=detect_bvc_printer_connection, args=(self.connect_on_client_connection, ))
-        bvc_conn_thread.daemon = True
-        bvc_conn_thread.start()
+        # Starts the connection monitor thread only if there are any connected clients
+        if len(self._connectedClients) > 0 and self._bvc_conn_thread is None:
+            import threading
+            self._bvc_conn_thread = ConnectionMonitorThread(self.connect)
+            self._bvc_conn_thread.start()
 
 
     def select_file(self, path, sd, printAfterSelect=False, pos=None):
@@ -395,7 +412,7 @@ class BeePrinter(Printer):
             if not filamentStr:
                 return None
 
-            filamentNormalizedName = filamentStr.lower().replace(' ', '_') + '_' + self.getPrinterName().lower()
+            filamentNormalizedName = filamentStr.lower().replace(' ', '_') + '_' + self.getPrinterNameNormalized()
             profiles = self._slicingManager.all_profiles_list(self._slicingManager.default_slicer)
 
             if len(profiles) > 0:
@@ -668,6 +685,17 @@ class BeePrinter(Printer):
         else:
             return None
 
+    def getPrinterNameNormalized(self):
+        """
+        Returns the name of the connected printer with lower case and without spaces
+        the same way it's used in the filament profile names
+        :return:
+        """
+        printer_name = self.getPrinterName()
+        if printer_name:
+            return self.getPrinterName().replace(' ', '').lower()
+
+        return None
 
     def feed_rate(self, factor):
         """
@@ -859,8 +887,12 @@ class BeePrinter(Printer):
         """
         Print cancelled callback for the EventManager.
         """
-        self._fileManager.remove_file(payload['origin'], payload['file'])
-        self.on_print_cancelled(event, payload)
+        try:
+            self.on_print_cancelled(event, payload)
+
+            self._fileManager.remove_file(payload['origin'], payload['file'])
+        except RuntimeError:
+            self._logger.exception('Error deleting temporary GCode file.')
 
 
     def on_comm_state_change(self, state):
@@ -906,7 +938,14 @@ class BeePrinter(Printer):
         """
         # Only appends the client address to the list. The connection monitor thread will automatically handle
         # the connection itself
-        self._connectedClients.append(payload['remoteAddress'])
+        if payload['remoteAddress'] not in self._connectedClients:
+            self._connectedClients.append(payload['remoteAddress'])
+
+            # Starts the connection monitor thread
+            if self._bvc_conn_thread is None and (self._comm is None or (self._comm is not None and not self._comm.isOperational())):
+                import threading
+                self._bvc_conn_thread = ConnectionMonitorThread(self.connect)
+                self._bvc_conn_thread.start()
 
 
     def on_client_disconnected(self, event, payload):
@@ -916,15 +955,34 @@ class BeePrinter(Printer):
         :param payload: 
         :return: 
         """
-        self._connectedClients.remove(payload['remoteAddress'])
+        if payload['remoteAddress'] in self._connectedClients:
+            self._connectedClients.remove(payload['remoteAddress'])
+
+        # if there are no more connected clients stops the connection monitor thread to release the USB connection
+        if len(self._connectedClients) == 0 and self._bvc_conn_thread is not None:
+            self._bvc_conn_thread.stop_connection_monitor()
+            self._bvc_conn_thread = None
 
         # Disconnects the printer connection if the connection is active
-        if self._comm is not None:
+        if len(self._connectedClients) == 0 and self._comm is not None:
             # calls only the disconnect function on the parent class instead of the complete bee_printer.disconnect
             # which also handles the connection monitor thread. This thread will be handled automatically when
             # the disconnect function is called by the beecom driver disconnect hook
             super(BeePrinter, self).disconnect()
 
+    def on_flash_firmware_started(self, event, payload):
+        for callback in self._callbacks:
+            try:
+                callback.sendFlashingFirmware(payload['version'])
+            except:
+                self._logger.exception("Exception while notifying client of firmware update operation start")
+
+    def on_flash_firmware_finished(self, event, payload):
+        for callback in self._callbacks:
+            try:
+                callback.sendFinishedFlashingFirmware(payload['result'])
+            except:
+                self._logger.exception("Exception while notifying client of firmware update operation finished")
 
     # # # # # # # # # # # # # # # # # # # # # # #
     ########### AUXILIARY FUNCTIONS #############
@@ -1060,35 +1118,37 @@ class BeePrinter(Printer):
         :param operation: Supports 'start' (Start Print), 'cancel' (Cancel Print), 'stop' (Print finished) operations
         :return: true in case the operation was successfull or false if not
         """
-        _logger = logging.getLogger()
-        biExePath = settings().getBaseFolder('bi') + '/bi_azure'
+        import sys
+        if not sys.platform == "darwin" and not sys.platform == "win32":
+            _logger = logging.getLogger()
+            biExePath = settings().getBaseFolder('bi') + '/bi_azure'
 
-        if operation != 'start' and operation != 'cancel' and operation != 'stop':
-            return False
-
-        if os.path.exists(biExePath) and os.path.isfile(biExePath):
-
-            printerSN = self._comm.getConnectedPrinterSN()
-
-            if printerSN is None:
-                _logger.error("Could not get Printer Serial Number for statistics communication.")
+            if operation != 'start' and operation != 'cancel' and operation != 'stop':
                 return False
-            else:
-                cmd = '%s %s %s' % (biExePath,str(printerSN), str(operation))
-                _logger.info(u"Running %s" % cmd)
 
-                import subprocess
-                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+            if os.path.exists(biExePath) and os.path.isfile(biExePath):
 
-                (output, err) = p.communicate()
+                printerSN = self._comm.getConnectedPrinterSN()
 
-                p_status = p.wait()
-
-                if p_status == 0 and 'IOTHUB_CLIENT_CONFIRMATION_OK' in output:
-                    _logger.info(u"Statistics sent to remote server. (Operation: %s)" % operation)
-                    return True
+                if printerSN is None:
+                    _logger.error("Could not get Printer Serial Number for statistics communication.")
+                    return False
                 else:
-                    _logger.info(u"Failed sending statistics to remote server. (Operation: %s)" % operation)
+                    cmd = '%s %s %s' % (biExePath,str(printerSN), str(operation))
+                    _logger.info(u"Running %s" % cmd)
+
+                    import subprocess
+                    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+
+                    (output, err) = p.communicate()
+
+                    p_status = p.wait()
+
+                    if p_status == 0 and 'IOTHUB_CLIENT_CONFIRMATION_OK' in output:
+                        _logger.info(u"Statistics sent to remote server. (Operation: %s)" % operation)
+                        return True
+                    else:
+                        _logger.info(u"Failed sending statistics to remote server. (Operation: %s)" % operation)
 
         return False
 

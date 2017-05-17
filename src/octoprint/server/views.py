@@ -531,9 +531,6 @@ def _process_templates():
 	templates["tab"]["entries"] = dict(
 		workbench=(gettext("Workbench"), dict(template="tabs/workbench.jinja2", _div="workbench")),
 	)
-	if enable_gcodeviewer:
-		templates["tab"]["entries"]["gcodeviewer"] = (gettext("GCode Viewer"), dict(template="tabs/gcodeviewer.jinja2", _div="gcode"))
-
 
 	# Tabs for developer mode
 	if enable_devMode:
@@ -544,6 +541,9 @@ def _process_templates():
 		if enable_timelapse:
 			templates["tab"]["entries"]["timelapse"] = (gettext("Timelapse"), dict(template="tabs/timelapse.jinja2", _div="timelapse"))
 
+		if enable_gcodeviewer:
+			templates["tab"]["entries"]["gcodeviewer"] = (
+			gettext("GCode Viewer"), dict(template="tabs/gcodeviewer.jinja2", _div="gcode"))
 
 	# settings dialog
 	templates["settings"]["entries"] = dict(

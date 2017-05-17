@@ -1,31 +1,44 @@
 # coding=utf-8
 import logging
+import threading
 from beedriver.connection import Conn as BeePrinterConn
 from time import sleep
 
-def detect_bvc_printer_connection(connection_callback):
-	"""
-	Thread function to check if a BVC printer was connected to a USB port
+class ConnectionMonitorThread(threading.Thread):
 
-	:param connection_callback: Callback function to call when a printer is detected
-	:return:
-	"""
-	USB_POLL_INTERVAL = 1 # seconds
-	printerConnIntf = BeePrinterConn()
+	def __init__(self, connection_callback):
+		"""
+		Thread class to check if a BVC printer was connected to a USB port
 
-	_logger = logging.getLogger()
-	_printer_detected_msg_logged = False
+		:param connection_callback: Callback function to call when a printer is detected
+		:return:
+		"""
+		super(ConnectionMonitorThread, self).__init__()
+		self.USB_POLL_INTERVAL = 1  # seconds
+		self._printerConnIntf = BeePrinterConn()
 
-	_logger.info("Starting BVC Printer connection monitor...")
-	while True:
-		printers = printerConnIntf.getPrinterList()
+		self._logger = logging.getLogger()
+		self._printer_detected_msg_logged = False
+		self._controlFlag = True
+		self._connection_callback = connection_callback
 
-		if len(printers) > 0: # printer found
-			if not _printer_detected_msg_logged:
-				_logger.info("BVC Printer detected. Waiting for client connection...")
-				_printer_detected_msg_logged = True
-				
-			if connection_callback():
-				return
+	def stop_connection_monitor(self):
+		self._controlFlag = False
+		self._logger.info("BVC Printer connection monitor stopped.")
 
-		sleep (USB_POLL_INTERVAL)
+	def run(self):
+
+		self._logger.info("Starting BVC Printer connection monitor...")
+
+		while self._controlFlag:
+			printers = self._printerConnIntf.getPrinterList()
+
+			if len(printers) > 0: # printer found
+				if not self._printer_detected_msg_logged:
+					self._logger.info("BVC Printer detected. Waiting for client connection...")
+					self._printer_detected_msg_logged = True
+
+				if self._connection_callback():
+					return
+
+			sleep (self.USB_POLL_INTERVAL)

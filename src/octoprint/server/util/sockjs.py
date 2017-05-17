@@ -186,6 +186,12 @@ class PrinterStateConnection(sockjs.tornado.SockJSConnection, octoprint.printer.
 		           dict(slicer=slicer, source_location=source_location, source_path=source_path, dest_location=dest_location, dest_path=dest_path, progress=progress)
 		)
 
+	def sendFlashingFirmware(self, firmwareVersion):
+		self._emit("flashing", dict(version=firmwareVersion))
+
+	def sendFinishedFlashingFirmware(self, firmwareFlashResult):
+		self._emit("flashingFinished", dict(result=firmwareFlashResult))
+
 	def on_plugin_message(self, plugin, data):
 		self._emit("plugin", dict(plugin=plugin, data=data))
 

@@ -48,7 +48,7 @@ INSTALL_REQUIRES = [
 	"scandir>=1.3,<1.4",
 	"websocket-client>=0.40,<0.41"
 	"feedparser>=5.2.1,<5.3",
-	"beecom==0.3.10",
+	"beecom==0.3.12",
 	"pyusb>=1.0.0b2"
 ]
 

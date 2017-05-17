@@ -22,6 +22,7 @@ $(function() {
         self.stateClass = ko.observable(undefined);
         self.isShutdown = ko.observable(undefined);
         self.isResuming = ko.observable(undefined);
+        self.isConnecting = ko.observable(undefined);
 
         self.insufficientFilament = ko.observable(false);
         self.ignoredInsufficientFilament = ko.observable(false);
@@ -64,7 +65,7 @@ $(function() {
             && !self.isPaused() && !self.isHeating() && !self.isShutdown());
         });
         self.noPrinterDetected = ko.pureComputed(function() {
-            return self.connection.isErrorOrClosed()
+            return self.connection.isErrorOrClosed() && !self.isConnecting()
         });
         self.isSelectedFile = ko.pureComputed(function() {
              return self.loginState.isUser() && self.filename() != undefined;
@@ -162,20 +163,6 @@ $(function() {
 
         self.titlePrintButton = ko.observable(self.TITLE_PRINT_BUTTON_UNPAUSED);
         self.titlePauseButton = ko.observable(self.TITLE_PAUSE_BUTTON_UNPAUSED);
-
-        self.printerLogo = ko.computed(function() {
-            var logo = "";
-
-            if (self.isErrorOrClosed() !== undefined && !self.isErrorOrClosed() && !self.isError()) {
-                var profile = self.printerProfiles.currentProfileData().id();
-                if (profile == "_default") {
-                    profile = "beethefirst";
-                }
-                logo = "/static/img/logo_" + profile + ".png";
-            }
-
-            return logo;
-        });
 
         self.printerName = ko.computed(function() {
             var name = "";
@@ -348,6 +335,7 @@ $(function() {
         self._processStateData = function(data) {
             var prevPaused = self.isPaused();
             var prevPrinting = self.isPrinting();
+            var prevClosed = self.isErrorOrClosed();
 
             self.stateString(gettext(data.text));
             self.isErrorOrClosed(data.flags.closedOrError);
@@ -360,6 +348,14 @@ $(function() {
             self.isHeating(data.flags.heating);
             self.isShutdown(data.flags.shutdown);
             self.isResuming(data.flags.resuming);
+
+            // Workaround to detect the Connecting printer state, because it is signaled from the backend as being
+            // in closedOrError state
+            if (data.text.toLowerCase().indexOf('connecting') !== -1) {
+                self.isConnecting(true);
+            } else {
+                self.isConnecting(false);
+            }
 
             if (self.isPaused() != prevPaused) {
                 if (self.isPaused()) {
@@ -378,6 +374,13 @@ $(function() {
 
             if (self.isShutdown()) {
                 self.expandStatusPanel();
+            }
+
+            // detects if the state changed from closed to ready (upon printer connection) in order to update
+            // the currently selected printer profile, instead of calling the API when the application is loaded
+            // in the PrinterProfilesViewModel which would cause the printer label to always show the default printer
+            if (prevClosed === true && self.isErrorOrClosed() === false && self.isReady() === true) {
+                self.printerProfiles.requestData();
             }
         };
 

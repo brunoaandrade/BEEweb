@@ -32,6 +32,8 @@ class BeeCom(MachineCom):
     _prepare_print_thread = None
     _preparing_print = False
     _resume_print_thread = None
+    _transferProgress = 0
+    _heatingProgress = 0
 
     def __init__(self, callbackObject=None, printerProfileManager=None):
         super(BeeCom, self).__init__(None, None, callbackObject, printerProfileManager)
@@ -120,7 +122,7 @@ class BeeCom(MachineCom):
 
                 fname_parts = firmware_file_name.split('-')
 
-                # gets the current firmware version
+                # gets the current firmware version, ex: BEEVC-BEETHEFIRST-10.5.23.BIN
                 curr_firmware = self.current_firmware()
                 curr_firmware_parts = curr_firmware.split('-')
 
@@ -132,20 +134,11 @@ class BeeCom(MachineCom):
                         for i in xrange(3):
                             if int(file_version_parts[i]) != int(curr_version_parts[i]):
                                 # version update found
-                                _logger.info("Updating printer firmware...")
-                                self.getCommandsInterface().flashFirmware(join(firmware_path, firmware_file_name),
-                                                                          firmware_file_name)
+                                return self._flashFirmware(firmware_file_name, firmware_path, fname_parts[2])
 
-                                _logger.info("Firmware updated to %s" % fname_parts[2])
-                                return
                 elif curr_firmware == '0.0.0':
                     # If curr_firmware is 0.0.0 it means something went wrong with a previous firmware update
-                    _logger.info("Updating printer firmware...")
-                    self.getCommandsInterface().flashFirmware(join(firmware_path, firmware_file_name),
-                                                              firmware_file_name)
-
-                    _logger.info("Firmware updated to %s" % fname_parts[2])
-                    return
+                    return self._flashFirmware(firmware_file_name, firmware_path, fname_parts[2])
             else:
                 _logger.error("No firmware file matching the configuration for printer %s found" % conn_printer)
 
@@ -885,20 +878,28 @@ class BeeCom(MachineCom):
         # waits for heating/file transfer
         while self._beeCommands.isTransferring():
             time.sleep(1)
+            self._transferProgress = self._beeCommands.getTransferState()
+            # makes use of the same method that is used for the print job progress, to update
+            # the transfer progress since we are going to use the same progress bar
+            self._callback._setProgressData(self._transferProgress, 0, 0, 0)
             if not self._preparing_print:  # the print (transfer) was cancelled
                 return
+        self._callback._resetPrintProgress()
 
         self._changeState(self.STATE_HEATING)
 
         while self._beeCommands.isHeating():
             time.sleep(1)
+            self._heatingProgress = round(self._beeCommands.getHeatingState(), 2)
+            # makes use of the same method that is used for the print job progress, to update
+            # the heating progress since we are going to use the same progress bar
+            self._callback._setProgressData(self._heatingProgress, 0, 0, 0)
             if not self._preparing_print:  # the print (heating) was cancelled
                 return
+        self._callback._resetPrintProgress()
 
         if self._currentFile is not None:
-        # Starts the real printing operation
-            self._currentFile.start()
-
+            # Starts the real printing operation
             self._changeState(self.STATE_PRINTING)
 
             payload = {
@@ -958,6 +959,34 @@ class BeeCom(MachineCom):
             self._changeState(self.STATE_READY)
             self._logger.error('Error starting Print operation. No selected file found.')
 
+
+    def _flashFirmware(self, firmware_file_name, firmware_path, version):
+        """
+        Auxiliary method that performs that calls the low level driver flash firmware operation
+        :param firmware_file_name: 
+        :param firmware_path: 
+        :param version: 
+        :return: 
+        """
+        from os.path import join
+        _logger = logging.getLogger()
+
+        try:
+            _logger.info("Updating printer firmware...")
+            eventManager().fire(Events.FIRMWARE_UPDATE_STARTED, {"version": firmware_file_name})
+
+            if self.getCommandsInterface().flashFirmware(join(firmware_path, firmware_file_name), firmware_file_name):
+
+                _logger.info("Firmware updated to %s" % version)
+                eventManager().fire(Events.FIRMWARE_UPDATE_FINISHED, {"result": True})
+                return True
+
+        except Exception as ex:
+            _logger.exception(ex)
+
+        _logger.info("Error updating firmware to version %s" % version)
+        eventManager().fire(Events.FIRMWARE_UPDATE_FINISHED, {"result": False})
+        return False
 
 class InMemoryFileInformation(PrintingFileInformation):
     """

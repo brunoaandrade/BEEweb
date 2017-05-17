@@ -566,7 +566,7 @@ $(function() {
         };
 
         self.onSettingsShown = self.requestData;
-        self.onStartup = self.requestData;
+        //self.onStartup = self.requestData;
     }
 
     OCTOPRINT_VIEWMODELS.push([
