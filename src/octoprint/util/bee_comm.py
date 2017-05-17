@@ -32,6 +32,8 @@ class BeeCom(MachineCom):
     _prepare_print_thread = None
     _preparing_print = False
     _resume_print_thread = None
+    _transferProgress = 0
+    _heatingProgress = 0
 
     def __init__(self, callbackObject=None, printerProfileManager=None):
         super(BeeCom, self).__init__(None, None, callbackObject, printerProfileManager)
@@ -876,15 +878,25 @@ class BeeCom(MachineCom):
         # waits for heating/file transfer
         while self._beeCommands.isTransferring():
             time.sleep(1)
+            self._transferProgress = self._beeCommands.getTransferState()
+            # makes use of the same method that is used for the print job progress, to update
+            # the transfer progress since we are going to use the same progress bar
+            self._callback._setProgressData(self._transferProgress, 0, 0, 0)
             if not self._preparing_print:  # the print (transfer) was cancelled
                 return
+        self._callback._resetPrintProgress()
 
         self._changeState(self.STATE_HEATING)
 
         while self._beeCommands.isHeating():
             time.sleep(1)
+            self._heatingProgress = round(self._beeCommands.getHeatingState(), 2)
+            # makes use of the same method that is used for the print job progress, to update
+            # the heating progress since we are going to use the same progress bar
+            self._callback._setProgressData(self._heatingProgress, 0, 0, 0)
             if not self._preparing_print:  # the print (heating) was cancelled
                 return
+        self._callback._resetPrintProgress()
 
         if self._currentFile is not None:
             # Starts the real printing operation
