@@ -75,13 +75,19 @@ def saveNetworkConfig():
 	data = request.json
 	network_name = data['network']
 	password = data['password']
+	custom_ssid = data['custom_ssid']
+
+	hidden_network = False
+	if custom_ssid:  # If a custom hidden SSID was specified uses it as the network name
+		network_name = custom_ssid
+		hidden_network = True
 
 	# validates input data
 	if network_name is None:
 		return make_response("Invalid network name parameter.", 406)
 
 	# Tries to switch the Wifi configuration to client mode
-	switch_wifi_client_mode(network_name, password)
+	switch_wifi_client_mode(network_name, password, hidden_network)
 
 	return NO_CONTENT
 

@@ -242,11 +242,7 @@
 
                 var custom_ssid = $('#custom-network-input').val();
 
-                if (custom_ssid !== "") {
-                    network = custom_ssid; // If the value for a hidden/custom ssid is not empty, uses it as the network name
-                }
-
-                var content = { 'network': network, 'password': pass };
+                var content = { 'network': network, 'password': pass, 'custom_ssid': custom_ssid };
 
                 $('#connect-button').prop('disabled', true);
                 $('#alert-connect').show();

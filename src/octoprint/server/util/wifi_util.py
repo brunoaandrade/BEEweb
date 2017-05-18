@@ -60,13 +60,14 @@ def get_ssid_list(net_iface, out_file_path = None):
 	return networks_found
 
 
-def switch_wifi_client_mode(network_name, password):
+def switch_wifi_client_mode(network_name, password, hidden_network=False):
 	"""
 	Switches the Wifi interfaces to client mode and tries to connect to the specified
 	network using the system configured scripts
 
 	:param network_name:
 	:param password:
+	:param hidden_network: flag signaling if the network to connect to has a hidden SSID broadcast
 	:return:
 	"""
 	import re
@@ -75,6 +76,11 @@ def switch_wifi_client_mode(network_name, password):
 
 	regex_net = re.compile(r'ssid=".+"', re.IGNORECASE)
 	regex_pass = re.compile(r'psk=".+"', re.IGNORECASE)
+	regex_scan_ssid = re.compile(r'scan_ssid=[0-9]', re.IGNORECASE)
+
+	scan_type = 0
+	if hidden_network is True:
+		scan_type = 1
 
 	lines = []
 	with open('/etc/wpa_supplicant/wpa_supplicant.conf.dist') as infile:
@@ -83,6 +89,8 @@ def switch_wifi_client_mode(network_name, password):
 				line = regex_net.sub('ssid="%s"' % network_name, line)
 			if 'psk' in line:
 				line = regex_pass.sub('psk="%s"' % password, line)
+			if 'scan_ssid' in line:
+				line = regex_scan_ssid.sub('scan_ssid=%d' % scan_type, line)
 
 			lines.append(line)
 
