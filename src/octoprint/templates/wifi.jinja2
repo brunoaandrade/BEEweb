@@ -74,7 +74,7 @@
                                         <div id="custom-newtwork" class="control-group" >
                                             <div class="controls">
                                                 <label>{{ _('Custom SSID') }}: </label>
-                                                <input id="custom-network-input" type="text" onkeyup="$('#network-password').show();"/>
+                                                <input id="custom-network-input" type="text" onkeyup="$('#network-password').show();" autocomplete="off"/>
                                                 <p>
                                                     <small>
                                                         <i class="icon-info"></i>
@@ -90,7 +90,7 @@
                                         <div id="network-password" class="control-group" style="display: none;">
                                             <div class="controls">
                                                 <label>{{ _('Network password') }}: </label><br />
-                                                <input id="password-input" type="password" class="password"/>
+                                                <input id="password-input" type="password" class="password" autocomplete="off"/>
 
                                                 <input id="showHide" type="checkbox" />
                                                 <label> {{ _('Show/hide password') }}</label>
