@@ -37,36 +37,64 @@
                     <!-- Tabs -->
                     <div class="tabbable span12">
 
-                        <ul class="nav nav-tabs" id="tabs">
-                            <li id="wifi-config_link" class="active">
-                                <a href="#wifi-config" data-toggle="tab">{{ _('Network Configurations') }}</a>
-                            </li>
-                        </ul>
+                        <!--<ul class="nav nav-tabs" id="tabs">-->
+                            <!--<li id="wifi-config_link" class="active">-->
+                                <!--<a href="#wifi-config" data-toggle="tab">{{ _('Network Configurations') }}</a>-->
+                            <!--</li>-->
+                        <!--</ul>-->
 
                         <div class="tab-content">
-
+                            <h4>{{ _('Network Configurations') }}</h4>
                             <div id="wifi-config" class="tab-pane active">
                                 <br /><br />
                                 <div class="row-fluid">
-                                    <div class="control-group">
-                                        <div class="controls">
-                                            <label>{{ _('Available networks') }}: </label>
-                                            <select id="networks-list" class="form-control" style="margin-bottom: 0px;"
-                                                    onchange="$('#network-password').show();" >
-                                                <option value=""></option>
-                                            </select>
-                                            <a id="get-networks-button" class="btn btn-default" onclick="getNetworkList()"
-                                            data-loading-text="<i class='icon-refresh icon-spin'></i>">
-                                                <i class="icon-refresh"></i>
-                                            </a>
-                                            <p>{{ _('Please select the wi-fi network you wish to join.') }}</p>
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <div class="controls">
+                                                <label>{{ _('Available networks') }}: </label>
+                                                <select id="networks-list" class="form-control" style="margin-bottom: 0px;"
+                                                        onchange="$('#network-password').show();" >
+                                                    <option value=""></option>
+                                                </select>
+                                                <a id="get-networks-button" class="btn btn-default" onclick="getNetworkList()"
+                                                data-loading-text="<i class='icon-refresh icon-spin'></i>">
+                                                    <i class="icon-refresh"></i>
+                                                </a>
+                                                <br />
+                                                <p>
+                                                    <small>
+                                                        <i class="icon-info"></i>
+                                                        {{ _('Please select the wi-fi network you wish to join.') }}
+                                                    </small>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div class="span6">
+                                        <div id="custom-newtwork" class="control-group" >
+                                            <div class="controls">
+                                                <label>{{ _('Custom SSID') }}: </label>
+                                                <input id="custom-network-input" type="text" onkeyup="$('#network-password').show();"/>
+                                                <p>
+                                                    <small>
+                                                        <i class="icon-info"></i>
+                                                        {{ _('If you want to connect to a hidden Wi-fi network, write the SSID name in the input above.') }}
+                                                    </small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row-fluid">
+                                    <div class="form-inline">
+                                        <div id="network-password" class="control-group" style="display: none;">
+                                            <div class="controls">
+                                                <label>{{ _('Network password') }}: </label><br />
+                                                <input id="password-input" type="password" class="password"/>
 
-                                    <div id="network-password" class="control-group" style="display: none;">
-                                        <div class="controls">
-                                            <label>{{ _('Network password') }}: </label>
-                                            <input id="password-input" type="text"/>
+                                                <input id="showHide" type="checkbox" />
+                                                <label> {{ _('Show/hide password') }}</label>
+                                            </div>
                                         </div>
                                     </div>
                                     <br />
@@ -79,36 +107,36 @@
                                         </div>
                                     </div>
                                     <div id="alert-connect" class="row-fluid" style="display: none;">
-                                        <div class="alert alert-warning">
+                                        <div class="alert alert-info">
                                             <i class="icon-info"></i>
                                             {{ _('The device will now try to connect to the selected network for one minute.
                                             You will loose connectivity with this web page. If the connection is not successful after
                                             one minute you can access this page again using the device own wi-fi network.') }}
                                         </div>
                                     </div>
-
-
-
-                                    <hr />
-                                    <div class="alert alert-info">
-                                        <i class="icon-info"></i>
-                                        <small>{{ _('The hostname will be used to identify your device in the network.
-                                        Please choose a unique name.') }}</small>
+                                </div>
+                                <br />
+                                <hr />
+                                <br />
+                                <div class="row-fluid">
+                                    <h4>{{ _('Hostname Configuration') }}</h4>
+                                    <div id="hostname" class="control-group" >
+                                        <div class="controls">
+                                            <label>{{ _('Current hostname') }}: </label>
+                                            <input id="hostname-input" type="text" />
+                                            <div>
+                                                <i class="icon-info"></i>
+                                                <small>{{ _('The hostname will be used to identify your device in the network.
+                                                Please choose a unique name.') }}</small>
+                                            </div>
+                                        </div>
                                     </div>
+                                    <br />
                                     <div class="alert alert-warning">
                                         <i class="icon-info"></i>
                                         <small>{{ _('Please notice that changing the hostname will require rebooting your device!') }}</small>
                                     </div>
-                                    <div id="hostname" class="control-group" >
-                                        <div class="controls">
-                                            <label>{{ _('Hostname') }}: </label>
-                                            <input id="hostname-input" type="text" />
-                                        </div>
-
-                                    </div>
-                                    <br />
                                     <div id="buttons" class="control-group" >
-
                                         <div class="controls">
                                             <button id="change-hostname-button" class="btn btn-primary" onclick="saveHostname()">
                                                 {{ _('Save') }} <i class="icon-save"></i>
@@ -119,8 +147,8 @@
 
                                 <div id="alert-hostname" class="row-fluid" style="display: none;">
 
-                                    <div class="alert alert-warning">
-                                        <i class="icon-info"></i>
+                                    <div class="alert alert-info">
+                                        <i class="icon-alert"></i>
                                         {{ _('The device will now reboot. In order to access this application again use the hostname you configured. Ex: http://beewepbi.local being beewebpi the hostname.') }}
                                     </div>
                                 </div>
@@ -161,6 +189,15 @@
                 getNetworkList();
 
                 getCurrentHostname();
+
+                $("#showHide").click(function() {
+                    if ($(".password").attr("type") == "password") {
+                      $(".password").attr("type", "text");
+
+                    } else {
+                      $(".password").attr("type", "password");
+                    }
+                  });
             });
 
             function getCurrentHostname() {
@@ -187,7 +224,7 @@
                     success: function(data) {
                         $("#networks-list option").remove();
 
-                        // Appens a first empty option
+                        // Appends a first empty option
                         $("#networks-list").append($("<option></option>"));
                         $.each(data.wifi_networks, function(index, item) {
                             $("#networks-list").append($("<option></option>").text(item).val(item));
@@ -202,6 +239,12 @@
 
                 var pass = $('#password-input').val();
                 var network = $('#networks-list').val();
+
+                var custom_ssid = $('#custom-network-input').val();
+
+                if (custom_ssid !== "") {
+                    network = custom_ssid; // If the value for a hidden/custom ssid is not empty, uses it as the network name
+                }
 
                 var content = { 'network': network, 'password': pass };
 
@@ -242,7 +285,6 @@
 
                     }
                 });
-
             }
 
         </script>

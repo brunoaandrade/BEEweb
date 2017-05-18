@@ -1359,6 +1359,11 @@ td.settings_users_actions .m-icon {
     height: 37px !important;
     border: 0px none;
 }
+.controls select {
+    background-color: #e1e2e1;
+    height: 37px !important;
+    border: 0px none;
+}
 .custom-input {
     background-color: #e1e2e1 !important;
     height: 37px !important;
