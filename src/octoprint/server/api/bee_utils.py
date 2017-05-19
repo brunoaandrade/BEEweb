@@ -47,6 +47,16 @@ def connectBeePanelClient():
 	else:
 		return jsonify({"result": "Error: could not signal beepanel connection"})
 
+@api.route("/printer/serial", methods=["GET"])
+def printerSerialNumber():
+	if printer is not None:
+		if not printer.is_operational():
+			return make_response("Printer is not operational", 409)
+
+		return jsonify({ "serial": printer.get_printer_serial()})
+	else:
+		return make_response("Printer is not operational", 409)
+
 @api.route("/wifi/list", methods=["GET"])
 def getAvailableHotspots():
 

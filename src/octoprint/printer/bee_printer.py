@@ -694,13 +694,13 @@ class BeePrinter(Printer):
         printer_name = self.getPrinterName()
         if printer_name:
             printer_name = self.getPrinterName().replace(' ', '').lower()
-			#printers with older bootloader
+            #printers with older bootloader
             if printer_name == 'beethefirst-bootloader':
-				return "beethefirst"
+                return "beethefirst"
             #prototype printer beethefirst+A
             elif printer_name == 'beethefirstplusa':
                 return "beethefirstplus"
-			# prototype printer beeinschoolA
+            # prototype printer beeinschoolA
             elif printer_name == 'beeinschoola':
                 return "beeinschool"
             return printer_name
@@ -794,6 +794,16 @@ class BeePrinter(Printer):
                 return 'Not available'
         else:
             return 'Not available'
+
+
+    def get_printer_serial(self):
+        """
+         Returns a human readable string corresponding to name of the connected printer.
+        """
+        if self._comm is None:
+            return ""
+        else:
+            return self._comm.getConnectedPrinterSN()
 
 
     def printFromMemory(self):
@@ -1138,7 +1148,7 @@ class BeePrinter(Printer):
 
             if os.path.exists(biExePath) and os.path.isfile(biExePath):
 
-                printerSN = self._comm.getConnectedPrinterSN()
+                printerSN = self.get_printer_serial()
 
                 if printerSN is None:
                     _logger.error("Could not get Printer Serial Number for statistics communication.")
