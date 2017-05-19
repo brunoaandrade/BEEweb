@@ -693,7 +693,17 @@ class BeePrinter(Printer):
         """
         printer_name = self.getPrinterName()
         if printer_name:
-            return self.getPrinterName().replace(' ', '').lower()
+            printer_name = self.getPrinterName().replace(' ', '').lower()
+			#printers with older bootloader
+            if printer_name == 'beethefirst-bootloader':
+				return "beethefirst"
+            #prototype printer beethefirst+A
+            elif printer_name == 'beethefirstplusa':
+                return "beethefirstplus"
+			# prototype printer beeinschoolA
+            elif printer_name == 'beeinschoola':
+                return "beeinschool"
+            return printer_name
 
         return None
 
