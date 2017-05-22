@@ -4,9 +4,11 @@ $(function() {
 
         self.loginState = parameters[0];
         self.printerProfiles = parameters[1];
+        self.printerState = parameters[2];
 
         self.file = ko.observable(undefined);
         self.target = undefined;
+        self.path = undefined;
         self.data = undefined;
 
         self.defaultSlicer = undefined;
@@ -35,6 +37,10 @@ $(function() {
         self.workbenchFile = false; // Signals if the slice dialog was called upon a workbench scene
 
         self.sliceButtonControl = ko.observable(true);
+
+        self.slicerSameDevice = ko.observable();
+
+        self.allViewModels = undefined;
 
         self.slicersForFile = function(file) {
             if (file === undefined) {
@@ -84,6 +90,19 @@ $(function() {
             self.profile(undefined);
         };
 
+        self.metadataForSlicer = function(key) {
+            if (key == undefined || !self.data.hasOwnProperty(key)) {
+                return;
+            }
+
+            var slicer = self.data[key];
+            self.slicerSameDevice(slicer.sameDevice);
+        };
+
+        self.resetMetadata = function() {
+            self.slicerSameDevice(true);
+        };
+
         self.configuredSlicers = ko.pureComputed(function() {
             return _.filter(self.slicers(), function(slicer) {
                 return slicer.configured;
@@ -121,18 +140,23 @@ $(function() {
         ];
         self.afterSlicing = ko.observable("none");
 
-        self.show = function(target, file, force, workbench) {
+        self.show = function(target, file, force, workbench, path) {
             if (!self.enableSlicingDialog() && !force) {
                 return;
             }
-            self.requestData(function() {
+
+            var filename = file.substr(0, file.lastIndexOf("."));
+            if (filename.lastIndexOf("/") != 0) {
+                path = path || filename.substr(0, filename.lastIndexOf("/"));
+                filename = filename.substr(filename.lastIndexOf("/") + 1);
+            }            self.requestData(function() {
                 self._nozzleFilamentUpdate();
-                self.target = target;
-                self.file(file);
-                self.title(_.sprintf(gettext("Slicing %(filename)s"), {filename: self.file()}));
-                self.destinationFilename(self.file().substr(0, self.file().lastIndexOf(".")));
-                self.printerProfile(self.printerProfiles.currentProfile());
-                self.afterSlicing("print");
+            self.target = target;
+            self.file(file);
+            self.path = path;self.title(_.sprintf(gettext("Slicing %(filename)s"), {filename: filename}));
+            self.destinationFilename(filename);
+            self.printerProfile(self.printerProfiles.currentProfile());
+            self.afterSlicing("print");
 
                 $("#slicing_configuration_dialog").modal("show");
 
@@ -144,8 +168,10 @@ $(function() {
         self.slicer.subscribe(function(newValue) {
             if (newValue === undefined) {
                 self.resetProfiles();
+                self.resetMetadata();
             } else {
                 self.profilesForSlicer(newValue);
+                self.metadataForSlicer(newValue);
             }
         });
 
@@ -162,21 +188,27 @@ $(function() {
                 && self.destinationFilename().trim() != ""
                 && self.slicer() != undefined
                 && self.sliceButtonControl();
-                //&& self.profile() != undefined;
+                //&& self.profile() != undefined
+                && (!(self.printerState.isPrinting() || self.printerState.isPaused()) || !self.slicerSameDevice());
         });
 
-        self.requestData = function(callback) {
-            $.ajax({
-                url: API_BASEURL + "slicing",
-                type: "GET",
-                dataType: "json",
-                success: function(data) {
-                    self.fromResponse(data);
-                    if (callback !== undefined) {
-                        callback();
-                    }
+        self.sliceButtonTooltip = ko.pureComputed(function() {
+            if (!self.enableSliceButton()) {
+                if ((self.printerState.isPrinting() || self.printerState.isPaused()) && self.slicerSameDevice()) {
+                    return gettext("Cannot slice on the same device while printing");
+                } else {
+                    return gettext("Cannot slice, not all parameters specified");
                 }
-            });
+            } else {
+                return gettext("Start the slicing process");
+            }
+        });
+
+        self.requestData = function() {
+            return OctoPrint.slicing.listAllSlicersAndProfiles()
+                .done(function(data) {
+                    self.fromResponse(data);
+                });
         };
 
         self.destinationExtension = ko.pureComputed(function() {
@@ -261,12 +293,17 @@ $(function() {
                     name: name,
                     configured: slicer.configured,
                     sourceExtensions: slicer.extensions.source,
-                    destinationExtensions: slicer.extensions.destination
+                    destinationExtensions: slicer.extensions.destination,
+                    sameDevice: slicer.sameDevice
                 };
                 self.slicers.push(props);
             });
 
             self.defaultSlicer = selectedSlicer;
+
+            if (self.allViewModels) {
+                callViewModels(self.allViewModels, "onSlicingData", [data]);
+            }
         };
 
         self.profilesForSlicer = function(key) {
@@ -337,6 +374,9 @@ $(function() {
         };
 
         self.slice = function(modelToRemoveAfterSlice) {
+            if (!self.enableSliceButton()) {
+                return;
+            }
 
             // Selects the slicing profile based on the color and resolution
             if (self.selColor() != null && self.selResolution() != null) {
@@ -369,12 +409,15 @@ $(function() {
             }
 
             var data = {
-                command: "slice",
                 slicer: self.slicer(),
                 profile: self.profile(),
                 printerProfile: self.printerProfile(),
                 destination: destinationFilename
             };
+
+            if (self.path != undefined) {
+                data["path"] = self.path;
+            }
 
             if (self.afterSlicing() == "print") {
                 data["print"] = true;
@@ -422,23 +465,10 @@ $(function() {
                 data['profile.support'] = 'none';
             }
 
-            $.ajax({
-                url: API_BASEURL + "files/" + self.target + "/" + self.file(),
-                type: "POST",
-                dataType: "json",
-                contentType: "application/json; charset=UTF-8",
-                data: JSON.stringify(data),
-                success: function ( response ) {
-
+            OctoPrint.files.slice(self.target, self.file(), data)
+                .done(function() {
                     self.sliceButtonControl(true);
-                },
-                error: function ( response ) {
-                    html = _.sprintf(gettext("Could not slice the selected file. Please make sure your printer is connected."));
-                    new PNotify({title: gettext("Slicing failed"), text: html, type: "error", hide: false});
-
-                    self.sliceButtonControl(true);
-                }
-            });
+                });
 
             $("#slicing_configuration_dialog").modal("hide");
 
@@ -454,11 +484,15 @@ $(function() {
         self.onEventSettingsUpdated = function(payload) {
             self.requestData();
         };
+
+        self.onAllBound = function(allViewModels) {
+            self.allViewModels = allViewModels;
+        };
     }
 
     OCTOPRINT_VIEWMODELS.push([
         SlicingViewModel,
-        ["loginStateViewModel", "printerProfilesViewModel"],
+        ["loginStateViewModel", "printerProfilesViewModel", "printerStateViewModel"],
         "#slicing_configuration_dialog"
     ]);
 });
