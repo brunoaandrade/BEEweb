@@ -187,7 +187,7 @@ $(function() {
             return self.destinationFilename() != undefined
                 && self.destinationFilename().trim() != ""
                 && self.slicer() != undefined
-                && self.sliceButtonControl();
+                && self.sliceButtonControl()
                 //&& self.profile() != undefined
                 && (!(self.printerState.isPrinting() || self.printerState.isPaused()) || !self.slicerSameDevice());
         });

@@ -307,11 +307,13 @@ class SoftwareUpdatePlugin(octoprint.plugin.BlueprintPlugin,
 						"stable_branch": dict(branch="master", name="Stable"),
 						"prerelease_branches": [dict(branch="develop", name="Devel RCs")]
 					},},
-			"pip_command": None,
-			"check_providers": {},
+				"pip_command": None,
+				"check_providers": {},
 
-			"cache_ttl": 24 * 60,
-"notify_users": True		}return default_settings
+				"cache_ttl": 24 * 60,
+				"notify_users": True
+			}
+		return default_settings
 
 	def on_settings_load(self):
 		data = dict(octoprint.plugin.SettingsPlugin.on_settings_load(self))

@@ -241,7 +241,7 @@ class Server(object):
 			except:
 				self._logger.exception("Error while creating printer instance from factory {}".format(name))
 		else:
-			printer = Printer(fileManager, analysisQueue, printerProfileManager)
+			printer = BeePrinter(fileManager, analysisQueue, printerProfileManager)
 		components.update(dict(printer=printer))
 
 		def octoprint_plugin_inject_factory(name, implementation):
