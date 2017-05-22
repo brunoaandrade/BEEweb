@@ -281,7 +281,7 @@ class PrinterProfileManager(object):
 		profile = dict_merge(self.__class__.default, profile)
 
 		if identifier == "_default":
-			default_profile = dict_merge(self._load_default(), profile)
+			default_profile = dict_merge(self.get_default(), profile)
 			if not self._ensure_valid_profile(default_profile):
 				raise InvalidProfileError()
 

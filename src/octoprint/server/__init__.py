@@ -414,8 +414,8 @@ class Server(object):
 			(r"/online.txt", util.tornado.StaticDataHandler, dict(data="online\n")),
 			(r"/online.gif", util.tornado.StaticDataHandler, dict(data=bytes(base64.b64decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")),
 			                                                      content_type="image/gif")),
-			(r"/stl/([^/]*\.stl)", util.tornado.LargeResponseHandler, dict(path=os.path.join(s.getBaseFolder("stls")))),
-			(r"/firmware/([^/]*\.BIN)", util.tornado.LargeResponseHandler, dict(path=os.path.join(s.getBaseFolder("firmware"))))
+			(r"/stl/([^/]*\.stl)", util.tornado.LargeResponseHandler, dict(path=os.path.join(self._settings.getBaseFolder("stls")))),
+			(r"/firmware/([^/]*\.BIN)", util.tornado.LargeResponseHandler, dict(path=os.path.join(self._settings.getBaseFolder("firmware"))))
 		]
 
 		# fetch additional routes from plugins
@@ -486,7 +486,7 @@ class Server(object):
 		#	if port in connectionOptions["ports"]:
 		#		printer.connect(port=port, baudrate=baudrate, profile=printer_profile["id"] if "id" in printer_profile else "_default")
 
-		if s.getBoolean(["usb", "autoconnect"]):
+		if self._settings.getBoolean(["usb", "autoconnect"]):
 			printer_profile = printerProfileManager.get_default()
 			connectionOptions = printer.__class__.get_connection_options()
 			printer.connect()
