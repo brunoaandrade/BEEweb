@@ -88,7 +88,6 @@ class BeePrinter(Printer):
                     return False
 
             self._comm = BeeCom(callbackObject=self, printerProfileManager=self._printerProfileManager)
-            self._comm.confirmConnection()
 
             # returns in case the connection with the printer was not established
             if self._comm is None:
@@ -109,6 +108,9 @@ class BeePrinter(Printer):
             if printer_name is not None:
                 printer_id = printer_name.lower().replace(' ', '')
             self._printerProfileManager.select(printer_id)
+
+            # Updates the printer connection state
+            self._comm.confirmConnection()
 
             # if the printer is printing or in shutdown mode selects the last selected file for print
             # and starts the progress monitor
