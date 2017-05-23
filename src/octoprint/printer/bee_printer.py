@@ -175,7 +175,7 @@ class BeePrinter(Printer):
             return
 
         # special case where we want to recover the file information after a disconnect/connect during a print job
-        if path is None:
+        if path is None or not os.path.exists(path) or not os.path.isfile(path):
             self._comm._currentFile = PrintingFileInformation('shutdown_recover_file')
             return # In case the server was restarted during connection break-up and path variable is passed empty from the connect method
 
