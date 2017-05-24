@@ -11,7 +11,7 @@ $(function() {
         self.isErrorOrClosed = ko.observable(undefined);
         self.isOperational = ko.observable(undefined);
         self.isPrinting = ko.observable(undefined);
-        self.isTransfering = ko.observable(undefined);
+        self.isTransferring = ko.observable(undefined);
         self.isHeating = ko.observable(undefined);
         self.isPaused = ko.observable(undefined);
         self.isError = ko.observable(undefined);
@@ -262,15 +262,15 @@ $(function() {
             if (self.isPrinting()){
                 return _.sprintf("%d%%", self.progressString());
             }
-            if (self.isTransfering()){
+            if (self.isTransferring()){
                 //is transfring file
                 transferTime= 5 + self.fileSizeBytes() / 85000;
-                transfereTimeLeft=transferTime-self.progressString()*transferTime/100;
-                if(transfereTimeLeft<1)
+                transferTimeLeft=transferTime-self.progressString()*transferTime/100;
+                if(transferTimeLeft<1)
                     return _.sprintf("Just a few seconds");
-                if(transfereTimeLeft<60)
-                    return _.sprintf("%d seconds", transfereTimeLeft);
-                return _.sprintf("%d minutes %d seconds", transfereTimeLeft,(transfereTimeLeft%60)*60);
+                if(transferTimeLeft<60)
+                    return _.sprintf("%d seconds", transferTimeLeft);
+                return _.sprintf("%d minutes %d seconds", transferTimeLeft/60,(transferTimeLeft%60));
             }
             return _.sprintf("%dº / 200º", self.progressString()*200/100);
         });
@@ -357,7 +357,7 @@ $(function() {
             self.isPrinting(data.flags.printing);
             self.isError(data.flags.error);
             self.isReady(data.flags.ready);
-            self.isTransfering(data.flags.transfering);
+            self.isTransferring(data.flags.transfering);
             self.isSdReady(data.flags.sdReady);
             self.isHeating(data.flags.heating);
             self.isShutdown(data.flags.shutdown);
