@@ -574,7 +574,7 @@ $(function() {
         });
 
         // reload overlay
-        $("#reloadui_overlay_reload").click(function() { reloadPage(); });
+        $("#reloadui_overlay_reload").click(function() { location.reload(true); });
 
         //~~ view model binding
 
@@ -718,12 +718,12 @@ $(function() {
                     dataType: "json",
                     contentType: "application/json; charset=UTF-8",
                     success: function(data) {
-                        location.reload();
+                        location.reload(true);
                     },
                     error: function(resp) {
                         alert("Could not clear cache files. Please click the option 'Clear App Data' in the Edit menu.");
 
-                        location.reload();
+                        location.reload(true);
                     }
                 });
         }
