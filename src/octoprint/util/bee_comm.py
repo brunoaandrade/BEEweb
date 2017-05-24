@@ -280,6 +280,9 @@ class BeeCom(MachineCom):
     def isResuming(self):
         return self._state == self.STATE_RESUMING
 
+    def isTransferring(self):
+        return self._state == self.STATE_PREPARING_PRINT
+
     def getStateString(self):
         """
         Returns the current printer state

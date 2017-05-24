@@ -11,6 +11,7 @@ $(function() {
         self.isErrorOrClosed = ko.observable(undefined);
         self.isOperational = ko.observable(undefined);
         self.isPrinting = ko.observable(undefined);
+        self.isTransferring = ko.observable(undefined);
         self.isHeating = ko.observable(undefined);
         self.isPaused = ko.observable(undefined);
         self.isError = ko.observable(undefined);
@@ -142,6 +143,7 @@ $(function() {
         self.filepos = ko.observable(undefined);
         self.printTime = ko.observable(undefined);
         self.printTimeLeft = ko.observable(undefined);
+        self.fileSizeBytes = ko.observable(undefined);
         self.printTimeLeftOrigin = ko.observable(undefined);
         self.sd = ko.observable(undefined);
         self.timelapse = ko.observable(undefined);
@@ -257,7 +259,20 @@ $(function() {
             if (!self.progress()) {
                 return "";
             }
-            return _.sprintf("%d%%", self.progressString());
+            if (self.isPrinting()){
+                return _.sprintf("%d%%", self.progressString());
+            }
+            if (self.isTransferring()){
+                //is transferring file
+                transferTime= 5 + self.fileSizeBytes() / 85000;
+                transferTimeLeft=transferTime-self.progressString()*transferTime/100;
+                if(transferTimeLeft<1)
+                    return _.sprintf("Just a few seconds  ( %d%% )", self.progressString());
+                if(transferTimeLeft<60)
+                    return _.sprintf("%d seconds  ( %d%% )", transferTimeLeft, self.progressString());
+                return _.sprintf("%d minutes %d seconds  ( %d%% )", transferTimeLeft/60,(transferTimeLeft%60), self.progressString());
+            }
+            return _.sprintf("%dº / 200º  ", self.progressString()*200/100);
         });
         self.pauseString = ko.pureComputed(function() {
             if (self.isPaused())
@@ -342,6 +357,7 @@ $(function() {
             self.isPrinting(data.flags.printing);
             self.isError(data.flags.error);
             self.isReady(data.flags.ready);
+            self.isTransferring(data.flags.transfering);
             self.isSdReady(data.flags.sdReady);
             self.isHeating(data.flags.heating);
             self.isShutdown(data.flags.shutdown);
@@ -444,6 +460,7 @@ $(function() {
             self.filepos(data.filepos);
             self.printTime(data.printTime);
             self.printTimeLeft(data.printTimeLeft);
+            self.fileSizeBytes(data.fileSizeBytes);
             self.printTimeLeftOrigin(data.printTimeLeftOrigin);
         };
 
