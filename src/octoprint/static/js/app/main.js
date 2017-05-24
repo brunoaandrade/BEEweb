@@ -574,7 +574,18 @@ $(function() {
         });
 
         // reload overlay
-        $("#reloadui_overlay_reload").click(function() { location.reload(true); });
+        $("#reloadui_overlay_reload").click(function() {
+            $.ajax({
+                url: window.location.href,
+                headers: {
+                    "Pragma": "no-cache",
+                    "Expires": -1,
+                    "Cache-Control": "no-cache"
+                }
+            }).done(function () {
+                window.location.reload(true);
+            });
+        });
 
         //~~ view model binding
 
