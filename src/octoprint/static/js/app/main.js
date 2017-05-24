@@ -577,6 +577,7 @@ $(function() {
         $("#reloadui_overlay_reload").click(function() {
             $.ajax({
                 url: window.location.href,
+                method: "GET",
                 headers: {
                     "Pragma": "no-cache",
                     "Expires": -1,
@@ -718,26 +719,6 @@ $(function() {
         $('#slicing_configuration_dialog .form-horizontal .control-label').on('click', function(){
             $(this).toggleClass('closed');
         });
-
-        /**
-         * Special reload function used for the desktop client apps, to force the removal of nativefier cache files
-         */
-        // function reloadPage() {
-        //     $.ajax({
-        //         url: BEE_CUSTOM_API_BASEURL + "cache/clear",
-        //             type: "DELETE",
-        //             dataType: "json",
-        //             contentType: "application/json; charset=UTF-8",
-        //             success: function(data) {
-        //                 location.reload(true);
-        //             },
-        //             error: function(resp) {
-        //                 alert("Could not clear cache files. Please click the option 'Clear App Data' in the Edit menu.");
-        //
-        //                 location.reload(true);
-        //             }
-        //         });
-        // }
     }
 );
 
