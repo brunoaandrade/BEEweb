@@ -263,7 +263,7 @@ $(function() {
                 return _.sprintf("%d%%", self.progressString());
             }
             if (self.isTransferring()){
-                //is transfring file
+                //is transferring file
                 transferTime= 5 + self.fileSizeBytes() / 85000;
                 transferTimeLeft=transferTime-self.progressString()*transferTime/100;
                 if(transferTimeLeft<1)
