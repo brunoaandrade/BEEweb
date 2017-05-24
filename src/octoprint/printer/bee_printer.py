@@ -1100,7 +1100,7 @@ class BeePrinter(Printer):
             "filepos": filepos,
             "printTime": int(self._elapsedTime * 60) if self._elapsedTime is not None else None,
             "printTimeLeft": int(self._printTimeLeft) if self._printTimeLeft is not None else None,
-			"fileSizeBytes": int ( self._selectedFile['filesize'])
+			"fileSizeBytes": int ( self._selectedFile['filesize']) if self._selectedFile['filesize'] is not None else None
         })
 
         if completion:
