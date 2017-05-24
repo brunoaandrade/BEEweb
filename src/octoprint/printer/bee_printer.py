@@ -754,6 +754,8 @@ class BeePrinter(Printer):
     def is_preparing_print(self):
         return self._comm is not None and self._comm.isPreparingPrint()
 
+    def is_transferring(self):
+        return self._comm is not None and self._comm.isTransferring()
 
     def is_heating(self):
         return self._comm is not None and (self._comm.isHeating() or self._comm.isPreparingPrint())
@@ -1128,7 +1130,7 @@ class BeePrinter(Printer):
             "error": self.is_error(),
             "paused": self.is_paused(),
             "ready": self.is_ready(),
-			"transfering": self.get_state_string()=="Preparing...",
+			"transfering":  self.is_transferring(),
             "sdReady": self.is_sd_ready(),
             "heating": self.is_heating(),
             "shutdown": self.is_shutdown(),
