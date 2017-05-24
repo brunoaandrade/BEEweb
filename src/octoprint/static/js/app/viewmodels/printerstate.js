@@ -267,12 +267,12 @@ $(function() {
                 transferTime= 5 + self.fileSizeBytes() / 85000;
                 transferTimeLeft=transferTime-self.progressString()*transferTime/100;
                 if(transferTimeLeft<1)
-                    return _.sprintf("Just a few seconds");
+                    return _.sprintf("Just a few seconds  ( %d%% )", self.progressString());
                 if(transferTimeLeft<60)
-                    return _.sprintf("%d seconds", transferTimeLeft);
-                return _.sprintf("%d minutes %d seconds", transferTimeLeft/60,(transferTimeLeft%60));
+                    return _.sprintf("%d seconds  ( %d%% )", transferTimeLeft, self.progressString());
+                return _.sprintf("%d minutes %d seconds  ( %d%% )", transferTimeLeft/60,(transferTimeLeft%60), self.progressString());
             }
-            return _.sprintf("%dº / 200º", self.progressString()*200/100);
+            return _.sprintf("%dº / 200º  ", self.progressString()*200/100);
         });
         self.pauseString = ko.pureComputed(function() {
             if (self.isPaused())
