@@ -1097,7 +1097,8 @@ class BeePrinter(Printer):
             "completion": self._progress * 100 if self._progress is not None else None,
             "filepos": filepos,
             "printTime": int(self._elapsedTime * 60) if self._elapsedTime is not None else None,
-            "printTimeLeft": int(self._printTimeLeft) if self._printTimeLeft is not None else None
+            "printTimeLeft": int(self._printTimeLeft) if self._printTimeLeft is not None else None,
+			"fileSizeBytes": int ( self._selectedFile['filesize'])
         })
 
         if completion:
@@ -1127,6 +1128,7 @@ class BeePrinter(Printer):
             "error": self.is_error(),
             "paused": self.is_paused(),
             "ready": self.is_ready(),
+			"transfering": self.get_state_string()=="Preparing...",
             "sdReady": self.is_sd_ready(),
             "heating": self.is_heating(),
             "shutdown": self.is_shutdown(),
