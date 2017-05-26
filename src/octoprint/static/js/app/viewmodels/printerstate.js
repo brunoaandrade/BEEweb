@@ -124,7 +124,7 @@ $(function() {
         };
 
         self.printFromMemory = function() {
-
+            $('#printFromMemoryDiv').addClass('hidden');
             $.ajax({
                 url: BEE_CUSTOM_API_BASEURL + "print_from_memory",
                 type: "POST",
@@ -133,6 +133,9 @@ $(function() {
                 success: function(response) {
                     $('#printFromMemoryDiv').addClass('hidden');
                     $('#preparePrint').removeClass('hidden');
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    $('#printFromMemoryDiv').removeClass('hidden');
                 }
             });
         };
