@@ -532,6 +532,14 @@ class BeePrinter(Printer):
         except Exception as ex:
             self._logger.error(ex)
 
+    def getNozzleTypes(self):
+        """
+        Gets the list of nozzles available for the printer connected
+        :return: 
+        """
+        if (self.getPrinterNameNormalized()== "beethefirst"):
+            return {'nz1': {'id': 'NZ400', 'value': 0.4}}
+        return settings().get(["nozzleTypes"])
 
     def getNozzleTypeString(self):
         """
