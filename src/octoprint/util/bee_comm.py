@@ -291,7 +291,7 @@ class BeeCom(MachineCom):
         if self._state == self.STATE_CLOSED:
             return "Disconnected"
         elif self._state == self.STATE_PREPARING_PRINT:
-            return "Preparing..."
+            return "Transferring"
         elif self._state == self.STATE_HEATING:
             return "Heating"
         elif self._state == self.STATE_SHUTDOWN:
