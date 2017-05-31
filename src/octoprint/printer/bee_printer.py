@@ -174,7 +174,7 @@ class BeePrinter(Printer):
             self._logger.info("Cannot load file: printer not connected or currently busy")
             return
 
-        if isinstance(path, PrintingFileInformation):
+        if path is not None and isinstance(path, PrintingFileInformation):
             self._comm._currentFile = path
             return
 

@@ -233,7 +233,7 @@ $(function() {
                 }
             });
         };
-        self.enableHightResolution = ko.pureComputed(function() {
+        self.enableHighPlusResolution = ko.pureComputed(function() {
             return self.selNozzle() != "0.6";
         });
         self.forPrint = function() {
